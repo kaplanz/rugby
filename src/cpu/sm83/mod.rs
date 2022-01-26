@@ -43,16 +43,16 @@ impl Cpu {
             self.prefixed = false;
             Instruction::prefixed(opcode)
         };
-        info!("{:#06x}: {inst}", self.regs.pc.get().wrapping_sub(1));
+        info!("{:#06x}: {inst}", self.regs.pc.wrapping_sub(1));
         // Execute the instruction
         inst.exec(self);
         debug!("Registers:\n{}", self.regs);
     }
 
     fn fetchbyte(&mut self) -> u8 {
-        let pc = self.regs.pc.get();
-        let byte = self.bus.read(pc as usize);
-        self.regs.pc.set(pc.wrapping_add(1));
+        let pc = &mut *self.regs.pc;
+        let byte = self.bus.read(*pc as usize);
+        *self.regs.pc = pc.wrapping_add(1);
         byte
     }
 
@@ -67,36 +67,32 @@ impl Cpu {
     }
 
     fn fetchword(&mut self) -> u16 {
+        let pc = &mut *self.regs.pc;
         let mut word = 0u16;
-        let pc = self.regs.pc.get();
-        word |= self.bus.read(pc as usize) as u16;
-        self.regs.pc.set(pc.wrapping_add(1));
-        let pc = self.regs.pc.get();
-        word |= (self.bus.read(pc as usize) as u16) << 8;
-        self.regs.pc.set(pc.wrapping_add(1));
+        word |= self.bus.read(*pc as usize) as u16;
+        *pc = pc.wrapping_add(1);
+        word |= (self.bus.read(*pc as usize) as u16) << 8;
+        *pc = pc.wrapping_add(1);
         word
     }
 
     fn popword(&mut self) -> u16 {
+        let sp = &mut *self.regs.sp;
         let mut word = 0u16;
-        let sp = self.regs.sp.get();
-        word |= self.bus.read(sp as usize) as u16;
-        self.regs.sp.set(sp.wrapping_add(1));
-        let sp = self.regs.sp.get();
-        word |= (self.bus.read(sp as usize) as u16) << 8;
-        self.regs.sp.set(sp.wrapping_add(1));
+        word |= self.bus.read(*sp as usize) as u16;
+        *sp = sp.wrapping_add(1);
+        word |= (self.bus.read(*sp as usize) as u16) << 8;
+        *sp = sp.wrapping_add(1);
         word
     }
 
     fn pushword(&mut self, word: u16) {
+        let sp = &mut *self.regs.sp;
         let word = word.to_le_bytes();
-        let sp = self.regs.sp.get();
-        self.regs.sp.set(sp.wrapping_sub(1));
-        let sp = self.regs.sp.get();
-        self.bus.write(sp as usize, word[1]);
-        self.regs.sp.set(sp.wrapping_sub(1));
-        let sp = self.regs.sp.get();
-        self.bus.write(sp as usize, word[0]);
+        *sp = sp.wrapping_sub(1);
+        self.bus.write(*sp as usize, word[1]);
+        *sp = sp.wrapping_sub(1);
+        self.bus.write(*sp as usize, word[0]);
     }
 }
 
@@ -114,20 +110,20 @@ impl Default for Cpu {
 
 #[derive(Debug)]
 struct Registers {
-    a: Register<1>,
-    f: Register<1>,
+    a: Register<u8>,
+    f: Register<u8>,
     af: PseudoRegister,
-    b: Register<1>,
-    c: Register<1>,
+    b: Register<u8>,
+    c: Register<u8>,
     bc: PseudoRegister,
-    d: Register<1>,
-    e: Register<1>,
+    d: Register<u8>,
+    e: Register<u8>,
     de: PseudoRegister,
-    h: Register<1>,
-    l: Register<1>,
+    h: Register<u8>,
+    l: Register<u8>,
     hl: PseudoRegister,
-    sp: Register<2>,
-    pc: Register<2>,
+    sp: Register<u16>,
+    pc: Register<u16>,
 }
 
 impl Default for Registers {
@@ -137,52 +133,52 @@ impl Default for Registers {
             f: Default::default(),
             af: PseudoRegister {
                 get: |regs: &Registers| {
-                    let a = regs.a.get() as u16;
-                    let f = regs.f.get() as u16;
+                    let a = *regs.a as u16;
+                    let f = *regs.f as u16;
                     (a << 8) | f
                 },
                 set: |regs: &mut Registers, af: u16| {
-                    regs.a.set(((af & 0xff00) >> 8) as u8);
-                    regs.f.set((af & 0x00ff) as u8);
+                    *regs.a = ((af & 0xff00) >> 8) as u8;
+                    *regs.f = (af & 0x00ff) as u8;
                 },
             },
             b: Default::default(),
             c: Default::default(),
             bc: PseudoRegister {
                 get: |regs: &Registers| {
-                    let b = regs.b.get() as u16;
-                    let c = regs.c.get() as u16;
+                    let b = *regs.b as u16;
+                    let c = *regs.c as u16;
                     (b << 8) | c
                 },
                 set: |regs: &mut Registers, bc: u16| {
-                    regs.b.set(((bc & 0xff00) >> 8) as u8);
-                    regs.c.set((bc & 0x00ff) as u8);
+                    *regs.b = ((bc & 0xff00) >> 8) as u8;
+                    *regs.c = (bc & 0x00ff) as u8;
                 },
             },
             d: Default::default(),
             e: Default::default(),
             de: PseudoRegister {
                 get: |regs: &Registers| {
-                    let d = regs.d.get() as u16;
-                    let e = regs.e.get() as u16;
+                    let d = *regs.d as u16;
+                    let e = *regs.e as u16;
                     (d << 8) | e
                 },
                 set: |regs: &mut Registers, de: u16| {
-                    regs.d.set(((de & 0xff00) >> 8) as u8);
-                    regs.e.set((de & 0x00ff) as u8);
+                    *regs.d = ((de & 0xff00) >> 8) as u8;
+                    *regs.e = (de & 0x00ff) as u8;
                 },
             },
             h: Default::default(),
             l: Default::default(),
             hl: PseudoRegister {
                 get: |regs: &Registers| {
-                    let h = regs.h.get() as u16;
-                    let l = regs.l.get() as u16;
+                    let h = *regs.h as u16;
+                    let l = *regs.l as u16;
                     (h << 8) | l
                 },
                 set: |regs: &mut Registers, hl: u16| {
-                    regs.h.set(((hl & 0xff00) >> 8) as u8);
-                    regs.l.set((hl & 0x00ff) as u8);
+                    *regs.h = ((hl & 0xff00) >> 8) as u8;
+                    *regs.l = (hl & 0x00ff) as u8;
                 },
             },
             sp: Default::default(),
@@ -194,17 +190,17 @@ impl Default for Registers {
 impl Display for Registers {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "┌───┬────┬───┬────┐")?;
-        writeln!(f, "│ A │ {:02x} │ F │ {:02x} │", self.a.get(), self.f.get())?;
+        writeln!(f, "│ A │ {:02x} │ F │ {:02x} │", *self.a, *self.f)?;
         writeln!(f, "├───┼────┼───┼────┤")?;
-        writeln!(f, "│ B │ {:02x} │ C │ {:02x} │", self.b.get(), self.c.get())?;
+        writeln!(f, "│ B │ {:02x} │ C │ {:02x} │", *self.b, *self.c)?;
         writeln!(f, "├───┼────┼───┼────┤")?;
-        writeln!(f, "│ D │ {:02x} │ E │ {:02x} │", self.d.get(), self.e.get())?;
+        writeln!(f, "│ D │ {:02x} │ E │ {:02x} │", *self.d, *self.e)?;
         writeln!(f, "├───┼────┼───┼────┤")?;
-        writeln!(f, "│ H │ {:02x} │ L │ {:02x} │", self.h.get(), self.l.get())?;
+        writeln!(f, "│ H │ {:02x} │ L │ {:02x} │", *self.h, *self.l)?;
         writeln!(f, "├───┴────┼───┴────┤")?;
-        writeln!(f, "│   SP   │  {:04x}  │", self.sp.get())?;
+        writeln!(f, "│   SP   │  {:04x}  │", *self.sp)?;
         writeln!(f, "├────────┼────────┤")?;
-        writeln!(f, "│   PC   │  {:04x}  │", self.pc.get())?;
+        writeln!(f, "│   PC   │  {:04x}  │", *self.pc)?;
         write!(f, "└────────┴────────┘")
     }
 }
