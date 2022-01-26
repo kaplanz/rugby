@@ -35,40 +35,41 @@ impl Display for Instruction {
 impl Instruction {
     fn adc(&self, cpu: &mut Cpu) {
         // Execute adc
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0x88..=0x8f => helpers::get_op8(cpu, self.opcode & 0x07),
             0xce => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let cin = Flag::C.get(&cpu.regs.f[0]) as u8;
-        let (res, carry0) = acc.overflowing_add(op2);
+        let cin = Flag::C.get(&*cpu.regs.f) as u8;
+        let (res, carry0) = cpu.regs.a.overflowing_add(op2);
         let (res, carry1) = res.overflowing_add(cin);
-        cpu.regs.a.set(res);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, (res & 0x0f) > (acc & 0x0f) + (op2 & 0x0f) + (cin & 0x0f));
-        Flag::C.set(f, carry0 | carry1);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(
+            flags,
+            (res & 0x0f) > (*cpu.regs.a & 0x0f) + (op2 & 0x0f) + (cin & 0x0f),
+        );
+        Flag::C.set(flags, carry0 | carry1);
     }
 
     fn add8(&self, cpu: &mut Cpu) {
         // Execute add8
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0x80..=0x87 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xc6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let (res, carry) = acc.overflowing_add(op2);
-        cpu.regs.a.set(res);
+        let (res, carry) = cpu.regs.a.overflowing_add(op2);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, (res & 0x0f) > (acc & 0x0f) + (op2 & 0x0f));
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, (res & 0x0f) > (*cpu.regs.a & 0x0f) + (op2 & 0x0f));
+        Flag::C.set(flags, carry);
     }
 
     fn add16(&self, cpu: &mut Cpu) {
@@ -79,34 +80,33 @@ impl Instruction {
             0x09 => cpu.regs.bc.get(&cpu.regs),
             0x19 => cpu.regs.de.get(&cpu.regs),
             0x29 => cpu.regs.hl.get(&cpu.regs),
-            0x39 => cpu.regs.sp.get(),
+            0x39 => *cpu.regs.sp,
             _ => panic!("Illegal instruction."),
         };
         let (res, carry) = op1.overflowing_add(op2);
         hl.set(&mut cpu.regs, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::N.set(f, false);
-        Flag::H.set(f, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
+        Flag::C.set(flags, carry);
     }
 
     fn and8(&self, cpu: &mut Cpu) {
         // Execute and8
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0xa0..=0xa0 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xe6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let res = acc.bitand(op2);
-        cpu.regs.a.set(res);
+        let res = cpu.regs.a.bitand(op2);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, true);
-        Flag::C.set(f, false);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, true);
+        Flag::C.set(flags, false);
     }
 
     fn bit(&self, cpu: &mut Cpu) {
@@ -115,76 +115,74 @@ impl Instruction {
         let op2 = helpers::get_op8(cpu, self.opcode & 0x07);
         let res = (0b1 << op1) & op2;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, true);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, true);
     }
 
     fn call(&self, cpu: &mut Cpu) {
         // Execute call
         let op1 = cpu.fetchword();
+        let flags = &mut cpu.regs.f;
         let cond = match self.opcode {
-            0xc4 => !Flag::Z.get(&cpu.regs.f.get()),
-            0xcc => Flag::Z.get(&cpu.regs.f.get()),
+            0xc4 => !Flag::Z.get(flags),
+            0xcc => Flag::Z.get(flags),
             0xcd => true,
-            0xd4 => !Flag::C.get(&cpu.regs.f.get()),
-            0xdc => Flag::C.get(&cpu.regs.f.get()),
+            0xd4 => !Flag::C.get(flags),
+            0xdc => Flag::C.get(flags),
             _ => panic!("Illegal instruction."),
         };
         if cond {
-            cpu.pushword(cpu.regs.pc.get());
-            cpu.regs.pc.set(op1);
+            cpu.pushword(*cpu.regs.pc);
+            *cpu.regs.pc = op1;
         }
     }
 
     fn ccf(&self, cpu: &mut Cpu) {
         // Execute ccf
-        let f = &mut cpu.regs.f[0];
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        let carry = Flag::C.get(f);
-        Flag::C.set(f, !carry);
+        let flags = &mut cpu.regs.f;
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        let carry = Flag::C.get(flags);
+        Flag::C.set(flags, !carry);
     }
 
     fn cp(&self, cpu: &mut Cpu) {
         // Execute cp
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0xb8..=0xbf => helpers::get_op8(cpu, self.opcode & 0x07),
             0xfe => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let (res, carry) = acc.overflowing_sub(op2);
+        let (res, carry) = cpu.regs.a.overflowing_sub(op2);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, true);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, true);
         let (resl, accl, op2l) = (
             (res & 0x0f | 0xf0) as i8,
-            (acc & 0x0f | 0xf0) as i8,
+            (*cpu.regs.a & 0x0f | 0xf0) as i8,
             (op2 & 0x0f | 0xf0) as i8,
         );
-        Flag::H.set(f, resl > accl - op2l);
-        Flag::C.set(f, carry);
+        Flag::H.set(flags, resl > accl - op2l);
+        Flag::C.set(flags, carry);
     }
 
     fn cpl(&self, cpu: &mut Cpu) {
         // Execute cpl
-        let op1 = &mut cpu.regs.a;
-        let res = !op1.get();
-        op1.set(res);
+        let res = !*cpu.regs.a;
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, res & 0x0f == 0);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, res & 0x0f == 0);
     }
 
     fn daa(&self, cpu: &mut Cpu) {
         // Execute daa
-        let op1 = cpu.regs.a.get();
-        let mut res = op1;
+        let mut res = *cpu.regs.a;
         let hcarry = (res & 0x0f) > 0x09;
         if hcarry {
             res += 0x06;
@@ -193,12 +191,12 @@ impl Instruction {
         if carry {
             res += 0x60;
         }
-        cpu.regs.a.set(res);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::H.set(f, hcarry);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::H.set(flags, hcarry);
+        Flag::C.set(flags, carry);
     }
 
     fn dec8(&self, cpu: &mut Cpu) {
@@ -210,32 +208,32 @@ impl Instruction {
             res
         } else {
             let op1 = match self.opcode {
-                0x05 => &mut cpu.regs.b,
-                0x0d => &mut cpu.regs.c,
-                0x15 => &mut cpu.regs.d,
-                0x1d => &mut cpu.regs.e,
-                0x25 => &mut cpu.regs.h,
-                0x2d => &mut cpu.regs.l,
-                0x3d => &mut cpu.regs.a,
+                0x05 => &mut *cpu.regs.b,
+                0x0d => &mut *cpu.regs.c,
+                0x15 => &mut *cpu.regs.d,
+                0x1d => &mut *cpu.regs.e,
+                0x25 => &mut *cpu.regs.h,
+                0x2d => &mut *cpu.regs.l,
+                0x3d => &mut *cpu.regs.a,
                 _ => panic!("Illegal instruction."),
             };
-            let res = op1.get().wrapping_sub(1);
-            op1.set(res);
+            let res = op1.wrapping_sub(1);
+            *op1 = res;
             res
         };
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, res & 0x0f == 0);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, res & 0x0f == 0);
     }
 
     fn dec16(&self, cpu: &mut Cpu) {
         // Execute dec16
         if self.opcode == 0x3b {
-            let op1 = &mut cpu.regs.sp;
-            let res = op1.get().wrapping_sub(1);
-            op1.set(res);
+            let op1 = &mut *cpu.regs.sp;
+            let res = op1.wrapping_sub(1);
+            *op1 = res;
         } else {
             let op1 = match self.opcode {
                 0x0b => cpu.regs.bc,
@@ -272,32 +270,32 @@ impl Instruction {
             res
         } else {
             let op1 = match self.opcode {
-                0x04 => &mut cpu.regs.b,
-                0x0c => &mut cpu.regs.c,
-                0x14 => &mut cpu.regs.d,
-                0x1c => &mut cpu.regs.e,
-                0x24 => &mut cpu.regs.h,
-                0x2c => &mut cpu.regs.l,
-                0x3c => &mut cpu.regs.a,
+                0x04 => &mut *cpu.regs.b,
+                0x0c => &mut *cpu.regs.c,
+                0x14 => &mut *cpu.regs.d,
+                0x1c => &mut *cpu.regs.e,
+                0x24 => &mut *cpu.regs.h,
+                0x2c => &mut *cpu.regs.l,
+                0x3c => &mut *cpu.regs.a,
                 _ => panic!("Illegal instruction."),
             };
-            let res = op1.get().wrapping_add(1);
-            op1.set(res);
+            let res = op1.wrapping_add(1);
+            *op1 = res;
             res
         };
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, res & 0x0f == 0);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, res & 0x0f == 0);
     }
 
     fn inc16(&self, cpu: &mut Cpu) {
         // Execute inc16
         if self.opcode == 0x33 {
-            let op1 = &mut cpu.regs.sp;
-            let res = op1.get().wrapping_add(1);
-            op1.set(res);
+            let op1 = &mut *cpu.regs.sp;
+            let res = op1.wrapping_add(1);
+            *op1 = res;
         } else {
             let op1 = match self.opcode {
                 0x03 => cpu.regs.bc,
@@ -317,35 +315,37 @@ impl Instruction {
             0xe9 => cpu.regs.hl.get(&cpu.regs),
             _ => panic!("Illegal instruction."),
         };
+        let flags = &mut cpu.regs.f;
         let cond = match self.opcode {
-            0xc2 => !Flag::Z.get(&cpu.regs.f.get()),
+            0xc2 => !Flag::Z.get(flags),
             0xc3 => true,
-            0xca => Flag::Z.get(&cpu.regs.f.get()),
-            0xd2 => !Flag::C.get(&cpu.regs.f.get()),
-            0xda => Flag::C.get(&cpu.regs.f.get()),
+            0xca => Flag::Z.get(flags),
+            0xd2 => !Flag::C.get(flags),
+            0xda => Flag::C.get(flags),
             0xe9 => true,
             _ => panic!("Illegal instruction."),
         };
         if cond {
-            cpu.regs.pc.set(op1);
+            *cpu.regs.pc = op1;
         }
     }
 
     fn jr(&self, cpu: &mut Cpu) {
         // Execute jr
         let op1 = cpu.fetchbyte() as i8 as i16;
+        let flags = &mut cpu.regs.f;
         let cond = match self.opcode {
             0x18 => true,
-            0x20 => !Flag::Z.get(&cpu.regs.f.get()),
-            0x28 => Flag::Z.get(&cpu.regs.f.get()),
-            0x30 => !Flag::C.get(&cpu.regs.f.get()),
-            0x38 => Flag::C.get(&cpu.regs.f.get()),
+            0x20 => !Flag::Z.get(flags),
+            0x28 => Flag::Z.get(flags),
+            0x30 => !Flag::C.get(flags),
+            0x38 => Flag::C.get(flags),
             _ => panic!("Illegal instruction."),
         };
         if cond {
-            let pc = cpu.regs.pc.get() as i16;
+            let pc = *cpu.regs.pc as i16;
             let res = pc.wrapping_add(op1) as u16;
-            cpu.regs.pc.set(res);
+            *cpu.regs.pc = res;
         }
     }
 
@@ -353,24 +353,24 @@ impl Instruction {
         // Execute ld8
         match self.opcode {
             0x02 => {
-                let op2 = cpu.regs.a.get();
+                let op2 = *cpu.regs.a;
                 let addr = cpu.regs.bc.get(&cpu.regs);
                 cpu.bus.write(addr as usize, op2);
             }
             0x12 => {
-                let op2 = cpu.regs.a.get();
+                let op2 = *cpu.regs.a;
                 let addr = cpu.regs.de.get(&cpu.regs);
                 cpu.bus.write(addr as usize, op2);
             }
             0x22 => {
-                let op2 = cpu.regs.a.get();
+                let op2 = *cpu.regs.a;
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
                 cpu.bus.write(addr as usize, op2);
                 hl.set(&mut cpu.regs, addr.wrapping_add(1));
             }
             0x32 => {
-                let op2 = cpu.regs.a.get();
+                let op2 = *cpu.regs.a;
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
                 cpu.bus.write(addr as usize, op2);
@@ -379,25 +379,25 @@ impl Instruction {
             0x0a => {
                 let addr = cpu.regs.bc.get(&cpu.regs);
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
             }
             0x1a => {
                 let addr = cpu.regs.de.get(&cpu.regs);
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
             }
             0x2a => {
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
                 hl.set(&mut cpu.regs, addr.wrapping_add(1));
             }
             0x3a => {
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
                 hl.set(&mut cpu.regs, addr.wrapping_sub(1));
             }
             0x06 | 0x16 | 0x26 | 0x36 | 0x0e | 0x1e | 0x2e | 0x3e => {
@@ -410,14 +410,14 @@ impl Instruction {
                 helpers::set_op8(cpu, (self.opcode & 0x38) >> 3, op2);
             }
             0xea => {
-                let op2 = cpu.regs.a.get();
+                let op2 = *cpu.regs.a;
                 let addr = cpu.fetchword();
                 cpu.bus.write(addr as usize, op2);
             }
             0xfa => {
                 let addr = cpu.fetchword();
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
             }
             _ => panic!("Illegal instruction."),
         }
@@ -430,7 +430,7 @@ impl Instruction {
             0x01 => (cpu.regs.bc.set)(&mut cpu.regs, op2),
             0x11 => (cpu.regs.de.set)(&mut cpu.regs, op2),
             0x21 => (cpu.regs.hl.set)(&mut cpu.regs, op2),
-            0x31 => cpu.regs.sp.set(op2),
+            0x31 => *cpu.regs.sp = op2,
             _ => panic!("Illegal instruction."),
         }
     }
@@ -439,24 +439,24 @@ impl Instruction {
         // Execute ldh
         match self.opcode {
             0xe0 => {
-                let op2 = cpu.regs.a.get();
+                let op2 = *cpu.regs.a;
                 let addr = 0xff00 | cpu.fetchbyte() as u16;
                 cpu.bus.write(addr as usize, op2);
             }
             0xe2 => {
-                let op2 = cpu.regs.a.get();
-                let addr = 0xff00 | cpu.regs.c.get() as u16;
+                let op2 = *cpu.regs.a;
+                let addr = 0xff00 | *cpu.regs.c as u16;
                 cpu.bus.write(addr as usize, op2);
             }
             0xf0 => {
                 let addr = 0xff00 | cpu.fetchbyte() as u16;
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
             }
             0xf2 => {
-                let addr = 0xff00 | cpu.regs.c.get() as u16;
+                let addr = 0xff00 | *cpu.regs.c as u16;
                 let op2 = cpu.bus.read(addr as usize);
-                cpu.regs.a.set(op2);
+                *cpu.regs.a = op2;
             }
             _ => panic!("Illegal instruction."),
         }
@@ -466,20 +466,19 @@ impl Instruction {
 
     fn or8(&self, cpu: &mut Cpu) {
         // Execute or8
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0xb0..=0xb0 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xf6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let res = acc.bitor(op2);
-        cpu.regs.a.set(res);
+        let res = cpu.regs.a.bitor(op2);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, false);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, false);
     }
 
     fn pop(&self, cpu: &mut Cpu) {
@@ -523,55 +522,57 @@ impl Instruction {
 
     fn ret(&self, cpu: &mut Cpu) {
         // Execute ret
+        let flags = &mut cpu.regs.f;
         let cond = match self.opcode {
-            0xc0 => !Flag::Z.get(&cpu.regs.f.get()),
-            0xc8 => Flag::Z.get(&cpu.regs.f.get()),
+            0xc0 => !Flag::Z.get(flags),
+            0xc8 => Flag::Z.get(flags),
             0xc9 => true,
-            0xd0 => !Flag::C.get(&cpu.regs.f.get()),
-            0xd8 => Flag::C.get(&cpu.regs.f.get()),
+            0xd0 => !Flag::C.get(flags),
+            0xd8 => Flag::C.get(flags),
             _ => panic!("Illegal instruction."),
         };
         if cond {
             let pc = cpu.popword();
-            cpu.regs.pc.set(pc);
+            *cpu.regs.pc = pc;
         }
     }
 
     fn reti(&self, cpu: &mut Cpu) {
         // Execute reti
         let pc = cpu.popword();
-        cpu.regs.pc.set(pc);
+        *cpu.regs.pc = pc;
         cpu.ime = true;
     }
 
     fn rl(&self, cpu: &mut Cpu) {
         // Execute rl
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
-        let cin = Flag::C.get(&cpu.regs.f.get());
+        let flags = &mut cpu.regs.f;
+        let cin = Flag::C.get(flags);
         let carry = op1 & 0x80 != 0;
         let res = op1 << 1 | (cin as u8);
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rla(&self, cpu: &mut Cpu) {
         // Execute rla
-        let op1 = cpu.regs.a.get();
-        let cin = Flag::C.get(&cpu.regs.f.get());
-        let carry = op1 & 0x80 != 0;
-        let res = op1 << 1 | (cin as u8);
-        cpu.regs.a.set(res);
+        let flags = &mut cpu.regs.f;
+        let cin = Flag::C.get(flags);
+        let carry = *cpu.regs.a & 0x80 != 0;
+        let res = *cpu.regs.a << 1 | (cin as u8);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, false);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, false);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rlc(&self, cpu: &mut Cpu) {
@@ -581,55 +582,55 @@ impl Instruction {
         let res = op1 << 1 | (carry as u8);
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rlca(&self, cpu: &mut Cpu) {
         // Execute rlca
-        let op1 = cpu.regs.a.get();
-        let carry = op1 & 0x80 != 0;
-        let res = op1 << 1 | (carry as u8);
-        cpu.regs.a.set(res);
+        let carry = *cpu.regs.a & 0x80 != 0;
+        let res = *cpu.regs.a << 1 | (carry as u8);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, false);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, false);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rr(&self, cpu: &mut Cpu) {
         // Execute rr
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
-        let cin = Flag::C.get(&cpu.regs.f.get());
+        let flags = &mut cpu.regs.f;
+        let cin = Flag::C.get(flags);
         let carry = op1 & 0x01 != 0;
         let res = ((cin as u8) << 7) | op1 >> 1;
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rra(&self, cpu: &mut Cpu) {
         // Execute rra
-        let op1 = cpu.regs.a.get();
-        let cin = Flag::C.get(&cpu.regs.f.get());
-        let carry = op1 & 0x01 != 0;
-        let res = ((cin as u8) << 7) | op1 >> 1;
-        cpu.regs.a.set(res);
+        let flags = &mut cpu.regs.f;
+        let cin = Flag::C.get(flags);
+        let carry = *cpu.regs.a & 0x01 != 0;
+        let res = ((cin as u8) << 7) | *cpu.regs.a >> 1;
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, false);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, false);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rrc(&self, cpu: &mut Cpu) {
@@ -639,25 +640,24 @@ impl Instruction {
         let res = ((carry as u8) << 7) | op1 >> 1;
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rrca(&self, cpu: &mut Cpu) {
         // Execute rrca
-        let op1 = cpu.regs.a.get();
-        let carry = op1 & 0x01 != 0;
-        let res = ((carry as u8) << 7) | op1 >> 1;
-        cpu.regs.a.set(res);
+        let carry = *cpu.regs.a & 0x01 != 0;
+        let res = ((carry as u8) << 7) | *cpu.regs.a >> 1;
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, false);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, false);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn rst(&self, cpu: &mut Cpu) {
@@ -673,41 +673,40 @@ impl Instruction {
             0xff => 0x38,
             _ => panic!("Illegal instruction."),
         };
-        cpu.regs.pc.set(op1);
+        *cpu.regs.pc = op1;
     }
 
     fn sbc8(&self, cpu: &mut Cpu) {
         // Execute sbc8
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0x98..=0x9f => helpers::get_op8(cpu, self.opcode & 0x07),
             0xde => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let cin = Flag::C.get(&cpu.regs.f[0]) as u8;
-        let (res, carry0) = acc.overflowing_sub(op2);
+        let cin = Flag::C.get(&*cpu.regs.f) as u8;
+        let (res, carry0) = cpu.regs.a.overflowing_sub(op2);
         let (res, carry1) = res.overflowing_sub(cin);
-        cpu.regs.a.set(res);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, true);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, true);
         let (resl, accl, op2l, cinl) = (
             (res & 0x0f | 0xf0),
-            (acc & 0x0f | 0xf0),
+            (*cpu.regs.a & 0x0f | 0xf0),
             (op2 & 0x0f | 0xf0),
             (cin & 0x0f | 0xf0),
         );
-        Flag::H.set(f, resl > accl - op2l - cinl);
-        Flag::C.set(f, carry0 | carry1);
+        Flag::H.set(flags, resl > accl - op2l - cinl);
+        Flag::C.set(flags, carry0 | carry1);
     }
 
     fn scf(&self, cpu: &mut Cpu) {
         // Execute scf
-        let f = &mut cpu.regs.f[0];
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, true);
+        let flags = &mut cpu.regs.f;
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, true);
     }
 
     fn set(&self, cpu: &mut Cpu) {
@@ -726,11 +725,11 @@ impl Instruction {
         let res = op1 << 1;
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn sra(&self, cpu: &mut Cpu) {
@@ -741,11 +740,11 @@ impl Instruction {
         let res = sign | (op1 >> 1);
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn srl(&self, cpu: &mut Cpu) {
@@ -755,11 +754,11 @@ impl Instruction {
         let res = 0x7f & (op1 >> 1);
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, carry);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, carry);
     }
 
     fn stop(&self, cpu: &mut Cpu) {
@@ -769,25 +768,24 @@ impl Instruction {
 
     fn sub(&self, cpu: &mut Cpu) {
         // Execute sub
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0x90..=0x90 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xd6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let (res, carry) = acc.overflowing_sub(op2);
-        cpu.regs.a.set(res);
+        let (res, carry) = cpu.regs.a.overflowing_sub(op2);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, true);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, true);
         let (resl, accl, op2l) = (
             (res & 0x0f | 0xf0) as i8,
-            (acc & 0x0f | 0xf0) as i8,
+            (*cpu.regs.a & 0x0f | 0xf0) as i8,
             (op2 & 0x0f | 0xf0) as i8,
         );
-        Flag::H.set(f, resl > accl - op2l);
-        Flag::C.set(f, carry);
+        Flag::H.set(flags, resl > accl - op2l);
+        Flag::C.set(flags, carry);
     }
 
     fn swap(&self, cpu: &mut Cpu) {
@@ -796,11 +794,11 @@ impl Instruction {
         let res = ((op1 & 0xf0) >> 4) | ((op1 ^ 0x0f) << 4);
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, false);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, false);
     }
 
     fn unused(&self, _: &mut Cpu) {
@@ -809,20 +807,19 @@ impl Instruction {
 
     fn xor8(&self, cpu: &mut Cpu) {
         // Execute xor8
-        let acc = cpu.regs.a.get();
         let op2 = match self.opcode {
             0xa8..=0xaf => helpers::get_op8(cpu, self.opcode & 0x07),
             0xee => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let res = acc.bitxor(op2);
-        cpu.regs.a.set(res);
+        let res = cpu.regs.a.bitxor(op2);
+        *cpu.regs.a = res;
         // Set flags
-        let f = &mut cpu.regs.f[0];
-        Flag::Z.set(f, res == 0);
-        Flag::N.set(f, false);
-        Flag::H.set(f, false);
-        Flag::C.set(f, false);
+        let flags = &mut cpu.regs.f;
+        Flag::Z.set(flags, res == 0);
+        Flag::N.set(flags, false);
+        Flag::H.set(flags, false);
+        Flag::C.set(flags, false);
     }
 }
 
@@ -831,28 +828,28 @@ mod helpers {
 
     pub fn get_op8(cpu: &mut Cpu, idx: u8) -> u8 {
         match idx {
-            0x0 => cpu.regs.b.get(),
-            0x1 => cpu.regs.c.get(),
-            0x2 => cpu.regs.d.get(),
-            0x3 => cpu.regs.e.get(),
-            0x4 => cpu.regs.h.get(),
-            0x5 => cpu.regs.l.get(),
+            0x0 => *cpu.regs.b,
+            0x1 => *cpu.regs.c,
+            0x2 => *cpu.regs.d,
+            0x3 => *cpu.regs.e,
+            0x4 => *cpu.regs.h,
+            0x5 => *cpu.regs.l,
             0x6 => cpu.readbyte(),
-            0x7 => cpu.regs.a.get(),
+            0x7 => *cpu.regs.a,
             _ => panic!("Illegal register."),
         }
     }
 
     pub fn set_op8(cpu: &mut Cpu, idx: u8, value: u8) {
         match idx {
-            0x0 => cpu.regs.b.set(value),
-            0x1 => cpu.regs.c.set(value),
-            0x2 => cpu.regs.d.set(value),
-            0x3 => cpu.regs.e.set(value),
-            0x4 => cpu.regs.h.set(value),
-            0x5 => cpu.regs.l.set(value),
+            0x0 => *cpu.regs.b = value,
+            0x1 => *cpu.regs.c = value,
+            0x2 => *cpu.regs.d = value,
+            0x3 => *cpu.regs.e = value,
+            0x4 => *cpu.regs.h = value,
+            0x5 => *cpu.regs.l = value,
             0x6 => cpu.writebyte(value),
-            0x7 => cpu.regs.a.set(value),
+            0x7 => *cpu.regs.a = value,
             _ => panic!("Illegal register."),
         };
     }
