@@ -6,8 +6,7 @@ use std::rc::Rc;
 
 use log::{debug, error, info, warn};
 use remus::bus::Bus;
-use remus::dev::Device;
-use remus::mem::Memory;
+use remus::mem::{Ram, Rom};
 use remus::reg::Register;
 
 use crate::cpu::sm83::Cpu;
@@ -74,8 +73,8 @@ impl GameBoy {
         let mut file = File::open(path)?;
         let metadata = file.metadata()?;
         // Read its contents into memory
-        let buf = &mut *self.cart.rom.borrow_mut();
-        let read = file.read(buf)?;
+        let mut buf = [0u8; 0x8000];
+        let read = file.read(&mut buf)?;
         if read < buf.len() {
             warn!(
                 r#"Read {read} bytes from "{}""; remaining {} bytes uninitialized."#,
@@ -92,8 +91,10 @@ impl GameBoy {
             info!(r#"Read {read} bytes from "{}""#, path.display());
         }
 
+        // Initialize the Cartridge ROM
+        self.cart.rom.replace(Rom::from(&buf));
         // Log the ROM contents
-        debug!("Cartridge ROM:\n{buf}");
+        debug!("Cartridge ROM:\n{}", self.cart.rom.borrow());
 
         Ok(())
     }
@@ -110,23 +111,23 @@ impl GameBoy {
 #[rustfmt::skip]
 #[derive(Debug, Default)]
 struct Devices {
-                                       // ┌────────┬───────────┬─────┬───────┐
-                                       // │  SIZE  │    NAME   │ DEV │ ALIAS │
-                                       // ├────────┼───────────┼─────┼───────┤
-    boot: Rc<RefCell<Memory<0x0100>>>, // │  256 B │      Boot │ ROM │       │
-    vram: Rc<RefCell<Memory<0x2000>>>, // │ 8 Ki B │     Video │ RAM │ VRAM  │
-    wram: Rc<RefCell<Memory<0x2000>>>, // │ 8 Ki B │      Work │ RAM │ WRAM  │
-    oam:  Rc<RefCell<Memory<0x00a0>>>, // │  160 B │     Video │ RAM │ OAM   │
-    io:   IoDevices,                   // │  128 B │       I/O │ Bus │       │
-    hram: Rc<RefCell<Memory<0x007f>>>, // │  127 B │      High │ RAM │ HRAM  │
-    ie:   Rc<RefCell<Register<1>>>,    // │    1 B │ Interrupt │ Reg │ IE    │
-                                       // └────────┴───────────┴─────┴───────┘
+                                    // ┌────────┬───────────┬─────┬───────┐
+                                    // │  SIZE  │    NAME   │ DEV │ ALIAS │
+                                    // ├────────┼───────────┼─────┼───────┤
+    boot: Rc<RefCell<Rom<0x0100>>>, // │  256 B │      Boot │ ROM │       │
+    vram: Rc<RefCell<Ram<0x2000>>>, // │ 8 Ki B │     Video │ RAM │ VRAM  │
+    wram: Rc<RefCell<Ram<0x2000>>>, // │ 8 Ki B │      Work │ RAM │ WRAM  │
+    oam:  Rc<RefCell<Ram<0x00a0>>>, // │  160 B │     Video │ RAM │ OAM   │
+    io:   IoDevices,                // │  128 B │       I/O │ Bus │       │
+    hram: Rc<RefCell<Ram<0x007f>>>, // │  127 B │      High │ RAM │ HRAM  │
+    ie:   Rc<RefCell<Register<1>>>, // │    1 B │ Interrupt │ Reg │ IE    │
+                                    // └────────┴───────────┴─────┴───────┘
 }
 
 impl Devices {
     fn reset(mut self) -> Self {
         // Reset Boot ROM
-        self.boot.replace(Memory::from(&BOOTROM));
+        self.boot.replace(Rom::from(&BOOTROM));
         // Reset I/O
         self.io = self.io.reset();
         self
@@ -137,18 +138,18 @@ impl Devices {
 #[derive(Debug, Default)]
 struct IoDevices {
     bus: Rc<RefCell<Bus>>,
-                                      // ┌────────┬─────────────────┬─────┐
-                                      // │  SIZE  │      NAME       │ DEV │
-                                      // ├────────┼─────────────────┼─────┤
-    con:   Rc<RefCell<Register<1>>>,  // │    1 B │      Controller │ Reg │
-    com:   Rc<RefCell<Register<2>>>,  // │    2 B │   Communication │ Reg │
-    timer: Rc<RefCell<Register<4>>>,  // │    4 B │ Divider & Timer │ Reg │
-    iflag: Rc<RefCell<Register<1>>>,  // │    1 B │  Interrupt Flag │ Reg │
-    sound: Rc<RefCell<Memory<0x17>>>, // │   23 B │           Sound │ RAM │
-    wram:  Rc<RefCell<Memory<0x10>>>, // │   16 B │        Waveform │ RAM │
-    lcd:   Rc<RefCell<Memory<0x0c>>>, // │   16 B │             LCD │ RAM │
-    bank:  Rc<RefCell<Register<1>>>,  // │    1 B │   Boot ROM Bank │ Reg │
-                                      // └────────┴─────────────────┴─────┘
+                                     // ┌────────┬─────────────────┬─────┐
+                                     // │  SIZE  │      NAME       │ DEV │
+                                     // ├────────┼─────────────────┼─────┤
+    con:   Rc<RefCell<Register<1>>>, // │    1 B │      Controller │ Reg │
+    com:   Rc<RefCell<Register<2>>>, // │    2 B │   Communication │ Reg │
+    timer: Rc<RefCell<Register<4>>>, // │    4 B │ Divider & Timer │ Reg │
+    iflag: Rc<RefCell<Register<1>>>, // │    1 B │  Interrupt Flag │ Reg │
+    sound: Rc<RefCell<Ram<0x17>>>,   // │   23 B │           Sound │ RAM │
+    wram:  Rc<RefCell<Ram<0x10>>>,   // │   16 B │        Waveform │ RAM │
+    lcd:   Rc<RefCell<Ram<0x0c>>>,   // │   16 B │             LCD │ RAM │
+    bank:  Rc<RefCell<Register<1>>>, // │    1 B │   Boot ROM Bank │ Reg │
+                                     // └────────┴─────────────────┴─────┘
 }
 
 #[rustfmt::skip]
@@ -177,8 +178,8 @@ impl IoDevices {
 
 #[derive(Debug, Default)]
 struct Cartridge {
-    rom: Rc<RefCell<Memory<0x8000>>>,
-    eram: Rc<RefCell<Memory<0x2000>>>,
+    rom: Rc<RefCell<Rom<0x8000>>>,
+    eram: Rc<RefCell<Ram<0x2000>>>,
 }
 
 impl Cartridge {
@@ -196,16 +197,6 @@ mod tests {
     #[test]
     fn bus_works() {
         let mut gb = GameBoy::new();
-        // Boot ROM
-        (0x0000..=0x00ff).for_each(|addr| gb.cpu.bus.write(addr, 0x10));
-        assert!((0x00..0xff)
-            .map(|addr| gb.devs.boot.borrow().read(addr))
-            .all(|byte| byte == 0x10));
-        // Cartridge ROM
-        (0x0100..=0x7fff).for_each(|addr| gb.cpu.bus.write(addr, 0x20));
-        assert!((0x0100..=0x7fff)
-            .map(|addr| gb.cart.rom.borrow().read(addr))
-            .all(|byte| byte == 0x20));
         // Video RAM
         (0x8000..=0x9fff).for_each(|addr| gb.cpu.bus.write(addr, 0x30));
         assert!((0x0000..=0x1fff)
@@ -298,5 +289,34 @@ mod tests {
         assert!((0x0..=0x0)
             .map(|addr| gb.devs.ie.borrow().read(addr))
             .all(|byte| byte == 0x80));
+    }
+
+    #[test]
+    fn bus_rom_read_works() {
+        let gb = GameBoy::new();
+        // Boot ROM
+        (0x00..0xff).for_each(|addr| {
+            gb.devs.boot.borrow().read(addr);
+        });
+        // Cartridge ROM
+        (0x0100..=0x7fff).for_each(|addr| {
+            gb.cart.rom.borrow().read(addr);
+        });
+    }
+
+    #[test]
+    #[should_panic]
+    fn bus_rom_write_boot_panics() {
+        let mut gb = GameBoy::new();
+        // Boot ROM
+        gb.cpu.bus.write(0x0000, 0xaa);
+    }
+
+    #[test]
+    #[should_panic]
+    fn bus_rom_write_cart_panics() {
+        let mut gb = GameBoy::new();
+        // Cartridge ROM
+        gb.cpu.bus.write(0x0100, 0xaa);
     }
 }
