@@ -241,7 +241,7 @@ checksum = "f497285884f3fcff424ffc933e56d7cbca511def0c9831a7f9b5f6153e3cc89b"
 [[package]]
 name = "remus"
 version = "0.1.0"
-source = "git+https://github.com/zakharykaplan/remus#dd97c40cdad9362d66011399d1a6c4801eb33ec2"
+source = "git+https://github.com/zakharykaplan/remus#d53d23198a2cf2d54cc81c502fa6687d49b1abe2"
 dependencies = [
  "byteorder",
 ]
