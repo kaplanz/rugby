@@ -111,17 +111,17 @@ impl GameBoy {
 #[rustfmt::skip]
 #[derive(Debug, Default)]
 struct Devices {
-                                    // ┌────────┬───────────┬─────┬───────┐
-                                    // │  SIZE  │    NAME   │ DEV │ ALIAS │
-                                    // ├────────┼───────────┼─────┼───────┤
-    boot: Rc<RefCell<Rom<0x0100>>>, // │  256 B │      Boot │ ROM │       │
-    vram: Rc<RefCell<Ram<0x2000>>>, // │ 8 Ki B │     Video │ RAM │ VRAM  │
-    wram: Rc<RefCell<Ram<0x2000>>>, // │ 8 Ki B │      Work │ RAM │ WRAM  │
-    oam:  Rc<RefCell<Ram<0x00a0>>>, // │  160 B │     Video │ RAM │ OAM   │
-    io:   IoDevices,                // │  128 B │       I/O │ Bus │       │
-    hram: Rc<RefCell<Ram<0x007f>>>, // │  127 B │      High │ RAM │ HRAM  │
-    ie:   Rc<RefCell<Register<1>>>, // │    1 B │ Interrupt │ Reg │ IE    │
-                                    // └────────┴───────────┴─────┴───────┘
+                                     // ┌────────┬───────────┬─────┬───────┐
+                                     // │  SIZE  │    NAME   │ DEV │ ALIAS │
+                                     // ├────────┼───────────┼─────┼───────┤
+    boot: Rc<RefCell<Rom<0x0100>>>,  // │  256 B │      Boot │ ROM │       │
+    vram: Rc<RefCell<Ram<0x2000>>>,  // │ 8 Ki B │     Video │ RAM │ VRAM  │
+    wram: Rc<RefCell<Ram<0x2000>>>,  // │ 8 Ki B │      Work │ RAM │ WRAM  │
+    oam:  Rc<RefCell<Ram<0x00a0>>>,  // │  160 B │     Video │ RAM │ OAM   │
+    io:   IoDevices,                 // │  128 B │       I/O │ Bus │       │
+    hram: Rc<RefCell<Ram<0x007f>>>,  // │  127 B │      High │ RAM │ HRAM  │
+    ie:   Rc<RefCell<Register<u8>>>, // │    1 B │ Interrupt │ Reg │ IE    │
+                                     // └────────┴───────────┴─────┴───────┘
 }
 
 impl Devices {
@@ -138,18 +138,18 @@ impl Devices {
 #[derive(Debug, Default)]
 struct IoDevices {
     bus: Rc<RefCell<Bus>>,
-                                     // ┌────────┬─────────────────┬─────┐
-                                     // │  SIZE  │      NAME       │ DEV │
-                                     // ├────────┼─────────────────┼─────┤
-    con:   Rc<RefCell<Register<1>>>, // │    1 B │      Controller │ Reg │
-    com:   Rc<RefCell<Register<2>>>, // │    2 B │   Communication │ Reg │
-    timer: Rc<RefCell<Register<4>>>, // │    4 B │ Divider & Timer │ Reg │
-    iflag: Rc<RefCell<Register<1>>>, // │    1 B │  Interrupt Flag │ Reg │
-    sound: Rc<RefCell<Ram<0x17>>>,   // │   23 B │           Sound │ RAM │
-    wram:  Rc<RefCell<Ram<0x10>>>,   // │   16 B │        Waveform │ RAM │
-    lcd:   Rc<RefCell<Ram<0x0c>>>,   // │   16 B │             LCD │ RAM │
-    bank:  Rc<RefCell<Register<1>>>, // │    1 B │   Boot ROM Bank │ Reg │
-                                     // └────────┴─────────────────┴─────┘
+                                       // ┌────────┬─────────────────┬─────┐
+                                       // │  SIZE  │      NAME       │ DEV │
+                                       // ├────────┼─────────────────┼─────┤
+    con:   Rc<RefCell<Register<u8>>>,  // │    1 B │      Controller │ Reg │
+    com:   Rc<RefCell<Register<u16>>>, // │    2 B │   Communication │ Reg │
+    timer: Rc<RefCell<Register<u32>>>, // │    4 B │ Divider & Timer │ Reg │
+    iflag: Rc<RefCell<Register<u8>>>,  // │    1 B │  Interrupt Flag │ Reg │
+    sound: Rc<RefCell<Ram<0x17>>>,     // │   23 B │           Sound │ RAM │
+    wram:  Rc<RefCell<Ram<0x10>>>,     // │   16 B │        Waveform │ RAM │
+    lcd:   Rc<RefCell<Ram<0x0c>>>,     // │   16 B │             LCD │ RAM │
+    bank:  Rc<RefCell<Register<u8>>>,  // │    1 B │   Boot ROM Bank │ Reg │
+                                       // └────────┴─────────────────┴─────┘
 }
 
 #[rustfmt::skip]
