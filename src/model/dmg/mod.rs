@@ -6,6 +6,7 @@ use std::rc::Rc;
 
 use log::{debug, error, info, warn};
 use remus::bus::Bus;
+use remus::dev::Device;
 use remus::mem::{Ram, Rom};
 use remus::reg::Register;
 
@@ -56,7 +57,7 @@ impl GameBoy {
         bus.map(0xe000, self.devs.wram.clone());   // │   7680 B │       Echo │ RAM │
         bus.map(0xfe00, self.devs.oam.clone());    // │    160 B │      Video │ RAM │
                                                    // │     96 B │     Unused │ --- │
-        bus.map(0xff00, self.devs.io.bus.clone()); // │    128 B │        I/O │ Bus │
+        bus.map(0xff00, self.devs.io.clone());     // │    128 B │        I/O │ Bus │
         bus.map(0xff80, self.devs.hram.clone());   // │    127 B │       High │ RAM │
         bus.map(0xffff, self.devs.ie.clone());     // │      1 B │  Interrupt │ Reg │
         drop(bus);                                 // └──────────┴────────────┴─────┘
@@ -120,27 +121,26 @@ struct Devices {
     vram: Rc<RefCell<Ram<0x2000>>>,  // │ 8 Ki B │     Video │ RAM │ VRAM  │
     wram: Rc<RefCell<Ram<0x2000>>>,  // │ 8 Ki B │      Work │ RAM │ WRAM  │
     oam:  Rc<RefCell<Ram<0x00a0>>>,  // │  160 B │     Video │ RAM │ OAM   │
-    io:   IoDevices,                 // │  128 B │       I/O │ Bus │       │
+    io:   Rc<RefCell<IoBus>>,        // │  128 B │       I/O │ Bus │       │
     hram: Rc<RefCell<Ram<0x007f>>>,  // │  127 B │      High │ RAM │ HRAM  │
     ie:   Rc<RefCell<Register<u8>>>, // │    1 B │ Interrupt │ Reg │ IE    │
                                      // └────────┴───────────┴─────┴───────┘
 }
 
 impl Devices {
-    fn reset(mut self) -> Self {
+    fn reset(self) -> Self {
         // Reset Boot ROM
         self.boot.replace(Rom::from(&BOOTROM));
         // Reset I/O
-        self.io = self.io.reset();
+        self.io.replace(self.io.take().reset());
         self
     }
 }
 
 #[rustfmt::skip]
 #[derive(Debug, Default)]
-struct IoDevices {
-    bus: Rc<RefCell<Bus>>,
-                                       // ┌────────┬─────────────────┬─────┐
+struct IoBus {
+    bus: Bus,                          // ┌────────┬─────────────────┬─────┐
                                        // │  SIZE  │      NAME       │ DEV │
                                        // ├────────┼─────────────────┼─────┤
     con:   Rc<RefCell<Register<u8>>>,  // │    1 B │      Controller │ Reg │
@@ -155,26 +155,40 @@ struct IoDevices {
 }
 
 #[rustfmt::skip]
-impl IoDevices {
-    fn reset(self) -> Self {
-        // Reset bus                         // ┌────────┬─────────────────┬─────┐
-        self.bus.replace(Bus::default());    // │  SIZE  │      NAME       │ DEV │
-        let mut bus = self.bus.borrow_mut(); // ├────────┼─────────────────┼─────┤
-        bus.map(0x00, self.con.clone());     // │    1 B │      Controller │ Reg │
-        bus.map(0x01, self.com.clone());     // │    2 B │   Communication │ Reg │
-                                             // │    1 B │          Unused │ --- │
-        bus.map(0x04, self.timer.clone());   // │    4 B │ Divider & Timer │ Reg │
-                                             // │    7 B │          Unused │ --- │
-        bus.map(0x0f, self.iflag.clone());   // │    1 B │  Interrupt Flag │ Reg │
-        bus.map(0x10, self.sound.clone());   // │   23 B │           Sound │ RAM │
-                                             // │    9 B │          Unused │ --- │
-        bus.map(0x30, self.wram.clone());    // │   16 B │        Waveform │ RAM │
-        bus.map(0x40, self.lcd.clone());     // │   12 B │             LCD │ RAM │
-                                             // │    4 B │          Unused │ --- │
-        bus.map(0x50, self.bank.clone());    // │    1 B │   Boot ROM Bank │ Reg │
-                                             // │   47 B │          Unused │ --- │
-        drop(bus);                           // └────────┴─────────────────┴─────┘
+impl IoBus {
+    fn reset(mut self) -> Self {
+        // Reset bus                            // ┌────────┬─────────────────┬─────┐
+        self.bus = Bus::default();              // │  SIZE  │      NAME       │ DEV │
+                                                // ├────────┼─────────────────┼─────┤
+        self.bus.map(0x00, self.con.clone());   // │    1 B │      Controller │ Reg │
+        self.bus.map(0x01, self.com.clone());   // │    2 B │   Communication │ Reg │
+                                                // │    1 B │          Unused │ --- │
+        self.bus.map(0x04, self.timer.clone()); // │    4 B │ Divider & Timer │ Reg │
+                                                // │    7 B │          Unused │ --- │
+        self.bus.map(0x0f, self.iflag.clone()); // │    1 B │  Interrupt Flag │ Reg │
+        self.bus.map(0x10, self.sound.clone()); // │   23 B │           Sound │ RAM │
+                                                // │    9 B │          Unused │ --- │
+        self.bus.map(0x30, self.wram.clone());  // │   16 B │        Waveform │ RAM │
+        self.bus.map(0x40, self.lcd.clone());   // │   12 B │             LCD │ RAM │
+                                                // │    4 B │          Unused │ --- │
+        self.bus.map(0x50, self.bank.clone());  // │    1 B │   Boot ROM Bank │ Reg │
+                                                // │   47 B │          Unused │ --- │
+                                                // └────────┴─────────────────┴─────┘
         self
+    }
+}
+
+impl Device for IoBus {
+    fn len(&self) -> usize {
+        self.bus.len()
+    }
+
+    fn read(&self, index: usize) -> u8 {
+        self.bus.read(index)
+    }
+
+    fn write(&mut self, index: usize, value: u8) {
+        self.bus.write(index, value);
     }
 }
 
@@ -219,66 +233,66 @@ mod tests {
             // Controller
             (0xff00..=0xff00).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x61));
             assert!((0x00..=0x00)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x61));
             assert!((0x0..=0x0)
-                .map(|addr| gb.devs.io.con.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().con.borrow().read(addr))
                 .all(|byte| byte == 0x61));
             // Communication
             (0xff01..=0xff02).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x62));
             assert!((0x01..=0x02)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x62));
             assert!((0x00..=0x01)
-                .map(|addr| gb.devs.io.com.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().com.borrow().read(addr))
                 .all(|byte| byte == 0x62));
             // Divider & Timer
             (0xff04..=0xff07).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x63));
             assert!((0x04..=0x07)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x63));
             assert!((0x00..=0x03)
-                .map(|addr| gb.devs.io.timer.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().timer.borrow().read(addr))
                 .all(|byte| byte == 0x63));
             // Interrupt Flag
             (0xff0f..=0xff0f).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x64));
             assert!((0x0f..=0x0f)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x64));
             assert!((0x00..=0x00)
-                .map(|addr| gb.devs.io.iflag.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().iflag.borrow().read(addr))
                 .all(|byte| byte == 0x64));
             // Sound
             (0xff10..=0xff26).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x65));
             assert!((0x10..=0x26)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x65));
             assert!((0x00..=0x16)
-                .map(|addr| gb.devs.io.sound.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().sound.borrow().read(addr))
                 .all(|byte| byte == 0x65));
             // Waveform RAM
             (0xff30..=0xff3f).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x66));
             assert!((0x30..=0x3f)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x66));
             assert!((0x00..=0x0f)
-                .map(|addr| gb.devs.io.wram.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().wram.borrow().read(addr))
                 .all(|byte| byte == 0x66));
             // LCD
             (0xff40..=0xff4b).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x67));
             assert!((0x40..=0x4b)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().read(addr))
                 .all(|byte| byte == 0x67));
             assert!((0x00..=0x0b)
-                .map(|addr| gb.devs.io.lcd.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().lcd.borrow().read(addr))
                 .all(|byte| byte == 0x67));
             // Boot ROM Disable
             (0xff50..=0xff50).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x68));
             assert!((0x50..=0x50)
-                .map(|addr| gb.devs.io.bus.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bus.read(addr))
                 .all(|byte| byte == 0x68));
             assert!((0x00..=0x00)
-                .map(|addr| gb.devs.io.bank.borrow().read(addr))
+                .map(|addr| gb.devs.io.borrow().bank.borrow().read(addr))
                 .all(|byte| byte == 0x68));
         }
         // High RAM
