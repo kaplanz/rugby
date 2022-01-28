@@ -355,48 +355,48 @@ impl Instruction {
             0x02 => {
                 let op2 = *cpu.regs.a;
                 let addr = cpu.regs.bc.get(&cpu.regs);
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
             }
             0x12 => {
                 let op2 = *cpu.regs.a;
                 let addr = cpu.regs.de.get(&cpu.regs);
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
             }
             0x22 => {
                 let op2 = *cpu.regs.a;
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
                 hl.set(&mut cpu.regs, addr.wrapping_add(1));
             }
             0x32 => {
                 let op2 = *cpu.regs.a;
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
                 hl.set(&mut cpu.regs, addr.wrapping_sub(1));
             }
             0x0a => {
                 let addr = cpu.regs.bc.get(&cpu.regs);
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
             }
             0x1a => {
                 let addr = cpu.regs.de.get(&cpu.regs);
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
             }
             0x2a => {
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
                 hl.set(&mut cpu.regs, addr.wrapping_add(1));
             }
             0x3a => {
                 let hl = cpu.regs.hl;
                 let addr = hl.get(&cpu.regs);
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
                 hl.set(&mut cpu.regs, addr.wrapping_sub(1));
             }
@@ -412,11 +412,11 @@ impl Instruction {
             0xea => {
                 let op2 = *cpu.regs.a;
                 let addr = cpu.fetchword();
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
             }
             0xfa => {
                 let addr = cpu.fetchword();
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
             }
             _ => panic!("Illegal instruction."),
@@ -441,21 +441,21 @@ impl Instruction {
             0xe0 => {
                 let op2 = *cpu.regs.a;
                 let addr = 0xff00 | cpu.fetchbyte() as u16;
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
             }
             0xe2 => {
                 let op2 = *cpu.regs.a;
                 let addr = 0xff00 | *cpu.regs.c as u16;
-                cpu.bus.write(addr as usize, op2);
+                cpu.bus.borrow_mut().write(addr as usize, op2);
             }
             0xf0 => {
                 let addr = 0xff00 | cpu.fetchbyte() as u16;
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
             }
             0xf2 => {
                 let addr = 0xff00 | *cpu.regs.c as u16;
-                let op2 = cpu.bus.read(addr as usize);
+                let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
             }
             _ => panic!("Illegal instruction."),
