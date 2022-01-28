@@ -1,4 +1,6 @@
+use std::cell::RefCell;
 use std::fmt::{Debug, Display};
+use std::rc::Rc;
 
 use log::{debug, info};
 use remus::bus::Bus;
@@ -11,7 +13,7 @@ mod inst;
 
 #[derive(Debug)]
 pub struct Cpu {
-    pub bus: Bus,
+    pub bus: Rc<RefCell<Bus>>,
     regs: Registers,
     status: Status,
     ime: bool,
@@ -51,27 +53,27 @@ impl Cpu {
 
     fn fetchbyte(&mut self) -> u8 {
         let pc = &mut *self.regs.pc;
-        let byte = self.bus.read(*pc as usize);
+        let byte = self.bus.borrow().read(*pc as usize);
         *self.regs.pc = pc.wrapping_add(1);
         byte
     }
 
     fn readbyte(&mut self) -> u8 {
         let hl = self.regs.hl.get(&self.regs);
-        self.bus.read(hl as usize)
+        self.bus.borrow().read(hl as usize)
     }
 
     fn writebyte(&mut self, byte: u8) {
         let hl = self.regs.hl.get(&self.regs);
-        self.bus.write(hl as usize, byte);
+        self.bus.borrow_mut().write(hl as usize, byte);
     }
 
     fn fetchword(&mut self) -> u16 {
         let pc = &mut *self.regs.pc;
         let mut word = 0u16;
-        word |= self.bus.read(*pc as usize) as u16;
+        word |= self.bus.borrow().read(*pc as usize) as u16;
         *pc = pc.wrapping_add(1);
-        word |= (self.bus.read(*pc as usize) as u16) << 8;
+        word |= (self.bus.borrow().read(*pc as usize) as u16) << 8;
         *pc = pc.wrapping_add(1);
         word
     }
@@ -79,9 +81,9 @@ impl Cpu {
     fn popword(&mut self) -> u16 {
         let sp = &mut *self.regs.sp;
         let mut word = 0u16;
-        word |= self.bus.read(*sp as usize) as u16;
+        word |= self.bus.borrow().read(*sp as usize) as u16;
         *sp = sp.wrapping_add(1);
-        word |= (self.bus.read(*sp as usize) as u16) << 8;
+        word |= (self.bus.borrow().read(*sp as usize) as u16) << 8;
         *sp = sp.wrapping_add(1);
         word
     }
@@ -90,16 +92,16 @@ impl Cpu {
         let sp = &mut *self.regs.sp;
         let word = word.to_le_bytes();
         *sp = sp.wrapping_sub(1);
-        self.bus.write(*sp as usize, word[1]);
+        self.bus.borrow_mut().write(*sp as usize, word[1]);
         *sp = sp.wrapping_sub(1);
-        self.bus.write(*sp as usize, word[0]);
+        self.bus.borrow_mut().write(*sp as usize, word[0]);
     }
 }
 
 impl Default for Cpu {
     fn default() -> Self {
         Self {
-            bus: Bus::default(),
+            bus: Default::default(),
             regs: Registers::default(),
             status: Status::Stopped,
             ime: false,
