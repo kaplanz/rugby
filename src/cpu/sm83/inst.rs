@@ -35,71 +35,86 @@ impl Display for Instruction {
 impl Instruction {
     fn adc(&self, cpu: &mut Cpu) {
         // Execute adc
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
             0x88..=0x8f => helpers::get_op8(cpu, self.opcode & 0x07),
             0xce => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
         let cin = Flag::C.get(&*cpu.regs.f) as u8;
-        let (res, carry0) = cpu.regs.a.overflowing_add(op2);
+        let (res, carry0) = acc.overflowing_add(op2);
         let (res, carry1) = res.overflowing_add(cin);
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, false);
-        Flag::H.set(
-            flags,
-            (res & 0x0f) > (*cpu.regs.a & 0x0f) + (op2 & 0x0f) + (cin & 0x0f),
-        );
+        Flag::H.set(flags, 0x0f > (acc & 0x0f) + (op2 & 0x0f) + cin);
         Flag::C.set(flags, carry0 | carry1);
     }
 
     fn add8(&self, cpu: &mut Cpu) {
         // Execute add8
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
             0x80..=0x87 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xc6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let (res, carry) = cpu.regs.a.overflowing_add(op2);
+        let (res, carry) = acc.overflowing_add(op2);
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, false);
-        Flag::H.set(flags, (res & 0x0f) > (*cpu.regs.a & 0x0f) + (op2 & 0x0f));
+        Flag::H.set(flags, 0x0f > (acc & 0x0f) + (op2 & 0x0f));
         Flag::C.set(flags, carry);
     }
 
     fn add16(&self, cpu: &mut Cpu) {
-        // Execute add16
-        let hl = cpu.regs.hl;
-        let op1 = hl.get(&cpu.regs);
-        let op2 = match self.opcode {
-            0x09 => cpu.regs.bc.get(&cpu.regs),
-            0x19 => cpu.regs.de.get(&cpu.regs),
-            0x29 => cpu.regs.hl.get(&cpu.regs),
-            0x39 => *cpu.regs.sp,
-            _ => panic!("Illegal instruction."),
-        };
-        let (res, carry) = op1.overflowing_add(op2);
-        hl.set(&mut cpu.regs, res);
-        // Set flags
-        let flags = &mut cpu.regs.f;
-        Flag::N.set(flags, false);
-        Flag::H.set(flags, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
-        Flag::C.set(flags, carry);
+        if self.opcode == 0xe8 {
+            // Execute add16
+            let op1 = *cpu.regs.sp;
+            let op2 = cpu.readbyte() as i8 as i16 as u16;
+            let (res, carry) = (op1 as i16).overflowing_add(op2 as i16);
+            let res = res as u16;
+            *cpu.regs.sp = res;
+            // Set flags
+            let flags = &mut cpu.regs.f;
+            Flag::N.set(flags, false);
+            Flag::H.set(flags, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
+            Flag::C.set(flags, carry);
+        } else {
+            // Execute add16
+            let hl = cpu.regs.hl;
+            let op1 = hl.get(&cpu.regs);
+            let op2 = match self.opcode {
+                0x09 => cpu.regs.bc.get(&cpu.regs),
+                0x19 => cpu.regs.de.get(&cpu.regs),
+                0x29 => cpu.regs.hl.get(&cpu.regs),
+                0x39 => *cpu.regs.sp,
+                _ => panic!("Illegal instruction."),
+            };
+            let (res, carry) = op1.overflowing_add(op2);
+            hl.set(&mut cpu.regs, res);
+            // Set flags
+            let flags = &mut cpu.regs.f;
+            Flag::Z.set(flags, false);
+            Flag::N.set(flags, false);
+            Flag::H.set(flags, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
+            Flag::C.set(flags, carry);
+        }
     }
 
-    fn and8(&self, cpu: &mut Cpu) {
-        // Execute and8
+    fn and(&self, cpu: &mut Cpu) {
+        // Execute and
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
-            0xa0..=0xa0 => helpers::get_op8(cpu, self.opcode & 0x07),
+            0xa0..=0xa7 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xe6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let res = cpu.regs.a.bitand(op2);
+        let res = acc.bitand(op2);
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
@@ -150,22 +165,18 @@ impl Instruction {
 
     fn cp(&self, cpu: &mut Cpu) {
         // Execute cp
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
             0xb8..=0xbf => helpers::get_op8(cpu, self.opcode & 0x07),
             0xfe => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let (res, carry) = cpu.regs.a.overflowing_sub(op2);
+        let (res, carry) = acc.overflowing_sub(op2);
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, true);
-        let (resl, accl, op2l) = (
-            (res & 0x0f | 0xf0) as i8,
-            (*cpu.regs.a & 0x0f | 0xf0) as i8,
-            (op2 & 0x0f | 0xf0) as i8,
-        );
-        Flag::H.set(flags, resl > accl - op2l);
+        Flag::H.set(flags, (op2 & 0x0f) > (acc & 0x0f));
         Flag::C.set(flags, carry);
     }
 
@@ -425,13 +436,32 @@ impl Instruction {
 
     fn ld16(&self, cpu: &mut Cpu) {
         // Execute ld16
-        let op2 = cpu.fetchword();
         match self.opcode {
-            0x01 => (cpu.regs.bc.set)(&mut cpu.regs, op2),
-            0x11 => (cpu.regs.de.set)(&mut cpu.regs, op2),
-            0x21 => (cpu.regs.hl.set)(&mut cpu.regs, op2),
-            0x31 => *cpu.regs.sp = op2,
-            _ => panic!("Illegal instruction."),
+            0x08 => {
+                let addr = cpu.fetchword();
+                let sp = &cpu.regs.sp;
+                cpu.bus.borrow_mut().write(addr as usize, sp.read(0));
+                let addr = addr.wrapping_add(1);
+                cpu.bus.borrow_mut().write(addr as usize, sp.read(0));
+            }
+            0xf8 => {
+                let op2 = (*cpu.regs.sp as i16).wrapping_add(cpu.fetchbyte() as i16) as u16;
+                (cpu.regs.hl.set)(&mut cpu.regs, op2);
+            }
+            0xf9 => {
+                let op2 = (cpu.regs.hl.get)(&cpu.regs);
+                *cpu.regs.sp = op2;
+            }
+            _ => {
+                let op2 = cpu.fetchword();
+                match self.opcode {
+                    0x01 => (cpu.regs.bc.set)(&mut cpu.regs, op2),
+                    0x11 => (cpu.regs.de.set)(&mut cpu.regs, op2),
+                    0x21 => (cpu.regs.hl.set)(&mut cpu.regs, op2),
+                    0x31 => *cpu.regs.sp = op2,
+                    _ => panic!("Illegal instruction."),
+                }
+            }
         }
     }
 
@@ -464,14 +494,15 @@ impl Instruction {
 
     fn nop(&self, _: &mut Cpu) {}
 
-    fn or8(&self, cpu: &mut Cpu) {
-        // Execute or8
+    fn or(&self, cpu: &mut Cpu) {
+        // Execute or
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
-            0xb0..=0xb0 => helpers::get_op8(cpu, self.opcode & 0x07),
+            0xb0..=0xb7 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xf6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let res = cpu.regs.a.bitor(op2);
+        let res = acc.bitor(op2);
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
@@ -676,28 +707,23 @@ impl Instruction {
         *cpu.regs.pc = op1;
     }
 
-    fn sbc8(&self, cpu: &mut Cpu) {
-        // Execute sbc8
+    fn sbc(&self, cpu: &mut Cpu) {
+        // Execute sbc
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
             0x98..=0x9f => helpers::get_op8(cpu, self.opcode & 0x07),
             0xde => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
         let cin = Flag::C.get(&*cpu.regs.f) as u8;
-        let (res, carry0) = cpu.regs.a.overflowing_sub(op2);
+        let (res, carry0) = acc.overflowing_sub(op2);
         let (res, carry1) = res.overflowing_sub(cin);
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, true);
-        let (resl, accl, op2l, cinl) = (
-            (res & 0x0f | 0xf0),
-            (*cpu.regs.a & 0x0f | 0xf0),
-            (op2 & 0x0f | 0xf0),
-            (cin & 0x0f | 0xf0),
-        );
-        Flag::H.set(flags, resl > accl - op2l - cinl);
+        Flag::H.set(flags, (op2 & 0x0f) + cin > (acc & 0x0f));
         Flag::C.set(flags, carry0 | carry1);
     }
 
@@ -768,23 +794,19 @@ impl Instruction {
 
     fn sub(&self, cpu: &mut Cpu) {
         // Execute sub
+        let acc = *cpu.regs.a;
         let op2 = match self.opcode {
-            0x90..=0x90 => helpers::get_op8(cpu, self.opcode & 0x07),
+            0x90..=0x97 => helpers::get_op8(cpu, self.opcode & 0x07),
             0xd6 => cpu.fetchbyte(),
             _ => panic!("Illegal instruction."),
         };
-        let (res, carry) = cpu.regs.a.overflowing_sub(op2);
+        let (res, carry) = acc.overflowing_sub(op2);
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, true);
-        let (resl, accl, op2l) = (
-            (res & 0x0f | 0xf0) as i8,
-            (*cpu.regs.a & 0x0f | 0xf0) as i8,
-            (op2 & 0x0f | 0xf0) as i8,
-        );
-        Flag::H.set(flags, resl > accl - op2l);
+        Flag::H.set(flags, (op2 & 0x0f) > (acc & 0x0f));
         Flag::C.set(flags, carry);
     }
 
@@ -805,8 +827,8 @@ impl Instruction {
         panic!("Illegal instruction.");
     }
 
-    fn xor8(&self, cpu: &mut Cpu) {
-        // Execute xor8
+    fn xor(&self, cpu: &mut Cpu) {
+        // Execute xor
         let op2 = match self.opcode {
             0xa8..=0xaf => helpers::get_op8(cpu, self.opcode & 0x07),
             0xee => cpu.fetchbyte(),
@@ -909,8 +931,8 @@ const DECODE: [Instruction; 0x100] = [
     Instruction { opcode: 0x31, exec: Instruction::ld16,   fmt: "LD SP, d16"     },
     Instruction { opcode: 0x32, exec: Instruction::ld8,    fmt: "LD (HL-), A"    },
     Instruction { opcode: 0x33, exec: Instruction::inc16,  fmt: "INC SP"         },
-    Instruction { opcode: 0x34, exec: Instruction::inc16,  fmt: "INC (HL)"       },
-    Instruction { opcode: 0x35, exec: Instruction::dec16,  fmt: "DEC (HL)"       },
+    Instruction { opcode: 0x34, exec: Instruction::inc8,   fmt: "INC (HL)"       },
+    Instruction { opcode: 0x35, exec: Instruction::dec8,   fmt: "DEC (HL)"       },
     Instruction { opcode: 0x36, exec: Instruction::ld8,    fmt: "LD (HL), d8"    },
     Instruction { opcode: 0x37, exec: Instruction::scf,    fmt: "SCF"            },
     Instruction { opcode: 0x38, exec: Instruction::jr,     fmt: "JR C, r8"       },
@@ -1009,38 +1031,38 @@ const DECODE: [Instruction; 0x100] = [
     Instruction { opcode: 0x95, exec: Instruction::sub,    fmt: "SUB A, L"       },
     Instruction { opcode: 0x96, exec: Instruction::sub,    fmt: "SUB A, (HL)"    },
     Instruction { opcode: 0x97, exec: Instruction::sub,    fmt: "SUB A, A"       },
-    Instruction { opcode: 0x98, exec: Instruction::sbc8,   fmt: "SBC A, B"       },
-    Instruction { opcode: 0x99, exec: Instruction::sbc8,   fmt: "SBC A, C"       },
-    Instruction { opcode: 0x9a, exec: Instruction::sbc8,   fmt: "SBC A, D"       },
-    Instruction { opcode: 0x9b, exec: Instruction::sbc8,   fmt: "SBC A, E"       },
-    Instruction { opcode: 0x9c, exec: Instruction::sbc8,   fmt: "SBC A, H"       },
-    Instruction { opcode: 0x9d, exec: Instruction::sbc8,   fmt: "SBC A, L"       },
-    Instruction { opcode: 0x9e, exec: Instruction::sbc8,   fmt: "SBC A, (HL)"    },
-    Instruction { opcode: 0x9f, exec: Instruction::sbc8,   fmt: "SBC A, A"       },
-    Instruction { opcode: 0xa0, exec: Instruction::and8,   fmt: "AND B"          },
-    Instruction { opcode: 0xa1, exec: Instruction::and8,   fmt: "AND C"          },
-    Instruction { opcode: 0xa2, exec: Instruction::and8,   fmt: "AND D"          },
-    Instruction { opcode: 0xa3, exec: Instruction::and8,   fmt: "AND E"          },
-    Instruction { opcode: 0xa4, exec: Instruction::and8,   fmt: "AND H"          },
-    Instruction { opcode: 0xa5, exec: Instruction::and8,   fmt: "AND L"          },
-    Instruction { opcode: 0xa6, exec: Instruction::and8,   fmt: "AND (HL)"       },
-    Instruction { opcode: 0xa7, exec: Instruction::and8,   fmt: "AND A"          },
-    Instruction { opcode: 0xa8, exec: Instruction::xor8,   fmt: "XOR B"          },
-    Instruction { opcode: 0xa9, exec: Instruction::xor8,   fmt: "XOR C"          },
-    Instruction { opcode: 0xaa, exec: Instruction::xor8,   fmt: "XOR D"          },
-    Instruction { opcode: 0xab, exec: Instruction::xor8,   fmt: "XOR E"          },
-    Instruction { opcode: 0xac, exec: Instruction::xor8,   fmt: "XOR H"          },
-    Instruction { opcode: 0xad, exec: Instruction::xor8,   fmt: "XOR L"          },
-    Instruction { opcode: 0xae, exec: Instruction::xor8,   fmt: "XOR (HL)"       },
-    Instruction { opcode: 0xaf, exec: Instruction::xor8,   fmt: "XOR A"          },
-    Instruction { opcode: 0xb0, exec: Instruction::or8,    fmt: "OR B"           },
-    Instruction { opcode: 0xb1, exec: Instruction::or8,    fmt: "OR C"           },
-    Instruction { opcode: 0xb2, exec: Instruction::or8,    fmt: "OR D"           },
-    Instruction { opcode: 0xb3, exec: Instruction::or8,    fmt: "OR E"           },
-    Instruction { opcode: 0xb4, exec: Instruction::or8,    fmt: "OR H"           },
-    Instruction { opcode: 0xb5, exec: Instruction::or8,    fmt: "OR L"           },
-    Instruction { opcode: 0xb6, exec: Instruction::or8,    fmt: "OR (HL)"        },
-    Instruction { opcode: 0xb7, exec: Instruction::or8,    fmt: "OR A"           },
+    Instruction { opcode: 0x98, exec: Instruction::sbc,    fmt: "SBC A, B"       },
+    Instruction { opcode: 0x99, exec: Instruction::sbc,    fmt: "SBC A, C"       },
+    Instruction { opcode: 0x9a, exec: Instruction::sbc,    fmt: "SBC A, D"       },
+    Instruction { opcode: 0x9b, exec: Instruction::sbc,    fmt: "SBC A, E"       },
+    Instruction { opcode: 0x9c, exec: Instruction::sbc,    fmt: "SBC A, H"       },
+    Instruction { opcode: 0x9d, exec: Instruction::sbc,    fmt: "SBC A, L"       },
+    Instruction { opcode: 0x9e, exec: Instruction::sbc,    fmt: "SBC A, (HL)"    },
+    Instruction { opcode: 0x9f, exec: Instruction::sbc,    fmt: "SBC A, A"       },
+    Instruction { opcode: 0xa0, exec: Instruction::and,    fmt: "AND B"          },
+    Instruction { opcode: 0xa1, exec: Instruction::and,    fmt: "AND C"          },
+    Instruction { opcode: 0xa2, exec: Instruction::and,    fmt: "AND D"          },
+    Instruction { opcode: 0xa3, exec: Instruction::and,    fmt: "AND E"          },
+    Instruction { opcode: 0xa4, exec: Instruction::and,    fmt: "AND H"          },
+    Instruction { opcode: 0xa5, exec: Instruction::and,    fmt: "AND L"          },
+    Instruction { opcode: 0xa6, exec: Instruction::and,    fmt: "AND (HL)"       },
+    Instruction { opcode: 0xa7, exec: Instruction::and,    fmt: "AND A"          },
+    Instruction { opcode: 0xa8, exec: Instruction::xor,    fmt: "XOR B"          },
+    Instruction { opcode: 0xa9, exec: Instruction::xor,    fmt: "XOR C"          },
+    Instruction { opcode: 0xaa, exec: Instruction::xor,    fmt: "XOR D"          },
+    Instruction { opcode: 0xab, exec: Instruction::xor,    fmt: "XOR E"          },
+    Instruction { opcode: 0xac, exec: Instruction::xor,    fmt: "XOR H"          },
+    Instruction { opcode: 0xad, exec: Instruction::xor,    fmt: "XOR L"          },
+    Instruction { opcode: 0xae, exec: Instruction::xor,    fmt: "XOR (HL)"       },
+    Instruction { opcode: 0xaf, exec: Instruction::xor,    fmt: "XOR A"          },
+    Instruction { opcode: 0xb0, exec: Instruction::or,     fmt: "OR B"           },
+    Instruction { opcode: 0xb1, exec: Instruction::or,     fmt: "OR C"           },
+    Instruction { opcode: 0xb2, exec: Instruction::or,     fmt: "OR D"           },
+    Instruction { opcode: 0xb3, exec: Instruction::or,     fmt: "OR E"           },
+    Instruction { opcode: 0xb4, exec: Instruction::or,     fmt: "OR H"           },
+    Instruction { opcode: 0xb5, exec: Instruction::or,     fmt: "OR L"           },
+    Instruction { opcode: 0xb6, exec: Instruction::or,     fmt: "OR (HL)"        },
+    Instruction { opcode: 0xb7, exec: Instruction::or,     fmt: "OR A"           },
     Instruction { opcode: 0xb8, exec: Instruction::cp,     fmt: "CP B"           },
     Instruction { opcode: 0xb9, exec: Instruction::cp,     fmt: "CP C"           },
     Instruction { opcode: 0xba, exec: Instruction::cp,     fmt: "CP D"           },
@@ -1079,7 +1101,7 @@ const DECODE: [Instruction; 0x100] = [
     Instruction { opcode: 0xdb, exec: Instruction::unused, fmt: "UNUSED"         },
     Instruction { opcode: 0xdc, exec: Instruction::call,   fmt: "CALL C, a16"    },
     Instruction { opcode: 0xdd, exec: Instruction::unused, fmt: "UNUSED"         },
-    Instruction { opcode: 0xde, exec: Instruction::sbc8,   fmt: "SBC A, d8"      },
+    Instruction { opcode: 0xde, exec: Instruction::sbc,    fmt: "SBC A, d8"      },
     Instruction { opcode: 0xdf, exec: Instruction::rst,    fmt: "RST 18H"        },
     Instruction { opcode: 0xe0, exec: Instruction::ldh,    fmt: "LDH (a8), A"    },
     Instruction { opcode: 0xe1, exec: Instruction::pop,    fmt: "POP HL"         },
@@ -1087,7 +1109,7 @@ const DECODE: [Instruction; 0x100] = [
     Instruction { opcode: 0xe3, exec: Instruction::unused, fmt: "UNUSED"         },
     Instruction { opcode: 0xe4, exec: Instruction::unused, fmt: "UNUSED"         },
     Instruction { opcode: 0xe5, exec: Instruction::push,   fmt: "PUSH HL"        },
-    Instruction { opcode: 0xe6, exec: Instruction::and8,   fmt: "AND d8"         },
+    Instruction { opcode: 0xe6, exec: Instruction::and,    fmt: "AND d8"         },
     Instruction { opcode: 0xe7, exec: Instruction::rst,    fmt: "RST 20H"        },
     Instruction { opcode: 0xe8, exec: Instruction::add16,  fmt: "ADD SP, r8"     },
     Instruction { opcode: 0xe9, exec: Instruction::jp,     fmt: "JP HL"          },
@@ -1095,7 +1117,7 @@ const DECODE: [Instruction; 0x100] = [
     Instruction { opcode: 0xeb, exec: Instruction::unused, fmt: "UNUSED"         },
     Instruction { opcode: 0xec, exec: Instruction::unused, fmt: "UNUSED"         },
     Instruction { opcode: 0xed, exec: Instruction::unused, fmt: "UNUSED"         },
-    Instruction { opcode: 0xee, exec: Instruction::xor8,   fmt: "XOR d8"         },
+    Instruction { opcode: 0xee, exec: Instruction::xor,    fmt: "XOR d8"         },
     Instruction { opcode: 0xef, exec: Instruction::rst,    fmt: "RST 28H"        },
     Instruction { opcode: 0xf0, exec: Instruction::ldh,    fmt: "LDH A, (a8)"    },
     Instruction { opcode: 0xf1, exec: Instruction::pop,    fmt: "POP AF"         },
@@ -1103,7 +1125,7 @@ const DECODE: [Instruction; 0x100] = [
     Instruction { opcode: 0xf3, exec: Instruction::di,     fmt: "DI"             },
     Instruction { opcode: 0xf4, exec: Instruction::unused, fmt: "UNUSED"         },
     Instruction { opcode: 0xf5, exec: Instruction::push,   fmt: "PUSH AF"        },
-    Instruction { opcode: 0xf6, exec: Instruction::or8,    fmt: "OR d8"          },
+    Instruction { opcode: 0xf6, exec: Instruction::or,     fmt: "OR d8"          },
     Instruction { opcode: 0xf7, exec: Instruction::rst,    fmt: "RST 30H"        },
     Instruction { opcode: 0xf8, exec: Instruction::ld16,   fmt: "LD HL, SP + r8" },
     Instruction { opcode: 0xf9, exec: Instruction::ld16,   fmt: "LD SP, HL"      },
