@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::ops::{BitAnd, BitOr, BitXor};
 
-use remus::dev::Device;
+use remus::Device;
 
 use super::{Cpu, Flag, Status};
 

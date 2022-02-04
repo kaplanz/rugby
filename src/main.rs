@@ -26,8 +26,8 @@ fn main() -> anyhow::Result<()> {
     // Load cartridge image
     gb.load(&args.rom)?;
 
-    // Start emulation
-    gb.start();
+    // Run emulator
+    gb.run();
 
     Ok(())
 }

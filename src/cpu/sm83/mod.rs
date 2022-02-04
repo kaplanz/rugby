@@ -4,8 +4,8 @@ use std::rc::Rc;
 
 use log::{debug, info};
 use remus::bus::Bus;
-use remus::dev::Device;
 use remus::reg::Register;
+use remus::Device;
 
 use self::inst::Instruction;
 
@@ -21,13 +21,11 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    pub fn reset(mut self) -> Self {
-        drop(self);
-        self = Self::default();
-        self
+    pub fn reset(&mut self) {
+        *self = Default::default();
     }
 
-    pub fn start(&mut self) {
+    pub fn setup(&mut self) {
         self.status = Status::Enabled(Mode::Normal);
     }
 
