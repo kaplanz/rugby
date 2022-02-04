@@ -8,7 +8,7 @@ use super::{Cpu, Flag, Status};
 #[derive(Clone)]
 pub struct Instruction {
     opcode: u8,
-    exec: fn(&Instruction, &mut Cpu),
+    exec: fn(&Instruction, &mut Cpu) -> usize,
     fmt: &'static str,
 }
 
@@ -21,8 +21,8 @@ impl Instruction {
         PREFIX[opcode as usize].clone()
     }
 
-    pub fn exec(self, cpu: &mut Cpu) {
-        (self.exec)(&self, cpu);
+    pub fn exec(self, cpu: &mut Cpu) -> usize {
+        (self.exec)(&self, cpu)
     }
 }
 
@@ -33,7 +33,7 @@ impl Display for Instruction {
 }
 
 impl Instruction {
-    fn adc(&self, cpu: &mut Cpu) {
+    fn adc(&self, cpu: &mut Cpu) -> usize {
         // Execute adc
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -49,11 +49,17 @@ impl Instruction {
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, false);
-        Flag::H.set(flags, 0x0f > (acc & 0x0f) + (op2 & 0x0f) + cin);
+        Flag::H.set(flags, 0x0f < (acc & 0x0f) + (op2 & 0x0f) + cin);
         Flag::C.set(flags, carry0 | carry1);
+        // Return cycles
+        match self.opcode {
+            0x8e | 0xce => 2,
+            0x88..=0x8f => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn add8(&self, cpu: &mut Cpu) {
+    fn add8(&self, cpu: &mut Cpu) -> usize {
         // Execute add8
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -67,11 +73,17 @@ impl Instruction {
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, false);
-        Flag::H.set(flags, 0x0f > (acc & 0x0f) + (op2 & 0x0f));
+        Flag::H.set(flags, 0x0f < (acc & 0x0f) + (op2 & 0x0f));
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode {
+            0x86 | 0xc6 => 2,
+            0x80..=0x87 => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn add16(&self, cpu: &mut Cpu) {
+    fn add16(&self, cpu: &mut Cpu) -> usize {
         if self.opcode == 0xe8 {
             // Execute add16
             let op1 = *cpu.regs.sp;
@@ -82,8 +94,10 @@ impl Instruction {
             // Set flags
             let flags = &mut cpu.regs.f;
             Flag::N.set(flags, false);
-            Flag::H.set(flags, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
+            Flag::H.set(flags, 0x0fff < (op1 & 0x0fff) + (op2 & 0x0fff));
             Flag::C.set(flags, carry);
+            // Return cycles
+            4
         } else {
             // Execute add16
             let hl = cpu.regs.hl;
@@ -99,14 +113,15 @@ impl Instruction {
             hl.set(&mut cpu.regs, res);
             // Set flags
             let flags = &mut cpu.regs.f;
-            Flag::Z.set(flags, false);
             Flag::N.set(flags, false);
-            Flag::H.set(flags, (res & 0x0f) > (op1 & 0x0f) + (op2 & 0x0f));
+            Flag::H.set(flags, 0x0fff < (op1 & 0x0fff) + (op2 & 0x0fff));
             Flag::C.set(flags, carry);
+            // Return cycles
+            2
         }
     }
 
-    fn and(&self, cpu: &mut Cpu) {
+    fn and(&self, cpu: &mut Cpu) -> usize {
         // Execute and
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -122,9 +137,15 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, true);
         Flag::C.set(flags, false);
+        // Return cycles
+        match self.opcode {
+            0xa6 | 0xe6 => 2,
+            0xa0..=0xa7 => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn bit(&self, cpu: &mut Cpu) {
+    fn bit(&self, cpu: &mut Cpu) -> usize {
         // Execute bit
         let op1 = (self.opcode & 0x38) >> 3;
         let op2 = helpers::get_op8(cpu, self.opcode & 0x07);
@@ -134,9 +155,14 @@ impl Instruction {
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, false);
         Flag::H.set(flags, true);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 2,
+            _ => 1,
+        }
     }
 
-    fn call(&self, cpu: &mut Cpu) {
+    fn call(&self, cpu: &mut Cpu) -> usize {
         // Execute call
         let op1 = cpu.fetchword();
         let flags = &mut cpu.regs.f;
@@ -151,19 +177,26 @@ impl Instruction {
         if cond {
             cpu.pushword(*cpu.regs.pc);
             *cpu.regs.pc = op1;
+            // Return cycles
+            6
+        } else {
+            // Return cycles
+            3
         }
     }
 
-    fn ccf(&self, cpu: &mut Cpu) {
+    fn ccf(&self, cpu: &mut Cpu) -> usize {
         // Execute ccf
         let flags = &mut cpu.regs.f;
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         let carry = Flag::C.get(flags);
         Flag::C.set(flags, !carry);
+        // Return cycles
+        4
     }
 
-    fn cp(&self, cpu: &mut Cpu) {
+    fn cp(&self, cpu: &mut Cpu) -> usize {
         // Execute cp
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -178,45 +211,59 @@ impl Instruction {
         Flag::N.set(flags, true);
         Flag::H.set(flags, (op2 & 0x0f) > (acc & 0x0f));
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode {
+            0xbe | 0xfe => 2,
+            0xb8..=0xbf => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn cpl(&self, cpu: &mut Cpu) {
+    fn cpl(&self, cpu: &mut Cpu) -> usize {
         // Execute cpl
         let res = !*cpu.regs.a;
         *cpu.regs.a = res;
         // Set flags
         let flags = &mut cpu.regs.f;
-        Flag::Z.set(flags, res == 0);
-        Flag::N.set(flags, false);
-        Flag::H.set(flags, res & 0x0f == 0);
+        Flag::N.set(flags, true);
+        Flag::H.set(flags, true);
+        // Return cycles
+        1
     }
 
-    fn daa(&self, cpu: &mut Cpu) {
+    fn daa(&self, cpu: &mut Cpu) -> usize {
         // Execute daa
-        let mut res = *cpu.regs.a;
-        let hcarry = (res & 0x0f) > 0x09;
-        if hcarry {
-            res += 0x06;
+        let subbed = Flag::N.get(&cpu.regs.f);
+        let hcarry = Flag::H.get(&cpu.regs.f);
+        let mut carry = Flag::C.get(&cpu.regs.f);
+        let mut adj = 0i8;
+        let acc = &mut *cpu.regs.a;
+        if hcarry || (!subbed && (*acc & 0x0f) > 0x09) {
+            adj |= 0x06;
         }
-        let carry = (res & 0xf0) > 0x90;
-        if carry {
-            res += 0x60;
+        if carry || (!subbed && *acc > 0x99) {
+            adj |= 0x60;
+            carry = true;
         }
-        *cpu.regs.a = res;
+        adj = if !subbed { adj } else { -adj };
+        let res = (*acc as i8).wrapping_add(adj) as u8;
+        *acc = res;
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
-        Flag::H.set(flags, hcarry);
+        Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        1
     }
 
-    fn dec8(&self, cpu: &mut Cpu) {
+    fn dec8(&self, cpu: &mut Cpu) -> usize {
         // Execute dec8
-        let res = if self.opcode == 0x35 {
+        let (op1, res) = if self.opcode == 0x35 {
             let op1 = cpu.readbyte();
             let res = op1.wrapping_sub(1);
             cpu.writebyte(res);
-            res
+            (op1, res)
         } else {
             let op1 = match self.opcode {
                 0x05 => &mut *cpu.regs.b,
@@ -229,17 +276,23 @@ impl Instruction {
                 _ => panic!("Illegal instruction."),
             };
             let res = op1.wrapping_sub(1);
+            let old = *op1;
             *op1 = res;
-            res
+            (old, res)
         };
         // Set flags
         let flags = &mut cpu.regs.f;
         Flag::Z.set(flags, res == 0);
-        Flag::N.set(flags, false);
-        Flag::H.set(flags, res & 0x0f == 0);
+        Flag::N.set(flags, true);
+        Flag::H.set(flags, op1 & 0x0f == 0);
+        // Return cycles
+        match self.opcode {
+            0x35 => 3,
+            _ => 1,
+        }
     }
 
-    fn dec16(&self, cpu: &mut Cpu) {
+    fn dec16(&self, cpu: &mut Cpu) -> usize {
         // Execute dec16
         if self.opcode == 0x3b {
             let op1 = &mut *cpu.regs.sp;
@@ -255,24 +308,32 @@ impl Instruction {
             let res = op1.get(&cpu.regs).wrapping_sub(1);
             op1.set(&mut cpu.regs, res);
         }
+        // Return cycles
+        2
     }
 
-    fn di(&self, cpu: &mut Cpu) {
+    fn di(&self, cpu: &mut Cpu) -> usize {
         // Execute di
         cpu.ime = false;
+        // Return cycles
+        1
     }
 
-    fn ei(&self, cpu: &mut Cpu) {
+    fn ei(&self, cpu: &mut Cpu) -> usize {
         // Execute ei
         cpu.ime = true;
+        // Return cycles
+        1
     }
 
-    fn halt(&self, cpu: &mut Cpu) {
+    fn halt(&self, cpu: &mut Cpu) -> usize {
         // Execute halt
         cpu.status = Status::Halted;
+        // Return cycles
+        1
     }
 
-    fn inc8(&self, cpu: &mut Cpu) {
+    fn inc8(&self, cpu: &mut Cpu) -> usize {
         // Execute inc8
         let res = if self.opcode == 0x34 {
             let op1 = cpu.readbyte();
@@ -299,9 +360,14 @@ impl Instruction {
         Flag::Z.set(flags, res == 0);
         Flag::N.set(flags, false);
         Flag::H.set(flags, res & 0x0f == 0);
+        // Return cycles
+        match self.opcode {
+            0x34 => 3,
+            _ => 1,
+        }
     }
 
-    fn inc16(&self, cpu: &mut Cpu) {
+    fn inc16(&self, cpu: &mut Cpu) -> usize {
         // Execute inc16
         if self.opcode == 0x33 {
             let op1 = &mut *cpu.regs.sp;
@@ -317,9 +383,11 @@ impl Instruction {
             let res = op1.get(&cpu.regs).wrapping_add(1);
             op1.set(&mut cpu.regs, res);
         }
+        // Return cycles
+        2
     }
 
-    fn jp(&self, cpu: &mut Cpu) {
+    fn jp(&self, cpu: &mut Cpu) -> usize {
         // Execute jp
         let op1 = match self.opcode {
             0xc2 | 0xc3 | 0xca | 0xd2 | 0xda => cpu.fetchword(),
@@ -338,10 +406,19 @@ impl Instruction {
         };
         if cond {
             *cpu.regs.pc = op1;
+            // Return cycles
+            if self.opcode == 0xe9 {
+                1
+            } else {
+                4
+            }
+        } else {
+            // Return cycles
+            3
         }
     }
 
-    fn jr(&self, cpu: &mut Cpu) {
+    fn jr(&self, cpu: &mut Cpu) -> usize {
         // Execute jr
         let op1 = cpu.fetchbyte() as i8 as i16;
         let flags = &mut cpu.regs.f;
@@ -357,21 +434,30 @@ impl Instruction {
             let pc = *cpu.regs.pc as i16;
             let res = pc.wrapping_add(op1) as u16;
             *cpu.regs.pc = res;
+            // Return cycles
+            3
+        } else {
+            // Return cycles
+            2
         }
     }
 
-    fn ld8(&self, cpu: &mut Cpu) {
+    fn ld8(&self, cpu: &mut Cpu) -> usize {
         // Execute ld8
         match self.opcode {
             0x02 => {
                 let op2 = *cpu.regs.a;
                 let addr = cpu.regs.bc.get(&cpu.regs);
                 cpu.bus.borrow_mut().write(addr as usize, op2);
+                // Return cycles
+                2
             }
             0x12 => {
                 let op2 = *cpu.regs.a;
                 let addr = cpu.regs.de.get(&cpu.regs);
                 cpu.bus.borrow_mut().write(addr as usize, op2);
+                // Return cycles
+                2
             }
             0x22 => {
                 let op2 = *cpu.regs.a;
@@ -379,6 +465,8 @@ impl Instruction {
                 let addr = hl.get(&cpu.regs);
                 cpu.bus.borrow_mut().write(addr as usize, op2);
                 hl.set(&mut cpu.regs, addr.wrapping_add(1));
+                // Return cycles
+                2
             }
             0x32 => {
                 let op2 = *cpu.regs.a;
@@ -386,16 +474,22 @@ impl Instruction {
                 let addr = hl.get(&cpu.regs);
                 cpu.bus.borrow_mut().write(addr as usize, op2);
                 hl.set(&mut cpu.regs, addr.wrapping_sub(1));
+                // Return cycles
+                2
             }
             0x0a => {
                 let addr = cpu.regs.bc.get(&cpu.regs);
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
+                // Return cycles
+                2
             }
             0x1a => {
                 let addr = cpu.regs.de.get(&cpu.regs);
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
+                // Return cycles
+                2
             }
             0x2a => {
                 let hl = cpu.regs.hl;
@@ -403,6 +497,8 @@ impl Instruction {
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
                 hl.set(&mut cpu.regs, addr.wrapping_add(1));
+                // Return cycles
+                2
             }
             0x3a => {
                 let hl = cpu.regs.hl;
@@ -410,31 +506,50 @@ impl Instruction {
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
                 hl.set(&mut cpu.regs, addr.wrapping_sub(1));
+                // Return cycles
+                2
             }
             0x06 | 0x16 | 0x26 | 0x36 | 0x0e | 0x1e | 0x2e | 0x3e => {
                 let op2 = cpu.fetchbyte();
                 helpers::set_op8(cpu, (self.opcode & 0x38) >> 3, op2);
+                // Return cycles
+                match self.opcode {
+                    0x36 => 3,
+                    _ => 2,
+                }
             }
             0x76 => panic!("Illegal instruction."),
             0x40..=0x7f => {
                 let op2 = helpers::get_op8(cpu, self.opcode & 0x07);
                 helpers::set_op8(cpu, (self.opcode & 0x38) >> 3, op2);
+                // Return cycles
+                match self.opcode & 0x0f {
+                    0x06 | 0x0e => 2,
+                    _ => match self.opcode & 0xf8 {
+                        0x78 => 2,
+                        _ => 1,
+                    },
+                }
             }
             0xea => {
                 let op2 = *cpu.regs.a;
                 let addr = cpu.fetchword();
                 cpu.bus.borrow_mut().write(addr as usize, op2);
+                // Return cycles
+                4
             }
             0xfa => {
                 let addr = cpu.fetchword();
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
+                // Return cycles
+                4
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    fn ld16(&self, cpu: &mut Cpu) {
+    fn ld16(&self, cpu: &mut Cpu) -> usize {
         // Execute ld16
         match self.opcode {
             0x08 => {
@@ -443,14 +558,20 @@ impl Instruction {
                 cpu.bus.borrow_mut().write(addr as usize, sp.read(0));
                 let addr = addr.wrapping_add(1);
                 cpu.bus.borrow_mut().write(addr as usize, sp.read(0));
+                // Return cycles
+                5
             }
             0xf8 => {
                 let op2 = (*cpu.regs.sp as i16).wrapping_add(cpu.fetchbyte() as i16) as u16;
                 (cpu.regs.hl.set)(&mut cpu.regs, op2);
+                // Return cycles
+                3
             }
             0xf9 => {
                 let op2 = (cpu.regs.hl.get)(&cpu.regs);
                 *cpu.regs.sp = op2;
+                // Return cycles
+                2
             }
             _ => {
                 let op2 = cpu.fetchword();
@@ -461,40 +582,53 @@ impl Instruction {
                     0x31 => *cpu.regs.sp = op2,
                     _ => panic!("Illegal instruction."),
                 }
+                // Return cycles
+                3
             }
         }
     }
 
-    fn ldh(&self, cpu: &mut Cpu) {
+    fn ldh(&self, cpu: &mut Cpu) -> usize {
         // Execute ldh
         match self.opcode {
             0xe0 => {
                 let op2 = *cpu.regs.a;
                 let addr = 0xff00 | cpu.fetchbyte() as u16;
                 cpu.bus.borrow_mut().write(addr as usize, op2);
+                // Return cycles
+                3
             }
             0xe2 => {
                 let op2 = *cpu.regs.a;
                 let addr = 0xff00 | *cpu.regs.c as u16;
                 cpu.bus.borrow_mut().write(addr as usize, op2);
+                // Return cycles
+                2
             }
             0xf0 => {
                 let addr = 0xff00 | cpu.fetchbyte() as u16;
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
+                // Return cycles
+                3
             }
             0xf2 => {
                 let addr = 0xff00 | *cpu.regs.c as u16;
                 let op2 = cpu.bus.borrow().read(addr as usize);
                 *cpu.regs.a = op2;
+                // Return cycles
+                2
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    fn nop(&self, _: &mut Cpu) {}
+    fn nop(&self, _: &mut Cpu) -> usize {
+        // Return cycles
+        1
+    }
 
-    fn or(&self, cpu: &mut Cpu) {
+    fn or(&self, cpu: &mut Cpu) -> usize {
         // Execute or
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -510,9 +644,15 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, false);
+        // Return cycles
+        match self.opcode {
+            0xb6 | 0xf6 => 2,
+            0xb0..=0xb7 => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn pop(&self, cpu: &mut Cpu) {
+    fn pop(&self, cpu: &mut Cpu) -> usize {
         // Execute pop
         let op1 = match self.opcode {
             0xc1 => cpu.regs.bc,
@@ -521,16 +661,24 @@ impl Instruction {
             0xf1 => cpu.regs.af,
             _ => panic!("Illegal instruction."),
         };
-        let word = cpu.popword();
+        let mut word = cpu.popword();
+        // Lower 4 bits of F cannot be changed, even by "POP AF"
+        if self.opcode == 0xf1 {
+            word &= 0xfff0;
+        }
         op1.set(&mut cpu.regs, word);
+        // Return cycles
+        3
     }
 
-    fn prefix(&self, cpu: &mut Cpu) {
+    fn prefix(&self, cpu: &mut Cpu) -> usize {
         // Execute prefix
-        cpu.prefixed = true;
+        cpu.prefix = true;
+        // Return cycles
+        1
     }
 
-    fn push(&self, cpu: &mut Cpu) {
+    fn push(&self, cpu: &mut Cpu) -> usize {
         // Execute push
         let op1 = match self.opcode {
             0xc5 => cpu.regs.bc,
@@ -540,18 +688,25 @@ impl Instruction {
             _ => panic!("Illegal instruction."),
         };
         cpu.pushword(op1.get(&cpu.regs));
+        // Return cycles
+        4
     }
 
-    fn res(&self, cpu: &mut Cpu) {
+    fn res(&self, cpu: &mut Cpu) -> usize {
         // Execute res
         let op1 = (self.opcode & 0x38) >> 3;
         let op2 = helpers::get_op8(cpu, self.opcode & 0x07);
         let mask = !(0b1 << op1);
         let res = mask & op2;
         helpers::set_op8(cpu, self.opcode & 0x07, res);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn ret(&self, cpu: &mut Cpu) {
+    fn ret(&self, cpu: &mut Cpu) -> usize {
         // Execute ret
         let flags = &mut cpu.regs.f;
         let cond = match self.opcode {
@@ -565,17 +720,28 @@ impl Instruction {
         if cond {
             let pc = cpu.popword();
             *cpu.regs.pc = pc;
+            // Return cycles
+            if self.opcode & 0x0f == 0x09 {
+                4
+            } else {
+                5
+            }
+        } else {
+            // Return cycles
+            2
         }
     }
 
-    fn reti(&self, cpu: &mut Cpu) {
+    fn reti(&self, cpu: &mut Cpu) -> usize {
         // Execute reti
         let pc = cpu.popword();
         *cpu.regs.pc = pc;
         cpu.ime = true;
+        // Return cycles
+        4
     }
 
-    fn rl(&self, cpu: &mut Cpu) {
+    fn rl(&self, cpu: &mut Cpu) -> usize {
         // Execute rl
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let flags = &mut cpu.regs.f;
@@ -589,9 +755,14 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn rla(&self, cpu: &mut Cpu) {
+    fn rla(&self, cpu: &mut Cpu) -> usize {
         // Execute rla
         let flags = &mut cpu.regs.f;
         let cin = Flag::C.get(flags);
@@ -604,9 +775,11 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        1
     }
 
-    fn rlc(&self, cpu: &mut Cpu) {
+    fn rlc(&self, cpu: &mut Cpu) -> usize {
         // Execute rlc
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let carry = op1 & 0x80 != 0;
@@ -618,9 +791,14 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn rlca(&self, cpu: &mut Cpu) {
+    fn rlca(&self, cpu: &mut Cpu) -> usize {
         // Execute rlca
         let carry = *cpu.regs.a & 0x80 != 0;
         let res = *cpu.regs.a << 1 | (carry as u8);
@@ -631,9 +809,11 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        1
     }
 
-    fn rr(&self, cpu: &mut Cpu) {
+    fn rr(&self, cpu: &mut Cpu) -> usize {
         // Execute rr
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let flags = &mut cpu.regs.f;
@@ -647,9 +827,14 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn rra(&self, cpu: &mut Cpu) {
+    fn rra(&self, cpu: &mut Cpu) -> usize {
         // Execute rra
         let flags = &mut cpu.regs.f;
         let cin = Flag::C.get(flags);
@@ -662,9 +847,11 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        1
     }
 
-    fn rrc(&self, cpu: &mut Cpu) {
+    fn rrc(&self, cpu: &mut Cpu) -> usize {
         // Execute rrc
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let carry = op1 & 0x01 != 0;
@@ -676,9 +863,14 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn rrca(&self, cpu: &mut Cpu) {
+    fn rrca(&self, cpu: &mut Cpu) -> usize {
         // Execute rrca
         let carry = *cpu.regs.a & 0x01 != 0;
         let res = ((carry as u8) << 7) | *cpu.regs.a >> 1;
@@ -689,9 +881,11 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        1
     }
 
-    fn rst(&self, cpu: &mut Cpu) {
+    fn rst(&self, cpu: &mut Cpu) -> usize {
         // Execute rst
         let op1 = match self.opcode {
             0xc7 => 0x00,
@@ -705,9 +899,11 @@ impl Instruction {
             _ => panic!("Illegal instruction."),
         };
         *cpu.regs.pc = op1;
+        // Return cycles
+        4
     }
 
-    fn sbc(&self, cpu: &mut Cpu) {
+    fn sbc(&self, cpu: &mut Cpu) -> usize {
         // Execute sbc
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -725,26 +921,39 @@ impl Instruction {
         Flag::N.set(flags, true);
         Flag::H.set(flags, (op2 & 0x0f) + cin > (acc & 0x0f));
         Flag::C.set(flags, carry0 | carry1);
+        // Return cycles
+        match self.opcode {
+            0x9e | 0xde => 2,
+            0x98..=0x9f => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn scf(&self, cpu: &mut Cpu) {
+    fn scf(&self, cpu: &mut Cpu) -> usize {
         // Execute scf
         let flags = &mut cpu.regs.f;
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, true);
+        // Return cycles
+        1
     }
 
-    fn set(&self, cpu: &mut Cpu) {
+    fn set(&self, cpu: &mut Cpu) -> usize {
         // Execute set
         let op1 = (self.opcode & 0x38) >> 3;
         let op2 = helpers::get_op8(cpu, self.opcode & 0x07);
         let mask = !(0b1 << op1);
         let res = (mask & op2) | !mask;
         helpers::set_op8(cpu, self.opcode & 0x07, res);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn sla(&self, cpu: &mut Cpu) {
+    fn sla(&self, cpu: &mut Cpu) -> usize {
         // Execute sla
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let carry = op1 & 0x80 != 0;
@@ -756,9 +965,14 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn sra(&self, cpu: &mut Cpu) {
+    fn sra(&self, cpu: &mut Cpu) -> usize {
         // Execute sra
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let sign = op1 & 0x80;
@@ -771,9 +985,14 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn srl(&self, cpu: &mut Cpu) {
+    fn srl(&self, cpu: &mut Cpu) -> usize {
         // Execute srl
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
         let carry = op1 & 0x01 != 0;
@@ -785,14 +1004,21 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn stop(&self, cpu: &mut Cpu) {
+    fn stop(&self, cpu: &mut Cpu) -> usize {
         // Execute stop
         cpu.status = Status::Stopped;
+        // Return cycles
+        1
     }
 
-    fn sub(&self, cpu: &mut Cpu) {
+    fn sub(&self, cpu: &mut Cpu) -> usize {
         // Execute sub
         let acc = *cpu.regs.a;
         let op2 = match self.opcode {
@@ -808,12 +1034,18 @@ impl Instruction {
         Flag::N.set(flags, true);
         Flag::H.set(flags, (op2 & 0x0f) > (acc & 0x0f));
         Flag::C.set(flags, carry);
+        // Return cycles
+        match self.opcode {
+            0x6e | 0xd6 => 2,
+            0x90..=0x97 => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 
-    fn swap(&self, cpu: &mut Cpu) {
+    fn swap(&self, cpu: &mut Cpu) -> usize {
         // Execute swap
         let op1 = helpers::get_op8(cpu, self.opcode & 0x07);
-        let res = ((op1 & 0xf0) >> 4) | ((op1 ^ 0x0f) << 4);
+        let res = ((op1 & 0xf0) >> 4) | ((op1 & 0x0f) << 4);
         helpers::set_op8(cpu, self.opcode & 0x07, res);
         // Set flags
         let flags = &mut cpu.regs.f;
@@ -821,13 +1053,18 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, false);
+        // Return cycles
+        match self.opcode & 0x0f {
+            0x06 | 0x0e => 3,
+            _ => 1,
+        }
     }
 
-    fn unused(&self, _: &mut Cpu) {
+    fn unused(&self, _: &mut Cpu) -> usize {
         panic!("Illegal instruction.");
     }
 
-    fn xor(&self, cpu: &mut Cpu) {
+    fn xor(&self, cpu: &mut Cpu) -> usize {
         // Execute xor
         let op2 = match self.opcode {
             0xa8..=0xaf => helpers::get_op8(cpu, self.opcode & 0x07),
@@ -842,6 +1079,12 @@ impl Instruction {
         Flag::N.set(flags, false);
         Flag::H.set(flags, false);
         Flag::C.set(flags, false);
+        // Return cycles
+        match self.opcode {
+            0xae | 0xee => 2,
+            0xa8..=0xaf => 1,
+            _ => panic!("Illegal instruction."),
+        }
     }
 }
 
