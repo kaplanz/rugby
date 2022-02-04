@@ -5,50 +5,23 @@ use std::rc::Rc;
 use log::{debug, info};
 use remus::bus::Bus;
 use remus::reg::Register;
-use remus::Device;
+use remus::{Block, Device, Machine};
 
 use self::inst::Instruction;
 
 mod inst;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Cpu {
     pub bus: Rc<RefCell<Bus>>,
     regs: Registers,
     status: Status,
+    cycle: usize,
     ime: bool,
-    prefixed: bool,
+    prefix: bool,
 }
 
 impl Cpu {
-    pub fn reset(&mut self) {
-        *self = Default::default();
-    }
-
-    pub fn setup(&mut self) {
-        self.status = Status::Enabled(Mode::Normal);
-    }
-
-    pub fn enabled(&self) -> bool {
-        matches!(self.status, Status::Enabled(_))
-    }
-
-    pub fn cycle(&mut self) {
-        // Read the next instruction
-        let opcode = self.fetchbyte();
-        // Decode the instruction
-        let inst = if !self.prefixed {
-            Instruction::new(opcode)
-        } else {
-            self.prefixed = false;
-            Instruction::prefixed(opcode)
-        };
-        info!("{:#06x}: {inst}", self.regs.pc.wrapping_sub(1));
-        // Execute the instruction
-        inst.exec(self);
-        debug!("Registers:\n{}", self.regs);
-    }
-
     fn fetchbyte(&mut self) -> u8 {
         let pc = &mut *self.regs.pc;
         let byte = self.bus.borrow().read(*pc as usize);
@@ -96,15 +69,38 @@ impl Cpu {
     }
 }
 
-impl Default for Cpu {
-    fn default() -> Self {
-        Self {
-            bus: Default::default(),
-            regs: Registers::default(),
-            status: Status::Stopped,
-            ime: false,
-            prefixed: false,
+impl Block for Cpu {
+    fn reset(&mut self) {
+        *self = Self::default();
+    }
+}
+
+impl Machine for Cpu {
+    fn setup(&mut self) {
+        self.status = Status::Enabled(Mode::Normal);
+    }
+
+    fn enabled(&self) -> bool {
+        matches!(self.status, Status::Enabled(_))
+    }
+
+    fn cycle(&mut self) {
+        if self.cycle == 0 {
+            // Read the next instruction
+            let opcode = self.fetchbyte();
+            // Decode the instruction
+            let inst = if !self.prefix {
+                Instruction::new(opcode)
+            } else {
+                self.prefix = false;
+                Instruction::prefixed(opcode)
+            };
+            info!("{:#06x}: {inst}", self.regs.pc.wrapping_sub(1));
+            // Execute the instruction
+            self.cycle = inst.exec(self);
+            debug!("Registers:\n{}", self.regs);
         }
+        self.cycle -= 1;
     }
 }
 
@@ -245,12 +241,17 @@ impl Flag {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 enum Status {
     Enabled(Mode),
     Halted,
     Stopped,
+}
+
+impl Default for Status {
+    fn default() -> Self {
+        Self::Stopped
+    }
 }
 
 #[allow(dead_code)]
