@@ -1,7 +1,8 @@
+use std::fs;
 use std::path::PathBuf;
 
 use clap::{Parser, ValueHint};
-use gameboy::GameBoy;
+use gameboy::{Cartridge, GameBoy};
 
 /// Game Boy emulator written in Rust.
 #[derive(Parser)]
@@ -20,11 +21,14 @@ fn main() -> anyhow::Result<()> {
     // Parse args
     let args = Args::parse();
 
-    // Create emulator instance
-    let mut gb = GameBoy::new();
+    // Read the ROM
+    let rom = fs::read(&args.rom)?;
 
-    // Load cartridge image
-    gb.load(&args.rom)?;
+    // Initialize the cartridge
+    let cart = Cartridge::new(&rom)?;
+
+    // Create emulator instance
+    let mut gb = GameBoy::new(cart);
 
     // Run emulator
     gb.run();
