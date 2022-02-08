@@ -296,7 +296,7 @@ struct Draw {
 
 impl Draw {
     fn exec(mut self, ppu: &mut Ppu) -> Mode {
-        // TODO: draw window, sprites
+        // TODO: draw sprites
         // If we have a pixel to draw, draw it
         if let Some(pixel) = self.fifo.pop() {
             // Extract current scanline
