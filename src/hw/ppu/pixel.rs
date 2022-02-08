@@ -2,8 +2,7 @@ use std::ops::{Deref, DerefMut};
 
 use remus::Device;
 
-use super::Ppu;
-use crate::model::dmg::ppu::Lcdc;
+use super::{Lcdc, Ppu};
 
 #[derive(Debug)]
 pub struct Pixel {
@@ -79,12 +78,23 @@ impl Stage {
                 let scy = **regs.scy.borrow();
                 let scx = **regs.scx.borrow();
                 let ly = **regs.ly.borrow();
+                let wy = **regs.wy.borrow();
+                let wx = **regs.wx.borrow();
+
+                // Check if we should be drawing a window
+                let win = Lcdc::WinEnable.get(&lcdc) && !(wy > ly || wx > 8 * fetch.xpos);
 
                 // Calculate index of the tile
                 let idx = {
-                    // Background tile
-                    let bgmap = Lcdc::BgMap.get(&lcdc);
-                    let base = [0x1800, 0x1c00][bgmap as usize];
+                    let base = if win {
+                        // Window tile
+                        let winmap = Lcdc::WinMap.get(&lcdc);
+                        [0x1800, 0x1c00][winmap as usize]
+                    } else {
+                        // Background tile
+                        let bgmap = Lcdc::BgMap.get(&lcdc);
+                        [0x1800, 0x1c00][bgmap as usize]
+                    };
                     let ypos = (scy.wrapping_add(ly) / 8) as u16;
                     let xpos = ((scx / 8).wrapping_add(fetch.xpos) & 0x1f) as u16;
                     base + (32 * ypos) + xpos
@@ -104,10 +114,10 @@ impl Stage {
                     let offset = (16 * tile) + (2 * yoff) as u16;
                     base + offset
                 } else {
-                    let base = 0x0800;
+                    let base = 0x1000;
                     let tile = tile as i8 as i16;
-                    let offset = (16 * tile) as u16 + (2 * yoff) as u16;
-                    base + offset
+                    let offset = (16 * tile) as i16 + (2 * yoff) as i16;
+                    (base + offset) as u16
                 };
 
                 // Progress to next stage

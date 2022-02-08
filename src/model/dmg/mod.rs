@@ -9,11 +9,9 @@ use remus::mem::{Ram, Rom};
 use remus::reg::Register;
 use remus::{clk, Block, Machine};
 
-use self::ppu::Ppu;
 use crate::cart::Cartridge;
 use crate::cpu::sm83::Cpu;
-
-mod ppu;
+use crate::hw::ppu::{self, Ppu};
 
 const BOOTROM: [u8; 0x100] = [
     0x31, 0xfe, 0xff, 0xaf, 0x21, 0xff, 0x9f, 0x32, 0xcb, 0x7c, 0x20, 0xfb, 0x21, 0x26, 0xff, 0x0e,
