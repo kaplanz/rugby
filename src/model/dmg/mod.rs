@@ -59,9 +59,9 @@ impl GameBoy {
         self.bus.replace(Bus::default());             // │   SIZE   │    NAME    │ DEV │
         let mut bus = self.bus.borrow_mut();          // ├──────────┼────────────┼─────┤
         bus.map(0x0000, self.devs.boot.clone());      // │    256 B │       Boot │ ROM │
-        bus.map(0x0000, self.cart.mbc.rom().clone()); // │  32 Ki B │  Cartridge │ ROM │
+        bus.map(0x0000, self.cart.rom().clone());     // │  32 Ki B │  Cartridge │ ROM │
         bus.map(0x8000, self.ppu.vram.clone());       // │   8 Ki B │      Video │ RAM │
-        bus.map(0xa000, self.cart.mbc.ram().clone()); // │   8 Ki B │   External │ RAM │
+        bus.map(0xa000, self.cart.ram().clone());     // │   8 Ki B │   External │ RAM │
         bus.map(0xc000, self.devs.wram.clone());      // │   8 Ki B │       Work │ RAM │
         bus.map(0xe000, self.devs.wram.clone());      // │   7680 B │       Echo │ RAM │
         bus.map(0xfe00, self.ppu.oam.clone());        // │    160 B │      Video │ RAM │
@@ -261,18 +261,13 @@ mod tests {
         // Cartridge ROM
         (0x0100..=0x7fff).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x20));
         (0x0100..=0x7fff)
-            .map(|addr| gb.cart.mbc.rom().borrow().read(addr))
+            .map(|addr| gb.cart.rom().borrow().read(addr))
             .any(|byte| byte != 0x20);
         // Video RAM
         (0x8000..=0x9fff).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x30));
         assert!((0x0000..=0x1fff)
             .map(|addr| gb.ppu.vram.borrow().read(addr))
             .all(|byte| byte == 0x30));
-        // External RAM
-        (0xa000..=0xbfff).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x40));
-        assert!((0x0000..=0x1fff)
-            .map(|addr| gb.cart.mbc.ram().borrow().read(addr))
-            .all(|byte| byte == 0x40));
         // Video RAM (OAM)
         (0xfe00..=0xfe9f).for_each(|addr| gb.bus.borrow_mut().write(addr, 0x50));
         assert!((0x00..=0x9f)

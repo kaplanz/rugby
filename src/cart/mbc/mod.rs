@@ -4,13 +4,13 @@ use std::rc::Rc;
 
 use remus::{Block, Device};
 
-pub use self::none::NoMbc;
+pub use self::mbc1::Mbc1;
+pub use self::nombc::NoMbc;
 
-mod none;
+mod mbc1;
+mod nombc;
 
 pub trait Mbc: Block + Debug {
-    fn load(&mut self, rom: &[u8]);
-
     fn rom(&self) -> Rc<RefCell<dyn Device>>;
 
     fn ram(&self) -> Rc<RefCell<dyn Device>>;
