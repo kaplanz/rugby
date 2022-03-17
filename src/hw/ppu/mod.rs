@@ -82,7 +82,7 @@ pub struct Ppu {
     // └────────┴──────────────────┴─────┴───────┘
     pub vram: Rc<RefCell<Ram<0x2000>>>,
     pub oam:  Rc<RefCell<Ram<0x00a0>>>,
-    pub regs: Rc<RefCell<Registers>>,
+    pub ctl: Rc<RefCell<Registers>>,
 }
 
 impl Block for Ppu {
@@ -95,13 +95,13 @@ impl Block for Ppu {
         self.vram.borrow_mut().reset();
         self.oam.borrow_mut().reset();
         // Reset registers
-        self.regs.borrow_mut().reset();
+        self.ctl.borrow_mut().reset();
     }
 }
 
 impl Machine for Ppu {
     fn enabled(&self) -> bool {
-        Lcdc::Enable.get(&*self.regs.borrow().lcdc.borrow_mut())
+        Lcdc::Enable.get(&*self.ctl.borrow().lcdc.borrow_mut())
     }
 
     fn cycle(&mut self) {
@@ -237,7 +237,7 @@ struct Scan {
 impl Scan {
     fn exec(mut self, ppu: &mut Ppu) -> Mode {
         // Extract the sprite and scanline config
-        let regs = ppu.regs.borrow();
+        let regs = ppu.ctl.borrow();
         let lcdc = **regs.lcdc.borrow();
         let enabled = Lcdc::ObjEnable.get(&lcdc);
         let size = Lcdc::ObjSize.get(&lcdc);
@@ -300,7 +300,7 @@ impl Draw {
         // If we have a pixel to draw, draw it
         if let Some(pixel) = self.fifo.pop() {
             // Extract current scanline
-            let regs = ppu.regs.borrow();
+            let regs = ppu.ctl.borrow();
             let ly = **regs.ly.borrow();
 
             // Push the pixel into the framebuffer
@@ -346,7 +346,7 @@ impl HBlank {
             Mode::HBlank(self)
         } else {
             // Extract scanline config
-            let regs = ppu.regs.borrow();
+            let regs = ppu.ctl.borrow();
             let mut ly = regs.ly.borrow_mut();
             let ly = &mut **ly;
             // Increment scanline at the 456th dot, and reset dot-clock
@@ -374,7 +374,7 @@ impl VBlank {
             Mode::VBlank(self)
         } else {
             // Extract scanline config
-            let regs = ppu.regs.borrow();
+            let regs = ppu.ctl.borrow();
             let mut ly = regs.ly.borrow_mut();
             let ly = &mut **ly;
             // Increment scanline at the 456th dot, and reset dot-clock

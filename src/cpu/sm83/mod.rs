@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::fmt::{Debug, Display};
 use std::rc::Rc;
 
-use log::{debug, info};
+use log::{debug, trace};
 use remus::bus::Bus;
 use remus::reg::Register;
 use remus::{Block, Device, Machine};
@@ -95,10 +95,10 @@ impl Machine for Cpu {
                 self.prefix = false;
                 Instruction::prefixed(opcode)
             };
-            info!("{:#06x}: {inst}", self.regs.pc.wrapping_sub(1));
+            debug!("{:#06x}: {inst}", self.regs.pc.wrapping_sub(1));
             // Execute the instruction
             self.cycle = inst.exec(self);
-            debug!("Registers:\n{}", self.regs);
+            trace!("Registers:\n{}", self.regs);
         }
         self.cycle -= 1;
     }
