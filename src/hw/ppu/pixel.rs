@@ -73,7 +73,7 @@ impl Stage {
         match self {
             Stage::ReadTile => {
                 // Extract scanline config
-                let regs = ppu.regs.borrow();
+                let regs = ppu.ctl.borrow();
                 let lcdc = **regs.lcdc.borrow();
                 let scy = **regs.scy.borrow();
                 let scx = **regs.scx.borrow();
