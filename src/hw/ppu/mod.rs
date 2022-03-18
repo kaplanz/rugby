@@ -211,8 +211,8 @@ enum Mode {
 
 impl Mode {
     fn exec(self, ppu: &mut Ppu) -> Self {
-        trace!("{:03}: {self:?}", ppu.dot);
         // Execute the current PPU mode
+        trace!("PPU @ {:03}:\n{self}", ppu.dot);
         match self {
             Mode::Scan(scan) => scan.exec(ppu),
             Mode::Draw(draw) => draw.exec(ppu),
@@ -225,6 +225,17 @@ impl Mode {
 impl Default for Mode {
     fn default() -> Self {
         Self::Scan(Default::default())
+    }
+}
+
+impl Display for Mode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Scan(scan) => Display::fmt(scan, f),
+            Self::Draw(draw) => Display::fmt(draw, f),
+            Self::HBlank(hblank) => Display::fmt(hblank, f),
+            Self::VBlank(vblank) => Display::fmt(vblank, f),
+        }
     }
 }
 
@@ -285,6 +296,17 @@ impl Scan {
     }
 }
 
+impl Display for Scan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "┌─────────────┐")?;
+        writeln!(f, "│ {:^11} │", "Scan")?;
+        writeln!(f, "├─────────────┤")?;
+        writeln!(f, "│ Sprite: {:>3} │", self.idx)?;
+        writeln!(f, "│ Found: {:>4} │", self.objs.len())?;
+        write!(f, "└─────────────┘")
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Debug, Default)]
 struct Draw {
@@ -326,6 +348,17 @@ impl Draw {
     }
 }
 
+impl Display for Draw {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "┌─────────────┐")?;
+        writeln!(f, "│ {:^11} │", "Draw")?;
+        writeln!(f, "├─────────────┤")?;
+        writeln!(f, "│ Column: {:>3} │", self.cx)?;
+        writeln!(f, "│ Objects: {:>2} │", self.objs.len())?;
+        write!(f, "└─────────────┘")
+    }
+}
+
 impl From<Scan> for Draw {
     fn from(scan: Scan) -> Self {
         Self {
@@ -363,6 +396,14 @@ impl HBlank {
     }
 }
 
+impl Display for HBlank {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "┌─────────────┐")?;
+        writeln!(f, "│ {:^11} │", "HBlank")?;
+        write!(f, "└─────────────┘")
+    }
+}
+
 #[derive(Debug, Default)]
 struct VBlank;
 
@@ -391,5 +432,13 @@ impl VBlank {
                 Mode::Scan(Default::default())
             }
         }
+    }
+}
+
+impl Display for VBlank {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "┌─────────────┐")?;
+        writeln!(f, "│ {:^11} │", "VBlank")?;
+        write!(f, "└─────────────┘")
     }
 }
