@@ -4,6 +4,7 @@ use std::ops::{BitAnd, BitOr, BitXor};
 use remus::Device;
 
 use super::{Cpu, Flag, Status};
+use crate::util::Bitflags;
 
 #[derive(Clone)]
 pub struct Instruction {

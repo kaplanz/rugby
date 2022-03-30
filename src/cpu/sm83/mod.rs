@@ -8,6 +8,7 @@ use remus::reg::Register;
 use remus::{Block, Device, Machine};
 
 use self::inst::Instruction;
+use crate::util::Bitflags;
 
 mod inst;
 
@@ -77,11 +78,11 @@ impl Block for Cpu {
 
 impl Machine for Cpu {
     fn setup(&mut self) {
-        self.status = Status::Enabled(Mode::Normal);
+        self.status = Status::Enabled;
     }
 
     fn enabled(&self) -> bool {
-        matches!(self.status, Status::Enabled(_))
+        matches!(self.status, Status::Enabled)
     }
 
     fn cycle(&mut self) {
@@ -108,16 +109,16 @@ impl Machine for Cpu {
 struct Registers {
     a: Register<u8>,
     f: Register<u8>,
-    af: PseudoRegister,
+    af: WideRegister,
     b: Register<u8>,
     c: Register<u8>,
-    bc: PseudoRegister,
+    bc: WideRegister,
     d: Register<u8>,
     e: Register<u8>,
-    de: PseudoRegister,
+    de: WideRegister,
     h: Register<u8>,
     l: Register<u8>,
-    hl: PseudoRegister,
+    hl: WideRegister,
     sp: Register<u16>,
     pc: Register<u16>,
 }
@@ -127,7 +128,7 @@ impl Default for Registers {
         Self {
             a: Default::default(),
             f: Default::default(),
-            af: PseudoRegister {
+            af: WideRegister {
                 get: |regs: &Registers| {
                     let a = *regs.a as u16;
                     let f = *regs.f as u16;
@@ -140,7 +141,7 @@ impl Default for Registers {
             },
             b: Default::default(),
             c: Default::default(),
-            bc: PseudoRegister {
+            bc: WideRegister {
                 get: |regs: &Registers| {
                     let b = *regs.b as u16;
                     let c = *regs.c as u16;
@@ -153,7 +154,7 @@ impl Default for Registers {
             },
             d: Default::default(),
             e: Default::default(),
-            de: PseudoRegister {
+            de: WideRegister {
                 get: |regs: &Registers| {
                     let d = *regs.d as u16;
                     let e = *regs.e as u16;
@@ -166,7 +167,7 @@ impl Default for Registers {
             },
             h: Default::default(),
             l: Default::default(),
-            hl: PseudoRegister {
+            hl: WideRegister {
                 get: |regs: &Registers| {
                     let h = *regs.h as u16;
                     let l = *regs.l as u16;
@@ -202,12 +203,12 @@ impl Display for Registers {
 }
 
 #[derive(Copy, Clone)]
-struct PseudoRegister {
+struct WideRegister {
     get: fn(&Registers) -> u16,
     set: fn(&mut Registers, u16),
 }
 
-impl PseudoRegister {
+impl WideRegister {
     pub fn get(&self, regs: &Registers) -> u16 {
         (self.get)(regs)
     }
@@ -217,7 +218,7 @@ impl PseudoRegister {
     }
 }
 
-impl Debug for PseudoRegister {
+impl Debug for WideRegister {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "PseudoRegister")
     }
@@ -231,19 +232,17 @@ enum Flag {
     C = 0b00010000,
 }
 
-impl Flag {
-    pub fn get(self, f: &u8) -> bool {
-        *f & self as u8 != 0
-    }
+impl Bitflags for Flag {}
 
-    pub fn set(self, f: &mut u8, enable: bool) {
-        *f ^= (*f & self as u8) ^ (!(enable as u8).wrapping_sub(1) & self as u8)
+impl From<Flag> for u8 {
+    fn from(value: Flag) -> Self {
+        value as u8
     }
 }
 
 #[derive(Debug)]
 enum Status {
-    Enabled(Mode),
+    Enabled,
     Halted,
     Stopped,
 }
