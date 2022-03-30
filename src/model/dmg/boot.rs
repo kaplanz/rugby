@@ -36,6 +36,7 @@ impl Block for Rom {
     fn reset(&mut self) {
         // Reset controller
         self.ctl.borrow_mut().reset();
+        self.ctl.borrow_mut().bank = self.bank.clone();
         // Reset bank
         self.bank.borrow_mut().reset();
         self.bank.borrow_mut().banks.push(self.rom.clone());
