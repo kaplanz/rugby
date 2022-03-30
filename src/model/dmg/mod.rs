@@ -11,6 +11,7 @@ use remus::{clk, Block, Machine};
 
 use crate::cart::Cartridge;
 use crate::cpu::sm83::Cpu;
+use crate::hw::pic::Pic;
 use crate::hw::ppu::{self, Ppu};
 
 mod boot;
@@ -22,6 +23,7 @@ pub struct GameBoy {
     io: InOut,
     mem: Memory,
     mmu: Rc<RefCell<Bus>>,
+    pic: Pic,
     ppu: Ppu,
 }
 
@@ -33,6 +35,7 @@ impl GameBoy {
             io: Default::default(),
             mem: Default::default(),
             mmu: Default::default(),
+            pic: Default::default(),
             ppu: Default::default(),
         }
         .reset()
@@ -46,6 +49,7 @@ impl GameBoy {
         // Reset cartridge
         self.cart.reset();
         // Reset I/O
+        self.io.iflag = self.pic.active.clone(); // link IF register
         self.io.lcd = self.ppu.ctl.clone(); // link LCD controller
         self.io.boot = self.mem.boot.borrow().ctl.clone(); // link BOOT controller
         self.io.reset();
@@ -64,8 +68,10 @@ impl GameBoy {
                                                   // │     96 B │     Unused │ --- │
         mmu.map(0xff00, self.io.bus.clone());     // │    128 B │        I/O │ Bus │
         mmu.map(0xff80, self.mem.hram.clone());   // │    127 B │       High │ RAM │
-        // TODO: Interrupt Enable (IE)            // │      1 B │ Int Enable │ Reg │
+        mmu.map(0xffff, self.pic.enable.clone()); // │      1 B │  Interrupt │ Reg │
         drop(mmu); // release mutable borrow      // └──────────┴────────────┴─────┘
+        // Reset interrupts
+        self.pic.reset();
         // Reset PPU
         self.ppu.reset();
         self
@@ -161,6 +167,7 @@ struct InOut {
     // │    1 B │       Controller │ Reg │
     // │    2 B │    Communication │ Reg │
     // │    4 B │  Divider & Timer │ Reg │
+    // │    1 B │   Interrupt Flag │ Reg │
     // │   23 B │            Sound │ RAM │
     // │   16 B │         Waveform │ RAM │
     // │   16 B │              LCD │ PPU │
@@ -169,6 +176,7 @@ struct InOut {
     con:   Rc<RefCell<Register<u8>>>,
     com:   Rc<RefCell<Register<u16>>>,
     timer: Rc<RefCell<Register<u32>>>,
+    iflag: Rc<RefCell<Register<u8>>>,
     sound: Rc<RefCell<Ram<0x17>>>,
     wave:  Rc<RefCell<Ram<0x10>>>,
     lcd:   Rc<RefCell<ppu::Registers>>,
@@ -186,7 +194,7 @@ impl Block for InOut {
                                               // │    1 B │          Unused │ --- │
         bus.map(0x04, self.timer.clone());    // │    4 B │ Divider & Timer │ Reg │
                                               // │    7 B │          Unused │ --- │
-        // TODO: Interrupt Flag (IF)          // │    1 B │  Interrupt Flag │ Reg │
+        bus.map(0x0f, self.iflag.clone());    // │    1 B │  Interrupt Flag │ Reg │
         bus.map(0x10, self.sound.clone());    // │   23 B │           Sound │ RAM │
                                               // │    9 B │          Unused │ --- │
         bus.map(0x30, self.wave.clone());     // │   16 B │        Waveform │ RAM │
@@ -297,7 +305,15 @@ mod tests {
                 .all(|byte| byte == 0x63));
             // Interrupt Flag
             (0xff0f..=0xff0f).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x64));
-            // FIXME: missing check for IF
+            assert!((0x0f..=0x0f)
+                .map(|addr| gb.io.bus.borrow().read(addr))
+                .all(|byte| byte == 0x64));
+            assert!((0x0..=0x0)
+                .map(|addr| gb.io.iflag.borrow().read(addr))
+                .all(|byte| byte == 0x64));
+            assert!((0x0..=0x0)
+                .map(|addr| gb.pic.active.borrow().read(addr))
+                .all(|byte| byte == 0x64));
             // Sound
             (0xff10..=0xff26).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x65));
             assert!((0x10..=0x26)
@@ -344,7 +360,9 @@ mod tests {
             .all(|byte| byte == 0x70));
         // Interrupt Enable
         (0xffff..=0xffff).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x80));
-        // FIXME: missing check for IE
+        assert!((0x0..=0x0)
+            .map(|addr| gb.pic.enable.borrow().read(addr))
+            .all(|byte| byte == 0x80));
     }
 
     #[test]

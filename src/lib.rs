@@ -5,3 +5,4 @@ mod cart;
 mod cpu;
 mod hw;
 mod model;
+mod util;

@@ -307,7 +307,6 @@ impl Display for Scan {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Default)]
 struct Draw {
     cx: usize,
