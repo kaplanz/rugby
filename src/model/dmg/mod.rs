@@ -1,24 +1,26 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use log::info;
-use minifb::{ScaleMode, Window, WindowOptions};
 use remus::bus::Bus;
 use remus::dev::Device;
 use remus::mem::Ram;
 use remus::reg::Register;
-use remus::{clk, Block, Machine};
+use remus::{Block, Machine};
 
 use crate::cart::Cartridge;
 use crate::cpu::sm83::Cpu;
 use crate::hw::pic::Pic;
 use crate::hw::ppu::{self, Ppu};
+use crate::{emu, Emulator};
 
 mod boot;
+
+const PALETTE: [u32; 4] = [0xe9efec, 0xa0a08b, 0x555568, 0x211e20];
 
 #[derive(Debug)]
 pub struct GameBoy {
     cart: Cartridge,
+    cycle: usize,
     cpu: Cpu,
     io: InOut,
     mem: Memory,
@@ -29,33 +31,23 @@ pub struct GameBoy {
 
 impl GameBoy {
     pub fn new(cart: Cartridge) -> Self {
-        Self {
+        let mut this = Self {
             cart,
+            cycle: Default::default(),
             cpu: Default::default(),
             io: Default::default(),
             mem: Default::default(),
             mmu: Default::default(),
             pic: Default::default(),
             ppu: Default::default(),
-        }
-        .reset()
+        };
+        this.reset();
+        this
     }
 
     #[rustfmt::skip]
-    fn reset(mut self) -> Self {
-        // Reset CPU
-        self.cpu.reset();
-        self.cpu.bus = self.mmu.clone(); // link CPU bus
-        // Reset cartridge
-        self.cart.reset();
-        // Reset I/O
-        self.io.iflag = self.pic.active.clone(); // link IF register
-        self.io.lcd = self.ppu.ctl.clone(); // link LCD controller
-        self.io.boot = self.mem.boot.borrow().ctl.clone(); // link BOOT controller
-        self.io.reset();
-        // Reset memory
-        self.mem.reset();
-        // Reset MMU                              // ┌──────────┬────────────┬─────┐
+    fn memmap(&mut self) {
+        // Map MMU                                // ┌──────────┬────────────┬─────┐
         self.mmu.take();                          // │   SIZE   │    NAME    │ DEV │
         let mut mmu = self.mmu.borrow_mut();      // ├──────────┼────────────┼─────┤
         mmu.map(0x0000, self.mem.boot.clone());   // │    256 B │       Boot │ ROM │
@@ -70,69 +62,83 @@ impl GameBoy {
         mmu.map(0xff80, self.mem.hram.clone());   // │    127 B │       High │ RAM │
         mmu.map(0xffff, self.pic.enable.clone()); // │      1 B │  Interrupt │ Reg │
         drop(mmu); // release mutable borrow      // └──────────┴────────────┴─────┘
+    }
+}
+
+impl Block for GameBoy {
+    #[rustfmt::skip]
+    fn reset(&mut self) {
+        // Reset CPU
+        self.cpu.reset();
+        self.cpu.bus = self.mmu.clone(); // link CPU bus
+        // Reset cartridge
+        self.cart.reset();
+        // Reset I/O
+        self.io.reset();
+        self.io.iflag = self.pic.active.clone(); // link IF register
+        self.io.lcd = self.ppu.ctl.clone(); // link LCD controller
+        self.io.boot = self.mem.boot.borrow().ctl.clone(); // link BOOT controller
+        // Reset memory
+        self.mem.reset();
         // Reset interrupts
         self.pic.reset();
         // Reset PPU
         self.ppu.reset();
-        self
+
+        // Re-map MMU
+        self.memmap();
+        self.io.memmap();
+    }
+}
+
+impl Emulator for GameBoy {
+    fn send(&mut self, btn: emu::Button) {
+        todo!("{btn:?}")
     }
 
-    pub fn run(&mut self) {
-        // Perform setup for FSMs
-        self.cpu.setup();
-        self.ppu.setup();
-
-        // Create a framebuffer window
-        const PALETTE: [u32; 4] = [0xe9efec, 0xa0a08b, 0x555568, 0x211e20];
-        let mut win = Window::new(
-            "Game Boy",
-            160,
-            144,
-            WindowOptions {
-                resize: true,
-                scale_mode: ScaleMode::AspectRatioStretch,
-                ..Default::default()
-            },
-        )
-        .unwrap();
-
-        // Mark the starting time
-        let mut now = std::time::Instant::now();
-        let mut active = 0;
-
-        // Run FSMs on a 4 MiHz clock
-        for (cycle, _) in clk::with_freq(4194304).enumerate() {
-            // As an abstraction, let the CPU run on a 1 MiHz clock which can
-            // be done using a simple clock division by 4.
-            if cycle % 4 == 0 && self.cpu.enabled() {
-                self.cpu.cycle();
-            }
-
-            // Let the PPU run on at full speed, and internally manage clock
-            // division as needed.
-            if self.ppu.enabled() {
-                self.ppu.cycle();
-            }
-
-            // Update the screen at 59.7 Hz
-            if cycle % (456 * 154) == 0 {
-                let buf = self
-                    .ppu
-                    .lcd
-                    .iter()
-                    .map(|pixel| PALETTE[*pixel as usize])
-                    .collect::<Vec<_>>();
-                win.update_with_buffer(&buf, 160, 144).unwrap();
-            }
-
-            // Calculate real-time clock frequency
-            if now.elapsed().as_secs() > 0 {
-                info!("Frequency: {active}");
-                active = 0;
-                now = std::time::Instant::now();
-            }
-            active += 1;
+    fn redraw<F>(&self, mut draw: F)
+    where
+        F: FnMut(&[u32]),
+    {
+        if self.ppu.refresh() {
+            let buf = self
+                .ppu
+                .screen()
+                .iter()
+                .map(|&pixel| PALETTE[pixel as usize])
+                .collect::<Vec<_>>();
+            draw(&buf);
         }
+    }
+}
+
+impl Machine for GameBoy {
+    fn setup(&mut self) {
+        // Set up CPU
+        self.cpu.setup();
+        // Set up PPU
+        self.ppu.setup();
+    }
+
+    fn enabled(&self) -> bool {
+        self.cpu.enabled()
+    }
+
+    fn cycle(&mut self) {
+        // As an abstraction, let the CPU run on a 1 MiHz clock which can
+        // be done using a simple clock division by 4.
+        if self.cycle % 4 == 0 && self.cpu.enabled() {
+            self.cpu.cycle();
+        }
+
+        // Let the PPU run on at full speed, and internally manage clock
+        // division as needed.
+        if self.ppu.enabled() {
+            self.ppu.cycle();
+        }
+
+        // Keep track of cycles executed
+        self.cycle = self.cycle.wrapping_add(1);
     }
 }
 
@@ -183,10 +189,10 @@ struct InOut {
     boot:  Rc<RefCell<boot::RomDisable>>,
 }
 
-#[rustfmt::skip]
-impl Block for InOut {
-    fn reset(&mut self) {
-        // Reset bus                          // ┌────────┬─────────────────┬─────┐
+impl InOut {
+    #[rustfmt::skip]
+    fn memmap(&mut self) {
+        // Map bus                            // ┌────────┬─────────────────┬─────┐
         self.bus.take();                      // │  SIZE  │      NAME       │ DEV │
         let mut bus = self.bus.borrow_mut();  // ├────────┼─────────────────┼─────┤
         bus.map(0x00, self.con.clone());      // │    1 B │      Controller │ Reg │
@@ -205,6 +211,8 @@ impl Block for InOut {
         drop(bus); // release mutable borrow  // └────────┴─────────────────┴─────┘
     }
 }
+
+impl Block for InOut {}
 
 impl Device for InOut {
     fn contains(&self, index: usize) -> bool {

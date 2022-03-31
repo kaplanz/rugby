@@ -1,10 +1,9 @@
 use std::cell::RefCell;
-use std::error::Error;
-use std::fmt::Display;
 use std::rc::Rc;
 
 use remus::reg::Register;
 use remus::Block;
+use thiserror::Error;
 
 use crate::util::Bitflags;
 
@@ -55,7 +54,7 @@ impl TryFrom<u8> for Interrupt {
             2 => Ok(Self::Timer),
             3 => Ok(Self::Serial),
             4 => Ok(Self::Joypad),
-            _ => Err(InterruptError),
+            _ => Err(InterruptError::Unknown),
         }
     }
 }
@@ -66,13 +65,8 @@ impl From<Interrupt> for u8 {
     }
 }
 
-#[derive(Debug)]
-pub struct InterruptError;
-
-impl Display for InterruptError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        "Unknown Interrupt".fmt(f)
-    }
+#[derive(Debug, Error)]
+pub enum InterruptError {
+    #[error("Unknown Interrupt")]
+    Unknown,
 }
-
-impl Error for InterruptError {}
