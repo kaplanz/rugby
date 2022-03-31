@@ -1,8 +1,8 @@
-use std::error::Error;
 use std::fmt::Display;
 use std::str::Utf8Error;
 
 use log::warn;
+use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Header {
@@ -347,35 +347,26 @@ impl TryFrom<u8> for CartridgeType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum ErrorKind {
+    #[error("No Header")]
     NoHeader,
+    #[error("Invalid Title: {0}")]
     Title(Utf8Error),
+    #[error("Invalid CGB Flag: {0}")]
     CgbFlag(u8),
+    #[error("Invalid SGB Flag: {0}")]
     SgbFlag(u8),
+    #[error("Unknown Cartridge Type: {0:#04x}")]
     CartridgeType(u8),
+    #[error("Invalid ROM Size: {0}")]
     RomSize(u8),
+    #[error("Invalid RAM Size: {0}")]
     RamSize(u8),
+    #[error("Invalid Destination Code: {0}")]
     DestinationCode(u8),
+    #[error("Bad Header Checksum: {0}")]
     HeaderChecksum(u8),
+    #[error("Bad Global Checksum: {0}")]
     GlobalChecksum(u16),
 }
-
-impl Display for ErrorKind {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::NoHeader => write!(f, "No Header"),
-            Self::Title(err) => write!(f, "Invalid Title: {err}"),
-            Self::CgbFlag(flag) => write!(f, "Invalid CGB Flag: {flag}"),
-            Self::SgbFlag(flag) => write!(f, "Invalid SGB Flag: {flag}"),
-            Self::CartridgeType(cart) => write!(f, "Unknown Cartridge Type: {cart:#04x}"),
-            Self::RomSize(romsz) => write!(f, "Invalid ROM Size: {romsz}"),
-            Self::RamSize(ramsz) => write!(f, "Invalid RAM Size: {ramsz}"),
-            Self::DestinationCode(code) => write!(f, "Invalid Destination Code: {code}"),
-            Self::HeaderChecksum(chk) => write!(f, "Bad Header Checksum: {chk}"),
-            Self::GlobalChecksum(chk) => write!(f, "Bad Global Checksum: {chk}"),
-        }
-    }
-}
-
-impl Error for ErrorKind {}

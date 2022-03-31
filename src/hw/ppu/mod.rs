@@ -1,6 +1,5 @@
 use std::cell::RefCell;
 use std::fmt::Display;
-use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
 use log::trace;
@@ -9,68 +8,18 @@ use remus::mem::Ram;
 use remus::reg::Register;
 use remus::{Block, Device, Machine};
 
-use self::pixel::{Colour, Fetch, Fifo};
+use self::lcd::{Screen, HEIGHT, WIDTH};
+use self::pixel::{Fetch, Fifo};
 use self::sprite::Sprite;
 
+mod lcd;
 mod pixel;
 mod sprite;
-
-const WIDTH: usize = 160;
-const HEIGHT: usize = 144;
-
-#[derive(Debug)]
-pub struct Screen([Colour; WIDTH * HEIGHT]);
-
-impl Default for Screen {
-    fn default() -> Self {
-        Self([Default::default(); WIDTH * HEIGHT])
-    }
-}
-
-impl Deref for Screen {
-    type Target = [Colour];
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for Screen {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl Display for Screen {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "┌{}┐", "─".repeat(WIDTH))?;
-        let rows = self.chunks_exact(WIDTH);
-        let even = rows.clone().step_by(2);
-        let odd = rows.clone().step_by(2).skip(1);
-        let rows = even.zip(odd);
-        for (even, odd) in rows {
-            writeln!(
-                f,
-                "│{}│",
-                even.iter()
-                    .zip(odd)
-                    .map(|(p0, p1)| match (p0, p1) {
-                        (Colour::C0, Colour::C0) => ' ',
-                        (Colour::C0, _) => '▄',
-                        (_, Colour::C0) => '▀',
-                        (_, _) => '█',
-                    })
-                    .collect::<String>()
-            )?;
-        }
-        write!(f, "└{}┘", "─".repeat(WIDTH))
-    }
-}
 
 #[rustfmt::skip]
 #[derive(Debug, Default)]
 pub struct Ppu {
-    pub lcd: Screen,
+    lcd: Screen,
     dot: usize,
     mode: Mode,
     // ┌────────┬──────────────────┬─────┬───────┐
@@ -85,12 +34,29 @@ pub struct Ppu {
     pub ctl: Rc<RefCell<Registers>>,
 }
 
+impl Ppu {
+    /// Get a reference to the ppu's lcd.
+    #[must_use]
+    pub fn screen(&self) -> &Screen {
+        &self.lcd
+    }
+
+    /// Check if the screen needs to be refreshed.
+    pub fn refresh(&self) -> bool {
+        // Refresh the screen once per frame, when:
+        // 1. PPU is enabled
+        // 2. Scanline is top of screen
+        // 3. Dot is first of scanline
+        self.enabled() && **self.ctl.borrow().ly.borrow() == 0 && self.dot == 0
+    }
+}
+
 impl Block for Ppu {
     fn reset(&mut self) {
-        // Reset mode
-        self.mode = Default::default();
         // Reset LCD
         self.lcd = Default::default();
+        // Reset mode
+        self.mode = Default::default();
         // Reset memory
         self.vram.borrow_mut().reset();
         self.oam.borrow_mut().reset();
