@@ -521,9 +521,9 @@ checksum = "19b17cddbe7ec3f8bc800887bab5e717348c95ea2ca0b1bf0837fb964dc67099"
 
 [[package]]
 name = "pkg-config"
-version = "0.3.24"
+version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58893f751c9b0412871a09abd62ecd2a00298c6c83befa223ef98c52aef40cbe"
+checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 
 [[package]]
 name = "ppv-lite86"
@@ -660,7 +660,7 @@ dependencies = [
 [[package]]
 name = "remus"
 version = "0.1.0"
-source = "git+https://github.com/zakharykaplan/remus#9aed77142c9afe8e130a80209e02d7f2d6891b65"
+source = "git+https://github.com/zakharykaplan/remus#52244789007a6395820f625acb047cf80109bb2e"
 dependencies = [
  "num",
  "rand",
