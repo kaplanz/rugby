@@ -8,9 +8,10 @@ use remus::mem::Ram;
 use remus::reg::Register;
 use remus::{Block, Device, Machine};
 
-use self::lcd::{Screen, HEIGHT, WIDTH};
+use self::lcd::Screen;
 use self::pixel::{Fetch, Fifo};
 use self::sprite::Sprite;
+use crate::SCREEN;
 
 mod lcd;
 mod pixel;
@@ -295,7 +296,7 @@ impl Draw {
             let ly = **regs.ly.borrow();
 
             // Push the pixel into the framebuffer
-            let idx = (ly as usize * WIDTH) + self.cx as usize;
+            let idx = (ly as usize * SCREEN.width) + self.cx as usize;
             ppu.lcd[idx] = pixel.colour;
             // Increment the internal pixel column x-position
             self.cx += 1;
@@ -309,7 +310,7 @@ impl Draw {
 
         // Either draw next pixel, or enter HBlank
         ppu.dot += 1;
-        if self.cx < WIDTH {
+        if self.cx < SCREEN.width {
             Mode::Draw(self)
         } else {
             Mode::HBlank(Default::default())
@@ -356,7 +357,7 @@ impl HBlank {
             ppu.dot = 0;
 
             // Either begin next scanline, or enter VBlank
-            if *ly < HEIGHT as u8 {
+            if *ly < SCREEN.height as u8 {
                 Mode::Scan(Default::default())
             } else {
                 Mode::VBlank(Default::default())

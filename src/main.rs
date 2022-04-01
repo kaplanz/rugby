@@ -9,9 +9,6 @@ use log::info;
 use minifb::{Scale, ScaleMode, Window, WindowOptions};
 use remus::{clk, Machine};
 
-const WIDTH: usize = SCREEN.0;
-const HEIGHT: usize = SCREEN.1;
-
 /// Game Boy emulator written in Rust.
 #[derive(Parser)]
 #[clap(author, version, about)]
@@ -61,8 +58,8 @@ fn main() -> Result<()> {
     // Create a framebuffer window
     let mut win = Window::new(
         &title,
-        WIDTH,
-        HEIGHT,
+        SCREEN.width,
+        SCREEN.height,
         WindowOptions {
             resize: true,
             scale: Scale::X2,
@@ -81,7 +78,10 @@ fn main() -> Result<()> {
         gb.cycle();
 
         // Redraw the screen (if needed)
-        gb.redraw(|buf| win.update_with_buffer(buf, WIDTH, HEIGHT).unwrap());
+        gb.redraw(|buf| {
+            win.update_with_buffer(buf, SCREEN.width, SCREEN.height)
+                .unwrap()
+        });
 
         // Calculate real-time clock frequency
         if now.elapsed().as_secs() > 0 {

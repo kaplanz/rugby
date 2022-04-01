@@ -4,15 +4,12 @@ use std::ops::{Deref, DerefMut};
 use super::pixel::Colour;
 use crate::SCREEN;
 
-pub const WIDTH: usize = SCREEN.0;
-pub const HEIGHT: usize = SCREEN.1;
-
 #[derive(Debug)]
-pub struct Screen([Colour; WIDTH * HEIGHT]);
+pub struct Screen([Colour; SCREEN.len()]);
 
 impl Default for Screen {
     fn default() -> Self {
-        Self([Default::default(); WIDTH * HEIGHT])
+        Self([Default::default(); SCREEN.len()])
     }
 }
 
@@ -32,8 +29,8 @@ impl DerefMut for Screen {
 
 impl Display for Screen {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "┌{}┐", "─".repeat(WIDTH))?;
-        let rows = self.chunks_exact(WIDTH);
+        writeln!(f, "┌{}┐", "─".repeat(SCREEN.width))?;
+        let rows = self.chunks_exact(SCREEN.width);
         let even = rows.clone().step_by(2);
         let odd = rows.clone().step_by(2).skip(1);
         let rows = even.zip(odd);
@@ -52,6 +49,6 @@ impl Display for Screen {
                     .collect::<String>()
             )?;
         }
-        write!(f, "└{}┘", "─".repeat(WIDTH))
+        write!(f, "└{}┘", "─".repeat(SCREEN.width))
     }
 }
