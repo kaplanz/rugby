@@ -7,5 +7,6 @@ mod cart;
 mod cpu;
 mod emu;
 mod hw;
+mod mem;
 mod model;
 mod util;

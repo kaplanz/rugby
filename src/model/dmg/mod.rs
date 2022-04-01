@@ -11,6 +11,7 @@ use crate::cart::Cartridge;
 use crate::cpu::sm83::Cpu;
 use crate::hw::pic::Pic;
 use crate::hw::ppu::{self, Ppu};
+use crate::mem::Unmapped;
 use crate::{emu, Emulator};
 
 mod boot;
@@ -61,7 +62,10 @@ impl GameBoy {
         mmu.map(0xff00, self.io.bus.clone());     // │    128 B │        I/O │ Bus │
         mmu.map(0xff80, self.mem.hram.clone());   // │    127 B │       High │ RAM │
         mmu.map(0xffff, self.pic.enable.clone()); // │      1 B │  Interrupt │ Reg │
-        drop(mmu); // release mutable borrow      // └──────────┴────────────┴─────┘
+                                                  // └──────────┴────────────┴─────┘
+        // Use an `Unmapped` as a fallback
+        mmu.map(0x0000, Rc::new(RefCell::new(Unmapped::new())));
+        drop(mmu); // release mutable borrow
     }
 }
 
