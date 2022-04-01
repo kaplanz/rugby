@@ -53,18 +53,38 @@ impl Cartridge {
         };
 
         // Construct external ROM
-        let erom: Rc<RefCell<dyn Device>> = match header.romsz {
-            0x8000 => Rc::new(RefCell::new(Rom::<0x8000>::from(&rom.try_into().unwrap()))),
-            0x10000 => Rc::new(RefCell::new(Rom::<0x10000>::from(&rom.try_into().unwrap()))),
-            0x20000 => Rc::new(RefCell::new(Rom::<0x20000>::from(&rom.try_into().unwrap()))),
-            0x40000 => Rc::new(RefCell::new(Rom::<0x40000>::from(&rom.try_into().unwrap()))),
-            0x80000 => Rc::new(RefCell::new(Rom::<0x80000>::from(&rom.try_into().unwrap()))),
-            romsz => unimplemented!("romsz = {romsz:#x}"),
-            // 0x100000 => Rc::new(RefCell::new(Rom::<0x100000>::from(&rom.try_into().unwrap()))),
-            // 0x200000 => Rc::new(RefCell::new(Rom::<0x200000>::from(&rom.try_into().unwrap()))),
-            // 0x400000 => Rc::new(RefCell::new(Rom::<0x400000>::from(&rom.try_into().unwrap()))),
-            // 0x800000 => Rc::new(RefCell::new(Rom::<0x800000>::from(&rom.try_into().unwrap()))),
-            // _ => unreachable!(),
+        let erom: Rc<RefCell<dyn Device>> = {
+            let rom: Box<[_]> = rom.into();
+            match header.romsz {
+                0x8000 => Rc::new(RefCell::new(Rom::<0x8000>::from(
+                    &*Box::<[_; 0x8000]>::try_from(rom).unwrap(),
+                ))),
+                0x10000 => Rc::new(RefCell::new(Rom::<0x10000>::from(
+                    &*Box::<[_; 0x10000]>::try_from(rom).unwrap(),
+                ))),
+                0x20000 => Rc::new(RefCell::new(Rom::<0x20000>::from(
+                    &*Box::<[_; 0x20000]>::try_from(rom).unwrap(),
+                ))),
+                0x40000 => Rc::new(RefCell::new(Rom::<0x40000>::from(
+                    &*Box::<[_; 0x40000]>::try_from(rom).unwrap(),
+                ))),
+                0x80000 => Rc::new(RefCell::new(Rom::<0x80000>::from(
+                    &*Box::<[_; 0x80000]>::try_from(rom).unwrap(),
+                ))),
+                0x100000 => Rc::new(RefCell::new(Rom::<0x100000>::from(
+                    &*Box::<[_; 0x100000]>::try_from(rom).unwrap(),
+                ))),
+                0x200000 => Rc::new(RefCell::new(Rom::<0x200000>::from(
+                    &*Box::<[_; 0x200000]>::try_from(rom).unwrap(),
+                ))),
+                0x400000 => Rc::new(RefCell::new(Rom::<0x400000>::from(
+                    &*Box::<[_; 0x400000]>::try_from(rom).unwrap(),
+                ))),
+                0x800000 => Rc::new(RefCell::new(Rom::<0x800000>::from(
+                    &*Box::<[_; 0x800000]>::try_from(rom).unwrap(),
+                ))),
+                _ => unreachable!(),
+            }
         };
 
         // Construct external RAM

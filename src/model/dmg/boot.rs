@@ -59,6 +59,10 @@ impl Device for Rom {
         self.bank.borrow().contains(index)
     }
 
+    fn len(&self) -> usize {
+        self.bank.borrow().len()
+    }
+
     fn read(&self, index: usize) -> u8 {
         self.bank.borrow().read(index)
     }
@@ -86,6 +90,10 @@ impl Block for RomDisable {
 impl Device for RomDisable {
     fn contains(&self, index: usize) -> bool {
         self.reg.contains(index)
+    }
+
+    fn len(&self) -> usize {
+        self.reg.len()
     }
 
     fn read(&self, index: usize) -> u8 {

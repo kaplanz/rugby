@@ -8,7 +8,6 @@ use remus::{Block, Device};
 
 use super::Mbc;
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Mbc1 {
     rom: Rc<RefCell<Rom>>,
@@ -25,7 +24,7 @@ impl Mbc1 {
         #[allow(clippy::vec_init_then_push)]
         let ram = {
             // Determine how many banks to create
-            let ramsz = std::mem::size_of_val(&*ram.borrow());
+            let ramsz = ram.borrow().len();
             let nbanks = ramsz / 0x4000;
             // Create banks as `View`s of the RAM
             let mut banks: Vec<Rc<RefCell<dyn Device>>> = Default::default();
@@ -43,7 +42,7 @@ impl Mbc1 {
         // Prepare ROM
         let rom = {
             // Determine how many banks to create
-            let romsz = std::mem::size_of_val(&*rom.borrow());
+            let romsz = rom.borrow().len();
             let nbanks = romsz / 0x4000;
             // Create banks as `View`s of the ROM
             let mut banks: Vec<Rc<RefCell<dyn Device>>> = Default::default();
@@ -104,6 +103,10 @@ impl Device for Ram {
         self.0.borrow().contains(index)
     }
 
+    fn len(&self) -> usize {
+        self.0.borrow().len()
+    }
+
     fn read(&self, index: usize) -> u8 {
         self.0.borrow().read(index)
     }
@@ -126,6 +129,10 @@ impl Block for Rom {}
 impl Device for Rom {
     fn contains(&self, index: usize) -> bool {
         self.bus.borrow().contains(index)
+    }
+
+    fn len(&self) -> usize {
+        self.bus.borrow().len()
     }
 
     fn read(&self, index: usize) -> u8 {

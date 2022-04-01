@@ -219,6 +219,10 @@ impl Device for InOut {
         self.bus.borrow().contains(index)
     }
 
+    fn len(&self) -> usize {
+        self.bus.borrow().len()
+    }
+
     fn read(&self, index: usize) -> u8 {
         self.bus.borrow().read(index)
     }

@@ -48,6 +48,10 @@ impl Device for ReadOnly {
         self.0.borrow().contains(index)
     }
 
+    fn len(&self) -> usize {
+        self.0.borrow().len()
+    }
+
     fn read(&self, index: usize) -> u8 {
         self.0.borrow().read(index)
     }
