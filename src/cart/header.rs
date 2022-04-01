@@ -67,13 +67,13 @@ impl Display for Header {
 }
 
 impl TryFrom<&[u8]> for Header {
-    type Error = ErrorKind;
+    type Error = Error;
 
     fn try_from(rom: &[u8]) -> Result<Self, Self::Error> {
         // Extract the header bytes
         let header: &[u8; 0x50] = rom
             .get(0x100..=0x14f)
-            .ok_or(ErrorKind::NoHeader)?
+            .ok_or(Error::NoHeader)?
             .try_into()
             .unwrap();
 
@@ -88,27 +88,27 @@ impl TryFrom<&[u8]> for Header {
         // Parse title
         let tlen = if header[0x43] & 0x80 != 0 { 15 } else { 16 };
         let title = std::str::from_utf8(&header[0x34..0x34 + tlen])
-            .map_err(ErrorKind::Title)?
+            .map_err(Error::Title)?
             .to_string();
         // Parse CGB flag
         let dmg = (header[0x43] & 0xc0) != 0xc0;
         let cgb = match header[0x43] {
             0x00 | 0x40 => Ok(false),
             0x80 | 0xc0 => Ok(true),
-            byte => Err(ErrorKind::CgbFlag(byte)),
+            byte => Err(Error::CgbFlag(byte)),
         }?;
         // Parse SGB flag
         let sgb = match header[0x46] {
             0x00 => Ok(false),
             0x03 => Ok(true),
-            byte => Err(ErrorKind::SgbFlag(byte)),
+            byte => Err(Error::SgbFlag(byte)),
         }?;
         // Parse cartridge type
         let cart = header[0x47].try_into()?;
         // Parse ROM size
         let romsz = match header[0x48] {
             byte @ 0x00..=0x08 => Ok(0x8000 << byte),
-            byte => Err(ErrorKind::RomSize(byte)),
+            byte => Err(Error::RomSize(byte)),
         }?;
         // Parse RAM size
         let ramsz = match header[0x49] {
@@ -117,13 +117,13 @@ impl TryFrom<&[u8]> for Header {
             0x03 => Ok(0x8000),
             0x04 => Ok(0x20000),
             0x05 => Ok(0x10000),
-            byte => Err(ErrorKind::RamSize(byte)),
+            byte => Err(Error::RamSize(byte)),
         }?;
         // Parse RAM size
         let jpn = match header[0x4a] {
             0x00 => Ok(true),
             0x01 => Ok(false),
-            byte => Err(ErrorKind::DestinationCode(byte)),
+            byte => Err(Error::DestinationCode(byte)),
         }?;
         // Parse mark ROM version number
         let version = header[0x4c];
@@ -139,7 +139,7 @@ impl TryFrom<&[u8]> for Header {
             .fold(0u8, |accum, item| accum.wrapping_sub(item).wrapping_sub(1))
         {
             chk if chk == hchk => Ok(()),
-            chk => Err(ErrorKind::HeaderChecksum(chk)),
+            chk => Err(Error::HeaderChecksum(chk)),
         }?;
         // Verify global checksum
         match rom
@@ -232,7 +232,7 @@ impl Display for CartridgeType {
 }
 
 impl TryFrom<u8> for CartridgeType {
-    type Error = ErrorKind;
+    type Error = Error;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
@@ -342,13 +342,13 @@ impl TryFrom<u8> for CartridgeType {
                 ram: true,
                 battery: true,
             }),
-            value => Err(ErrorKind::CartridgeType(value)),
+            value => Err(Error::CartridgeType(value)),
         }
     }
 }
 
 #[derive(Debug, Error)]
-pub enum ErrorKind {
+pub enum Error {
     #[error("No Header")]
     NoHeader,
     #[error("Invalid Title: {0}")]
