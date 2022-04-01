@@ -1,7 +1,21 @@
 use std::ops::Deref;
 
-pub const SCREEN: (usize, usize) = (160, 144);
-const DEPTH: usize = SCREEN.0 * SCREEN.1;
+pub const SCREEN: Resolution = Resolution {
+    width: 160,
+    height: 144,
+};
+
+#[derive(Debug)]
+pub struct Resolution {
+    pub width: usize,
+    pub height: usize,
+}
+
+impl Resolution {
+    pub const fn len(&self) -> usize {
+        self.width.saturating_mul(self.height)
+    }
+}
 
 pub trait Emulator {
     fn send(&mut self, btn: Button);
@@ -11,20 +25,21 @@ pub trait Emulator {
         F: FnMut(&[u32]);
 }
 
+#[rustfmt::skip]
 #[derive(Debug)]
 pub enum Button {
-    A,
-    B,
-    Start,
-    Select,
-    Up,
-    Down,
-    Left,
-    Right,
+    A      = 0b00100001,
+    B      = 0b00100010,
+    Select = 0b00100100,
+    Start  = 0b00101000,
+    Right  = 0b00010001,
+    Left   = 0b00010010,
+    Up     = 0b00010100,
+    Down   = 0b00011000,
 }
 
 #[derive(Debug)]
-pub struct Screen([u32; DEPTH]);
+pub struct Screen([u32; SCREEN.len()]);
 
 impl Deref for Screen {
     type Target = [u32];
@@ -34,8 +49,8 @@ impl Deref for Screen {
     }
 }
 
-impl From<[u32; DEPTH]> for Screen {
-    fn from(buf: [u32; DEPTH]) -> Self {
+impl From<[u32; SCREEN.len()]> for Screen {
+    fn from(buf: [u32; SCREEN.len()]) -> Self {
         Self(buf)
     }
 }
