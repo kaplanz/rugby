@@ -138,6 +138,10 @@ impl Device for Registers {
         self.bus.contains(index)
     }
 
+    fn len(&self) -> usize {
+        self.bus.len()
+    }
+
     fn read(&self, index: usize) -> u8 {
         self.bus.read(index)
     }
