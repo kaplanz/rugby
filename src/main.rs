@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
-use anyhow::Context;
 use clap::{Parser, ValueHint};
+use color_eyre::eyre::{Result, WrapErr};
 use gameboy::{Cartridge, Emulator, GameBoy, SCREEN};
 use log::info;
 use minifb::{Scale, ScaleMode, Window, WindowOptions};
@@ -22,7 +22,9 @@ struct Args {
     rom: PathBuf,
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() -> Result<()> {
+    // Install panic and error report handlers
+    color_eyre::install()?;
     // Initialize logger
     env_logger::init();
     // Parse args
@@ -31,18 +33,20 @@ fn main() -> anyhow::Result<()> {
     // Read the ROM
     let rom = {
         // Open ROM file
-        let f = File::open(&args.rom).with_context(|| "Failed to open ROM file.".to_string())?;
+        let f = File::open(&args.rom)
+            .with_context(|| format!("Failed to open ROM: `{}`", args.rom.display()))?;
         // Read ROM into a buffer
         let mut buf = Vec::new();
         // NOTE: Game Paks manufactured by Nintendo have a maximum 8 MiB ROM.
         f.take(0x800000)
             .read_to_end(&mut buf)
-            .with_context(|| "Failed to read ROM file.".to_string())?;
+            .with_context(|| format!("Failed to open ROM: `{}`", args.rom.display()))?;
 
         buf
     };
     // Initialize the cartridge
-    let cart = Cartridge::new(&rom).with_context(|| "Failed to parse ROM header.".to_string())?;
+    let cart = Cartridge::new(&rom)
+        .with_context(|| format!("Failed to parse ROM: `{}`", args.rom.display()))?;
     // Extract ROM title from cartridge
     let title = match cart.header().title.replace('\0', " ").trim() {
         "" => "Game Boy",
