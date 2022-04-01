@@ -45,7 +45,7 @@ pub enum Interrupt {
 impl Bitflags for Interrupt {}
 
 impl TryFrom<u8> for Interrupt {
-    type Error = InterruptError;
+    type Error = Error;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value.leading_zeros() {
@@ -54,7 +54,7 @@ impl TryFrom<u8> for Interrupt {
             2 => Ok(Self::Timer),
             3 => Ok(Self::Serial),
             4 => Ok(Self::Joypad),
-            _ => Err(InterruptError::Unknown),
+            _ => Err(Error::Unknown),
         }
     }
 }
@@ -66,7 +66,7 @@ impl From<Interrupt> for u8 {
 }
 
 #[derive(Debug, Error)]
-pub enum InterruptError {
+pub enum Error {
     #[error("Unknown Interrupt")]
     Unknown,
 }

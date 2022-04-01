@@ -22,7 +22,7 @@ pub struct Cartridge {
 }
 
 impl Cartridge {
-    pub fn new(rom: &[u8]) -> Result<Cartridge, header::ErrorKind> {
+    pub fn new(rom: &[u8]) -> Result<Cartridge, header::Error> {
         // Parse cartridge header
         let header = Header::try_from(&*rom)?;
         info!("Cartridge:\n{header}");
