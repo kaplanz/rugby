@@ -7,7 +7,7 @@ use color_eyre::eyre::{Result, WrapErr};
 use gameboy::{Cartridge, Emulator, GameBoy, SCREEN};
 use log::info;
 use minifb::{Scale, ScaleMode, Window, WindowOptions};
-use remus::{clk, Machine};
+use remus::Machine;
 
 /// Game Boy emulator written in Rust.
 #[derive(Parser)]
@@ -73,7 +73,7 @@ fn main() -> Result<()> {
     let mut now = std::time::Instant::now();
     let mut active = 0;
     // Run emulator on a 4 MiHz clock
-    for _ in clk::with_freq(4194304) {
+    for _ in std::iter::repeat(()) {
         // Perform a single cycle
         gb.cycle();
 
