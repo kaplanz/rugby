@@ -17,7 +17,7 @@ pub struct Cpu {
     pub bus: Rc<RefCell<Bus>>,
     regs: Registers,
     status: Status,
-    cycle: usize,
+    state: State,
     ime: bool,
     prefix: bool,
 }
@@ -26,7 +26,7 @@ impl Cpu {
     fn fetchbyte(&mut self) -> u8 {
         let pc = &mut *self.regs.pc;
         let byte = self.bus.borrow().read(*pc as usize);
-        *self.regs.pc = pc.wrapping_add(1);
+        *pc = pc.wrapping_add(1);
         byte
     }
 
@@ -42,22 +42,22 @@ impl Cpu {
 
     fn fetchword(&mut self) -> u16 {
         let pc = &mut *self.regs.pc;
-        let mut word = 0u16;
-        word |= self.bus.borrow().read(*pc as usize) as u16;
+        let mut word = [0; 2];
+        word[0] = self.bus.borrow().read(*pc as usize);
         *pc = pc.wrapping_add(1);
-        word |= (self.bus.borrow().read(*pc as usize) as u16) << 8;
+        word[1] = self.bus.borrow().read(*pc as usize);
         *pc = pc.wrapping_add(1);
-        word
+        u16::from_le_bytes(word)
     }
 
     fn popword(&mut self) -> u16 {
         let sp = &mut *self.regs.sp;
-        let mut word = 0u16;
-        word |= self.bus.borrow().read(*sp as usize) as u16;
+        let mut word = [0; 2];
+        word[0] = self.bus.borrow().read(*sp as usize);
         *sp = sp.wrapping_add(1);
-        word |= (self.bus.borrow().read(*sp as usize) as u16) << 8;
+        word[1] = self.bus.borrow().read(*sp as usize);
         *sp = sp.wrapping_add(1);
-        word
+        u16::from_le_bytes(word)
     }
 
     fn pushword(&mut self, word: u16) {
@@ -72,7 +72,7 @@ impl Cpu {
 
 impl Block for Cpu {
     fn reset(&mut self) {
-        *self = Self::default();
+        std::mem::take(self);
     }
 }
 
@@ -86,27 +86,25 @@ impl Machine for Cpu {
     }
 
     fn cycle(&mut self) {
-        if self.cycle == 0 {
-            // Read the next instruction
-            let opcode = self.fetchbyte();
-            // Decode the instruction
-            let inst = if !self.prefix {
-                Instruction::new(opcode)
-            } else {
-                self.prefix = false;
-                Instruction::prefixed(opcode)
-            };
-            debug!("{:#06x}: {inst}", self.regs.pc.wrapping_sub(1));
-            // Execute the instruction
-            self.cycle = inst.exec(self);
-            trace!("Registers:\n{}", self.regs);
-        }
-        self.cycle -= 1;
+        self.state = std::mem::take(&mut self.state).exec(self);
     }
 }
 
 #[derive(Debug)]
 struct Registers {
+    // ┌───────┬───────┐
+    // │ A: u8 │ F: u8 │
+    // ├───────┼───────┤
+    // │ B: u8 │ C: u8 │
+    // ├───────┼───────┤
+    // │ D: u8 │ E: u8 │
+    // ├───────┼───────┤
+    // │ H: u8 │ L: u8 │
+    // ├───────┴───────┤
+    // │    SP: u16    │
+    // ├───────────────┤
+    // │    PC: u16    │
+    // └───────────────┘
     a: Register<u8>,
     f: Register<u8>,
     af: WideRegister,
@@ -253,9 +251,57 @@ impl Default for Status {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
-enum Mode {
-    Normal,
-    Interrupt,
+enum State {
+    Fetch,
+    Execute(Instruction),
+    Done,
+}
+
+impl State {
+    fn exec(mut self, cpu: &mut Cpu) -> Self {
+        // If we're State::Done, proceed to State::Fetch this cycle
+        if let State::Done = self {
+            // Log previous register state
+            trace!("Registers:\n{}", cpu.regs);
+            // Proceed to State::Fetch
+            self = State::Fetch;
+        }
+
+        // If we're State::Fetch, proceed to State::Execute(_) this cycle
+        if let State::Fetch = self {
+            // Read the next instruction
+            let pc = *cpu.regs.pc;
+            let opcode = cpu.fetchbyte();
+            // Decode the instruction
+            let inst = if !cpu.prefix {
+                Instruction::new(opcode)
+            } else {
+                cpu.prefix = false; // no longer prefixed
+                Instruction::prefix(opcode)
+            };
+            debug!("{pc:#06x}: {inst}");
+            // Proceed to State::Execute(_)
+            self = State::Execute(inst);
+        }
+
+        // Run the current State::Execute(_)
+        if let State::Execute(inst) = self {
+            // Execute a cycle of the instruction
+            let inst = inst.exec(cpu);
+            // Proceed to next State
+            self = match inst {
+                Some(inst) => State::Execute(inst),
+                None => State::Done,
+            };
+        }
+
+        self
+    }
+}
+
+impl Default for State {
+    fn default() -> Self {
+        Self::Fetch
+    }
 }
