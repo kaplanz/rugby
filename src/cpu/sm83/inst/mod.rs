@@ -1,6 +1,7 @@
 use std::fmt::{Debug, Display};
 
-use super::{Cpu, Flag, Status};
+use super::{Cpu, Flag, Ime, Status};
+use crate::hw::pic::Interrupt;
 
 mod exec;
 
@@ -19,6 +20,15 @@ impl Instruction {
 
     pub fn prefix(opcode: u8) -> Self {
         PREFIX[opcode as usize].clone()
+    }
+
+    pub fn int(int: Interrupt) -> Self {
+        Self {
+            opcode: 0x00,
+            fmt: int.repr(),
+            exec: exec::int::start,
+            stack: vec![int.handler()],
+        }
     }
 
     pub fn exec(self, cpu: &mut Cpu) -> Option<Self> {

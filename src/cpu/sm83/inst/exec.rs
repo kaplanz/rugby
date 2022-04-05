@@ -2,7 +2,7 @@ use std::ops::{BitAnd, BitOr, BitXor};
 
 use remus::Device;
 
-use super::{helpers, Cpu, Flag, Instruction, Status};
+use super::{helpers, Cpu, Flag, Ime, Instruction, Status};
 use crate::util::Bitflags;
 
 pub mod adc {
@@ -636,7 +636,7 @@ pub mod di {
         }
 
         // Execute DI
-        cpu.ime = false;
+        cpu.ime = Ime::Disabled;
 
         // Finish
         None
@@ -653,7 +653,7 @@ pub mod ei {
         }
 
         // Execute EI
-        cpu.ime = true; // FIXME: delay by 1 cycle
+        cpu.ime = Ime::WillEnable;
 
         // Finish
         None
@@ -797,6 +797,51 @@ pub mod incw {
             0x33 => *cpu.regs.sp = res,
             _ => panic!("Illegal instruction."),
         }
+
+        // Finish
+        None
+    }
+}
+
+pub mod int {
+    use super::*;
+
+    pub fn start(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
+        // Disable interrupts
+        cpu.ime = Ime::Disabled;
+
+        inst.exec = nop;
+        Some(inst)
+    }
+
+    pub fn nop(mut inst: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Execute NOP
+        inst.exec = push;
+        Some(inst)
+    }
+
+    pub fn push(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
+        // Push SP
+        cpu.pushword(*cpu.regs.pc);
+
+        // Proceed
+        inst.exec = delay;
+        Some(inst)
+    }
+
+    pub fn delay(mut inst: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to push a u16.
+
+        // Proceed
+        inst.exec = jump;
+        Some(inst)
+    }
+
+    pub fn jump(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
+        // Perform jump
+        let addr = inst.stack.pop().unwrap() as u16;
+        *cpu.regs.pc = addr;
 
         // Finish
         None
@@ -1709,7 +1754,7 @@ pub mod reti {
 
     pub fn done(_: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
         // Enable interrupts
-        cpu.ime = true;
+        cpu.ime = Ime::WillEnable;
 
         // Finish
         None

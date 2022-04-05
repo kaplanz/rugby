@@ -8,21 +8,35 @@ use remus::reg::Register;
 use remus::{Block, Device, Machine};
 
 use self::inst::Instruction;
+use crate::hw::pic::Pic;
 use crate::util::Bitflags;
 
 mod inst;
 
 #[derive(Debug, Default)]
 pub struct Cpu {
-    pub bus: Rc<RefCell<Bus>>,
+    // External
+    bus: Rc<RefCell<Bus>>,
+    pic: Rc<RefCell<Pic>>,
+    // Internal
     regs: Registers,
     status: Status,
     state: State,
-    ime: bool,
+    ime: Ime,
     prefix: bool,
 }
 
 impl Cpu {
+    /// Set the cpu's bus.
+    pub fn set_bus(&mut self, bus: Rc<RefCell<Bus>>) {
+        self.bus = bus;
+    }
+
+    /// Set the cpu's pic.
+    pub fn set_pic(&mut self, pic: Rc<RefCell<Pic>>) {
+        self.pic = pic;
+    }
+
     fn fetchbyte(&mut self) -> u8 {
         let pc = &mut *self.regs.pc;
         let byte = self.bus.borrow().read(*pc as usize);
@@ -264,8 +278,32 @@ impl State {
         if let State::Done = self {
             // Log previous register state
             trace!("Registers:\n{}", cpu.regs);
-            // Proceed to State::Fetch
-            self = State::Fetch;
+
+            // Enable interrupts (after EI, RETI)
+            if let Ime::WillEnable = cpu.ime {
+                cpu.ime = Ime::Enabled;
+            }
+
+            // Check for pending interrupts
+            let int = match cpu.ime {
+                Ime::Enabled => cpu.pic.borrow().interrupt(),
+                _ => None,
+            };
+
+            // Handle pending interrupt...
+            if let Some(int) = int {
+                // Acknowledge the interrupt
+                cpu.pic.borrow_mut().ack(int);
+                // Skip State::Fetch
+                let inst = Instruction::int(int);
+                debug!("0xXXXX: {inst}");
+                self = State::Execute(inst);
+            }
+            // ... or fetch next instruction
+            else {
+                // Proceed to State::Fetch
+                self = State::Fetch;
+            }
         }
 
         // If we're State::Fetch, proceed to State::Execute(_) this cycle
@@ -303,5 +341,18 @@ impl State {
 impl Default for State {
     fn default() -> Self {
         Self::Fetch
+    }
+}
+
+#[derive(Debug)]
+enum Ime {
+    Disabled,
+    Enabled,
+    WillEnable,
+}
+
+impl Default for Ime {
+    fn default() -> Self {
+        Self::Disabled
     }
 }
