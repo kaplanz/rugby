@@ -26,7 +26,7 @@ pub struct GameBoy {
     io: InOut,
     mem: Memory,
     mmu: Rc<RefCell<Bus>>,
-    pic: Pic,
+    pic: Rc<RefCell<Pic>>,
     ppu: Ppu,
 }
 
@@ -48,9 +48,10 @@ impl GameBoy {
 
     #[rustfmt::skip]
     fn memmap(&mut self) {
-        // Map MMU                                // ┌──────────┬────────────┬─────┐
-        self.mmu.take();                          // │   SIZE   │    NAME    │ DEV │
-        let mut mmu = self.mmu.borrow_mut();      // ├──────────┼────────────┼─────┤
+        // Map MMU
+        self.mmu.take();                          // ┌──────────┬────────────┬─────┐
+        let mut mmu = self.mmu.borrow_mut();      // │   SIZE   │    NAME    │ DEV │
+        let pic = self.pic.borrow();              // ├──────────┼────────────┼─────┤
         mmu.map(0x0000, self.mem.boot.clone());   // │    256 B │       Boot │ ROM │
         mmu.map(0x0000, self.cart.rom().clone()); // │  32 Ki B │  Cartridge │ ROM │
         mmu.map(0x8000, self.ppu.vram.clone());   // │   8 Ki B │      Video │ RAM │
@@ -61,7 +62,7 @@ impl GameBoy {
                                                   // │     96 B │     Unused │ --- │
         mmu.map(0xff00, self.io.bus.clone());     // │    128 B │        I/O │ Bus │
         mmu.map(0xff80, self.mem.hram.clone());   // │    127 B │       High │ RAM │
-        mmu.map(0xffff, self.pic.enable.clone()); // │      1 B │  Interrupt │ Reg │
+        mmu.map(0xffff, pic.enable.clone());      // │      1 B │  Interrupt │ Reg │
                                                   // └──────────┴────────────┴─────┘
         // Use an `Unmapped` as a fallback
         mmu.map(0x0000, Rc::new(RefCell::new(Unmapped::new())));
@@ -74,18 +75,19 @@ impl Block for GameBoy {
     fn reset(&mut self) {
         // Reset CPU
         self.cpu.reset();
-        self.cpu.bus = self.mmu.clone(); // link CPU bus
+        self.cpu.set_bus(self.mmu.clone()); // link CPU bus
         // Reset cartridge
         self.cart.reset();
         // Reset I/O
         self.io.reset();
-        self.io.iflag = self.pic.active.clone(); // link IF register
+        self.io.iflag = self.pic.borrow().active.clone(); // link IF register
         self.io.lcd = self.ppu.ctl.clone(); // link LCD controller
         self.io.boot = self.mem.boot.borrow().ctl.clone(); // link BOOT controller
         // Reset memory
         self.mem.reset();
         // Reset interrupts
-        self.pic.reset();
+        self.pic.borrow_mut().reset();
+        self.cpu.set_pic(self.pic.clone()); // link PIC
         // Reset PPU
         self.ppu.reset();
 
@@ -328,7 +330,7 @@ mod tests {
                 .map(|addr| gb.io.iflag.borrow().read(addr))
                 .all(|byte| byte == 0x64));
             assert!((0x0..=0x0)
-                .map(|addr| gb.pic.active.borrow().read(addr))
+                .map(|addr| gb.pic.borrow().active.borrow().read(addr))
                 .all(|byte| byte == 0x64));
             // Sound
             (0xff10..=0xff26).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x65));
@@ -377,7 +379,7 @@ mod tests {
         // Interrupt Enable
         (0xffff..=0xffff).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x80));
         assert!((0x0..=0x0)
-            .map(|addr| gb.pic.enable.borrow().read(addr))
+            .map(|addr| gb.pic.borrow().enable.borrow().read(addr))
             .all(|byte| byte == 0x80));
     }
 
