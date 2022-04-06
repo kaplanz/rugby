@@ -115,7 +115,7 @@ impl From<Interrupt> for u8 {
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("Unknown Interrupt")]
+    #[error("unknown interrupt")]
     Unknown,
 }
 

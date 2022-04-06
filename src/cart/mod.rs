@@ -3,10 +3,11 @@ use std::cmp::Ordering;
 use std::iter;
 use std::rc::Rc;
 
-use log::{error, info};
+use log::{debug, error, info};
 use remus::dev::Null;
-use remus::mem::{Ram, Rom};
+use remus::mem::{Memory, Ram, Rom};
 use remus::{Block, Device};
+use thiserror::Error;
 
 use self::header::Header;
 use self::mbc::{Mbc, Mbc1, NoMbc};
@@ -22,7 +23,7 @@ pub struct Cartridge {
 }
 
 impl Cartridge {
-    pub fn new(rom: &[u8]) -> Result<Cartridge, header::Error> {
+    pub fn new(rom: &[u8]) -> Result<Cartridge, Error> {
         // Parse cartridge header
         let header = Header::try_from(&*rom)?;
         info!("Cartridge:\n{header}");
@@ -51,6 +52,7 @@ impl Cartridge {
                 .take(header.romsz)
                 .collect::<Vec<_>>()
         };
+        debug!("ROM:\n{}", &rom as &dyn Memory);
 
         // Construct external ROM
         let erom: Rc<RefCell<dyn Device>> = {
@@ -131,4 +133,10 @@ impl Block for Cartridge {
     fn reset(&mut self) {
         self.mbc.reset();
     }
+}
+
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("could not parse ROM header")]
+    Header(#[from] header::Error),
 }

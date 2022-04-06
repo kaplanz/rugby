@@ -73,7 +73,7 @@ impl TryFrom<&[u8]> for Header {
         // Extract the header bytes
         let header: &[u8; 0x50] = rom
             .get(0x100..=0x14f)
-            .ok_or(Error::NoHeader)?
+            .ok_or(Error::Missing)?
             .try_into()
             .unwrap();
 
@@ -139,7 +139,10 @@ impl TryFrom<&[u8]> for Header {
             .fold(0u8, |accum, item| accum.wrapping_sub(item).wrapping_sub(1))
         {
             chk if chk == hchk => Ok(()),
-            chk => Err(Error::HeaderChecksum(chk)),
+            chk => Err(Error::HeaderChecksum {
+                found: chk,
+                expected: hchk,
+            }),
         }?;
         // Verify global checksum
         match rom
@@ -349,26 +352,26 @@ impl TryFrom<u8> for CartridgeType {
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("No Header")]
-    NoHeader,
-    #[error("Invalid Title: {0}")]
-    Title(Utf8Error),
-    #[error("Invalid CGB Flag: {0}")]
+    #[error("header missing")]
+    Missing,
+    #[error("could not parse title")]
+    Title(#[from] Utf8Error),
+    #[error("invalid CGB flag: {0}")]
     CgbFlag(u8),
-    #[error("Invalid SGB Flag: {0}")]
+    #[error("invalid SGB flag: {0}")]
     SgbFlag(u8),
-    #[error("Unknown Cartridge Type: {0:#04x}")]
+    #[error("unknown cartridge type: {0:#04x}")]
     CartridgeType(u8),
-    #[error("Invalid ROM Size: {0}")]
+    #[error("invalid ROM size: {0}")]
     RomSize(u8),
-    #[error("Invalid RAM Size: {0}")]
+    #[error("invalid RAM size: {0}")]
     RamSize(u8),
-    #[error("Invalid Destination Code: {0}")]
+    #[error("invalid destination code: {0:#04x}")]
     DestinationCode(u8),
-    #[error("Bad Header Checksum: {0}")]
-    HeaderChecksum(u8),
-    #[error("Bad Global Checksum: {0}")]
-    GlobalChecksum(u16),
+    #[error("bad header checksum (found {found:#04x}, expected {expected:#04x})")]
+    HeaderChecksum { found: u8, expected: u8 },
+    #[error("bad global checksum: (found {found:#06x}, (expected {expected:#06x})")]
+    GlobalChecksum { found: u8, expected: u8 },
 }
 
 #[cfg(test)]

@@ -31,19 +31,19 @@ fn main() -> Result<()> {
     let rom = {
         // Open ROM file
         let f = File::open(&args.rom)
-            .with_context(|| format!("Failed to open ROM: `{}`", args.rom.display()))?;
+            .with_context(|| format!("failed to open ROM: `{}`", args.rom.display()))?;
         // Read ROM into a buffer
         let mut buf = Vec::new();
         // NOTE: Game Paks manufactured by Nintendo have a maximum 8 MiB ROM.
         f.take(0x800000)
             .read_to_end(&mut buf)
-            .with_context(|| format!("Failed to open ROM: `{}`", args.rom.display()))?;
+            .with_context(|| format!("failed to open ROM: `{}`", args.rom.display()))?;
 
         buf
     };
     // Initialize the cartridge
     let cart = Cartridge::new(&rom)
-        .with_context(|| format!("Failed to parse ROM: `{}`", args.rom.display()))?;
+        .with_context(|| format!("failed to load cartridge: `{}`", args.rom.display()))?;
     // Extract ROM title from cartridge
     let title = match cart.header().title.replace('\0', " ").trim() {
         "" => "Game Boy",
