@@ -9,11 +9,13 @@ use remus::{Block, Machine};
 
 use crate::cart::Cartridge;
 use crate::cpu::sm83::Cpu;
+use crate::emu::Button;
+use crate::hw::joypad::{self, Joypad};
 use crate::hw::pic::Pic;
 use crate::hw::ppu::{self, Ppu};
 use crate::hw::timer::{self, Timer};
 use crate::mem::Unmapped;
-use crate::{emu, Emulator};
+use crate::Emulator;
 
 mod boot;
 
@@ -25,6 +27,7 @@ pub struct GameBoy {
     cycle: usize,
     cpu: Cpu,
     io: InOut,
+    joypad: Joypad,
     mem: Memory,
     mmu: Rc<RefCell<Bus>>,
     pic: Rc<RefCell<Pic>>,
@@ -39,6 +42,7 @@ impl GameBoy {
             cycle: Default::default(),
             cpu: Default::default(),
             io: Default::default(),
+            joypad: Default::default(),
             mem: Default::default(),
             mmu: Default::default(),
             pic: Default::default(),
@@ -84,6 +88,7 @@ impl Block for GameBoy {
 
         // Reset I/O
         self.io.reset();
+        self.io.con = self.joypad.p1.clone(); // link joypad
         self.io.timer = self.timer.regs.clone(); // link timer registers
         self.io.iflag = self.pic.borrow().active.clone(); // link IF register
         self.io.lcd = self.ppu.ctl.clone(); // link LCD controller
@@ -95,7 +100,11 @@ impl Block for GameBoy {
         // Reset interrupts
         self.pic.borrow_mut().reset();
         self.cpu.set_pic(self.pic.clone()); // link PIC
+        self.joypad.set_pic(self.pic.clone()); // link PIC
         self.timer.set_pic(self.pic.clone()); // link PIC
+
+        // Reset joypad
+        self.joypad.reset();
 
         // Reset PPU
         self.ppu.reset();
@@ -111,8 +120,8 @@ impl Block for GameBoy {
 }
 
 impl Emulator for GameBoy {
-    fn send(&mut self, btn: emu::Button) {
-        todo!("{btn:?}")
+    fn send(&mut self, btns: Vec<Button>) {
+        self.joypad.recv(btns);
     }
 
     fn redraw<F>(&self, mut draw: F)
@@ -206,7 +215,7 @@ struct InOut {
     // │   16 B │              LCD │ PPU │
     // │    1 B │ Boot ROM Disable │ Reg │
     // └────────┴──────────────────┴─────┘
-    con:   Rc<RefCell<Register<u8>>>,
+    con:   Rc<RefCell<joypad::Register>>,
     com:   Rc<RefCell<Register<u16>>>,
     timer: Rc<RefCell<timer::Registers>>,
     iflag: Rc<RefCell<Register<u8>>>,
@@ -322,12 +331,13 @@ mod tests {
         {
             // Controller
             (0xff00..=0xff00).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x61));
+            // NOTE: Only bits 0x30 are writable
             (0x00..=0x00)
                 .map(|addr| gb.io.bus.borrow().read(addr))
-                .for_each(|byte| assert_eq!(byte, 0x61));
+                .for_each(|byte| assert_eq!(byte, 0xef));
             (0x0..=0x0)
                 .map(|addr| gb.io.con.borrow().read(addr))
-                .for_each(|byte| assert_eq!(byte, 0x61));
+                .for_each(|byte| assert_eq!(byte, 0xef));
             // Communication
             (0xff01..=0xff02).for_each(|addr| gb.mmu.borrow_mut().write(addr, 0x62));
             (0x01..=0x02)
@@ -430,6 +440,7 @@ mod tests {
 
         // Ensure RAM, registers did get overwritten
         (0x8000..=0xffff)
+            .filter(|addr| ![0xff00].contains(addr))
             .map(|addr| gb.mmu.borrow().read(addr))
             .for_each(|byte| assert_eq!(byte, 0xaa));
     }
