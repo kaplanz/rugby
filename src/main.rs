@@ -4,9 +4,10 @@ use std::path::PathBuf;
 
 use clap::{Parser, ValueHint};
 use color_eyre::eyre::{Result, WrapErr};
+use gameboy::emu::Button;
 use gameboy::{Cartridge, Emulator, GameBoy, SCREEN};
 use log::info;
-use minifb::{Scale, ScaleMode, Window, WindowOptions};
+use minifb::{Key, Scale, ScaleMode, Window, WindowOptions};
 use remus::Machine;
 
 /// Game Boy emulator written in Rust.
@@ -72,8 +73,9 @@ fn main() -> Result<()> {
     // Mark the starting time
     let mut now = std::time::Instant::now();
     let mut active = 0;
-    // Run emulator on a 4 MiHz clock
-    for _ in std::iter::repeat(()) {
+
+    // TODO: Run emulator on a 4 MiHz clock
+    while win.is_open() {
         // Perform a single cycle
         gb.cycle();
 
@@ -82,6 +84,21 @@ fn main() -> Result<()> {
             win.update_with_buffer(buf, SCREEN.width, SCREEN.height)
                 .unwrap()
         });
+
+        // Send joypad input
+        #[rustfmt::skip]
+        let keys: Vec<_> = win.get_keys().into_iter().flat_map(|key| match key {
+            Key::Z     => Some(Button::A),
+            Key::X     => Some(Button::B),
+            Key::Space => Some(Button::Select),
+            Key::Enter => Some(Button::Start),
+            Key::Right => Some(Button::Right),
+            Key::Left  => Some(Button::Left),
+            Key::Up    => Some(Button::Up),
+            Key::Down  => Some(Button::Down),
+            _ => None
+        }).collect();
+        gb.send(keys);
 
         // Calculate real-time clock frequency
         if now.elapsed().as_secs() > 0 {

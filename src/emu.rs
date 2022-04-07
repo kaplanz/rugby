@@ -15,10 +15,14 @@ impl Resolution {
     pub const fn len(&self) -> usize {
         self.width.saturating_mul(self.height)
     }
+
+    pub const fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 pub trait Emulator {
-    fn send(&mut self, btn: Button);
+    fn send(&mut self, btns: Vec<Button>);
 
     fn redraw<F>(&self, draw: F)
     where
@@ -26,7 +30,7 @@ pub trait Emulator {
 }
 
 #[rustfmt::skip]
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Button {
     A      = 0b00100001,
     B      = 0b00100010,
