@@ -292,7 +292,7 @@ impl State {
 
             // Check for pending interrupts
             let int = match cpu.ime {
-                Ime::Enabled => cpu.pic.borrow().interrupt(),
+                Ime::Enabled => cpu.pic.borrow().int(),
                 _ => None,
             };
 

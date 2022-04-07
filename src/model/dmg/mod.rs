@@ -145,7 +145,7 @@ impl Machine for GameBoy {
 
     fn cycle(&mut self) {
         // Wake CPU if interrupts pending
-        if self.pic.borrow().interrupt().is_some() {
+        if self.pic.borrow().int().is_some() {
             self.cpu.wake();
         }
 
