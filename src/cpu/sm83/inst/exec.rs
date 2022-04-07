@@ -2468,14 +2468,14 @@ pub mod srl {
 pub mod stop {
     use super::*;
 
-    pub fn start(inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
+    pub fn start(inst: Instruction, _: &mut Cpu) -> Option<Instruction> {
         // Check opcode
         if inst.opcode != 0x10 {
             panic!("Illegal instruction.");
         }
 
         // Execute STOP
-        cpu.status = Status::Stopped;
+        // TODO: implement this mess of an instruction
 
         // Finish
         None
