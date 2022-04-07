@@ -1522,11 +1522,10 @@ pub mod prefix {
             panic!("Illegal instruction.");
         }
 
-        // Execute PREFIX
-        cpu.prefix = true;
-
-        // Finish
-        None
+        // Fetch prefix instruction
+        let opcode = cpu.fetchbyte();
+        let inst = Instruction::prefix(opcode);
+        Some(inst)
     }
 }
 

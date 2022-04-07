@@ -23,7 +23,6 @@ pub struct Cpu {
     status: Status,
     state: State,
     ime: Ime,
-    prefix: bool,
 }
 
 impl Cpu {
@@ -317,14 +316,21 @@ impl State {
             // Read the next instruction
             let pc = *cpu.regs.pc;
             let opcode = cpu.fetchbyte();
+
             // Decode the instruction
-            let inst = if !cpu.prefix {
-                Instruction::new(opcode)
-            } else {
-                cpu.prefix = false; // no longer prefixed
-                Instruction::prefix(opcode)
+            let inst = Instruction::new(opcode);
+
+            // Log the instruction
+            // NOTE: Ensure that prefix instructions are logged correctly
+            let fmt = match opcode {
+                0xcb => {
+                    let opcode = cpu.bus.borrow().read(*cpu.regs.pc as usize);
+                    format!("{}", Instruction::prefix(opcode))
+                }
+                _ => format!("{inst}"),
             };
-            debug!("{pc:#06x}: {inst}");
+            debug!("{pc:#06x}: {fmt}");
+
             // Proceed to State::Execute(_)
             self = State::Execute(inst);
         }
