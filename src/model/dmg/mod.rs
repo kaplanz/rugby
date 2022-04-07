@@ -99,6 +99,7 @@ impl Block for GameBoy {
 
         // Reset PPU
         self.ppu.reset();
+        self.ppu.set_pic(self.pic.clone()); // link PIC
 
         // Reset timer
         self.timer.reset();
