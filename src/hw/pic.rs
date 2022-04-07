@@ -17,7 +17,7 @@ pub struct Pic {
 }
 
 impl Pic {
-    pub fn interrupt(&self) -> Option<Interrupt> {
+    pub fn int(&self) -> Option<Interrupt> {
         let active = **self.active.borrow();
         let enable = **self.enable.borrow();
         (active & enable).try_into().ok()
