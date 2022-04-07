@@ -37,6 +37,12 @@ impl Cpu {
         self.pic = pic;
     }
 
+    pub fn wake(&mut self) {
+        self.status = Status::Enabled;
+    }
+}
+
+impl Cpu {
     fn fetchbyte(&mut self) -> u8 {
         let pc = &mut *self.regs.pc;
         let byte = self.bus.borrow().read(*pc as usize);

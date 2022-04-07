@@ -23,7 +23,6 @@ impl Pic {
         (active & enable).try_into().ok()
     }
 
-    #[allow(dead_code)]
     pub fn req(&mut self, int: Interrupt) {
         **self.active.borrow_mut() |= int as u8;
     }
