@@ -11,6 +11,7 @@ use crate::cart::Cartridge;
 use crate::cpu::sm83::Cpu;
 use crate::hw::pic::Pic;
 use crate::hw::ppu::{self, Ppu};
+use crate::hw::timer::{self, Timer};
 use crate::mem::Unmapped;
 use crate::{emu, Emulator};
 
@@ -28,6 +29,7 @@ pub struct GameBoy {
     mmu: Rc<RefCell<Bus>>,
     pic: Rc<RefCell<Pic>>,
     ppu: Ppu,
+    timer: Timer,
 }
 
 impl GameBoy {
@@ -41,6 +43,7 @@ impl GameBoy {
             mmu: Default::default(),
             pic: Default::default(),
             ppu: Default::default(),
+            timer: Default::default(),
         };
         this.reset();
         this
@@ -71,25 +74,34 @@ impl GameBoy {
 }
 
 impl Block for GameBoy {
-    #[rustfmt::skip]
     fn reset(&mut self) {
         // Reset CPU
         self.cpu.reset();
         self.cpu.set_bus(self.mmu.clone()); // link CPU bus
+
         // Reset cartridge
         self.cart.reset();
+
         // Reset I/O
         self.io.reset();
+        self.io.timer = self.timer.regs.clone(); // link timer registers
         self.io.iflag = self.pic.borrow().active.clone(); // link IF register
         self.io.lcd = self.ppu.ctl.clone(); // link LCD controller
         self.io.boot = self.mem.boot.borrow().ctl.clone(); // link BOOT controller
+
         // Reset memory
         self.mem.reset();
+
         // Reset interrupts
         self.pic.borrow_mut().reset();
         self.cpu.set_pic(self.pic.clone()); // link PIC
+        self.timer.set_pic(self.pic.clone()); // link PIC
+
         // Reset PPU
         self.ppu.reset();
+
+        // Reset timer
+        self.timer.reset();
 
         // Re-map MMU
         self.memmap();
@@ -131,16 +143,24 @@ impl Machine for GameBoy {
     }
 
     fn cycle(&mut self) {
-        // As an abstraction, let the CPU run on a 1 MiHz clock which can
-        // be done using a simple clock division by 4.
+        // Wake CPU if interrupts pending
+        if self.pic.borrow().interrupt().is_some() {
+            self.cpu.wake();
+        }
+
+        // CPU runs on a 1 MiHz clock: implement using a simple clock divider
         if self.cycle % 4 == 0 && self.cpu.enabled() {
             self.cpu.cycle();
         }
 
-        // Let the PPU run on at full speed, and internally manage clock
-        // division as needed.
+        // PPU runs on a 4 MiHz clock
         if self.ppu.enabled() {
             self.ppu.cycle();
+        }
+
+        // Timer runs on a 4 MiHz clock
+        if self.timer.enabled() {
+            self.timer.cycle();
         }
 
         // Keep track of cycles executed
@@ -187,7 +207,7 @@ struct InOut {
     // └────────┴──────────────────┴─────┘
     con:   Rc<RefCell<Register<u8>>>,
     com:   Rc<RefCell<Register<u16>>>,
-    timer: Rc<RefCell<Register<u32>>>,
+    timer: Rc<RefCell<timer::Registers>>,
     iflag: Rc<RefCell<Register<u8>>>,
     sound: Rc<RefCell<Ram<0x17>>>,
     wave:  Rc<RefCell<Ram<0x10>>>,

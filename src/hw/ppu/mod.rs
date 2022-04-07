@@ -56,11 +56,14 @@ impl Block for Ppu {
     fn reset(&mut self) {
         // Reset LCD
         self.lcd = Default::default();
+
         // Reset mode
         self.mode = Default::default();
+
         // Reset memory
         self.vram.borrow_mut().reset();
         self.oam.borrow_mut().reset();
+
         // Reset registers
         self.ctl.borrow_mut().reset();
     }
