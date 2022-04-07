@@ -544,11 +544,14 @@ pub mod dec {
         // Check opcode
         match inst.opcode {
             0x35 => {
-                inst.stack.push(res);
-                inst.exec = done_0x35;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x05 | 0x0d | 0x15 | 0x1d | 0x25 | 0x2d | 0x3d => {
+                // Write X
                 *match inst.opcode {
                     0x05 => &mut *cpu.regs.b,
                     0x0d => &mut *cpu.regs.c,
@@ -566,10 +569,9 @@ pub mod dec {
         }
     }
 
-    pub fn done_0x35(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -721,11 +723,14 @@ pub mod inc {
         // Check opcode
         match inst.opcode {
             0x34 => {
-                inst.stack.push(res);
-                inst.exec = done_0x34;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x04 | 0x0c | 0x14 | 0x1c | 0x24 | 0x2c | 0x3c => {
+                // Write X
                 *match inst.opcode {
                     0x04 => &mut *cpu.regs.b,
                     0x0c => &mut *cpu.regs.c,
@@ -743,10 +748,9 @@ pub mod inc {
         }
     }
 
-    pub fn done_0x34(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -1611,11 +1615,14 @@ pub mod res {
         // Check opcode
         match inst.opcode {
             0x86 | 0x8e | 0x96 | 0x9e | 0xa6 | 0xae | 0xb6 | 0xbe => {
-                inst.stack.push(res);
-                inst.exec = done_0xX6_0xXe;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x80..=0xbf => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
                 // Finish
                 None
@@ -1624,11 +1631,9 @@ pub mod res {
         }
     }
 
-    #[allow(non_snake_case)]
-    pub fn done_0xX6_0xXe(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -1800,22 +1805,25 @@ pub mod rl {
         // Check opcode
         match inst.opcode {
             0x16 => {
-                inst.stack.push(res);
-                inst.exec = done_0x16;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x10..=0x17 => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x16(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -1887,22 +1895,25 @@ pub mod rlc {
         // Check opcode
         match inst.opcode {
             0x06 => {
-                inst.stack.push(res);
-                inst.exec = done_0x06;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x00..=0x07 => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x06(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -1974,22 +1985,25 @@ pub mod rr {
         // Check opcode
         match inst.opcode {
             0x1e => {
-                inst.stack.push(res);
-                inst.exec = done_0x1e;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x18..=0x1f => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x1e(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -2061,22 +2075,25 @@ pub mod rrc {
         // Check opcode
         match inst.opcode {
             0x0e => {
-                inst.stack.push(res);
-                inst.exec = done_0x0e;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x08..=0x0f => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x0e(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -2264,23 +2281,25 @@ pub mod set {
         // Check opcode
         match inst.opcode {
             0xc6 | 0xce | 0xd6 | 0xde | 0xe6 | 0xee | 0xf6 | 0xfe => {
-                inst.stack.push(res);
-                inst.exec = done_0xX6_0xXe;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0xc0..=0xff => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    #[allow(non_snake_case)]
-    pub fn done_0xX6_0xXe(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -2324,22 +2343,25 @@ pub mod sla {
         // Check opcode
         match inst.opcode {
             0x26 => {
-                inst.stack.push(res);
-                inst.exec = done_0x26;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x20..=0x27 => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x26(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -2384,22 +2406,25 @@ pub mod sra {
         // Check opcode
         match inst.opcode {
             0x2e => {
-                inst.stack.push(res);
-                inst.exec = done_0x2e;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x28..=0x2f => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x2e(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -2443,22 +2468,25 @@ pub mod srl {
         // Check opcode
         match inst.opcode {
             0x3e => {
-                inst.stack.push(res);
-                inst.exec = done_0x3e;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x38..=0x3f => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x3e(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
@@ -2564,22 +2592,25 @@ pub mod swap {
         // Check opcode
         match inst.opcode {
             0x36 => {
-                inst.stack.push(res);
-                inst.exec = done_0x36_0x3e;
+                // Write (HL)
+                cpu.writebyte(res);
+                // Proceed
+                inst.exec = delay;
                 Some(inst)
             }
             0x30..=0x37 => {
+                // Write X
                 helpers::set_op8(cpu, inst.opcode & 0x07, res);
+                // Finish
                 None
             }
             _ => panic!("Illegal instruction."),
         }
     }
 
-    pub fn done_0x36_0x3e(mut inst: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-        // Write (HL)
-        let res = inst.stack.pop().unwrap();
-        cpu.writebyte(res);
+    pub fn delay(_: Instruction, _: &mut Cpu) -> Option<Instruction> {
+        // Delay by 1 cycle
+        // NOTE: This represents the fact that it takes 2 cycles to write a u16.
 
         // Finish
         None
