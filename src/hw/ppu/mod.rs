@@ -11,6 +11,7 @@ use remus::{Block, Device, Machine};
 use self::lcd::Screen;
 use self::pixel::{Fetch, Fifo};
 use self::sprite::Sprite;
+use super::pic::{Interrupt, Pic};
 use crate::SCREEN;
 
 mod lcd;
@@ -23,6 +24,7 @@ pub struct Ppu {
     lcd: Screen,
     dot: usize,
     mode: Mode,
+    pic: Rc<RefCell<Pic>>,
     // ┌────────┬──────────────────┬─────┬───────┐
     // │  SIZE  │       NAME       │ DEV │ ALIAS │
     // ├────────┼──────────────────┼─────┼───────┤
@@ -36,6 +38,11 @@ pub struct Ppu {
 }
 
 impl Ppu {
+    /// Set the ppu's pic.
+    pub fn set_pic(&mut self, pic: Rc<RefCell<Pic>>) {
+        self.pic = pic;
+    }
+
     /// Get a reference to the ppu's lcd.
     #[must_use]
     pub fn screen(&self) -> &Screen {
@@ -185,6 +192,40 @@ enum Mode {
 
 impl Mode {
     fn exec(self, ppu: &mut Ppu) -> Self {
+        // Handle previous state
+        {
+            // Update STAT
+            let regs = ppu.ctl.borrow();
+            let stat = &mut **regs.stat.borrow_mut();
+            let ly = **regs.ly.borrow();
+            let lyc = **regs.lyc.borrow();
+            *stat ^= (*stat & 0x03)
+                ^ match self {
+                    Mode::Scan(_) => 0b10,
+                    Mode::Draw(_) => 0b11,
+                    Mode::HBlank(_) => 0b00,
+                    Mode::VBlank(_) => 0b01,
+                };
+            *stat ^= (*stat & 0x04) ^ ((ly == lyc) as u8) << 2;
+
+            // Trigger interrupts
+            if ppu.dot == 0 {
+                let mut int = 0;
+                // LYC=LY
+                int |= ((lyc == ly) as u8) << 6;
+                // Mode 2
+                int |= (matches!(self, Mode::Scan(_)) as u8) << 5;
+                // Mode 1
+                int |= (matches!(self, Mode::VBlank(_)) as u8) << 4;
+                // Mode 0
+                int |= (matches!(self, Mode::HBlank(_)) as u8) << 3;
+                // Check for interrupts
+                if int & (*stat & 0x78) != 0 {
+                    ppu.pic.borrow_mut().req(Interrupt::LcdStat);
+                }
+            }
+        }
+
         // Execute the current PPU mode
         trace!("PPU @ {:03}:\n{self}", ppu.dot);
         match self {
@@ -358,6 +399,9 @@ impl HBlank {
             // Increment scanline at the 456th dot, and reset dot-clock
             *ly += 1;
             ppu.dot = 0;
+
+            // Schedule VBlank interrupt
+            ppu.pic.borrow_mut().req(Interrupt::VBlank);
 
             // Either begin next scanline, or enter VBlank
             if *ly < SCREEN.height as u8 {
