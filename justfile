@@ -42,7 +42,7 @@ help:
 
 # lint source files
 lint:
-    @cargo clippy --workspace
+    @cargo clippy --workspace --all-targets
 
 # build `release` profile
 release:
