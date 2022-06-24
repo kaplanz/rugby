@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
 alias b := build
+alias c := check
 alias r := run
 alias t := test
 
@@ -15,6 +16,10 @@ all: build doc release
 
 # compile local package
 build: dev
+
+# check local package for errors
+check:
+    @cargo check --workspace --all-targets
 
 # clean build artifacts
 clean:
