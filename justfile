@@ -1,5 +1,5 @@
 # File:        Justfile
-# Author:      Zakhary Kaplan <zakharykaplan@gmail.com>
+# Author:      Zakhary Kaplan <https://zakhary.dev>
 # Created:     27 Apr 2022
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
