@@ -1,7 +1,7 @@
 # gameboy
 
 <p align="center">
-  <img width="100" height="100" src="./doc/assets/img/gameboy.svg"/>
+  <img width="100" height="100" src="./docs/assets/img/gameboy.svg"/>
 </p>
 
 <p align="center">
