@@ -2,6 +2,7 @@
 # Author:      Zakhary Kaplan <https://zakhary.dev>
 # Created:     27 Apr 2022
 # SPDX-License-Identifier: MIT OR Apache-2.0
+# Vim:         set fdl=0 fdm=marker ft=make:
 
 alias b := build
 alias c := check
@@ -60,5 +61,3 @@ run rom:
 # perform tests
 test *opts:
     @cargo test --workspace -- {{ opts }}
-
-# vim:fdl=0:fdm=marker:ft=make:
