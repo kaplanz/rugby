@@ -804,7 +804,7 @@ dependencies = [
 [[package]]
 name = "remus"
 version = "0.2.0"
-source = "git+https://github.com/zakharykaplan/remus#350eabf9feba3dbd4d7692610b37fcc2c19a9df1"
+source = "git+https://github.com/kaplanz/remus#350eabf9feba3dbd4d7692610b37fcc2c19a9df1"
 dependencies = [
  "num",
  "rand",

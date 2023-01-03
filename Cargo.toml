@@ -2,7 +2,7 @@
 name = "gameboy"
 version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/zakharykaplan/gameboy"
+repository = "https://github.com/kaplanz/gameboy"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -25,5 +25,5 @@ gameboy-core = { path = "core" }
 hexicolor = { version = "0.1.0", path = "crates/hexicolor" }
 log = "0.4.17"
 minifb = "0.23.0"
-remus = { git = "https://github.com/zakharykaplan/remus" }
+remus = { git = "https://github.com/kaplanz/remus" }
 thiserror = "1.0.38"
