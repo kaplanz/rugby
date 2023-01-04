@@ -50,6 +50,10 @@ help:
 lint:
     @cargo clippy --workspace --all-targets
 
+# lint pedantically
+pedantic:
+    @cargo clippy --workspace --all-targets -- --warn=clippy::pedantic
+
 # build `release` profile
 release:
     @cargo build --all-targets --release
