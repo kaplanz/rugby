@@ -10,6 +10,8 @@ main {
   .screen {
     canvas {
       background-color: #8ca05a;
+      image-rendering: pixelated;
+      width: 25em;
     }
   }
 
