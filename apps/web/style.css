@@ -1,52 +1,5 @@
-body {
-  background-color: #c5c0bd;
-}
+@import "https://unpkg.com/normalize.css@8.0.1/normalize.css";
 
-main {
-  margin: 1em;
-}
-
-.gameboy {
-  .screen {
-    canvas {
-      background-color: #8ca05a;
-      image-rendering: pixelated;
-      width: 25em;
-    }
-  }
-
-  .joypad {
-    color: #204786;
-
-    .dpad {
-      display: grid;
-
-      input {
-        background-color: var(--oc-gray-7);
-        border: none;
-        width: 1em;
-        height: 1em;
-      }
-    }
-
-    .game {
-      input {
-        background-color: #9a2257;
-        border: none;
-        border-radius: 50%;
-        width: 2em;
-        height: 2em;
-      }
-    }
-
-    .keys {
-      input {
-        background-color: #908d92;
-        border: none;
-        border-radius: 16px;
-        width: 4em;
-        height: 1em;
-      }
-    }
-  }
+:root {
+  color-scheme: light dark;
 }
