@@ -1,0 +1,8 @@
+# Compiled distrubution files.
+/dist/
+
+# Dependency cache.
+/node_modules/
+
+# Output directory from wasm-pack.
+/pkg/
