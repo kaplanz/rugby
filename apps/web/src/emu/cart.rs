@@ -3,25 +3,21 @@ use wasm_bindgen::prelude::*;
 
 use super::GameBoy;
 
-#[wasm_bindgen]
-pub fn acid2() -> Box<[u8]> {
-    Box::from(
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../roms/test/acid2/dmg-acid2.gb"
-        ))
-        .as_slice(),
-    )
-}
-
+/// Game cartridge.
 #[wasm_bindgen]
 pub struct Cartridge(dmg::Cartridge);
 
 #[wasm_bindgen]
 impl Cartridge {
+    /// Constructs a new `Cartridge`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the cartridge could not be constructed. This will
+    /// either be due to invalid header bytes or an unsupported cartridge type.
     #[wasm_bindgen(constructor)]
-    pub fn new(rom: &[u8]) -> Self {
-        Self(dmg::Cartridge::new(rom).unwrap())
+    pub fn new(rom: &[u8]) -> Result<Cartridge, JsError> {
+        Ok(Self(dmg::Cartridge::new(rom)?))
     }
 }
 
