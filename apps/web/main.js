@@ -1,4 +1,4 @@
-import { acid2, Cartridge, GameBoy } from "./pkg/rugby.js";
+import { acid2, Button, Cartridge, GameBoy } from "./pkg/rugby.js";
 
 // Construct an emulator instance
 const emu = new GameBoy();
@@ -12,6 +12,22 @@ console.log("inserted a game cartridge");
 const app = {
     play: true,
 };
+
+// Define the input keymap
+function keymap(key) {
+    return (
+        {
+            x: Button.A,
+            z: Button.B,
+            " ": Button.Select,
+            Enter: Button.Start,
+            ArrowRight: Button.Right,
+            ArrowLeft: Button.Left,
+            ArrowUp: Button.Up,
+            ArrowDown: Button.Down,
+        }[key] ?? null
+    );
+}
 
 // Construct application state
 const gui = {
@@ -36,8 +52,14 @@ const gui = {
 };
 
 // Add event listeners
-addEventListener("keydown", ({ key }) => emu.keydown(key));
-addEventListener("keyup", ({ key }) => emu.keyup(key));
+addEventListener("keydown", ({ key }) => {
+    const button = keymap(key);
+    if (button != null) emu.press(button);
+});
+addEventListener("keyup", ({ key }) => {
+    const button = keymap(key);
+    if (button != null) emu.release(button);
+});
 
 // Handle cartridge input
 gui.cartridge.onchange = function () {
