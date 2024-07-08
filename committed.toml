@@ -1,0 +1,16 @@
+subject_length = 64
+subject_capitalized = false
+imperative_subject = false
+style = "conventional"
+allowed_types = [
+    "build",
+    "chore",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "refactor",
+    "revert",
+    "style",
+    "test",
+]
