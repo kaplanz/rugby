@@ -11,13 +11,13 @@ license = { workspace = true }
 [dependencies]
 advise = { workspace = true }
 bytecount = { version = "0.6.8" }
-displaydoc = { version = "0.2.4" }
+displaydoc = { version = "0.2.5" }
 hexd = { workspace = true }
 indexmap = { version = "2.2.6" }
 log = { workspace = true }
 num = { workspace = true }
-pest = { version = "2.7.10" }
-pest_derive = { version = "2.7.10" }
+pest = { version = "2.7.11" }
+pest_derive = { version = "2.7.11" }
 png = { workspace = true }
 rugby = { workspace = true, features = ["debug"] }
 thiserror = { workspace = true }
