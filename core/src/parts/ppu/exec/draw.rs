@@ -23,7 +23,7 @@ impl Draw {
 
         // If we have a pixel to draw, draw it
         if let Some(pixel) = self.pipe.shift(ppu) {
-            // Fetch pixel coordinates
+            // Determine pixel coordinates
             let ly: u16 = ppu.reg.ly.load().into();
             let lx: u16 = self.pipe.lx.into();
 
@@ -66,7 +66,7 @@ impl Ppu {
     /// Color a pixel using the current palette.
     pub(in super::super) fn color(&self, pixel: &Pixel) -> Color {
         // Load palette data
-        let pal = match pixel.meta.pal {
+        let pal = match pixel.meta.pal() {
             Palette::BgWin => self.reg.bgp.load(),
             Palette::Obp0 => self.reg.obp0.load(),
             Palette::Obp1 => self.reg.obp1.load(),
@@ -82,7 +82,7 @@ impl Ppu {
         trace!(
             "transformed: {old:?} -> {col:?}, using: {reg:?} = {pal:#010b}",
             old = pixel.col,
-            reg = pixel.meta.pal,
+            reg = pixel.meta.pal(),
         );
         col
     }
