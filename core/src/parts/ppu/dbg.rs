@@ -58,7 +58,7 @@ impl Debug {
             .unwrap();
 
         // Render tile data, maps
-        let meta = Meta::bgwin();
+        let meta = Meta::Bgw;
         let tdat = Self::render(&tdat, ppu, &meta, 16); // 16x24 tiles
         let map1 = Self::render(&map1, ppu, &meta, 32); // 32x32 tiles
         let map2 = Self::render(&map2, ppu, &meta, 32); // 32x32 tiles
