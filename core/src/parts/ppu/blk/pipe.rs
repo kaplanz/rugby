@@ -11,8 +11,8 @@ use super::{Lcdc, Ppu};
 pub struct Pipeline {
     /// Warmup completed.
     pub ready: bool,
-    /// Scroll offset.
-    pub scroll: u8,
+    /// Background scroll offset.
+    pub scx: u8,
     /// LCD X-coordinate.
     pub lx: Byte,
     /// Background/Window channel.
@@ -46,14 +46,21 @@ impl Pipeline {
             // We're now ready for real fetches
             self.ready = true;
             trace!("pipeline warmup complete");
+            // Initialize background scroll
+            self.scx = ppu.reg.scx.load() % 8;
+            if self.scx > 0 {
+                trace!("prepare background scroll: {}", self.scx);
+            }
         }
         // 2. The window border has been reached
-        let window_reached = {
+        let window_reached = self.ready && {
             // 1. The window is enabled
             let win_enabled = ppu.lcdc(Lcdc::WinEnable);
             // 2. Fetcher is still at the background
             let fetch_at_bg = self.bgw.layer == Layer::Background;
             // 3. Y-coordinate is below the window
+            // FIXME: Should really be checked at the start of mode 2 (scan),
+            //        and stored for the entire frame duration.
             let y_below_win = ppu.reg.wy.load() <= ppu.reg.ly.load();
             // 4. X-coordinate is right of window
             let x_right_win = ppu.reg.wx.load() <= self.lx + 7;
@@ -69,11 +76,16 @@ impl Pipeline {
             );
             // Update the fetcher's location
             self.bgw.layer = Layer::Window;
+            // Clear background scroll
+            if self.scx > 0 {
+                self.scx = 0;
+                trace!("cleared background pixel: {}", self.scx);
+            }
         }
         //
-        // If either condition is met...
+        // Perform a restart on either condition
         if done_warmup || window_reached {
-            // ... reset background fetcher
+            // Reset background fetcher
             self.bgw.reset();
         }
     }
@@ -100,10 +112,10 @@ impl Pipeline {
             bgwin // no sprite; use background/window pixel
         };
 
-        // Discard pixels from initial scroll offset
-        if self.scroll > 0 {
+        // Discard scrolled background pixels
+        if self.scx > 0 {
             // One fewer pixel to discard
-            self.scroll -= 1;
+            self.scx -= 1;
             // Discard this pixel
             None
         } else {
