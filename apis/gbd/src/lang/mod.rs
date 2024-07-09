@@ -214,7 +214,7 @@ pub enum Keyword {
      *                 instruction; always 1-6 machine cycles.
      * * `l`, `line`:  Duration to draw one line of the LCD display; always
      *                 exactly 456 dots.
-     * * `r`, `frame`: Duration to draw an entire frame of the LCD display;
+     * * `f`, `frame`: Duration to draw an entire frame of the LCD display;
      *                 always exactly 154 scanlines.
      *
      * Aliases: `freq`, `f`
