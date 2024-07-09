@@ -1,6 +1,7 @@
 use rugby_arch::Byte;
 
 use super::pixel::Meta;
+use super::Palette;
 
 /// Sprite metadata.
 #[derive(Clone, Debug)]
@@ -25,7 +26,11 @@ impl Sprite {
     /// Extracts sprite metadata.
     #[must_use]
     pub fn meta(&self) -> Meta {
-        Meta::sprite(&self.attr)
+        Meta::Obj {
+            objp: Palette::objp(self.attr.objp),
+            prty: self.attr.prty,
+            xpos: self.xpos,
+        }
     }
 }
 
