@@ -118,7 +118,7 @@ pub(super) mod exec {
     pub fn push(fetch: &mut Fetcher, data: [Byte; 2]) -> Step {
         // Decode pixel row from bytes
         let row = Row::from(data);
-        let meta = Meta::bgwin();
+        let meta = Meta::Bgw;
 
         // Only push when the FIFO is empty
         if fetch.fifo.is_empty() {

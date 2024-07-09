@@ -48,7 +48,7 @@ pub enum Palette {
 impl Palette {
     /// Constructs a new sprite `Palette`.
     #[must_use]
-    pub fn obp(flag: bool) -> Self {
+    pub fn objp(flag: bool) -> Self {
         [Self::Obp0, Self::Obp1][usize::from(flag)]
     }
 }
