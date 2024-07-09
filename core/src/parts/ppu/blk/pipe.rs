@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use log::trace;
 use rugby_arch::reg::Register;
 use rugby_arch::{Block, Byte};
@@ -19,20 +21,37 @@ pub struct Pipeline {
     pub bgw: fetch::Background,
     /// Sprite channel.
     pub obj: fetch::Sprite,
+    /// In-progress sprites
+    pub ipr: VecDeque<usize>,
 }
 
 impl Pipeline {
     /// Performs a fetch for the next pixels to the appropriate FIFO.
     pub fn fetch(&mut self, ppu: &mut Ppu, objs: &[Sprite]) {
-        // Check if we're at an object
-        if let Some(obj) = objs.iter().find(|obj| obj.xpos == self.lx + 8) {
-            if ppu.lcdc(Lcdc::ObjEnable) && !self.obj.fifo.is_full() {
+        // Search for sprites
+        if self.ipr.is_empty() && !self.obj.fifo.is_full() && ppu.lcdc(Lcdc::ObjEnable) {
+            self.ipr.extend(
+                objs.iter()
+                    .enumerate()
+                    .filter(|(_, obj)| obj.xpos == self.lx + 8)
+                    .map(|(idx, _)| idx),
+            );
+        }
+        // Fetch most-pending sprite
+        if let Some(obj) = self.ipr.front().map(|&idx| &objs[idx]) {
+            // Mark sprite as found
+            if matches!(self.obj.step, Step::Fetch) {
                 trace!("found sprite: {obj:?}");
-                // Fetch the sprite
-                self.obj.exec(ppu, obj);
-                // Stall the background fetcher
-                return;
             }
+            // Fetch pending sprite
+            self.obj.exec(ppu, obj);
+            // Mark sprites as completed
+            if matches!(self.obj.step, Step::Fetch) {
+                self.ipr.pop_front();
+                trace!("completed sprite: {obj:?}");
+            }
+            // Stall background fetcher
+            return;
         }
 
         // Execute the background fetcher
