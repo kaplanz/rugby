@@ -93,8 +93,7 @@ impl Debugger {
         self.pc = cpu.load(cpu::Select16::PC);
         self.state = State {
             cpu: cpu.stage().clone(),
-            dot: ppu.dot(),
-            ppu: ppu.mode().clone(),
+            ppu: (ppu.dot(), ppu.load(ppu::Select::Ly)),
         };
     }
 
@@ -267,15 +266,18 @@ impl Debugger {
     #[rustfmt::skip]
     fn edge(&self) -> bool {
         // Pre-calculate machine cycle
-        let mcycle = self.cycle % 4 == 0;
-        let ppudot = self.state.dot == 0;
+        let (dx, ly) = self.state.ppu;
+        let mtick = self.cycle % 4 == 0;
+        let dinsn = matches!(self.state.cpu, cpu::Stage::Done);
+        let dxrst = dx == 0;
+        let lyrst = ly == 0;
         // Check if this is an edge cycle
         match self.freq {
             Tick::Dot   => true,
-            Tick::Mach  => mcycle,
-            Tick::Insn  => mcycle && matches!(self.state.cpu, cpu::Stage::Done),
-            Tick::Line  => ppudot,
-            Tick::Frame => ppudot && matches!(self.state.ppu, ppu::Mode::Scan(_)),
+            Tick::Mach  => mtick,
+            Tick::Insn  => mtick && dinsn,
+            Tick::Line  => dxrst,
+            Tick::Frame => dxrst && lyrst,
         }
     }
 }
@@ -399,8 +401,7 @@ impl Display for Tick {
 #[derive(Debug, Default)]
 struct State {
     cpu: cpu::Stage,
-    dot: u16,
-    ppu: ppu::Mode,
+    ppu: (u16, u8),
 }
 
 /// An opaque [getter](Self::get) and [setter](Self::set) for a computed value.
