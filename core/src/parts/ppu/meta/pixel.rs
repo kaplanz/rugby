@@ -1,4 +1,6 @@
-use super::{Attributes, Color, Palette};
+use rugby_arch::Byte;
+
+use super::{Color, Palette};
 
 /// Pre-rendered pixel.
 #[derive(Clone, Debug)]
@@ -16,57 +18,101 @@ impl Pixel {
         Self { col, meta }
     }
 
-    /// Blends a pair of window/background and sprite pixels together.
+    // Blends two pixels together.
+    #[must_use]
+    pub fn blend(a: Self, b: Self) -> Self {
+        match (&a.meta, &b.meta) {
+            (Meta::Bgw, Meta::Bgw) => select::color(a, b),
+            (Meta::Bgw, Meta::Obj { .. }) => select::blend(a, b),
+            (Meta::Obj { .. }, Meta::Bgw) => select::blend(b, a),
+            (Meta::Obj { .. }, Meta::Obj { .. }) => select::overlap(a, b),
+        }
+    }
+}
+
+mod select {
+    use super::{Color, Meta, Pixel};
+
+    /// Select the first opaque pixel.
+    #[must_use]
+    pub fn color(a: Pixel, b: Pixel) -> Pixel {
+        if a.col == Color::C0 {
+            b
+        } else {
+            a
+        }
+    }
+
+    /// Blend background and sprite pixels.
     #[allow(clippy::if_same_then_else)]
     #[must_use]
-    pub fn blend(winbg: Self, sprite: Self) -> Self {
+    pub fn blend(bgw: Pixel, obj: Pixel) -> Pixel {
         // Pixels are blended as follows:
         //
         // 1. If the color number of the sprite pixel is 0, the background pixel
-        //    is pushed to the LCD.
-        if sprite.col == Color::C0 {
-            winbg
+        //    is used.
+        if obj.col == Color::C0 {
+            bgw
         }
         // 2. If the BG-to-OBJ priority bit is 1 and the color number of the
         //    background pixel is anything other than 0, the background pixel is
-        //    pushed to the LCD.
-        else if sprite.meta.bgp && winbg.col != Color::C0 {
-            winbg
+        //    used.
+        else if bgw.col != Color::C0 && matches!(obj.meta, Meta::Obj { prty: true, .. }) {
+            bgw
         }
-        // 3. If none of the above conditions apply, the Sprite Pixel is pushed
-        //    to the LCD.
+        // 3. If none of the above conditions apply, the sprite pixel is used.
         else {
-            sprite
+            obj
         }
         // <https://hacktix.github.io/GBEDG/ppu/#pixel-mixing>
+    }
+
+    // Overlap two object pixels.
+    #[must_use]
+    pub fn overlap(a: Pixel, b: Pixel) -> Pixel {
+        // If either is transparent, use the other
+        if a.col == Color::C0 || b.col == Color::C0 {
+            return color(a, b);
+        }
+        // Otherwise, use drawing priority such that:
+        //
+        // 1. Lower X-coordinates win
+        match (&a.meta, &b.meta) {
+            (Meta::Obj { xpos: xa, .. }, Meta::Obj { xpos: xb, .. }) => {
+                if xa < xb {
+                    a
+                } else {
+                    b
+                }
+            }
+            _ => unreachable!(),
+        }
     }
 }
 
 /// Pixel metadata.
 #[derive(Clone, Debug)]
-pub struct Meta {
-    /// Monochrome palette.
-    pub pal: Palette,
-    /// Background priority.
-    pub bgp: bool,
+pub enum Meta {
+    /// Background/window metadata.
+    Bgw,
+    /// Object metadata.
+    Obj {
+        /// Object palette.
+        objp: Palette,
+        /// Background priority.
+        prty: bool,
+        /// X-coordinate.
+        xpos: Byte,
+    },
 }
 
 impl Meta {
-    /// Constructs background metadata.
+    /// Retrieve the palette.
     #[must_use]
-    pub fn bgwin() -> Self {
-        Self {
-            pal: Palette::BgWin,
-            bgp: false,
-        }
-    }
-
-    /// Constructs object metadata.
-    #[must_use]
-    pub fn sprite(attr: &Attributes) -> Self {
-        Self {
-            pal: Palette::obp(attr.objp),
-            bgp: attr.prty,
+    pub fn pal(&self) -> Palette {
+        match self {
+            Meta::Bgw => Palette::BgWin,
+            Meta::Obj { objp, .. } => *objp,
         }
     }
 }
