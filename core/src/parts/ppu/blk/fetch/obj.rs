@@ -60,9 +60,9 @@ pub(super) mod exec {
             if ppu.lcdc(Lcdc::ObjSize) {
                 // Tall (8x16) sprites span two tiles; must check if flipped
                 let upper = {
-                    let xpos = obj.ypos;
+                    let ypos = obj.ypos;
                     let line = ppu.reg.ly.load().saturating_add(16);
-                    (xpos..xpos + 8).contains(&line)
+                    (ypos..ypos + 8).contains(&line)
                 };
                 if upper ^ obj.attr.yflip {
                     obj.tnum & 0b1111_1110 // use upper tile
@@ -76,7 +76,7 @@ pub(super) mod exec {
         };
         trace!("used tile index: sprite.tnum -> #{tnum}");
         // Calculate the tile data address
-        let mut tdat = ppu.tdat(Fetcher::LAYER, tnum);
+        let mut tdat = ppu.tdat(Fetcher::LAYER, tnum, obj.ypos);
         // Perform vertical flip
         if obj.attr.yflip {
             tdat ^= 0b0000_1110;

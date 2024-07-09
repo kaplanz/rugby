@@ -85,7 +85,7 @@ pub(super) mod exec {
         let tnum = ppu.mem.vram.read(addr).unwrap();
         trace!("read tile index: VRAM[${addr:04x}] -> #{tnum}");
         // Calculate the tile data address
-        let tdat = ppu.tdat(fetch.layer, tnum);
+        let tdat = ppu.tdat(fetch.layer, tnum, ppu.reg.scy.load());
 
         // Progress to next step
         Step::Read0 { tdat }

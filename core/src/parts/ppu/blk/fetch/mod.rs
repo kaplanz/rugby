@@ -60,21 +60,20 @@ impl Ppu {
 
     /// Calculates the tile offset for a given layer.
     #[inline]
-    pub(crate) fn toff(&self, layer: Layer) -> Word {
+    pub(crate) fn toff(&self, layer: Layer, yoff: Byte) -> Word {
         Word::from(match layer {
-            Layer::Background | Layer::Sprite => {
-                self.reg.ly.load().wrapping_add(self.reg.scy.load())
-            }
+            Layer::Background => self.reg.ly.load().wrapping_add(yoff),
             Layer::Window => self.etc.ywin,
+            Layer::Sprite => self.reg.ly.load().wrapping_sub(yoff),
         }) % 8
     }
 
     /// Calculates the tile data address from a tile number using the configured
     /// addressing mode.
     #[inline]
-    pub(crate) fn tdat(&self, layer: Layer, tnum: Byte) -> Word {
+    pub(crate) fn tdat(&self, layer: Layer, tnum: Byte, yoff: Byte) -> Word {
         let tidx = self.tidx(layer, tnum);
-        let toff = self.toff(layer) * 2;
+        let toff = self.toff(layer, yoff) * 2;
         tidx | toff
     }
 }
