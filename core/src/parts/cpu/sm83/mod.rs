@@ -648,7 +648,15 @@ impl Stage {
             // Proceed to next stage
             self = match insn {
                 Ok(Some(insn)) => Stage::Execute(insn),
-                Ok(None) => Stage::Done,
+                Ok(None) => {
+                    if cpu.etc.prefix {
+                        // Atomically handle prefix instructions
+                        Stage::Fetch
+                    } else {
+                        // Otherwise, conclude the instruction
+                        Stage::Done
+                    }
+                }
                 Err(err) => {
                     // Log the error
                     error!("{err}");
