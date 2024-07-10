@@ -1,6 +1,6 @@
 use std::io;
 
-use log::{debug, error, trace};
+use log::{debug, trace};
 use rugby_arch::mem::{Error, Memory, Result};
 use rugby_arch::mio::Device;
 use rugby_arch::reg::Register;
@@ -211,7 +211,22 @@ impl Rom {
     }
 
     /// Adjusts addresses by internal bank number.
-    fn adjust(&self, addr: Word) -> usize {
+    fn adjust0(&self, addr: Word) -> usize {
+        let bank = {
+            let lo = 0;
+            let hi = if self.ctl.sel.load() == 0 {
+                0
+            } else {
+                usize::from(self.ctl.ram.load())
+            };
+            hi << 5 | lo
+        };
+        let addr = usize::from(addr);
+        (bank << 14 | addr & 0x3fff) % self.mem.len().max(0x8000)
+    }
+
+    /// Adjusts addresses by internal bank number.
+    fn adjust1(&self, addr: Word) -> usize {
         let bank = {
             let lo = match usize::from(self.ctl.rom.load()) {
                 0 => 1,
@@ -227,11 +242,16 @@ impl Rom {
 
 impl Memory for Rom {
     fn read(&self, addr: Word) -> Result<Byte> {
+        // Translate address
         let index = match addr {
-            0x0000..=0x3fff => usize::from(addr),
-            0x4000..=0x7fff => self.adjust(addr),
+            0x0000..=0x3fff => self.adjust0(addr),
+            0x4000..=0x7fff => self.adjust1(addr),
             _ => return Err(Error::Range),
         };
+        if usize::from(addr) != index {
+            trace!("address translation: ${addr:04x} -> ${index:04x}");
+        }
+        // Perform read
         self.mem.get(index).ok_or(Error::Range).copied()
     }
 
@@ -256,7 +276,6 @@ impl Memory for Rom {
             // Banking Mode Select
             0x6000..=0x7fff => {
                 // ctl.sel <- data[3:0] == 0xA
-                error!("unimplemented: Mbc1::write({addr:#06x}, {data:#04x})");
                 self.ctl.sel.store(data);
             }
             _ => return Err(Error::Range),
@@ -280,7 +299,13 @@ impl Ram {
 
     /// Adjusts addresses by internal bank number.
     fn adjust(&self, addr: Word) -> usize {
-        let bank = usize::from(self.ctl.ram.load());
+        let bank = {
+            if self.ctl.sel.load() == 0 {
+                0
+            } else {
+                usize::from(self.ctl.ram.load())
+            }
+        };
         let addr = usize::from(addr);
         (bank << 13 | addr & 0x1fff) % self.mem.len().max(0x2000)
     }
@@ -292,8 +317,12 @@ impl Memory for Ram {
         if self.ctl.ena.load() == 0 {
             return Err(Error::Busy);
         }
-        // Perform adjusted read
+        // Translate address
         let index = self.adjust(addr);
+        if usize::from(addr) != index {
+            trace!("address translation: ${addr:04x} -> ${index:04x}");
+        }
+        // Perform read
         self.mem.get(index).ok_or(Error::Range).copied()
     }
 
@@ -302,9 +331,14 @@ impl Memory for Ram {
         if self.ctl.ena.load() == 0 {
             return Err(Error::Busy);
         }
-        // Perform adjusted write
+        // Translate address
         let index = self.adjust(addr);
+        if usize::from(addr) != index {
+            trace!("address translation: ${addr:04x} -> ${index:04x}");
+        }
+        // Perform write
         *self.mem.get_mut(index).ok_or(Error::Range)? = data;
+
         Ok(())
     }
 }
