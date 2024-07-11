@@ -1,31 +1,44 @@
 //! Introspective tracing.
 
-use std::fs::File;
+use std::fmt::Debug;
 use std::io::{BufWriter, Write};
 
-/// Tracing logfile.
+use crate::cli::Tracing as Format;
+
+/// Tracing output.
 ///
 /// Output handle where tracing entries are logged.
-#[derive(Debug)]
-pub struct Trace {
-    buf: BufWriter<File>,
+pub struct Tracer {
+    /// Output format.
+    pub fmt: Format,
+    /// Trace logfile.
+    log: BufWriter<Box<dyn Write>>,
 }
 
-impl Trace {
+impl Debug for Tracer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(std::any::type_name::<Self>())
+            .field("fmt", &self.fmt)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Tracer {
     /// Constructs a new `Trace`.
-    pub fn new(log: File) -> Self {
+    pub fn new(fmt: Format, log: impl Write + 'static) -> Self {
         Self {
-            buf: BufWriter::new(log),
+            log: BufWriter::new(Box::new(log)),
+            fmt,
         }
     }
 }
 
-impl Write for Trace {
+impl Write for Tracer {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.buf.write(buf)
+        self.log.write(buf)
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        self.buf.flush()
+        self.log.flush()
     }
 }
