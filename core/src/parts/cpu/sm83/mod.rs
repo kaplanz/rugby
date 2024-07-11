@@ -12,8 +12,6 @@ use self::insn::Instruction;
 use crate::api::part::proc::Processor;
 use crate::parts::pic;
 
-#[cfg(feature = "debug")]
-pub mod dbg;
 pub mod insn;
 
 /// Processor byte select.

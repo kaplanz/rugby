@@ -1,20 +1,18 @@
-//! Gameboy Doctor.
+//! Introspective tracing.
 
 use std::fs::File;
 use std::io::{BufWriter, Write};
 
-/// Doctor logfile.
+/// Tracing logfile.
 ///
-/// Logging output destination for CPU introspection formatted as specified for
-/// [Gameboy Doctor][gbdoc].
-///
-/// [gbdoc]: https://robertheaton.com/gameboy-doctor
+/// Output handle where tracing entries are logged.
 #[derive(Debug)]
-pub struct Doctor {
+pub struct Trace {
     buf: BufWriter<File>,
 }
 
-impl Doctor {
+impl Trace {
+    /// Constructs a new `Trace`.
     pub fn new(log: File) -> Self {
         Self {
             buf: BufWriter::new(log),
@@ -22,7 +20,7 @@ impl Doctor {
     }
 }
 
-impl Write for Doctor {
+impl Write for Trace {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         self.buf.write(buf)
     }
