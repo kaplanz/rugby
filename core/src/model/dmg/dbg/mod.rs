@@ -2,7 +2,7 @@
 
 pub mod trace;
 
-use super::{ppu, GameBoy};
+use super::{cpu, ppu, GameBoy};
 
 /// Collect debug information from the PPU.
 pub fn ppu(emu: &mut GameBoy) -> ppu::dbg::Debug {
