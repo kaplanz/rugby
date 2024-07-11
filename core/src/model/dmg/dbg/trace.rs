@@ -1,42 +1,19 @@
-//! Debugging the [CPU](super).
+//! Introspective tracing.
 
 use std::fmt::Write;
 
 use rugby_arch::reg::Register;
 
-use super::Cpu;
+use super::GameBoy;
+use crate::api::core::Core;
 
-/// Collect debug information.
+/// Collect a trace formatted as specified by [Gameboy Doctor][gbdoc].
+///
+/// [gbdoc]: https://robertheaton.com/gameboy-doctor
 #[must_use]
-pub fn info(cpu: &Cpu) -> Debug {
-    Debug::new(cpu)
-}
-
-/// Debug information.
-#[derive(Debug)]
-pub struct Debug {
-    /// Doctor entry.
-    ///
-    /// An introspecive view of the CPU's state, formatted as specified by
-    /// [Gameboy Doctor][gbdoc].
-    ///
-    /// [gbdoc]: https://robertheaton.com/gameboy-doctor
-    pub doc: String,
-}
-
-impl Debug {
-    /// Constructs a new `Debug`.
-    fn new(cpu: &Cpu) -> Self {
-        Self {
-            doc: self::doctor(cpu),
-        }
-    }
-}
-
-/// Collect logs.
-fn doctor(cpu: &Cpu) -> String {
-    // Check if we're ready for the next doctor entry
+pub fn doctor(emu: &GameBoy) -> String {
     let mut repr = String::new();
+    let cpu = emu.inside().proc();
     write!(&mut repr, "A:{:02X} ", cpu.reg.a.load()).unwrap();
     write!(&mut repr, "F:{:02X} ", cpu.reg.f.load()).unwrap();
     write!(&mut repr, "B:{:02X} ", cpu.reg.b.load()).unwrap();
