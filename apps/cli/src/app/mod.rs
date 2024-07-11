@@ -21,8 +21,9 @@ use rugby_gbd::Debugger;
 use self::ctx::Counter;
 #[cfg(feature = "win")]
 use self::gui::dbg::Region;
+use crate::cli::Tracing;
 #[cfg(feature = "trace")]
-use crate::dbg::trace::Trace;
+use crate::dbg::trace::Tracer;
 use crate::NAME;
 
 mod ctx;
@@ -67,7 +68,7 @@ pub struct Debug {
     pub gbd: Option<Debugger>,
     /// Introspective tracing.
     #[cfg(feature = "trace")]
-    pub trace: Option<Trace>,
+    pub trace: Option<Tracer>,
     /// Graphical VRAM rendering.
     #[cfg(feature = "win")]
     pub win: bool,
@@ -214,14 +215,15 @@ impl App {
 
             // Write trace entries.
             #[cfg(feature = "trace")]
-            if let Some(out) = &mut self.dbg.trace {
+            if let Some(trace) = &mut self.dbg.trace {
                 if matches!(self.emu.inside().proc().stage(), Stage::Done) && count.delta % 4 == 0 {
-                    // Gather debug info
-                    let trace = dmg::dbg::trace::doctor(&self.emu);
+                    // Gather trace entry
+                    let entry = match trace.fmt {
+                        Tracing::Binjgb => dmg::dbg::trace::binjgb,
+                        Tracing::Doctor => dmg::dbg::trace::doctor,
+                    }(&self.emu);
                     // Write to logfile
-                    if !trace.is_empty() {
-                        writeln!(out, "{trace}").context("failed to write trace entry")?;
-                    }
+                    writeln!(trace, "{entry}").context("failed to write trace entry")?;
                 }
             }
 
