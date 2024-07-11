@@ -92,11 +92,11 @@ mod build {
 
     use crate::app::gui::Cable;
     use crate::app::{self, App, Graphics};
-    use crate::cli::{self, Cli};
+    use crate::cli::{self, Cli, Tracing};
     #[cfg(feature = "gbd")]
     use crate::dbg::gbd::Console;
     #[cfg(feature = "trace")]
-    use crate::dbg::trace::Trace;
+    use crate::dbg::trace::Tracer;
     use crate::NAME;
 
     #[cfg(feature = "gbd")]
@@ -290,10 +290,9 @@ mod build {
         let trace = args
             .dbg
             .trace
-            .as_deref()
-            .map(trace)
+            .map(|fmt| trace(fmt, None)) // FIXME: provide trace logfile
             .transpose()
-            .context("could not open trace file")?;
+            .context("could not open trace logfile")?;
 
         // Construct application
         let app = App {
@@ -372,12 +371,17 @@ mod build {
 
     /// Builds a tracing logfile instance.
     #[cfg(feature = "trace")]
-    fn trace(path: &Path) -> Result<Trace> {
+    fn trace(fmt: Tracing, path: Option<&Path>) -> Result<Tracer> {
         // Create logfile
-        let file =
-            File::create(path).with_context(|| format!("failed to open: `{}`", path.display()))?;
-        // Construct a tracer
-        Ok(Trace::new(file))
+        Ok(if let Some(path) = path {
+            Tracer::new(
+                fmt,
+                File::create(path)
+                    .with_context(|| format!("failed to open: `{}`", path.display()))?,
+            )
+        } else {
+            Tracer::new(fmt, std::io::stdout())
+        })
     }
 
     /// Flashes the cartridge RAM from a save file.
