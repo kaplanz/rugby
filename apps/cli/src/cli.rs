@@ -3,7 +3,7 @@
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
-use clap::{Args, Parser, ValueHint};
+use clap::{Args, Parser, ValueEnum, ValueHint};
 use rugby_cfg::Config;
 
 use crate::NAME;
@@ -105,9 +105,8 @@ pub struct Debug {
     /// instruction.
     #[cfg(feature = "trace")]
     #[clap(long)]
-    #[clap(value_name = "PATH")]
-    #[clap(value_hint = ValueHint::FilePath)]
-    pub trace: Option<PathBuf>,
+    #[clap(value_name = "FORMAT")]
+    pub trace: Option<Tracing>,
 
     /// Enable VRAM debug windows.
     ///
@@ -115,4 +114,18 @@ pub struct Debug {
     #[cfg(feature = "win")]
     #[clap(long)]
     pub win: bool,
+}
+
+/// Introspective tracing format.
+#[derive(Clone, Copy, Debug, ValueEnum)]
+#[non_exhaustive]
+pub enum Tracing {
+    /// Tracing format used by Ben Smith's binjgb emulator.
+    ///
+    /// [binjgb]: https://github.com/binji/binjgb
+    Binjgb,
+    /// Tracing format specified by Robert Heaton's Gameboy Doctor.
+    ///
+    /// [gbdoc]: https://robertheaton.com/gameboy-doctor
+    Doctor,
 }
