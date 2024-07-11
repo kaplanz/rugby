@@ -71,9 +71,9 @@ Serial:
       --peer <ADDR>  Link cable peer address
 
 Debug:
-      --doc <PATH>  Doctor logfile path
-  -i, --gbd         Enable interactive debugging
-      --win         Enable VRAM debug windows
+  -i, --gbd           Enable interactive debugging
+      --trace <PATH>  Enable introspective tracing
+      --win           Enable VRAM debug windows
 ```
 
 ### Configuration
