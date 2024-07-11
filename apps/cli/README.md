@@ -71,10 +71,11 @@ Serial:
       --peer <ADDR>  Link cable peer address
 
 Debug:
-  -i, --gbd             Enable interactive debugging
-      --trace <FORMAT>  Enable introspective tracing [possible values: binjgb,
-                        doctor]
-      --win             Enable VRAM debug windows
+  -i, --gbd              Enable interactive debugging
+      --trace <FORMAT>   Enable introspective tracing [possible values: binjgb,
+                         doctor]
+      --tracelog <PATH>  Output tracing logfile
+      --win              Enable VRAM debug windows
 ```
 
 ### Configuration

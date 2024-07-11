@@ -1,7 +1,5 @@
 //! Application structures.
 
-#[cfg(feature = "trace")]
-use std::io::Write;
 #[cfg(feature = "gbd")]
 use std::sync::mpsc;
 use std::time::Instant;
@@ -21,7 +19,6 @@ use rugby_gbd::Debugger;
 use self::ctx::Counter;
 #[cfg(feature = "win")]
 use self::gui::dbg::Region;
-use crate::cli::Tracing;
 #[cfg(feature = "trace")]
 use crate::dbg::trace::Tracer;
 use crate::NAME;
@@ -217,13 +214,9 @@ impl App {
             #[cfg(feature = "trace")]
             if let Some(trace) = &mut self.dbg.trace {
                 if matches!(self.emu.inside().proc().stage(), Stage::Done) && count.delta % 4 == 0 {
-                    // Gather trace entry
-                    let entry = match trace.fmt {
-                        Tracing::Binjgb => dmg::dbg::trace::binjgb,
-                        Tracing::Doctor => dmg::dbg::trace::doctor,
-                    }(&self.emu);
-                    // Write to logfile
-                    writeln!(trace, "{entry}").context("failed to write trace entry")?;
+                    trace
+                        .log(&self.emu)
+                        .context("failed to write trace entry")?;
                 }
             }
 
