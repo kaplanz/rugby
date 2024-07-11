@@ -1437,6 +1437,7 @@ dependencies = [
  "clap_complete",
  "clap_mangen",
  "ctrlc",
+ "either",
  "log",
  "minifb",
  "rugby",

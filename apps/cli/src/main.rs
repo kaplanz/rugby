@@ -92,12 +92,12 @@ mod build {
 
     use crate::app::gui::Cable;
     use crate::app::{self, App, Graphics};
-    use crate::cli::{self, Cli, Tracing};
+    use crate::cli::{self, Cli};
     #[cfg(feature = "gbd")]
     use crate::dbg::gbd::Console;
-    #[cfg(feature = "trace")]
-    use crate::dbg::trace::Tracer;
     use crate::NAME;
+    #[cfg(feature = "trace")]
+    use crate::{cli::trace::Trace, dbg::trace::Tracer};
 
     #[cfg(feature = "gbd")]
     type Log = Portal<String>;
@@ -290,7 +290,8 @@ mod build {
         let trace = args
             .dbg
             .trace
-            .map(|fmt| trace(fmt, None)) // FIXME: provide trace logfile
+            .as_ref()
+            .map(trace)
             .transpose()
             .context("could not open trace logfile")?;
 
@@ -369,19 +370,19 @@ mod build {
         Ok(gbd)
     }
 
-    /// Builds a tracing logfile instance.
+    /// Builds a tracing instance.
     #[cfg(feature = "trace")]
-    fn trace(fmt: Tracing, path: Option<&Path>) -> Result<Tracer> {
-        // Create logfile
-        Ok(if let Some(path) = path {
-            Tracer::new(
-                fmt,
+    fn trace(Trace { fmt, log }: &Trace) -> Result<Tracer> {
+        let log = match log.as_deref() {
+            // Create a logfile from the path
+            Some(path) if path != Path::new("-") => either::Either::Left({
                 File::create(path)
-                    .with_context(|| format!("failed to open: `{}`", path.display()))?,
-            )
-        } else {
-            Tracer::new(fmt, std::io::stdout())
-        })
+                    .with_context(|| format!("failed to open: `{}`", path.display()))?
+            }),
+            // Use `stdout` missing path or as alias of "-"
+            _ => either::Either::Right(std::io::stdout()),
+        };
+        Ok(Tracer::new(*fmt, log))
     }
 
     /// Flashes the cartridge RAM from a save file.

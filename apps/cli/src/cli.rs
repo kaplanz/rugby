@@ -3,7 +3,7 @@
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
-use clap::{Args, Parser, ValueEnum, ValueHint};
+use clap::{Args, Parser, ValueHint};
 use rugby_cfg::Config;
 
 use crate::NAME;
@@ -99,14 +99,10 @@ pub struct Debug {
     #[clap(short = 'i', long)]
     pub gbd: bool,
 
-    /// Enable introspective tracing.
-    ///
-    /// Enables logging at the provided path of the emulator's state after every
-    /// instruction.
+    /// Introspective tracing.
     #[cfg(feature = "trace")]
-    #[clap(long)]
-    #[clap(value_name = "FORMAT")]
-    pub trace: Option<Tracing>,
+    #[clap(flatten)]
+    pub trace: Option<trace::Trace>,
 
     /// Enable VRAM debug windows.
     ///
@@ -116,16 +112,48 @@ pub struct Debug {
     pub win: bool,
 }
 
-/// Introspective tracing format.
-#[derive(Clone, Copy, Debug, ValueEnum)]
-#[non_exhaustive]
-pub enum Tracing {
-    /// Tracing format used by Ben Smith's binjgb emulator.
-    ///
-    /// [binjgb]: https://github.com/binji/binjgb
-    Binjgb,
-    /// Tracing format specified by Robert Heaton's Gameboy Doctor.
-    ///
-    /// [gbdoc]: https://robertheaton.com/gameboy-doctor
-    Doctor,
+/// Introspective tracing.
+#[cfg(feature = "trace")]
+pub mod trace {
+    use std::path::PathBuf;
+
+    use clap::{Args, ValueEnum};
+
+    /// Introspective tracing.
+    #[derive(Args, Debug)]
+    #[group(requires = "trace")]
+    pub struct Trace {
+        /// Enable introspective tracing.
+        ///
+        /// Produces tracing logs of the emulator's state in the requested
+        /// format.
+        #[clap(name = "trace")]
+        #[clap(long)]
+        #[clap(required = false)]
+        #[clap(value_name = "FORMAT")]
+        pub fmt: Format,
+
+        /// Output tracing logfile.
+        ///
+        /// Defines the path where tracing output will be logged.
+        #[clap(name = "tracelog")]
+        #[clap(long)]
+        #[clap(requires = "trace")]
+        #[clap(value_name = "PATH")]
+        pub log: Option<PathBuf>,
+    }
+
+    /// Tracing output format.
+    #[derive(Clone, Copy, Debug, ValueEnum)]
+    #[non_exhaustive]
+    pub enum Format {
+        /// Tracing format used by Ben Smith's binjgb emulator.
+        ///
+        /// [binjgb]: https://github.com/binji/binjgb
+        Binjgb,
+        /// Tracing format specified by Robert Heaton's Gameboy Doctor.
+        ///
+        /// [gbdoc]: https://robertheaton.com/gameboy-doctor
+        Doctor,
+    }
 }

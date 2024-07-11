@@ -17,6 +17,7 @@ advise = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
 ctrlc = { version = "3.4.4", optional = true }
+either = "1.13.0"
 log = { workspace = true }
 minifb = "0.27.0"
 rugby = { workspace = true }
