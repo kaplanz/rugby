@@ -1,6 +1,6 @@
 //! Application structures.
 
-#[cfg(feature = "doc")]
+#[cfg(feature = "trace")]
 use std::io::Write;
 #[cfg(feature = "gbd")]
 use std::sync::mpsc;
@@ -9,9 +9,9 @@ use std::time::Instant;
 use anyhow::Context as _;
 use log::debug;
 use rugby::arch::{Block, Clock};
-#[cfg(any(feature = "doc", feature = "win"))]
+#[cfg(any(feature = "trace", feature = "win"))]
 use rugby::core::dmg;
-#[cfg(feature = "doc")]
+#[cfg(feature = "trace")]
 use rugby::core::dmg::cpu::Stage;
 use rugby::core::dmg::{Cartridge, GameBoy};
 use rugby::prelude::*;
@@ -21,8 +21,8 @@ use rugby_gbd::Debugger;
 use self::ctx::Counter;
 #[cfg(feature = "win")]
 use self::gui::dbg::Region;
-#[cfg(feature = "doc")]
-use crate::dbg::doc::Doctor;
+#[cfg(feature = "trace")]
+use crate::dbg::trace::Trace;
 use crate::NAME;
 
 mod ctx;
@@ -62,12 +62,12 @@ pub struct Options {
 #[cfg(feature = "debug")]
 #[derive(Debug)]
 pub struct Debug {
-    /// Introspective logging.
-    #[cfg(feature = "doc")]
-    pub doc: Option<Doctor>,
     /// Interactive debugger.
     #[cfg(feature = "gbd")]
     pub gbd: Option<Debugger>,
+    /// Introspective tracing.
+    #[cfg(feature = "trace")]
+    pub trace: Option<Trace>,
     /// Graphical VRAM rendering.
     #[cfg(feature = "win")]
     pub win: bool,
@@ -212,15 +212,15 @@ impl App {
                 }
             }
 
-            // Log doctor entries
-            #[cfg(feature = "doc")]
-            if let Some(out) = &mut self.dbg.doc {
+            // Write trace entries.
+            #[cfg(feature = "trace")]
+            if let Some(out) = &mut self.dbg.trace {
                 if matches!(self.emu.inside().proc().stage(), Stage::Done) && count.delta % 4 == 0 {
                     // Gather debug info
-                    let info = dmg::dbg::cpu(&mut self.emu);
-                    // Format, writing if non-empty
-                    if !info.doc.is_empty() {
-                        writeln!(out, "{}", info.doc).context("failed to write doctor entry")?;
+                    let trace = dmg::dbg::trace::doctor(&self.emu);
+                    // Write to logfile
+                    if !trace.is_empty() {
+                        writeln!(out, "{trace}").context("failed to write trace entry")?;
                     }
                 }
             }
