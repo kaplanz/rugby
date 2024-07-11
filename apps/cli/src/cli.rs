@@ -91,16 +91,6 @@ pub struct Link {
 /// Debugging options.
 #[derive(Args, Debug)]
 pub struct Debug {
-    /// Doctor logfile path.
-    ///
-    /// Enables logging at the provided path of the emulator's state after every
-    /// instruction in the format used by Gameboy Doctor.
-    #[cfg(feature = "doc")]
-    #[clap(long)]
-    #[clap(value_name = "PATH")]
-    #[clap(value_hint = ValueHint::FilePath)]
-    pub doc: Option<PathBuf>,
-
     /// Enable interactive debugging.
     ///
     /// Starts with Game Boy Debugger (GBD) enabled, presenting the prompt after
@@ -108,6 +98,16 @@ pub struct Debug {
     #[cfg(feature = "gbd")]
     #[clap(short = 'i', long)]
     pub gbd: bool,
+
+    /// Enable introspective tracing.
+    ///
+    /// Enables logging at the provided path of the emulator's state after every
+    /// instruction.
+    #[cfg(feature = "trace")]
+    #[clap(long)]
+    #[clap(value_name = "PATH")]
+    #[clap(value_hint = ValueHint::FilePath)]
+    pub trace: Option<PathBuf>,
 
     /// Enable VRAM debug windows.
     ///

@@ -38,13 +38,13 @@ rugby = { workspace = true }
 rugby-cfg = { workspace = true, features = ["clap"] }
 
 [features]
-default = ["doc", "gbd", "win"]
+default = ["gbd", "trace", "win"]
 debug = ["rugby/debug"]
-doc = ["debug"]
 gbd = [
     "debug",
     "dep:ctrlc",
     "dep:rugby-gbd",
     "dep:rustyline",
 ]
+trace = ["debug"]
 win = ["debug"]

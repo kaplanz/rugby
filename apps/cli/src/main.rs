@@ -93,10 +93,10 @@ mod build {
     use crate::app::gui::Cable;
     use crate::app::{self, App, Graphics};
     use crate::cli::{self, Cli};
-    #[cfg(feature = "doc")]
-    use crate::dbg::doc::Doctor;
     #[cfg(feature = "gbd")]
     use crate::dbg::gbd::Console;
+    #[cfg(feature = "trace")]
+    use crate::dbg::trace::Trace;
     use crate::NAME;
 
     #[cfg(feature = "gbd")]
@@ -276,16 +276,6 @@ mod build {
             .transpose()
             .context("could not open link cable")?;
 
-        // Open log file
-        #[cfg(feature = "doc")]
-        let doc = args
-            .dbg
-            .doc
-            .as_deref()
-            .map(doc)
-            .transpose()
-            .context("could not open log file")?;
-
         // Prepare debugger
         #[cfg(feature = "gbd")]
         let gbd = args
@@ -295,6 +285,16 @@ mod build {
             .transpose()
             .context("could not prepare debugger")?;
 
+        // Initialize tracing
+        #[cfg(feature = "trace")]
+        let trace = args
+            .dbg
+            .trace
+            .as_deref()
+            .map(trace)
+            .transpose()
+            .context("could not open trace file")?;
+
         // Construct application
         let app = App {
             cfg: app::Options {
@@ -302,10 +302,10 @@ mod build {
             },
             #[cfg(feature = "debug")]
             dbg: app::Debug {
-                #[cfg(feature = "doc")]
-                doc,
                 #[cfg(feature = "gbd")]
                 gbd,
+                #[cfg(feature = "trace")]
+                trace,
                 #[cfg(feature = "win")]
                 win: args.dbg.win,
             },
@@ -355,16 +355,6 @@ mod build {
         Ok(sock)
     }
 
-    /// Builds a doctor logfile instance.
-    #[cfg(feature = "doc")]
-    fn doc(path: &Path) -> Result<Doctor> {
-        // Create logfile
-        let file =
-            File::create(path).with_context(|| format!("failed to open: `{}`", path.display()))?;
-        // Construct a doctor instance
-        Ok(Doctor::new(file))
-    }
-
     /// Builds a debugger instance.
     #[cfg(feature = "gbd")]
     fn gbd(log: Log) -> Result<Debugger> {
@@ -378,6 +368,16 @@ mod build {
         gbd.logger(log);
         // Return constructed debugger
         Ok(gbd)
+    }
+
+    /// Builds a tracing logfile instance.
+    #[cfg(feature = "trace")]
+    fn trace(path: &Path) -> Result<Trace> {
+        // Create logfile
+        let file =
+            File::create(path).with_context(|| format!("failed to open: `{}`", path.display()))?;
+        // Construct a tracer
+        Ok(Trace::new(file))
     }
 
     /// Flashes the cartridge RAM from a save file.
