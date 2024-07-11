@@ -3,7 +3,9 @@
 use std::fmt::Debug;
 use std::io::{BufWriter, Write};
 
-use crate::cli::Tracing as Format;
+use rugby::core::dmg::{self, GameBoy};
+
+use crate::cli::trace::Format;
 
 /// Tracing output.
 ///
@@ -24,12 +26,23 @@ impl Debug for Tracer {
 }
 
 impl Tracer {
-    /// Constructs a new `Trace`.
+    /// Constructs a new `Tracer`.
     pub fn new(fmt: Format, log: impl Write + 'static) -> Self {
         Self {
             log: BufWriter::new(Box::new(log)),
             fmt,
         }
+    }
+
+    /// Logs a single trace.
+    pub fn log(&mut self, emu: &GameBoy) -> std::io::Result<()> {
+        // Gather trace entry
+        let entry = match self.fmt {
+            Format::Binjgb => dmg::dbg::trace::binjgb,
+            Format::Doctor => dmg::dbg::trace::doctor,
+        }(emu);
+        // Write to logfile
+        writeln!(self.log, "{entry}")
     }
 }
 
