@@ -119,7 +119,7 @@ impl Cpu {
     pub fn read(&self, addr: Word) -> Byte {
         self.bus
             .read(addr)
-            .inspect_err(|err| warn!("failed to read [{addr:#06x}] (default: `0xff`): {err}"))
+            .inspect_err(|err| warn!("failed to read [${addr:04x}] (default: `0xff`): {err}"))
             .unwrap_or(0xff)
     }
 
@@ -128,7 +128,7 @@ impl Cpu {
         let _ = self
             .bus
             .write(addr, data)
-            .inspect_err(|err| warn!("failed to write [{addr:#06x}] <- {data:#04x}: {err}"));
+            .inspect_err(|err| warn!("failed to write [${addr:04x}] <- {data:#04x}: {err}"));
     }
 
     /// Fetch the next byte after PC.
@@ -585,7 +585,7 @@ impl Stage {
                 cpu.int.clear(int);
                 // Skip `Stage::Fetch`
                 let insn = Instruction::int(int);
-                debug!("{pc:#06x}: {insn}", pc = int.handler());
+                debug!("${pc:04x}: {insn}", pc = int.handler());
                 self = Stage::Execute(insn);
             }
             // ... or fetch next instruction
@@ -618,7 +618,7 @@ impl Stage {
             }
 
             // Log the instruction
-            debug!("{pc:#06x}: {insn}");
+            debug!("${pc:04x}: {insn}");
 
             // Enable interrupts (after EI, RETI)
             if let Ime::WillEnable = cpu.etc.ime {
