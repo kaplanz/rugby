@@ -186,7 +186,7 @@ impl Debugger {
         let line = self.line.as_mut().ok_or(Error::CfgPrompt)?;
 
         // Present the prompt; get input
-        let fmt = format!("(#{} @ {:#06x})> ", self.cycle, self.pc);
+        let fmt = format!("(#{} @ ${:04x})> ", self.cycle, self.pc);
         let input = match line.prompt(&fmt) {
             Err(prompt::Error::Quit) => return Err(Error::Quit),
             res => res?,
@@ -338,7 +338,7 @@ impl Breakpoint {
         let mut f = String::new();
 
         // Format the point, addr
-        write!(f, "breakpoint {point} @ {addr:#06x}").unwrap();
+        write!(f, "breakpoint {point} @ ${addr:04x}").unwrap();
         // Format characteristics
         if disable {
             write!(f, ": disabled").unwrap();

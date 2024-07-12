@@ -19,7 +19,7 @@ pub fn r#break(gbd: &mut Debugger, addr: u16) -> Result<()> {
     // Check if the breakpoint already exists
     if let Some((point, _, Some(_))) = gbd.bpts.get_full_mut(&addr) {
         // Inform of existing breakpoint
-        advise::warn!("breakpoint {point} already exists at {addr:#06x}");
+        advise::warn!("breakpoint {point} already exists at ${addr:04x}");
     } else {
         // Create a new breakpoint
         let (point, _) = gbd.bpts.insert_full(addr, Some(Breakpoint::default()));
@@ -79,7 +79,7 @@ pub fn delete(gbd: &mut Debugger, point: usize) -> Result<()> {
     };
     // Mark it as deleted
     *bpt = None;
-    advise::info!("breakpoint {point} @ {addr:#06x} deleted");
+    advise::info!("breakpoint {point} @ ${addr:04x} deleted");
 
     Ok(())
 }
@@ -91,7 +91,7 @@ pub fn disable(gbd: &mut Debugger, point: usize) -> Result<()> {
     };
     // Disable it
     bpt.disable = true;
-    advise::info!("breakpoint {point} @ {addr:#06x} disabled");
+    advise::info!("breakpoint {point} @ ${addr:04x} disabled");
 
     Ok(())
 }
@@ -103,7 +103,7 @@ pub fn enable(gbd: &mut Debugger, point: usize) -> Result<()> {
     };
     // Enable it
     bpt.disable = false;
-    advise::info!("breakpoint {point} @ {addr:#06x} enabled");
+    advise::info!("breakpoint {point} @ ${addr:04x} enabled");
 
     Ok(())
 }
@@ -198,7 +198,7 @@ pub fn info(gbd: &Debugger, what: Option<Keyword>) -> Result<()> {
 pub fn list(gbd: &Debugger, emu: &GameBoy) -> Result<()> {
     let insn = emu.inside().proc().insn();
     advise::info!(
-        "{addr:#06x}: {opcode:02X} ; {insn}",
+        "${addr:04x}: {opcode:02X} ; {insn}",
         addr = gbd.pc,
         opcode = insn.opcode()
     );
@@ -265,7 +265,7 @@ pub fn quit() -> Result<()> {
 pub fn read(emu: &mut GameBoy, addr: u16) -> Result<()> {
     // Perform the read
     let byte = emu.inside().proc().read(addr);
-    advise::info!("{addr:#06x}: {byte:02x}");
+    advise::info!("${addr:04x}: {byte:02x}");
 
     Ok(())
 }
@@ -414,7 +414,7 @@ pub fn write(emu: &mut GameBoy, addr: u16, byte: u8) -> Result<()> {
     emu.inside_mut().proc().write(addr, byte);
     let data = emu.inside().proc().read(addr);
     if data != byte {
-        advise::warn!("ignored write {addr:#06x} <- {byte:02x} (retained: {data:02x})");
+        advise::warn!("ignored write ${addr:04x} <- {byte:02x} (retained: {data:02x})");
     }
     // Read the written value
     read(emu, addr)?;
@@ -438,7 +438,7 @@ pub fn write_range(emu: &mut GameBoy, range: Wrange<u16>, byte: u8) -> Result<()
     // Check if it worked
     let nbytes = bytecount::count(&data, byte);
     if nbytes < data.len() {
-        advise::warn!("ignored some writes in {start:#06x}..{end:04x} <- {byte:02x}");
+        advise::warn!("ignored some writes in ${start:04x}..${end:04x} <- {byte:02x}");
     }
     // Display results
     advise::info!("write {nbytes} bytes:", nbytes = data.len(),);
