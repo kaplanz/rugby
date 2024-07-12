@@ -585,7 +585,7 @@ impl Stage {
                 cpu.int.clear(int);
                 // Skip `Stage::Fetch`
                 let insn = Instruction::int(int);
-                debug!("{:#06x}: {insn}", int.handler());
+                debug!("{pc:#06x}: {insn}", pc = int.handler());
                 self = Stage::Execute(insn);
             }
             // ... or fetch next instruction
@@ -618,17 +618,7 @@ impl Stage {
             }
 
             // Log the instruction
-            // NOTE: Ensure that prefix instructions are logged correctly
-            debug!(
-                "{pc:#06x}: {}",
-                if op == 0xcb {
-                    let pc = cpu.reg.pc.load();
-                    let code = cpu.read(pc);
-                    format!("{}", Instruction::prefix(code))
-                } else {
-                    format!("{insn}")
-                }
-            );
+            debug!("{pc:#06x}: {insn}");
 
             // Enable interrupts (after EI, RETI)
             if let Ime::WillEnable = cpu.etc.ime {
