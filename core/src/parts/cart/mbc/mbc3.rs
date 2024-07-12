@@ -234,7 +234,7 @@ impl Memory for Rom {
     }
 
     fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
-        trace!("Mbc3::write({addr:#06x}, {data:#04x})");
+        trace!("Mbc3::write(${addr:04x}, {data:#04x})");
         match addr {
             // RAM Enable
             0x0000..=0x1fff => {
@@ -254,7 +254,7 @@ impl Memory for Rom {
             // Banking Mode Select
             0x6000..=0x7fff => {
                 // ctl.sel <- data[3:0] == 0xA
-                error!("unimplemented: Mbc3::write({addr:#06x}, {data:#04x})");
+                error!("unimplemented: Mbc3::write(${addr:04x}, {data:#04x})");
                 self.ctl.lcd.store(data);
             }
             _ => return Err(Error::Range),
