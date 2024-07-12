@@ -22,11 +22,11 @@ trait Execute {
 ///
 /// Stores the currently executing instruction together with its state. Can be
 /// started and resumed.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Instruction {
     code: Byte,
-    repr: &'static str,
     oper: Operation,
+    repr: &'static str,
 }
 
 impl Instruction {
@@ -74,6 +74,16 @@ impl Instruction {
         };
         // Return updated state
         Ok(Some(self))
+    }
+}
+
+impl Debug for Instruction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(std::any::type_name::<Self>())
+            .field("code", &format_args!("{:02X?}", self.code))
+            .field("repr", &self.repr)
+            .field("oper", &format_args!("{:02X?}", self.oper))
+            .finish()
     }
 }
 
