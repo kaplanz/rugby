@@ -173,9 +173,9 @@ fn bus_unmapped_works() {
     for range in [0xfea0..=0xfeff, 0xff03..=0xff03, 0xff27..=0xff2f] {
         for addr in range {
             // Write to every unmapped address
-            assert!(bus.write(addr, 0xaa).is_err(), "{addr:#06x}");
+            assert!(bus.write(addr, 0xaa).is_err(), "${addr:04x}");
             // Check the write didn't work
-            assert!(bus.read(addr).is_err(), "{addr:#06x}");
+            assert!(bus.read(addr).is_err(), "${addr:04x}");
         }
     }
 }
