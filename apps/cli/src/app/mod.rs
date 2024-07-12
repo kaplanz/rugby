@@ -127,6 +127,18 @@ impl App {
                 }
             }
 
+            // Write trace entries.
+            #[cfg(feature = "trace")]
+            if let Some(trace) = &mut self.dbg.trace {
+                if matches!(self.emu.inside().proc().stage(), Stage::Fetch | Stage::Done)
+                    && count.delta % 4 == 0
+                {
+                    trace
+                        .log(&self.emu)
+                        .context("failed to write trace entry")?;
+                }
+            }
+
             // Run debugger when enabled
             #[cfg(feature = "gbd")]
             if let Some(gbd) = self.dbg.gbd.as_mut() {
@@ -207,16 +219,6 @@ impl App {
                             .transpose()
                             .context("failed to redraw tile map 2")?;
                     }
-                }
-            }
-
-            // Write trace entries.
-            #[cfg(feature = "trace")]
-            if let Some(trace) = &mut self.dbg.trace {
-                if matches!(self.emu.inside().proc().stage(), Stage::Done) && count.delta % 4 == 0 {
-                    trace
-                        .log(&self.emu)
-                        .context("failed to write trace entry")?;
                 }
             }
 
