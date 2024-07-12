@@ -231,7 +231,7 @@ impl Memory for Rom {
     }
 
     fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
-        trace!("Mbc5::write({addr:#06x}, {data:#04x})");
+        trace!("Mbc5::write(${addr:04x}, {data:#04x})");
         match addr {
             // RAM Enable
             0x0000..=0x1fff => {
