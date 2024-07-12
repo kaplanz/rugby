@@ -338,7 +338,7 @@ pub struct Control {
 
 impl Control {
     /// Joint AF register.
-    fn af(&self) -> Alias {
+    pub(crate) fn af(&self) -> Alias {
         Alias {
             hi: &self.a,
             lo: &self.f,
@@ -346,7 +346,7 @@ impl Control {
     }
 
     /// Joint mutable AF register.
-    fn af_mut(&mut self) -> AliasMut {
+    pub(crate) fn af_mut(&mut self) -> AliasMut {
         AliasMut {
             hi: &mut self.a,
             lo: &mut self.f,
@@ -354,7 +354,7 @@ impl Control {
     }
 
     /// Joint BC register.
-    fn bc(&self) -> Alias {
+    pub(crate) fn bc(&self) -> Alias {
         Alias {
             hi: &self.b,
             lo: &self.c,
@@ -362,7 +362,7 @@ impl Control {
     }
 
     /// Joint mutable BC register.
-    fn bc_mut(&mut self) -> AliasMut {
+    pub(crate) fn bc_mut(&mut self) -> AliasMut {
         AliasMut {
             hi: &mut self.b,
             lo: &mut self.c,
@@ -370,7 +370,7 @@ impl Control {
     }
 
     /// Joint DE register.
-    fn de(&self) -> Alias {
+    pub(crate) fn de(&self) -> Alias {
         Alias {
             hi: &self.d,
             lo: &self.e,
@@ -378,7 +378,7 @@ impl Control {
     }
 
     /// Joint mutable DE register.
-    fn de_mut(&mut self) -> AliasMut {
+    pub(crate) fn de_mut(&mut self) -> AliasMut {
         AliasMut {
             hi: &mut self.d,
             lo: &mut self.e,
@@ -386,7 +386,7 @@ impl Control {
     }
 
     /// Address register.
-    fn hl(&self) -> Alias {
+    pub(crate) fn hl(&self) -> Alias {
         Alias {
             hi: &self.h,
             lo: &self.l,
@@ -394,7 +394,7 @@ impl Control {
     }
 
     /// Mutable address register.
-    fn hl_mut(&mut self) -> AliasMut {
+    pub(crate) fn hl_mut(&mut self) -> AliasMut {
         AliasMut {
             hi: &mut self.h,
             lo: &mut self.l,
@@ -448,13 +448,13 @@ impl Display for Control {
 
 /// Aliased register.
 #[derive(Clone, Copy)]
-struct Alias<'a> {
+pub(crate) struct Alias<'a> {
     pub lo: &'a Byte,
     pub hi: &'a Byte,
 }
 
 impl Alias<'_> {
-    fn load(&self) -> Word {
+    pub fn load(&self) -> Word {
         let value = [*self.lo, *self.hi];
         Word::from_le_bytes(value)
     }
@@ -473,7 +473,7 @@ impl Display for Alias<'_> {
 }
 
 /// Aliased register.
-struct AliasMut<'a> {
+pub(crate) struct AliasMut<'a> {
     pub lo: &'a mut Byte,
     pub hi: &'a mut Byte,
 }
