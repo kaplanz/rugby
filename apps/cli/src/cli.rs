@@ -69,6 +69,7 @@ pub struct Runtime {
 
 /// Serial connection.
 #[derive(Args, Debug)]
+#[group(requires_all = ["host", "peer"])]
 pub struct Link {
     /// Link cable local address.
     ///
@@ -76,7 +77,7 @@ pub struct Link {
     /// communications.
     #[clap(long)]
     #[clap(value_name = "ADDR")]
-    #[clap(required = false, requires = "peer")]
+    #[clap(required = false)]
     pub host: SocketAddr,
 
     /// Link cable peer address.
@@ -84,7 +85,7 @@ pub struct Link {
     /// Opens a UDP socket at the specified address for serial communications.
     #[clap(long)]
     #[clap(value_name = "ADDR")]
-    #[clap(required = false, requires = "host")]
+    #[clap(required = false)]
     pub peer: SocketAddr,
 }
 
