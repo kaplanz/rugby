@@ -56,7 +56,7 @@ impl Block for Dma {
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
                 self.oam.write(lo as Word, data).unwrap();
-                trace!("copied: 0xfe{lo:02x} <- {addr:#06x}, data: {data:#04x}");
+                trace!("copied: $fe{lo:02x} <- ${addr:04x}, data: {data:#04x}");
                 // Increment transfer index
                 let lo = lo.saturating_add(1);
                 if usize::from(lo) < self.oam.borrow().inner().len() {
