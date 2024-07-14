@@ -10,7 +10,6 @@ use log::debug;
 use rugby::arch::reg::Port;
 use rugby::arch::{Block, Clock};
 use rugby::core::dmg::{cpu, ppu, GameBoy};
-use rugby::prelude::*;
 use thiserror::Error;
 
 use self::lang::Program;
@@ -86,8 +85,8 @@ impl Debugger {
 
     /// Synchronizes the debugger with the console.
     pub fn sync(&mut self, emu: &GameBoy) {
-        let cpu = emu.inside().proc();
-        let ppu = emu.inside().video();
+        let cpu = &emu.main.soc.cpu;
+        let ppu = &emu.main.soc.ppu;
 
         // Update program counter
         self.pc = cpu.load(cpu::Select16::PC);
