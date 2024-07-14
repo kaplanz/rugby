@@ -48,6 +48,9 @@ pub struct GameBoy {
     /// Game cartridge.
     cart: Option<Cartridge>,
     /// DMG-01 Motherboard.
+    #[cfg(feature = "debug")]
+    pub main: Motherboard,
+    #[cfg(not(feature = "debug"))]
     main: Motherboard,
 }
 
@@ -210,21 +213,6 @@ impl core::has::Video for GameBoy {
 
     fn video_mut(&mut self) -> &mut Self::Video {
         &mut self.main.soc.ppu
-    }
-}
-
-/// Debug introspection.
-#[cfg(feature = "debug")]
-impl GameBoy {
-    /// Borrows the core's system-on-chip.
-    #[must_use]
-    pub fn chip(&self) -> &Chip {
-        &self.main.soc
-    }
-
-    /// Mutably borrows the core's system-on-chip.
-    pub fn chip_mut(&mut self) -> &mut Chip {
-        &mut self.main.soc
     }
 }
 
