@@ -1,6 +1,5 @@
 use rugby::arch::Block;
 use rugby::core::dmg::{Cartridge, GameBoy};
-use rugby::prelude::*;
 
 mod common;
 
@@ -23,7 +22,7 @@ fn emulate(rom: &[u8], img: &[u8], diff: usize) -> Result<()> {
         emu.cycle();
     }
     // Calculate difference
-    let delta = image::cmp(emu.inside().video().screen(), img).abs_diff(diff);
+    let delta = image::cmp(emu.main.soc.ppu.screen(), img).abs_diff(diff);
     let total = img.len();
 
     // Check for success

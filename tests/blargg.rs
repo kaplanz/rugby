@@ -2,7 +2,6 @@ use std::fmt::{Debug, Display};
 
 use rugby::arch::Block;
 use rugby::core::dmg::{Cartridge, GameBoy};
-use rugby::prelude::*;
 use thiserror::Error;
 
 /// Number of cycles after which the test is considered to have failed due to a
@@ -20,7 +19,7 @@ fn emulate(rom: &[u8], check: fn(&mut GameBoy) -> Result<()>) -> Result<()> {
     // Load the cartridge
     emu.insert(cart);
     // Write in-progress sentinel
-    emu.inside_mut().proc().write(0xa000, 0x80);
+    emu.main.soc.cpu.write(0xa000, 0x80);
 
     // Loop until completion or timeout
     for cycle in 0..TIMEOUT {
@@ -65,7 +64,7 @@ mod check {
     /// tests which print lots of information that scrolls off screen.
     pub fn console(emu: &mut GameBoy) -> Result<()> {
         // Extract serial output
-        let buf = emu.inside_mut().serial().rx().fill_buf()?;
+        let buf = emu.main.soc.ser.rx().fill_buf()?;
         // Calculate pass/fail conditions
         let repr = String::from_utf8_lossy(buf);
         let pass = repr.contains("Passed");
@@ -99,8 +98,9 @@ mod check {
     /// just printing the final output at the end.
     pub fn memory(emu: &mut GameBoy) -> Result<()> {
         // Extract memory output
-        let res = emu.inside().proc().read(0xa000);
-        let chk = [0xa001, 0xa002, 0xa003].map(|addr| emu.inside().proc().read(addr));
+        let cpu = &emu.main.soc.cpu;
+        let res = cpu.read(0xa000);
+        let chk = [0xa001, 0xa002, 0xa003].map(|addr| cpu.read(addr));
         // Calculate pass/fail conditions
         let chkd = chk == [0xde, 0xb0, 0x61];
         let done = chkd && res != 0x80;
