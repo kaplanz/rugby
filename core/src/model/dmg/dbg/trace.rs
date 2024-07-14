@@ -1,6 +1,7 @@
 //! Introspective tracing.
 
 use rugby_arch::reg::Register;
+use rugby_arch::Block;
 
 use super::cpu::Flag;
 use super::GameBoy;
@@ -11,6 +12,7 @@ use super::GameBoy;
 #[must_use]
 pub fn binjgb(emu: &GameBoy) -> String {
     let cpu = &emu.main.soc.cpu;
+    let ppu = &emu.main.soc.ppu;
     [
         format!("A:{:02X}", cpu.reg.a),
         format!("F:{}", {
@@ -29,6 +31,12 @@ pub fn binjgb(emu: &GameBoy) -> String {
         format!("HL:{:04x}", cpu.reg.hl().load()),
         format!("SP:{:04x}", cpu.reg.sp),
         format!("PC:{:04x}", cpu.reg.pc),
+        format!("(cy: {})", emu.main.clk),
+        format!(
+            "ppu:{}{}",
+            ['-', '+'][usize::from(ppu.ready())],
+            ppu.mode().value()
+        ),
     ]
     .join(" ")
 }
