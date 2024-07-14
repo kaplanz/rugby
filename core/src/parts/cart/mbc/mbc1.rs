@@ -89,6 +89,10 @@ impl Block for Control {
 #[derive(Debug, Default)]
 struct Enable(bool);
 
+impl Enable {
+    const MASK: u8 = 0x0f;
+}
+
 impl Memory for Enable {
     fn read(&self, _: Word) -> Result<Byte> {
         Err(Error::Misuse)
@@ -104,11 +108,11 @@ impl Register for Enable {
     type Value = Byte;
 
     fn load(&self) -> Self::Value {
-        Byte::from(self.0)
+        Byte::from(self.0) & Self::MASK
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = value & 0x0f == 0x0a;
+        self.0 = Self::MASK & value == 0x0a;
         debug!("RAM Enable: {}", self.0);
     }
 }
@@ -116,6 +120,10 @@ impl Register for Enable {
 /// ROM Bank Number.
 #[derive(Debug, Default)]
 struct RomBank(Byte);
+
+impl RomBank {
+    const MASK: u8 = 0x1f;
+}
 
 impl Memory for RomBank {
     fn read(&self, _: Word) -> Result<Byte> {
@@ -132,11 +140,11 @@ impl Register for RomBank {
     type Value = Byte;
 
     fn load(&self) -> Self::Value {
-        self.0 & 0x1f
+        self.0 & Self::MASK
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = 0x1f & value;
+        self.0 = Self::MASK & value;
         debug!("ROM Bank Number: {:#04x}", self.0);
     }
 }
@@ -144,6 +152,10 @@ impl Register for RomBank {
 /// RAM Bank Number.
 #[derive(Debug, Default)]
 struct RamBank(Byte);
+
+impl RamBank {
+    const MASK: u8 = 0x03;
+}
 
 impl Memory for RamBank {
     fn read(&self, _: Word) -> Result<Byte> {
@@ -160,11 +172,11 @@ impl Register for RamBank {
     type Value = Byte;
 
     fn load(&self) -> Self::Value {
-        self.0 & 0x03
+        self.0 & Self::MASK
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = 0x03 & value;
+        self.0 = Self::MASK & value;
         debug!("RAM Bank Number: {:#04x}", self.0);
     }
 }
@@ -172,6 +184,10 @@ impl Register for RamBank {
 /// Banking Mode Select.
 #[derive(Debug, Default)]
 struct Select(bool);
+
+impl Select {
+    const MASK: u8 = 0x01;
+}
 
 impl Memory for Select {
     fn read(&self, _: Word) -> Result<Byte> {
@@ -192,7 +208,7 @@ impl Register for Select {
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = value != 0;
+        self.0 = Self::MASK & value != 0;
         debug!("Banking Mode Select: {}", self.0);
     }
 }
@@ -275,7 +291,7 @@ impl Memory for Rom {
             }
             // Banking Mode Select
             0x6000..=0x7fff => {
-                // ctl.sel <- data[3:0] == 0xA
+                // ctl.sel <- data[0]
                 self.ctl.sel.store(data);
             }
             _ => return Err(Error::Range),
