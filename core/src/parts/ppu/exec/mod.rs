@@ -27,6 +27,18 @@ pub enum Mode {
 }
 
 impl Mode {
+    /// Returns the internal mode value.
+    #[must_use]
+    #[rustfmt::skip]
+    pub fn value(&self) -> Byte {
+        match self {
+            Mode::Scan(_)   => 0b10,
+            Mode::Draw(_)   => 0b11,
+            Mode::HBlank(_) => 0b00,
+            Mode::VBlank(_) => 0b01,
+        }
+    }
+
     #[must_use]
     pub(super) fn exec(self, ppu: &mut Ppu) -> Self {
         // Update status register
@@ -34,7 +46,7 @@ impl Mode {
         let lyc = ppu.reg.lyc.load();
         let stat = {
             let mut stat = ppu.reg.stat.load();
-            stat ^= (0x03 & stat) ^ Byte::from(&self);
+            stat ^= (0x03 & stat) ^ self.value();
             stat ^= (0x04 & stat) ^ Byte::from(ly == lyc) << 2;
             stat
         };
@@ -78,17 +90,5 @@ impl Mode {
 impl Default for Mode {
     fn default() -> Self {
         Self::Scan(Scan::default())
-    }
-}
-
-#[rustfmt::skip]
-impl From<&Mode> for Byte {
-    fn from(mode: &Mode) -> Self {
-        match mode {
-            Mode::Scan(_)   => 0b10,
-            Mode::Draw(_)   => 0b11,
-            Mode::HBlank(_) => 0b00,
-            Mode::VBlank(_) => 0b01,
-        }
     }
 }
