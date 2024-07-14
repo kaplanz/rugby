@@ -6,7 +6,6 @@ use rugby::arch::reg::Port;
 use rugby::arch::{Block, Word};
 use rugby::core::dmg::cpu::Cpu;
 use rugby::core::dmg::{Cartridge, GameBoy};
-use rugby::prelude::*;
 use thiserror::Error;
 
 /// Number of cycles after which the test is considered to have failed due to a
@@ -41,7 +40,7 @@ fn emulate(rom: &[u8]) -> Result<()> {
 fn check(emu: &GameBoy) -> Result<()> {
     type Select = <Cpu as Port<Word>>::Select;
     // Extract register values
-    let cpu = emu.inside().proc();
+    let cpu = &emu.main.soc.cpu;
     let bc: u16 = cpu.load(Select::BC);
     let de: u16 = cpu.load(Select::DE);
     let hl: u16 = cpu.load(Select::HL);
