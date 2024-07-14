@@ -17,6 +17,7 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 png = { workspace = true }
+rugby = { workspace = true, features = ["debug"] }
 
 [features]
 default = []
