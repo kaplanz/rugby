@@ -7,7 +7,7 @@ use std::time::Instant;
 use anyhow::Context as _;
 use log::debug;
 use rugby::arch::{Block, Clock};
-#[cfg(any(feature = "trace", feature = "win"))]
+#[cfg(feature = "win")]
 use rugby::core::dmg;
 #[cfg(feature = "trace")]
 use rugby::core::dmg::cpu::Stage;
@@ -45,6 +45,7 @@ pub struct App {
     /// Graphical frontend.
     pub gui: Frontend,
     /// Debug features.
+    #[allow(unused)]
     #[cfg(feature = "debug")]
     pub dbg: Debug,
 }
