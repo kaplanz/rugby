@@ -1401,6 +1401,7 @@ version = "0.1.0"
 dependencies = [
  "chex",
  "png",
+ "rugby",
  "rugby-arch",
  "rugby-core",
  "serde",
