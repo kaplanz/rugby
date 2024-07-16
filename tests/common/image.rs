@@ -2,7 +2,7 @@
 
 use std::fmt::{Debug, Display};
 
-use rugby::core::dmg::ppu::{Color, Frame};
+use rugby::core::dmg::ppu::Color;
 use thiserror::Error;
 
 /// Loads a PNG image from its raw binary data.
@@ -22,21 +22,21 @@ pub fn png(data: &[u8]) -> Result<Vec<u8>, png::DecodingError> {
 }
 
 /// Compare an LCD frame to reference frame data.
-pub fn cmp(lcd: &Frame, img: &[u8]) -> usize {
+pub fn cmp(lcd: &[Color], img: &[u8]) -> usize {
     // expand pixels to bytes
-    lcd.map(|pix| match pix {
-        Color::C0 => 0xff,
-        Color::C1 => 0xaa,
-        Color::C2 => 0x55,
-        Color::C3 => 0x00,
-    })
-    .iter()
-    // compare to source image
-    .zip(img)
-    // filter out matching pixels
-    .filter(|(a, b)| a != b)
-    // count remaining differences
-    .count()
+    lcd.iter()
+        .map(|pix| match pix {
+            Color::C0 => 0xff,
+            Color::C1 => 0xaa,
+            Color::C2 => 0x55,
+            Color::C3 => 0x00,
+        })
+        // compare to source image
+        .zip(img)
+        // filter out matching pixels
+        .filter(|&(a, &b)| a != b)
+        // count remaining differences
+        .count()
 }
 
 /// Check if an image-based test has failed.

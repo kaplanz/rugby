@@ -5,6 +5,7 @@ use std::io::{BufRead, Read, Write};
 use std::ops::Not;
 use std::path::Path;
 
+use itertools::Itertools;
 use rugby::arch::reg::Port;
 use rugby::arch::Block;
 use rugby::core::dmg::LCD;
@@ -36,12 +37,16 @@ pub fn capture(emu: &mut GameBoy, path: &Path, force: bool) -> Result<()> {
         .main
         .soc
         .ppu
-        .screen()
+        .frame()
+        // iterate over pixels
+        .iter()
+        .copied()
         // convert pixels to 2-bit value
         .map(|pix| pix as u8)
         // combine every 4 pixels (2bpp) into a byte
-        .chunks_exact(4)
-        .map(|cols| cols.iter().fold(0, |acc, &pix| (acc << 2) | pix))
+        .chunks(4)
+        .into_iter()
+        .map(|cols| cols.into_iter().fold(0, |acc, pix| (acc << 2) | pix))
         // invert data (`Color::C0` is usually lightest)
         .map(Not::not)
         // collect as a fixed-size array
