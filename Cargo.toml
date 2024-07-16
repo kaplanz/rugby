@@ -46,6 +46,7 @@ anyhow = "1.0.86"
 chex = { version = "0.1.0", path = "crates/chex" }
 clap = { version = "4.5.8", features = ["derive"] }
 hexd = { version = "0.1.0", path = "crates/hexd" }
+itertools = "0.13.0"
 log = "0.4.22"
 num = "0.4.3"
 png = "0.17.13"
