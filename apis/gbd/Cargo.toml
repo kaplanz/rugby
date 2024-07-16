@@ -14,6 +14,7 @@ bytecount = { version = "0.6.8" }
 displaydoc = { version = "0.2.5" }
 hexd = { workspace = true }
 indexmap = { version = "2.2.6" }
+itertools = { workspace = true }
 log = { workspace = true }
 num = { workspace = true }
 pest = { version = "2.7.11" }

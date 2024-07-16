@@ -198,12 +198,6 @@ impl Ppu {
     pub fn lcdc(&self, opt: Lcdc) -> bool {
         opt.get(self.reg.lcdc.load())
     }
-
-    /// Get a reference to the PPU's screen.
-    #[must_use]
-    pub fn screen(&self) -> &Frame {
-        &self.etc.buf
-    }
 }
 
 impl Api for Ppu {
