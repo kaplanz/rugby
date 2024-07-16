@@ -10,7 +10,7 @@ license = { workspace = true }
 
 [dependencies]
 hexd = { workspace = true }
-itertools = { version = "0.13.0", optional = true }
+itertools = { workspace = true, optional = true }
 log = { workspace = true }
 rugby-arch = { workspace = true }
 thiserror = { workspace = true }
