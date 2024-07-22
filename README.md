@@ -168,9 +168,12 @@ conditions of their respective licenses:
 
 ### Games
 
-- A [2048][2048.game] Game Boy port is included under the conditions of the
+- [2048][2048.game] is included under the conditions of the
   [zlib License][2048.license] (dated 29 Aug 2023). See the project
   [here][2048].
+- [Porklike][porklike.game] is included under the conditions of the
+  [MIT License][porklike.license] (dated 22 Jul 2024). See the project
+  [here][porklike].
 
 ### Testing
 
@@ -235,6 +238,9 @@ chosen license.
 [mooneye.doc]:      ./tests/README.md#mooneye
 [mooneye.test]:     ./roms/test/mooneye
 [mooneye.license]:  ./roms/test/mooneye/LICENSE
+[porklike]:         https://github.com/binji/porklike.gb
+[porklike.game]:    ./roms/games/porklike/porklike.gb
+[porklike.license]: ./roms/games/porklike/LICENSE
 [sameboy]:          https://sameboy.github.io
 [sameboy.boot]:     ./roms/boot/sameboy/dmg_boot.bin
 [sameboy.license]:  ./roms/boot/sameboy/LICENSE
