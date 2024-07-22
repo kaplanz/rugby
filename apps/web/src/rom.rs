@@ -1,12 +1,12 @@
 use wasm_bindgen::prelude::*;
 
-/// `dmg-acid2` Test ROM.
+/// Demo ROM.
 #[wasm_bindgen]
-pub fn acid2() -> Box<[u8]> {
+pub fn demo() -> Box<[u8]> {
     Box::from(
         include_bytes!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../roms/test/acid2/dmg-acid2.gb"
+            "/../../roms/games/porklike/porklike.gb"
         ))
         .as_slice(),
     )
