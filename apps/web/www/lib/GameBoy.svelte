@@ -1,7 +1,7 @@
 <script>
 import { onMount } from "svelte";
 
-import { Cartridge, GameBoy, acid2 } from "/pkg/rugby.js";
+import { Cartridge, GameBoy, demo } from "/pkg/rugby.js";
 
 import Insert from "./Insert.svelte";
 import Joypad from "./Joypad.svelte";
@@ -35,7 +35,7 @@ function override(event) {
 
 onMount(() => {
   // Insert a game cartridge
-  emu.insert(new Cartridge(acid2()));
+  emu.insert(new Cartridge(demo()));
   app.run = true;
 
   // Start emulation loop
