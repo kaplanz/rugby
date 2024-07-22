@@ -12,7 +12,7 @@
 //!
 //! // Instantiate a cartridge from ROM bytes
 //! let rom: &[u8]; // -- snip --
-//! # rom = include_bytes!("../roms/games/2048/2048.gb");
+//! # rom = include_bytes!("../roms/test/acid2/dmg-acid2.gb");
 //! let cart = Cartridge::new(rom).unwrap();
 //!
 //! // Create an emulator instance
