@@ -128,7 +128,10 @@ pub struct Cart {
     /// This option can be used to override the cartridge's hardware support for
     /// persistent RAM. When enabled, RAM will be loaded and saved from a file
     /// with the same path and name as the ROM, but using the ".sav" extension.
-    #[cfg_attr(feature = "clap", clap(long, value_name = "WHEN", value_enum))]
+    #[cfg_attr(
+        feature = "clap",
+        clap(short = 'S', long, value_name = "WHEN", value_enum)
+    )]
     pub save: Option<Tristate>,
 }
 
