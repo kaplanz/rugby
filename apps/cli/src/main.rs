@@ -396,7 +396,7 @@ mod build {
         if save == Tristate::Never {
             return Ok(());
         }
-        if save == Tristate::Auto && cart.header().info.has_battery() {
+        if save == Tristate::Auto && !cart.header().info.has_battery() {
             return Ok(());
         }
         if !path.exists() {
