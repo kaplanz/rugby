@@ -63,7 +63,7 @@ Console:
   -b, --boot [<PATH>]  Boot ROM image file
   -c, --check          Check cartridge integrity
   -f, --force          Force cartridge construction
-      --save <WHEN>    Cartridge RAM persistence [possible values: never, auto,
+  -S, --save <WHEN>    Cartridge RAM persistence [possible values: never, auto,
                        always]
 
 Serial:
