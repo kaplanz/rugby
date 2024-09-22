@@ -59,14 +59,14 @@ pub enum Select {
     ///
     /// | Bit | Name                        |
     /// |-----|-----------------------------|
-    /// |  7  | LCD & PPU enable            |
+    /// |  7  | LCD enable                  |
     /// |  6  | Window tile map area        |
     /// |  5  | Window enable               |
-    /// |  4  | BG & Window tile data area  |
+    /// |  4  | BG-Window tile data area    |
     /// |  3  | BG tile map area            |
     /// |  2  | OBJ size                    |
     /// |  1  | OBJ enable                  |
-    /// |  0  | BG & Window enable/priority |
+    /// |  0  | BG-Window enable            |
     ///
     /// [lcdc]: https://gbdev.io/pandocs/LCDC.html
     Lcdc,
@@ -193,7 +193,7 @@ impl Ppu {
         &self.etc.mode
     }
 
-    /// Retrieves LCD control options.
+    /// Gets a configured state option.
     #[must_use]
     pub fn lcdc(&self, opt: Lcdc) -> bool {
         opt.get(self.reg.lcdc.load())
@@ -333,7 +333,7 @@ pub struct Control {
 }
 
 impl Control {
-    /// Constructs a new `File`.
+    /// Constructs a new `Control`.
     #[rustfmt::skip]
     #[must_use]
     pub fn new(dma: Shared<Dma>) -> Self {
@@ -418,7 +418,7 @@ pub enum Lcdc {
     ///
     /// [window]: meta::Layer::Window
     WinEnable   = 0b0010_0000,
-    /// `LCDC[4]`: Background/Window tile data area.
+    /// `LCDC[4]`: Background-Window tile data area.
     ///
     /// Controls which [addressing mode] the [background]/[window] use to pick
     /// tiles.
@@ -445,7 +445,7 @@ pub enum Lcdc {
     ///
     /// Controls whether objects are displayed or not.
     ObjEnable   = 0b0000_0010,
-    /// `LCDC[0]`: Background/Window enable.
+    /// `LCDC[0]`: Background-Window enable.
     ///
     /// When cleared, both background and window become blank (white), and
     /// `LCDC[5]` (window enable) is ignored. Only objects may still be
