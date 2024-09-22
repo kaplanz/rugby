@@ -335,7 +335,8 @@ pub struct Control {
 impl Control {
     /// Constructs a new `File`.
     #[rustfmt::skip]
-    #[must_use]    pub fn new(dma: Shared<Dma>) -> Self {
+    #[must_use]
+    pub fn new(dma: Shared<Dma>) -> Self {
         Self {
             lcdc: Shared::default(),
             stat: Shared::default(),
