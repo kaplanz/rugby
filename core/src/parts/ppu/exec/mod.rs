@@ -26,6 +26,12 @@ pub enum Mode {
     VBlank(VBlank),
 }
 
+impl Default for Mode {
+    fn default() -> Self {
+        Self::HBlank(HBlank::default())
+    }
+}
+
 impl Mode {
     /// Returns the internal mode value.
     #[must_use]
@@ -84,11 +90,5 @@ impl Mode {
 
         // Return next state
         next
-    }
-}
-
-impl Default for Mode {
-    fn default() -> Self {
-        Self::Scan(Scan::default())
     }
 }
