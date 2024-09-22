@@ -62,6 +62,10 @@ impl Control {
 }
 
 impl Block for Control {
+    fn ready(&self) -> bool {
+        !self.0
+    }
+
     fn reset(&mut self) {
         std::mem::take(&mut self.0);
     }
@@ -87,7 +91,7 @@ impl Register for Control {
 
     #[rustfmt::skip]
     fn store(&mut self, value: Self::Value) {
-        let enabled = !self.0;            // is boot enabled?
+        let enabled = self.ready();       // is boot enabled?
         let disable = value & 0x01 != 0;  // disable request?
 
         // Disable cannot be undone (other than a reset). This is implemented in
@@ -117,7 +121,7 @@ impl Bank {
 
 impl Block for Bank {
     fn ready(&self) -> bool {
-        self.reg.load() & 0x01 == 0
+        self.reg.ready()
     }
 }
 
