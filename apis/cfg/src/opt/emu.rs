@@ -60,7 +60,7 @@ pub struct Boot {
     ))]
     pub rom: Option<PathBuf>,
 
-    /// Skip the boot ROM.
+    /// Skip running boot ROM.
     ///
     /// Negates `-b/--boot`.
     #[cfg_attr(
