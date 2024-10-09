@@ -28,7 +28,7 @@ pub enum Mode {
 
 impl Default for Mode {
     fn default() -> Self {
-        Self::HBlank(HBlank::default())
+        Self::HBlank(HBlank)
     }
 }
 
