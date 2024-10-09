@@ -122,7 +122,7 @@ save = "auto"
 
 [emu.boot]
 # Boot ROM image file
-# image = "path/to/dmg_boot.bin"
+# rom = "path/to/dmg_boot.bin"
 ```
 
 A customized example could be found [here][config].
