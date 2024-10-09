@@ -44,4 +44,4 @@ save = "always"
 
 [emu.boot]
 # Boot ROM image file
-image = "../../../roms/boot/sameboy/dmg_boot.bin"
+rom = "../../../roms/boot/sameboy/dmg_boot.bin"
