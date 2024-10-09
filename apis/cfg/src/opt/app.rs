@@ -14,7 +14,7 @@ use crate::Conf;
     serde(default, deny_unknown_fields)
 )]
 pub struct Application {
-    /// Logging level.
+    /// Logging filter.
     ///
     /// A comma-separated list of logging directives.
     #[cfg_attr(feature = "clap", clap(
