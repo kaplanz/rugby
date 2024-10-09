@@ -3,7 +3,7 @@
 use rugby::core::dmg::FREQ;
 use rugby::pal;
 
-/// Tristate value.
+/// When to enable.
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(
@@ -11,7 +11,7 @@ use rugby::pal;
     derive(serde::Deserialize),
     serde(rename_all = "kebab-case")
 )]
-pub enum Tristate {
+pub enum When {
     /// Never enable.
     Never,
     /// Smartly enable.
