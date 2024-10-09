@@ -160,7 +160,7 @@ mod build {
             let boot = &args.cfg.emu.boot;
             boot.skip
                 .not()
-                .then(|| boot.image.as_deref().map(self::boot))
+                .then(|| boot.rom.as_deref().map(self::boot))
                 .map(|res| res.ok_or(anyhow!("missing path; unspecified by `--boot`")))
                 .transpose()?
                 .transpose()
