@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-pub use crate::val::Tristate;
+pub use crate::val::When;
 use crate::Conf;
 
 /// Emulation options.
@@ -132,7 +132,7 @@ pub struct Cart {
         feature = "clap",
         clap(short = 'S', long, value_name = "WHEN", value_enum)
     )]
-    pub save: Option<Tristate>,
+    pub save: Option<When>,
 }
 
 impl Cart {
