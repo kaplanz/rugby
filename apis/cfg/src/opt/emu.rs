@@ -58,7 +58,7 @@ pub struct Boot {
         value_name = "PATH",
         value_hint = clap::ValueHint::FilePath,
     ))]
-    pub image: Option<PathBuf>,
+    pub rom: Option<PathBuf>,
 
     /// Skip the boot ROM.
     ///
@@ -79,11 +79,11 @@ pub struct Boot {
 
 impl Conf for Boot {
     fn rebase(&mut self, root: &Path) {
-        self.image = self.image.take().map(|path| root.join(path));
+        self.rom = self.rom.take().map(|path| root.join(path));
     }
 
     fn merge(&mut self, other: Self) {
-        self.image = self.image.take().or(other.image);
+        self.rom = self.rom.take().or(other.rom);
     }
 }
 
