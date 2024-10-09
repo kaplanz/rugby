@@ -84,7 +84,7 @@ mod build {
     use rugby::core::dmg::cart::mbc::Mbc;
     use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
     use rugby::emu::part::video;
-    use rugby_cfg::opt::emu::Tristate;
+    use rugby_cfg::opt::emu::When;
     #[cfg(feature = "gbd")]
     use rugby_gbd::{Debugger, Portal};
     use tracing_subscriber::filter::LevelFilter;
@@ -386,17 +386,17 @@ mod build {
     }
 
     /// Flashes the cartridge RAM from a save file.
-    pub fn flash(path: Option<&Path>, cart: Option<&mut Cartridge>, save: Tristate) -> Result<()> {
+    pub fn flash(path: Option<&Path>, cart: Option<&mut Cartridge>, save: When) -> Result<()> {
         let Some(path) = path else {
             return Ok(());
         };
         let Some(cart) = cart else {
             return Ok(());
         };
-        if save == Tristate::Never {
+        if save == When::Never {
             return Ok(());
         }
-        if save == Tristate::Auto && !cart.header().info.has_battery() {
+        if save == When::Auto && !cart.header().info.has_battery() {
             return Ok(());
         }
         if !path.exists() {
@@ -419,17 +419,17 @@ mod build {
     }
 
     /// Dumps the cartridge RAM to a save file.
-    pub fn dump(cart: Option<&Cartridge>, path: Option<&Path>, save: Tristate) -> Result<()> {
+    pub fn dump(cart: Option<&Cartridge>, path: Option<&Path>, save: When) -> Result<()> {
         let Some(cart) = cart else {
             return Ok(());
         };
         let Some(path) = path else {
             return Ok(());
         };
-        if save == Tristate::Never {
+        if save == When::Never {
             return Ok(());
         }
-        if save == Tristate::Auto && !cart.header().info.has_battery() {
+        if save == When::Auto && !cart.header().info.has_battery() {
             return Ok(());
         }
         if !cart.header().info.has_ram() {
