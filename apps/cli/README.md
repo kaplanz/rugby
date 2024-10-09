@@ -51,7 +51,7 @@ Runtime:
   -H, --headless  Run in headless mode
 
 Startup:
-  -l, --log <FILTER>     Logging level [env: RUGBY_LOG=]
+  -l, --log <FILTER>     Logging filter [env: RUGBY_LOG=]
   -p, --palette <COLOR>  2-bit color palette [possible values: autumn-chill,
                          blk-aqu, blue-dream, coldfire, coral, demichrome,
                          earth, ice-cream, legacy, mist, mono, morris,
