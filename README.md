@@ -172,7 +172,7 @@ conditions of their respective licenses:
   [zlib License][2048.license] (dated 29 Aug 2023). See the project
   [here][2048].
 - [Porklike][porklike.game] is included under the conditions of the
-  [MIT License][porklike.license] (dated 22 Jul 2024). See the project
+  [MIT License][porklike.license] (dated 16 Oct 2024). See the project
   [here][porklike].
 
 ### Testing
