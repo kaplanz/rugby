@@ -162,7 +162,7 @@ For information regarding licensure, please see the project's [README][license].
 [win.badge]: https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=fff
 
 <!-- Usage -->
-[config]:  ./docs/config.toml
+[config]:  ./rugby.toml
 
 <!-- License -->
 [license]: /README.md#license
