@@ -52,7 +52,7 @@ fn run() -> Result<()> {
     // Prepare emulator
     let emu = build::emu(&args)?;
     // Perform early exit
-    if args.run.exit {
+    if args.feat.exit {
         return Ok(());
     }
     // Prepare application
@@ -256,7 +256,7 @@ mod build {
     pub fn app(args: &Cli, emu: GameBoy, log: Log) -> Result<App> {
         // Initialize graphics
         let gui = args
-            .run
+            .feat
             .headless
             .not()
             .then(|| {
@@ -270,6 +270,7 @@ mod build {
 
         // Open link cable
         let lnk = args
+            .feat
             .link
             .as_ref()
             .map(link)
