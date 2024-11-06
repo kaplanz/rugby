@@ -14,6 +14,7 @@ use crate::NAME;
 /// speed, interactive debugging, and more!
 #[derive(Debug, Parser)]
 #[clap(name = NAME, author, version, about, long_about)]
+#[clap(arg_required_else_help = true)]
 pub struct Cli {
     /// Configuration file.
     ///
