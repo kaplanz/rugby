@@ -36,11 +36,11 @@ pub trait Conf {
 )]
 pub struct Config {
     /// Application options.
-    #[cfg_attr(feature = "clap", clap(flatten, next_help_heading = "Startup"))]
+    #[cfg_attr(feature = "clap", clap(flatten))]
     pub app: Application,
 
     /// Emulation options.
-    #[cfg_attr(feature = "clap", clap(flatten, next_help_heading = "Console"))]
+    #[cfg_attr(feature = "clap", clap(flatten))]
     pub emu: Emulation,
 }
 
