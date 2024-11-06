@@ -46,11 +46,13 @@ Options:
   -h, --help         Print help (see more with '--help')
   -V, --version      Print version
 
-Runtime:
-  -x, --exit      Exit without running
-  -H, --headless  Run in headless mode
+Features:
+  -x, --exit         Exit after instantiation
+  -H, --headless     Run in headless mode (command-line only)
+      --host <ADDR>  Link cable local address
+      --peer <ADDR>  Link cable peer address
 
-Startup:
+Settings:
   -l, --log <FILTER>     Logging filter [env: RUGBY_LOG=]
   -p, --palette <COLOR>  2-bit color palette [possible values: autumn-chill,
                          blk-aqu, blue-dream, coldfire, coral, demichrome,
@@ -58,17 +60,11 @@ Startup:
                          purple-dawn, rustic, velvet-cherry]
   -s, --speed <FREQ>     Simulated clock speed [possible values: half, actual,
                          double, max]
-
-Console:
-  -b, --boot [<PATH>]  Boot ROM image file
-  -c, --check          Check cartridge integrity
-  -f, --force          Force cartridge construction
-  -S, --save <WHEN>    Cartridge RAM persistence [possible values: never, auto,
-                       always]
-
-Serial:
-      --host <ADDR>  Link cable local address
-      --peer <ADDR>  Link cable peer address
+  -b, --boot [<PATH>]    Boot ROM image file
+  -c, --check            Check cartridge integrity
+  -f, --force            Force cartridge construction
+  -S, --save <WHEN>      Cartridge RAM persistence [possible values: never,
+                         auto, always]
 
 Debug:
   -i, --gbd              Enable interactive debugging

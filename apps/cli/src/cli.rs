@@ -28,20 +28,15 @@ pub struct Cli {
     #[clap(value_hint = ValueHint::FilePath)]
     pub conf: PathBuf,
 
-    /// Runtime options.
+    /// Runtime features.
     #[clap(flatten)]
-    #[clap(next_help_heading = "Runtime")]
-    pub run: Runtime,
+    #[clap(next_help_heading = "Features")]
+    pub feat: Features,
 
     /// Configuration data.
     #[clap(flatten)]
-    #[clap(next_help_heading = None)]
+    #[clap(next_help_heading = "Settings")]
     pub cfg: Config,
-
-    /// Serial connection.
-    #[clap(flatten)]
-    #[clap(next_help_heading = "Serial")]
-    pub link: Option<Link>,
 
     /// Debugging options.
     #[clap(flatten)]
@@ -49,10 +44,10 @@ pub struct Cli {
     pub dbg: Debug,
 }
 
-/// Runtime options.
+/// Runtime features.
 #[derive(Args, Debug)]
-pub struct Runtime {
-    /// Exit without running.
+pub struct Features {
+    /// Exit after instantiation.
     ///
     /// Instead of entering the main emulation loop, return immediately after
     /// loading the cartridge ROM. This option could be used along with
@@ -61,11 +56,16 @@ pub struct Runtime {
     #[clap(short = 'x', long)]
     pub exit: bool,
 
-    /// Run in headless mode.
+    /// Run in headless mode (command-line only).
     ///
-    /// Starts without initializing or opening the UI.
+    /// Starts without initializing or opening the UI. This is often useful when
+    /// debugging to prevent the GUI from taking focus in your OS.
     #[clap(short = 'H', long)]
     pub headless: bool,
+
+    /// Serial connection.
+    #[clap(flatten)]
+    pub link: Option<Link>,
 }
 
 /// Serial connection.
