@@ -21,9 +21,9 @@ use crate::app::{self, App, Graphics};
 use crate::cfg::Config;
 #[cfg(feature = "gbd")]
 use crate::dbg::gbd::Console;
-#[cfg(feature = "trace")]
-use crate::dbg::trace::Tracer;
-#[cfg(feature = "trace")]
+#[cfg(feature = "log")]
+use crate::dbg::log::Tracer;
+#[cfg(feature = "log")]
 use crate::exe::run::cli::trace::Trace;
 use crate::exe::run::{cli, Cli};
 use crate::{util, NAME};
@@ -224,7 +224,7 @@ pub fn app(args: &Cli, emu: GameBoy, log: Log) -> Result<App> {
         .context("could not prepare debugger")?;
 
     // Initialize tracing
-    #[cfg(feature = "trace")]
+    #[cfg(feature = "log")]
     let trace = args
         .dbg
         .trace
@@ -242,7 +242,7 @@ pub fn app(args: &Cli, emu: GameBoy, log: Log) -> Result<App> {
         dbg: app::Debug {
             #[cfg(feature = "gbd")]
             gbd,
-            #[cfg(feature = "trace")]
+            #[cfg(feature = "log")]
             trace,
             #[cfg(feature = "win")]
             win: args.dbg.win,
@@ -309,7 +309,7 @@ pub fn gbd(log: Log) -> Result<Debugger> {
 }
 
 /// Builds a tracing instance.
-#[cfg(feature = "trace")]
+#[cfg(feature = "log")]
 pub fn trace(Trace { fmt, log }: &Trace) -> Result<Tracer> {
     let log = match log.as_deref() {
         // Create a logfile from the path
