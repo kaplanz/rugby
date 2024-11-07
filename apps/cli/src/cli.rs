@@ -40,6 +40,8 @@ pub enum Command {
     Run(Box<exe::run::Cli>),
     /// Print ROM information.
     Info(Box<exe::info::Cli>),
+    /// Generate shell files.
+    Gen(Box<exe::gen::Cli>),
 }
 
 /// Configuration options.
