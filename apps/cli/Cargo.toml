@@ -16,6 +16,8 @@ path = "src/main.rs"
 advise = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
+clap_complete = "4.5.37"
+clap_mangen = "0.2.24"
 ctrlc = { version = "3.4.4", optional = true }
 either = "1.13.0"
 log = { workspace = true }
