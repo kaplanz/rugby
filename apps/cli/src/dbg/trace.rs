@@ -5,7 +5,7 @@ use std::io::{BufWriter, Write};
 
 use rugby::core::dmg::{self, GameBoy};
 
-use crate::cli::trace::Format;
+use crate::exe::run::cli::trace::Format;
 
 /// Tracing output.
 ///

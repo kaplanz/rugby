@@ -24,6 +24,11 @@ To see usage information, run the `rugby` executable with the `-h` flag (use
 Emulate the Nintendo Game Boy
 
 Usage: rugby [OPTIONS] [ROM]
+       rugby <COMMAND>
+
+Commands:
+  run   Emulate provided ROM
+  info  Print ROM information
 
 Arguments:
   [ROM]  Cartridge ROM image file
