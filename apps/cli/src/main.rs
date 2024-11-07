@@ -5,7 +5,7 @@ use std::path::Path;
 use anyhow::Context;
 use clap::Parser;
 use log::{trace, warn};
-use rugby_cfg::Conf;
+use rugby_cfg::Join;
 
 use crate::cli::Cli;
 use crate::err::{Exit, Result};

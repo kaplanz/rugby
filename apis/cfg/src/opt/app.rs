@@ -3,7 +3,7 @@
 use std::path::Path;
 
 pub use crate::val::{Palette, Speed};
-use crate::Conf;
+use crate::Join;
 
 /// Application options.
 #[derive(Debug, Default)]
@@ -47,7 +47,7 @@ pub struct Application {
     pub spd: Option<Speed>,
 }
 
-impl Conf for Application {
+impl Join for Application {
     fn rebase(&mut self, _: &Path) {}
 
     fn merge(&mut self, other: Self) {
