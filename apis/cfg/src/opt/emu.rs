@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 
 pub use crate::val::When;
-use crate::Conf;
+use crate::Join;
 
 /// Emulation options.
 #[derive(Debug, Default)]
@@ -23,7 +23,7 @@ pub struct Emulation {
     pub cart: Cart,
 }
 
-impl Conf for Emulation {
+impl Join for Emulation {
     fn rebase(&mut self, root: &Path) {
         self.boot.rebase(root);
         self.cart.rebase(root);
@@ -77,7 +77,7 @@ pub struct Boot {
     pub skip: bool,
 }
 
-impl Conf for Boot {
+impl Join for Boot {
     fn rebase(&mut self, root: &Path) {
         self.rom = self.rom.take().map(|path| root.join(path));
     }
@@ -144,7 +144,7 @@ impl Cart {
     }
 }
 
-impl Conf for Cart {
+impl Join for Cart {
     fn rebase(&mut self, root: &Path) {
         self.rom = self.rom.take().map(|path| root.join(path));
     }
