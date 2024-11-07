@@ -83,7 +83,7 @@ pub struct Debug {
     pub gbd: bool,
 
     /// Introspective tracing.
-    #[cfg(feature = "trace")]
+    #[cfg(feature = "log")]
     #[clap(flatten)]
     pub trace: Option<trace::Trace>,
 
@@ -96,7 +96,7 @@ pub struct Debug {
 }
 
 /// Introspective tracing.
-#[cfg(feature = "trace")]
+#[cfg(feature = "log")]
 pub mod trace {
     use std::path::PathBuf;
 
