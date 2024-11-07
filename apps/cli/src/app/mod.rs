@@ -9,7 +9,7 @@ use log::debug;
 use rugby::arch::{Block, Clock};
 #[cfg(feature = "win")]
 use rugby::core::dmg;
-#[cfg(feature = "trace")]
+#[cfg(feature = "log")]
 use rugby::core::dmg::cpu::Stage;
 use rugby::core::dmg::{Cartridge, GameBoy};
 use rugby::prelude::*;
@@ -19,8 +19,8 @@ use rugby_gbd::Debugger;
 use self::ctx::Counter;
 #[cfg(feature = "win")]
 use self::gui::dbg::Region;
-#[cfg(feature = "trace")]
-use crate::dbg::trace::Tracer;
+#[cfg(feature = "log")]
+use crate::dbg::log::Tracer;
 use crate::NAME;
 
 mod ctx;
@@ -65,7 +65,7 @@ pub struct Debug {
     #[cfg(feature = "gbd")]
     pub gbd: Option<Debugger>,
     /// Introspective tracing.
-    #[cfg(feature = "trace")]
+    #[cfg(feature = "log")]
     pub trace: Option<Tracer>,
     /// Graphical VRAM rendering.
     #[cfg(feature = "win")]
@@ -129,7 +129,7 @@ impl App {
             }
 
             // Write trace entries.
-            #[cfg(feature = "trace")]
+            #[cfg(feature = "log")]
             if let Some(trace) = &mut self.dbg.trace {
                 if matches!(self.emu.inside().proc().stage(), Stage::Fetch | Stage::Done)
                     && count.delta % 4 == 0
