@@ -31,13 +31,6 @@ toml = { workspace = true }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 xdir = { workspace = true }
 
-[build-dependencies]
-clap = { workspace = true }
-clap_complete = "4.5.7"
-clap_mangen = "0.2.22"
-rugby = { workspace = true }
-rugby-cfg = { workspace = true, features = ["clap"] }
-
 [features]
 default = ["gbd", "trace", "win"]
 debug = ["rugby/debug"]
