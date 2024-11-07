@@ -10,7 +10,7 @@ pub mod env;
 pub mod opt;
 
 /// Configuration interface.
-pub trait Conf {
+pub trait Join {
     /// Rebase relative paths to the provided root.
     ///
     /// Any relative paths will have be rebased such that they are not relative
@@ -44,7 +44,7 @@ pub struct Config {
     pub emu: Emulation,
 }
 
-impl Conf for Config {
+impl Join for Config {
     fn rebase(&mut self, root: &Path) {
         self.app.rebase(root);
         self.emu.rebase(root);
