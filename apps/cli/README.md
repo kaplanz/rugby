@@ -29,6 +29,7 @@ Usage: rugby [OPTIONS] [ROM]
 Commands:
   run   Emulate provided ROM
   info  Print ROM information
+  gen   Generate shell files
 
 Arguments:
   [ROM]  Cartridge ROM image file
