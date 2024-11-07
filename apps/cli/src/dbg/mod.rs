@@ -2,5 +2,5 @@
 
 #[cfg(feature = "gbd")]
 pub mod gbd;
-#[cfg(feature = "trace")]
-pub mod trace;
+#[cfg(feature = "log")]
+pub mod log;
