@@ -34,7 +34,7 @@ tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 xdir = { workspace = true }
 
 [features]
-default = ["gbd", "trace", "win"]
+default = ["gbd", "log", "win"]
 debug = ["rugby/debug"]
 gbd = [
     "debug",
@@ -42,5 +42,5 @@ gbd = [
     "dep:rugby-gbd",
     "dep:rustyline",
 ]
-trace = ["debug"]
+log = ["debug"]
 win = ["debug"]
