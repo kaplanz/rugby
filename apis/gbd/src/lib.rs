@@ -28,7 +28,7 @@ pub struct Debugger {
     // Application
     cycle: usize,
     line: Option<Box<dyn Prompt>>,
-    log: Option<Portal<String>>,
+    log: Option<Box<dyn Filter>>,
     // Console
     pc: u16,
     state: State,
@@ -51,15 +51,15 @@ impl Debugger {
     /// Sets the logging handle.
     ///
     /// Used to change the logging level filter.
-    pub fn logger(&mut self, log: Portal<String>) {
-        self.log = Some(log);
+    pub fn logger(&mut self, log: impl Filter + 'static) {
+        self.log = Some(Box::new(log));
     }
 
     /// Sets the prompt handle.
     ///
     /// Used to prompt the user for commands.
-    pub fn prompt(&mut self, line: Box<dyn Prompt>) {
-        self.line = Some(line);
+    pub fn prompt(&mut self, line: impl Prompt + 'static) {
+        self.line = Some(Box::new(line));
     }
 
     /// Enables the debugger.
@@ -403,20 +403,16 @@ struct State {
     ppu: (u16, u8),
 }
 
-/// An opaque [getter](Self::get) and [setter](Self::set) for a computed value.
-pub struct Portal<T> {
-    /// Get the value.
-    pub get: Box<dyn Fn() -> T + Send>,
-    /// Set the value.
-    pub set: Box<dyn FnMut(T) + Send>,
-}
+/// Handle for logger filter.
+///
+/// Provides a [getter](Self::get) and [setter](Self::set) to inspect and change
+/// the logging filter.
+pub trait Filter: Debug {
+    /// Inspect the logging filter.
+    fn get(&self) -> &str;
 
-impl<T: Debug> Debug for Portal<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Portal")
-            .field(&format!("{:?}", (self.get)()))
-            .finish()
-    }
+    /// Changes the logging filter.
+    fn set(&mut self, filter: String);
 }
 
 /// A convenient type alias for [`Result`](std::result::Result).
