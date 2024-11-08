@@ -218,11 +218,11 @@ pub fn log(gbd: &mut Debugger, filter: Option<String>) -> Result<()> {
 
     // Change the tracing filter
     if let Some(filter) = filter {
-        (log.set)(filter);
+        log.set(filter);
     }
 
     // Print the current filter
-    advise::info!("filter: {}", (log.get)());
+    advise::info!("filter: {}", log.get());
 
     Ok(())
 }
