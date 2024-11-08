@@ -12,9 +12,11 @@ use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
 use rugby::emu::part::video;
 use rugby_cfg::opt::emu::Cart;
 #[cfg(feature = "gbd")]
-use rugby_gbd::{Debugger, Portal};
+use rugby_gbd::{Debugger, Filter};
 use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::EnvFilter;
+use tracing_subscriber::fmt::Layer;
+use tracing_subscriber::layer::Layered;
+use tracing_subscriber::{reload, EnvFilter, Registry};
 
 use crate::app::gui::Cable;
 use crate::app::{self, App, Graphics};
@@ -28,18 +30,55 @@ use crate::exe::run::cli::trace::Trace;
 use crate::exe::run::{cli, Cli};
 use crate::{util, NAME};
 
-/// Logging filter reload handle.
-#[cfg(feature = "gbd")]
-type Log = Portal<String>;
+/// Dummy filter trait.
 #[cfg(not(feature = "gbd"))]
-type Log = ();
+pub trait Filter {}
 
 /// Installs the global logger.
 ///
 /// # Returns
 ///
 /// Returns an handle which can be used to reload the logging filter.
-pub fn log(filter: &str) -> Result<Log> {
+pub fn log(filter: &str) -> Result<impl Filter> {
+    /// Reload handle implementation.
+    mod imp {
+        #[allow(clippy::wildcard_imports)]
+        use super::*;
+
+        /// Tracing reload handle.
+        type Reload = reload::Handle<EnvFilter, Layered<Layer<Registry>, Registry>>;
+
+        /// Internal reload handle.
+        #[cfg_attr(not(feature = "gbd"), allow(unused))]
+        #[derive(Debug)]
+        pub struct Handle {
+            handle: Reload,
+            filter: String,
+        }
+
+        impl Handle {
+            pub fn new(reload: Reload) -> Self {
+                Self {
+                    filter: reload.with_current(ToString::to_string).unwrap(),
+                    handle: reload,
+                }
+            }
+        }
+
+        impl Filter for Handle {
+            #[cfg(feature = "gbd")]
+            fn get(&self) -> &str {
+                &self.filter
+            }
+
+            #[cfg(feature = "gbd")]
+            fn set(&mut self, filter: String) {
+                self.handle.reload(&filter).unwrap();
+                self.filter = filter;
+            }
+        }
+    }
+
     // Construct logger
     let log = tracing_subscriber::fmt()
         .with_env_filter({
@@ -49,25 +88,14 @@ pub fn log(filter: &str) -> Result<Log> {
                 .with_context(|| format!("failed to parse: {filter:?}"))?
         })
         .with_filter_reloading();
-    // Extract handle
-    #[cfg(feature = "gbd")]
-    let handle = {
-        Portal {
-            get: {
-                let handle = log.reload_handle();
-                Box::new(move || handle.with_current(ToString::to_string).unwrap())
-            },
-            set: {
-                let handle = log.reload_handle();
-                Box::new(move |filter: String| handle.reload(filter).unwrap())
-            },
-        }
-    };
-    #[cfg(not(feature = "gbd"))]
-    let handle = ();
+
+    // Retrieve handle
+    let handle = imp::Handle::new(log.reload_handle());
+
     // Install logger
     log.init();
-    // Return handle
+
+    // Pass internal reload handle
     Ok(handle)
 }
 
@@ -190,7 +218,7 @@ pub fn cart(args: &Cart) -> Result<Cartridge> {
 
 /// Builds an application instance.
 #[allow(unused_variables)]
-pub fn app(args: &Cli, emu: GameBoy, log: Log) -> Result<App> {
+pub fn app(args: &Cli, emu: GameBoy, log: impl Filter + 'static) -> Result<App> {
     // Initialize graphics
     let gui = args
         .feat
@@ -295,13 +323,11 @@ pub fn link(cli::Link { host, peer }: &cli::Link) -> Result<Cable> {
 
 /// Builds a debugger instance.
 #[cfg(feature = "gbd")]
-pub fn gbd(log: Log) -> Result<Debugger> {
+pub fn gbd(log: impl Filter + 'static) -> Result<Debugger> {
     // Construct a new `Debugger`
     let mut gbd = Debugger::new();
     // Initialize prompt handle
-    gbd.prompt(Box::new({
-        Console::new().context("failed to initialize readline")?
-    }));
+    gbd.prompt(Console::new().context("failed to initialize readline")?);
     // Initialize logger handle
     gbd.logger(log);
     // Return constructed debugger
