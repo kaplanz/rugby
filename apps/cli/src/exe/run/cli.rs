@@ -22,9 +22,10 @@ pub struct Cli {
     pub cfg: Settings,
 
     /// Debugging options.
+    #[cfg(feature = "debug")]
     #[clap(flatten)]
     #[clap(next_help_heading = "Debug")]
-    pub dbg: Debug,
+    pub dbg: Debugger,
 }
 
 /// Runtime features.
@@ -72,8 +73,9 @@ pub struct Link {
 }
 
 /// Debugging options.
+#[cfg(feature = "debug")]
 #[derive(Args, Debug)]
-pub struct Debug {
+pub struct Debugger {
     /// Enable interactive debugging.
     ///
     /// Starts with Game Boy Debugger (GBD) enabled, presenting the prompt after

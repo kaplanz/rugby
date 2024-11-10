@@ -7,7 +7,7 @@
 use std::fmt::Debug;
 use std::io;
 
-use log::trace;
+use log::{info, trace};
 use rugby_arch::mio::{Bus, Device, Mmio};
 use rugby_arch::{Block, Byte};
 
@@ -208,6 +208,7 @@ impl Mbc for Body {
             Body::Mbc3(mbc) => mbc.flash(buf),
             Body::Mbc5(mbc) => mbc.flash(buf),
         }
+        .inspect(|nbytes| info!("flashed {nbytes} bytes"))
     }
 
     /// Dumps the contents of the cartridge's RAM.
@@ -218,6 +219,7 @@ impl Mbc for Body {
             Body::Mbc3(mbc) => mbc.dump(buf),
             Body::Mbc5(mbc) => mbc.dump(buf),
         }
+        .inspect(|nbytes| info!("dumped {nbytes} bytes"))
     }
 }
 
