@@ -11,6 +11,7 @@ mod cli;
 #[cfg(feature = "debug")]
 mod dbg;
 mod dir;
+mod drop;
 mod err;
 mod exe;
 mod init;
