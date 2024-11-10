@@ -1,9 +1,37 @@
 //! Runtime context.
 
 use std::fmt::Display;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
+use rugby::arch::Clock;
 use rugby::core::dmg::{self, ppu};
+
+use super::{Options, DIVIDER};
+
+/// Application context.
+#[derive(Debug)]
+pub struct Context {
+    /// System clock.
+    pub clock: Option<Clock>,
+    /// Cycle counter.
+    pub count: Counter,
+    /// Statistics timer.
+    pub timer: Instant,
+}
+
+impl Context {
+    /// Constructs a new `Context`.
+    pub fn new(cfg: &Options) -> Self {
+        Self {
+            // System clock
+            clock: { cfg.spd.map(|freq| freq / DIVIDER).map(Clock::with_freq) },
+            // Cycle counter
+            count: Counter::new(),
+            // Statistics timer
+            timer: Instant::now(),
+        }
+    }
+}
 
 /// Counter for emulated cycles.
 #[derive(Clone, Debug, Default)]
