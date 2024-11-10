@@ -122,8 +122,8 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 /// An error caused by constructing a [cartridge](Cartridge).
 #[derive(Debug, Error)]
 pub enum Error {
-    /// Failed to parse header.
-    #[error("failed to parse header")]
+    /// Bad cartridge header.
+    #[error("bad cartridge header")]
     Header(#[from] header::Error),
     /// Unsupported cartridge type.
     #[error("unsupported cartridge: {0}")]

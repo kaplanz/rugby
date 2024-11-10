@@ -4,19 +4,21 @@ use std::fs::File;
 use std::io::Read;
 use std::net::UdpSocket;
 use std::ops::Not;
+#[cfg(feature = "log")]
 use std::path::Path;
+use std::sync::mpsc;
 
-use anyhow::{anyhow, ensure, Context, Result};
-use log::{debug, info, warn};
+use anyhow::{ensure, Context, Result};
+use log::{debug, info, trace, warn};
 use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
 use rugby::emu::part::video;
-use rugby_cfg::opt::emu::Cart;
+use rugby_cfg::opt;
 #[cfg(feature = "gbd")]
 use rugby_gbd::{Debugger, Filter};
 use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::fmt::Layer;
-use tracing_subscriber::layer::Layered;
-use tracing_subscriber::{reload, EnvFilter, Registry};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{fmt, reload, EnvFilter, Layer, Registry};
 
 use crate::app::gui::Cable;
 use crate::app::{self, App, Graphics};
@@ -29,6 +31,100 @@ use crate::dbg::log::Tracer;
 use crate::exe::run::cli::trace::Trace;
 use crate::exe::run::{cli, Cli};
 use crate::{util, NAME};
+
+impl App {
+    /// Constructs a new `App`.
+    pub fn new(args: &Cli) -> Result<Self> {
+        // Initialize emulator
+        let emu = self::emu(&args.cfg.data)?;
+
+        // Initialize graphics
+        let gui = args
+            .feat
+            .headless
+            .not()
+            .then(|| {
+                self::gui(
+                    #[cfg(feature = "win")]
+                    args.dbg.win,
+                )
+            })
+            .transpose()
+            .context("could not open graphics")?;
+
+        // Initialize link cable
+        let lnk = args
+            .feat
+            .link
+            .as_ref()
+            .map(self::link)
+            .transpose()
+            .context("could not open link cable")?;
+
+        // Initialize debugger
+        #[cfg(feature = "gbd")]
+        let gbd = args
+            .dbg
+            .gbd
+            .then(self::gbd)
+            .transpose()
+            .context("could not prepare debugger")?;
+
+        // Initialize tracing
+        #[cfg(feature = "log")]
+        let trace = args
+            .dbg
+            .trace
+            .as_ref()
+            .map(trace)
+            .transpose()
+            .context("could not open trace logfile")?;
+
+        // Install signal handler
+        let sig = {
+            // Use channels for communication
+            let (tx, rx) = mpsc::channel();
+            // Register SIGINT
+            ctrlc::set_handler(move || {
+                trace!("interrupt occurred");
+                // Crash if channel has closed
+                if let Err(err) = tx.send(()) {
+                    panic!("failed to send interrupt: {err}");
+                }
+            })
+            .context("could not register signal handler")?;
+            // Use receiver as signal handle
+            rx
+        };
+
+        // Construct application
+        Ok(App {
+            bye: args.feat.exit.then_some(app::Exit::CommandLine),
+            cfg: app::Options {
+                spd: args.cfg.data.app.spd.clone().unwrap_or_default().freq(),
+            },
+            ctx: None,
+            emu,
+            gui: app::Frontend {
+                cfg: app::gui::Options {
+                    pal: args.cfg.data.app.pal.clone().unwrap_or_default().into(),
+                },
+                win: gui,
+                lnk,
+            },
+            sig,
+            #[cfg(feature = "debug")]
+            dbg: app::Debug {
+                #[cfg(feature = "gbd")]
+                gbd,
+                #[cfg(feature = "log")]
+                trace,
+                #[cfg(feature = "win")]
+                win: args.dbg.win,
+            },
+        })
+    }
+}
 
 /// Dummy filter trait.
 #[cfg(not(feature = "gbd"))]
@@ -46,7 +142,7 @@ pub fn log(filter: &str) -> Result<impl Filter> {
         use super::*;
 
         /// Tracing reload handle.
-        type Reload = reload::Handle<EnvFilter, Layered<Layer<Registry>, Registry>>;
+        type Reload = reload::Handle<EnvFilter, Registry>;
 
         /// Internal reload handle.
         #[cfg_attr(not(feature = "gbd"), allow(unused))]
@@ -79,55 +175,35 @@ pub fn log(filter: &str) -> Result<impl Filter> {
         }
     }
 
-    // Construct logger
-    let log = tracing_subscriber::fmt()
-        .with_env_filter({
-            EnvFilter::builder()
-                .with_default_directive(LevelFilter::WARN.into())
-                .parse(filter)
-                .with_context(|| format!("failed to parse: {filter:?}"))?
-        })
-        .with_filter_reloading();
-
-    // Retrieve handle
-    let handle = imp::Handle::new(log.reload_handle());
-
     // Install logger
-    log.init();
+    let reload;
+    tracing_subscriber::registry()
+        .with({
+            let (filter, handle) = reload::Layer::new(
+                EnvFilter::builder()
+                    .with_default_directive(LevelFilter::WARN.into())
+                    .parse(filter)
+                    .with_context(|| format!("failed to parse: {filter:?}"))?,
+            );
+            reload = handle;
+            fmt::layer().with_filter(filter)
+        })
+        .try_init()?;
 
-    // Pass internal reload handle
-    Ok(handle)
+    // Wrap reload handle
+    Ok(imp::Handle::new(reload))
 }
 
 /// Builds an emulator instance.
 pub fn emu(cfg: &Config) -> Result<GameBoy> {
-    // Load cartridge
-    let mut cart = cfg
-        .emu
-        .cart
-        .force
-        .not()
-        .then(|| self::cart(&cfg.emu.cart))
-        .transpose()
-        .context("could not load cartridge")?;
-    // Flash cartridge RAM
-    util::rom::flash(
-        cfg.emu.cart.ram().as_deref(),
-        cart.as_mut(),
-        cfg.emu.cart.save.unwrap_or_default(),
-    )
-    .context("could not flash RAM")?;
+    // Load cart ROM
+    let mut cart = self::cart(&cfg.emu.cart).context("invalid cartridge")?;
+    // Load cart RAM
+    if let Some(cart) = cart.as_mut() {
+        util::rom::flash(&cfg.emu.cart, cart).context("invalid save RAM")?;
+    }
     // Load boot ROM
-    let boot = (|| {
-        let boot = &cfg.emu.boot;
-        boot.skip
-            .not()
-            .then(|| boot.rom.as_deref().map(self::boot))
-            .map(|res| res.ok_or(anyhow!("missing path; unspecified by `--boot`")))
-            .transpose()?
-            .transpose()
-    })() // NOTE: This weird syntax is in lieu of using unstable try blocks.
-    .context("could not load boot ROM")?;
+    let boot = self::boot(&cfg.emu.boot).context("invalid boot ROM")?;
 
     // Instantiate emulator
     let mut emu = boot.map_or_else(GameBoy::new, GameBoy::with);
@@ -148,7 +224,14 @@ pub fn emu(cfg: &Config) -> Result<GameBoy> {
 }
 
 /// Builds a boot ROM instance.
-pub fn boot(path: &Path) -> Result<Boot> {
+pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
+    // Allow none if skipped
+    if args.skip && args.rom.is_none() {
+        return Ok(None);
+    }
+    // Otherwise, extract path
+    let path = args.rom.as_deref().context("missing path to ROM image")?;
+
     // Read ROM file
     let rom = {
         // Open ROM file
@@ -169,12 +252,16 @@ pub fn boot(path: &Path) -> Result<Boot> {
     info!("loaded boot ROM");
 
     // Return success
-    Ok(boot)
+    Ok(Some(boot))
 }
 
 /// Builds a cartridge instance.
-pub fn cart(args: &Cart) -> Result<Cartridge> {
-    // Extract path
+pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
+    // Allow none if forced
+    if args.force && args.rom.is_none() {
+        return Ok(None);
+    }
+    // Otherwise, extract path
     let path = args.rom.as_deref().context("missing path to ROM image")?;
 
     // Read ROM file
@@ -213,80 +300,7 @@ pub fn cart(args: &Cart) -> Result<Cartridge> {
     info!("loaded cartridge:\n{}", cart.header());
 
     // Return success
-    Ok(cart)
-}
-
-/// Builds an application instance.
-#[allow(unused_variables)]
-pub fn app(args: &Cli, emu: GameBoy, log: impl Filter + 'static) -> Result<App> {
-    // Initialize graphics
-    let gui = args
-        .feat
-        .headless
-        .not()
-        .then(|| {
-            gui(
-                #[cfg(feature = "win")]
-                args.dbg.win,
-            )
-        })
-        .transpose()
-        .context("could not open graphics")?;
-
-    // Open link cable
-    let lnk = args
-        .feat
-        .link
-        .as_ref()
-        .map(link)
-        .transpose()
-        .context("could not open link cable")?;
-
-    // Prepare debugger
-    #[cfg(feature = "gbd")]
-    let gbd = args
-        .dbg
-        .gbd
-        .then(|| gbd(log))
-        .transpose()
-        .context("could not prepare debugger")?;
-
-    // Initialize tracing
-    #[cfg(feature = "log")]
-    let trace = args
-        .dbg
-        .trace
-        .as_ref()
-        .map(trace)
-        .transpose()
-        .context("could not open trace logfile")?;
-
-    // Construct application
-    let app = App {
-        cfg: app::Options {
-            spd: args.cfg.data.app.spd.clone().unwrap_or_default().freq(),
-        },
-        #[cfg(feature = "debug")]
-        dbg: app::Debug {
-            #[cfg(feature = "gbd")]
-            gbd,
-            #[cfg(feature = "log")]
-            trace,
-            #[cfg(feature = "win")]
-            win: args.dbg.win,
-        },
-        emu,
-        gui: app::Frontend {
-            cfg: app::gui::Options {
-                pal: args.cfg.data.app.pal.clone().unwrap_or_default().into(),
-            },
-            win: gui,
-            lnk,
-        },
-    };
-
-    // Return app
-    Ok(app)
+    Ok(Some(cart))
 }
 
 /// Builds a graphics instance.
@@ -323,13 +337,13 @@ pub fn link(cli::Link { host, peer }: &cli::Link) -> Result<Cable> {
 
 /// Builds a debugger instance.
 #[cfg(feature = "gbd")]
-pub fn gbd(log: impl Filter + 'static) -> Result<Debugger> {
+pub fn gbd() -> Result<Debugger> {
     // Construct a new `Debugger`
     let mut gbd = Debugger::new();
     // Initialize prompt handle
     gbd.prompt(Console::new().context("failed to initialize readline")?);
-    // Initialize logger handle
-    gbd.logger(log);
+    // Enable by default
+    gbd.enable();
     // Return constructed debugger
     Ok(gbd)
 }

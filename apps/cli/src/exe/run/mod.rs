@@ -6,8 +6,9 @@ use anyhow::Context;
 use log::trace;
 use rugby_cfg::Join;
 
+use crate::app::App;
 use crate::err::Result;
-use crate::{cfg, init, util};
+use crate::{cfg, init};
 
 pub mod cli;
 
@@ -24,32 +25,35 @@ pub fn main(mut args: Cli) -> Result<()> {
         // Merge with parsed args
         cfg
     });
-
     // Initialize logger
-    #[cfg_attr(not(feature = "gbd"), allow(unused, clippy::let_unit_value))]
-    let log = init::log(args.cfg.data.app.log.as_deref().unwrap_or_default())
+    #[cfg_attr(not(feature = "gbd"), allow(unused))]
+    let filter = init::log(args.cfg.data.app.log.as_deref().unwrap_or_default())
         .context("could not initialize logger")?;
     // Log previous steps
     trace!("{args:#?}");
 
-    // Prepare emulator
-    let emu = init::emu(&args.cfg.data)?;
-    // Perform early exit
-    if args.feat.exit {
-        return Ok(());
-    }
-    // Prepare application
-    let mut app = init::app(&args, emu, log)?;
-    // Run application
-    app.run()?;
-    // Dump cartridge RAM
-    util::rom::dump(
-        app.emu.eject().as_ref(),
-        args.cfg.data.emu.cart.ram().as_deref(),
-        args.cfg.data.emu.cart.save.unwrap_or_default(),
-    )
-    .context("could not dump RAM")?;
+    // Initialize application
+    let mut app = App::new(&args).context("startup sequence failed")?;
+    // Install reload handle
+    #[cfg(feature = "gbd")]
+    app.logger(filter);
 
+    // Run application
+    let res = (|| -> Result<()> {
+        loop {
+            // Check termination
+            if app.done() {
+                return Ok(());
+            }
+            // Cycle application
+            app.main()?;
+        }
+    })(); // NOTE: This weird syntax is in lieu of using unstable try blocks.
+
+    // Destroy emulator
+    app.drop(&args).context("shutdown sequence failed")?;
+    // Forward app errors
+    res.context("an application error occurred")?;
     // Terminate normally
     Ok(())
 }
