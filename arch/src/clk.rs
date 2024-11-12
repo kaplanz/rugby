@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 type Runnable = Arc<Mutex<State>>;
 
 /// Internal state of a [`Clock`].
-#[derive(Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 enum State {
     /// Causes the clock to run.
     #[default]
@@ -157,9 +157,9 @@ struct Child {
 impl Child {
     /// Main function of the runner thread.
     ///
-    /// This will continually sends ticks at the provided frequency to the parent
-    /// thread, unless it is stopped, or the clock is dropped (at which point it
-    /// exits).
+    /// This will continually sends ticks at the provided frequency to the
+    /// parent thread, unless it is stopped, or the clock is dropped (at which
+    /// point it exits).
     fn run(&self) {
         // Deconstruct child
         let Self { tick, play, send } = self;
@@ -168,14 +168,15 @@ impl Child {
 
         loop {
             // Loop until paused externally
-            let mut play = play.lock().unwrap();
-            match *play {
+            let state = *play.lock().unwrap();
+            match state {
                 // Send ticks at a regular frequency
                 State::Play => {
                     // Check the time before going to sleep
-                    // NOTE: Due to OS scheduling, the call to `thread::sleep()` may
-                    //       last longer than the specified duration. Because of
-                    //       this, we must record how many cycles were missed.
+                    //
+                    // NOTE: Due to OS scheduling, the call to `thread::sleep()`
+                    // may last longer than the specified duration. Because of
+                    // this, we must record how many cycles were missed.
                     let now = Instant::now();
                     // Sleep for the specified duration
                     thread::sleep(*tick);
@@ -189,11 +190,11 @@ impl Child {
                         // Calculate elapsed complete cycles
                         now / per
                     };
-                    // Clock in elapsed cycles. Run until failure (usually caused by
-                    // the receiver hanging up).
+                    // Clock in elapsed cycles. Run until failure (usually
+                    // caused by the receiver hanging up).
                     if (0..cycles).any(|_| send.send(()).is_err()) {
                         // Error encountered, pause the clock
-                        *play = State::Drop;
+                        *play.lock().unwrap() = State::Drop;
                         break;
                     }
                 }
