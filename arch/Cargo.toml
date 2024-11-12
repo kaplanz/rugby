@@ -9,7 +9,7 @@ license = { workspace = true }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-indexmap = "2.2.6"
+indexmap = "2.6.0"
 log = { workspace = true }
 num = { workspace = true }
 rand = "0.8.5"
