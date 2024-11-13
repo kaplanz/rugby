@@ -1,14 +1,14 @@
 //! Emulate provided ROM.
 
 use std::path::Path;
+use std::thread;
 
-use anyhow::Context;
+use anyhow::Context as _;
 use log::trace;
 use rugby_cfg::Join;
 
-use crate::app::App;
 use crate::err::Result;
-use crate::{cfg, init};
+use crate::{app, cfg, emu, talk};
 
 pub mod cli;
 
@@ -27,33 +27,25 @@ pub fn main(mut args: Cli) -> Result<()> {
     });
     // Initialize logger
     #[cfg_attr(not(feature = "gbd"), allow(unused))]
-    let filter = init::log(args.cfg.data.app.log.as_deref().unwrap_or_default())
-        .context("could not initialize logger")?;
+    crate::log::init(args.cfg.data.app.log.as_deref().unwrap_or_default())
+        .context("logger initialization failed")?;
     // Log previous steps
     trace!("{args:#?}");
 
-    // Initialize application
-    let mut app = App::new(&args).context("startup sequence failed")?;
-    // Install reload handle
-    #[cfg(feature = "gbd")]
-    app.logger(filter);
-
     // Run application
-    let res = (|| -> Result<()> {
-        loop {
-            // Check termination
-            if app.done() {
-                return Ok(());
-            }
-            // Cycle application
-            app.main()?;
-        }
-    })(); // NOTE: This weird syntax is in lieu of using unstable try blocks.
+    let res = thread::scope(|s| {
+        // Initialize channels
+        let channel = talk::pair::<emu::Message, app::Message>();
 
-    // Destroy emulator
-    app.drop(&args).context("shutdown sequence failed")?;
-    // Forward app errors
-    res.context("an application error occurred")?;
-    // Terminate normally
-    Ok(())
+        // Run emulator on another thread
+        let emu = s.spawn(|| emu::main(&args, channel.0));
+        // Run frontend on main thread
+        let app = app::main(&args, channel.1);
+
+        // Forward result
+        emu.join().expect("emulator thread panicked").and(app)
+    });
+
+    // Return runtime errors
+    res.map_err(Into::into)
 }
