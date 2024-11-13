@@ -73,7 +73,6 @@ pub struct Link {
 }
 
 /// Debugging options.
-#[cfg(feature = "debug")]
 #[derive(Args, Debug)]
 pub struct Debugger {
     /// Enable interactive debugging.

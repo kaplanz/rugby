@@ -12,13 +12,11 @@ use rugby::core::dmg::{self, Button};
 use rugby::emu::part::joypad::Event;
 use rugby::pal::Palette;
 
-mod win;
+pub mod win;
 
-pub use std::net::UdpSocket as Cable;
-
-#[cfg(feature = "win")]
-pub use self::win::dbg;
 pub use self::win::Graphics;
+
+pub type Cable = std::net::UdpSocket;
 
 /// Frontend options.
 #[derive(Debug)]
