@@ -1,5 +1,19 @@
 //! Application utilities.
 
+use std::ffi::OsStr;
+use std::path::Path;
+
+use rugby_cfg::opt;
+
+/// Resolves the application title.
+pub fn title(args: &opt::emu::Cart) -> &str {
+    args.rom
+        .as_deref()
+        .and_then(Path::file_stem)
+        .and_then(OsStr::to_str)
+        .unwrap_or(crate::NAME)
+}
+
 /// Cartridge utilities.
 pub mod rom {
     use std::fs::File;
@@ -24,7 +38,7 @@ pub mod rom {
             return Ok(());
         }
         if !cart.header().info.has_ram() {
-            error!("cannot dump: cartridge does not support RAM");
+            error!("cannot flash: cartridge does not support RAM");
             return Ok(());
         }
         if !path.exists() {
