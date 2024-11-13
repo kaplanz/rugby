@@ -8,7 +8,7 @@ use std::fmt::{Debug, Display, Write};
 use indexmap::IndexMap;
 use log::debug;
 use rugby::arch::reg::Port;
-use rugby::arch::{Block, Clock};
+use rugby::arch::Block;
 use rugby::core::dmg::{cpu, ppu, GameBoy};
 use thiserror::Error;
 
@@ -113,7 +113,7 @@ impl Debugger {
     /// # Errors
     ///
     /// Errors if the debugger failed to fetch, parse, or execute a command.
-    pub fn run(&mut self, emu: &mut GameBoy, clk: &mut Option<Clock>) -> Result<()> {
+    pub fn run(&mut self, emu: &mut GameBoy) -> Result<()> {
         // Provide information to user before prompting for command
         self.inform(emu);
         // Prompt and execute commands until emulation resumed
@@ -127,8 +127,6 @@ impl Debugger {
                         // It worked; use it
                         cmd
                     } else {
-                        // Pause clock while awaiting user input
-                        clk.as_mut().map(Clock::pause);
                         // Couldn't fetch; get program from user
                         match self.readline() {
                             // Program input; fetch next iteration
@@ -168,9 +166,6 @@ impl Debugger {
                 Err(err) => advise::error!("{err}"),
             }
         }
-
-        // Unconditionally resume the clock
-        clk.as_mut().map(Clock::resume);
 
         Ok(())
     }

@@ -7,27 +7,16 @@ use std::path::PathBuf;
 use anyhow::Context;
 use log::{debug, error, trace};
 use rugby_gbd::prompt::{Error, Prompt};
-use rugby_gbd::Filter;
 use rustyline::error::ReadlineError::{Eof, Interrupted as Int};
 use rustyline::history::History;
 use rustyline::DefaultEditor as Editor;
 
-use crate::app::App;
 use crate::dir;
 
 /// Returns the path to the application's history file.
 #[must_use]
 pub fn history() -> PathBuf {
     dir::state().join("history.txt")
-}
-
-impl App {
-    /// Installs a reload handle for the logger.
-    pub fn logger(&mut self, log: impl Filter + 'static) {
-        if let Some(gbd) = self.dbg.gbd.as_mut() {
-            gbd.logger(log);
-        };
-    }
 }
 
 /// Interface over the user's console.
@@ -55,8 +44,8 @@ impl Console {
         let state = dir::state();
         if !state.exists() {
             fs::create_dir_all(&state)
-                .inspect(|()| trace!("created state directory: `{}`", state.display()))
-                .with_context(|| format!("failed to create directory: `{}`", state.display()))?;
+                .inspect(|()| trace!("created directory: `{}`", state.display()))
+                .with_context(|| format!("failed to create: `{}`", state.display()))?;
         }
         // Set maximum history entries
         self.edit.history_mut().set_max_len(10_000)?;
@@ -92,7 +81,7 @@ impl Console {
                     self.edit.history().iter().collect::<Vec<_>>()
                 );
             })
-            .context("failed to load history")
+            .context("error loading history")
     }
 
     /// Saves history from the prompt into a file.
@@ -113,7 +102,7 @@ impl Console {
                     self.edit.history().iter().collect::<Vec<_>>()
                 );
             })
-            .context("failed to save history")
+            .context("error saving history")
     }
 }
 

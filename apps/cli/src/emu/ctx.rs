@@ -1,35 +1,68 @@
-//! Runtime context.
+//! Emulator context.
 
 use std::fmt::Display;
 use std::time::{Duration, Instant};
 
 use rugby::arch::Clock;
 use rugby::core::dmg::{self, ppu};
+use rugby_cfg::Config;
 
-use super::{Options, DIVIDER};
+use super::DIVIDER;
 
-/// Application context.
+/// Emulator context.
 #[derive(Debug)]
 pub struct Context {
     /// System clock.
     pub clock: Option<Clock>,
     /// Cycle counter.
     pub count: Counter,
+    /// Pause emulator.
+    pub pause: bool,
     /// Statistics timer.
     pub timer: Instant,
+    /// Video enable.
+    pub video: bool,
 }
 
 impl Context {
     /// Constructs a new `Context`.
-    pub fn new(cfg: &Options) -> Self {
+    pub fn new(cfg: &Config) -> Self {
         Self {
             // System clock
-            clock: { cfg.spd.map(|freq| freq / DIVIDER).map(Clock::with_freq) },
+            clock: cfg
+                .app
+                .spd
+                .clone()
+                .unwrap_or_default()
+                .freq()
+                .map(|freq| freq / DIVIDER)
+                .map(Clock::with_freq),
             // Cycle counter
             count: Counter::new(),
+            // Emulator paused
+            pause: false,
             // Statistics timer
             timer: Instant::now(),
+            // Video enable
+            video: true,
         }
+    }
+
+    /// Resumes emulation.
+    pub fn resume(&mut self) {
+        self.pause = false;
+        // Resume clock
+        self.clock.as_mut().map(Clock::resume);
+        // Flush count, reset timer
+        self.count.flush();
+        self.timer = Instant::now();
+    }
+
+    /// Pauses emulation.
+    pub fn pause(&mut self) {
+        self.pause = true;
+        // Pause clock
+        self.clock.as_mut().map(Clock::pause);
     }
 }
 
