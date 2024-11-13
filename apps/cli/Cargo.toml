@@ -19,6 +19,7 @@ clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
 clap_complete = "4.5.37"
 clap_mangen = "0.2.24"
 ctrlc = "3.4.5"
+derive_more = { version = "1.0.0", features = ["display"] }
 either = "1.13.0"
 log = { workspace = true }
 minifb = "0.27.0"
@@ -34,7 +35,11 @@ tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 xdir = { workspace = true }
 
 [features]
-default = ["gbd", "log", "win"]
+default = [
+    "gbd",
+    "log",
+    "win"
+]
 debug = ["rugby/debug"]
 gbd = [
     "debug",
