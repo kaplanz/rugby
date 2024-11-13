@@ -11,17 +11,11 @@ use std::sync::mpsc;
 use anyhow::{ensure, Context, Result};
 use log::{debug, info, trace, warn};
 use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
-use rugby::emu::part::video;
 use rugby_cfg::opt;
 #[cfg(feature = "gbd")]
-use rugby_gbd::{Debugger, Filter};
-use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{fmt, reload, EnvFilter, Layer, Registry};
+use rugby_gbd::Debugger;
 
-use crate::app::gui::Cable;
-use crate::app::{self, App, Graphics};
+use crate::app::{self, App};
 use crate::cfg::Config;
 #[cfg(feature = "gbd")]
 use crate::dbg::gbd::Console;
@@ -29,169 +23,59 @@ use crate::dbg::gbd::Console;
 use crate::dbg::log::Tracer;
 #[cfg(feature = "log")]
 use crate::exe::run::cli::trace::Trace;
-use crate::exe::run::{cli, Cli};
-use crate::{util, NAME};
+use crate::exe::run::{self, cli, Cli};
+use crate::gui::{self, Cable};
+use crate::util;
 
-impl App {
-    /// Constructs a new `App`.
-    pub fn new(args: &Cli) -> Result<Self> {
-        // Initialize emulator
-        let emu = self::emu(&args.cfg.data)?;
+/// Builds an application instance
+pub fn app(args: &Cli) -> Result<App> {
+    // Initialize graphics
+    let gui = args
+        .feat
+        .headless
+        .not()
+        .then_some(args)
+        .map(self::gui)
+        .transpose()
+        .context("graphics initialization failed")?;
 
-        // Initialize graphics
-        let gui = args
-            .feat
-            .headless
-            .not()
-            .then(|| {
-                self::gui(
-                    #[cfg(feature = "win")]
-                    args.dbg.win,
-                )
-            })
-            .transpose()
-            .context("could not open graphics")?;
+    // Initialize link cable
+    let lnk = args
+        .feat
+        .link
+        .as_ref()
+        .map(self::link)
+        .transpose()
+        .context("link cable initialization failed")?;
 
-        // Initialize link cable
-        let lnk = args
-            .feat
-            .link
-            .as_ref()
-            .map(self::link)
-            .transpose()
-            .context("could not open link cable")?;
-
-        // Initialize debugger
-        #[cfg(feature = "gbd")]
-        let gbd = args
-            .dbg
-            .gbd
-            .then(self::gbd)
-            .transpose()
-            .context("could not prepare debugger")?;
-
-        // Initialize tracing
-        #[cfg(feature = "log")]
-        let trace = args
-            .dbg
-            .trace
-            .as_ref()
-            .map(trace)
-            .transpose()
-            .context("could not open trace logfile")?;
-
-        // Install signal handler
-        let sig = {
-            // Use channels for communication
-            let (tx, rx) = mpsc::channel();
-            // Register SIGINT
-            ctrlc::set_handler(move || {
-                trace!("interrupt occurred");
-                // Crash if channel has closed
-                if let Err(err) = tx.send(()) {
-                    panic!("failed to send interrupt: {err}");
-                }
-            })
-            .context("could not register signal handler")?;
-            // Use receiver as signal handle
-            rx
-        };
-
-        // Construct application
-        Ok(App {
-            bye: args.feat.exit.then_some(app::Exit::CommandLine),
-            cfg: app::Options {
-                spd: args.cfg.data.app.spd.clone().unwrap_or_default().freq(),
-            },
-            ctx: None,
-            emu,
-            gui: app::Frontend {
-                cfg: app::gui::Options {
-                    pal: args.cfg.data.app.pal.clone().unwrap_or_default().into(),
-                },
-                win: gui,
-                lnk,
-            },
-            sig,
-            #[cfg(feature = "debug")]
-            dbg: app::Debug {
-                #[cfg(feature = "gbd")]
-                gbd,
-                #[cfg(feature = "log")]
-                trace,
-                #[cfg(feature = "win")]
-                win: args.dbg.win,
-            },
+    // Install signal handler
+    let sig = {
+        // Use channels for communication
+        let (tx, rx) = mpsc::channel();
+        // Register SIGINT
+        ctrlc::set_handler(move || {
+            trace!("interrupt signalled");
+            // Crash if channel has closed
+            tx.send(()).expect("receiver channel disconnected");
         })
-    }
-}
+        // Consider failed registration an application error
+        .expect("error registering signal handler");
+        // Use receiver as signal handle
+        rx
+    };
 
-/// Dummy filter trait.
-#[cfg(not(feature = "gbd"))]
-pub trait Filter {}
-
-/// Installs the global logger.
-///
-/// # Returns
-///
-/// Returns an handle which can be used to reload the logging filter.
-pub fn log(filter: &str) -> Result<impl Filter> {
-    /// Reload handle implementation.
-    mod imp {
-        #[allow(clippy::wildcard_imports)]
-        use super::*;
-
-        /// Tracing reload handle.
-        type Reload = reload::Handle<EnvFilter, Registry>;
-
-        /// Internal reload handle.
-        #[cfg_attr(not(feature = "gbd"), allow(unused))]
-        #[derive(Debug)]
-        pub struct Handle {
-            handle: Reload,
-            filter: String,
-        }
-
-        impl Handle {
-            pub fn new(reload: Reload) -> Self {
-                Self {
-                    filter: reload.with_current(ToString::to_string).unwrap(),
-                    handle: reload,
-                }
-            }
-        }
-
-        impl Filter for Handle {
-            #[cfg(feature = "gbd")]
-            fn get(&self) -> &str {
-                &self.filter
-            }
-
-            #[cfg(feature = "gbd")]
-            fn set(&mut self, filter: String) {
-                self.handle.reload(&filter).unwrap();
-                self.filter = filter;
-            }
-        }
-    }
-
-    // Install logger
-    let reload;
-    tracing_subscriber::registry()
-        .with({
-            let (filter, handle) = reload::Layer::new(
-                EnvFilter::builder()
-                    .with_default_directive(LevelFilter::WARN.into())
-                    .parse(filter)
-                    .with_context(|| format!("failed to parse: {filter:?}"))?,
-            );
-            reload = handle;
-            fmt::layer().with_filter(filter)
-        })
-        .try_init()?;
-
-    // Wrap reload handle
-    Ok(imp::Handle::new(reload))
+    // Construct application
+    Ok(App {
+        bye: args.feat.exit.then_some(app::Exit::CommandLine),
+        gui: gui::Frontend {
+            cfg: gui::Options {
+                pal: args.cfg.data.app.pal.clone().unwrap_or_default().into(),
+            },
+            win: gui,
+            lnk,
+        },
+        sig,
+    })
 }
 
 /// Builds an emulator instance.
@@ -200,7 +84,7 @@ pub fn emu(cfg: &Config) -> Result<GameBoy> {
     let mut cart = self::cart(&cfg.emu.cart).context("invalid cartridge")?;
     // Load cart RAM
     if let Some(cart) = cart.as_mut() {
-        util::rom::flash(&cfg.emu.cart, cart).context("invalid save RAM")?;
+        util::rom::flash(&cfg.emu.cart, cart).context("error flashing save RAM")?;
     }
     // Load boot ROM
     let boot = self::boot(&cfg.emu.boot).context("invalid boot ROM")?;
@@ -226,7 +110,7 @@ pub fn emu(cfg: &Config) -> Result<GameBoy> {
 /// Builds a boot ROM instance.
 pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
     // Allow none if skipped
-    if args.skip && args.rom.is_none() {
+    if args.skip || args.rom.is_none() {
         return Ok(None);
     }
     // Otherwise, extract path
@@ -304,18 +188,18 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
 }
 
 /// Builds a graphics instance.
-pub fn gui(#[cfg(feature = "win")] dbg: bool) -> Result<Graphics> {
-    // Calculate aspect
-    let video::Aspect { wd, ht } = LCD;
-    let size = (wd.into(), ht.into()).into();
+pub fn gui(args: &run::Cli) -> Result<gui::Graphics> {
     // Construct GUI
-    #[cfg_attr(not(feature = "win"), allow(unused_mut))]
-    let mut gui = Graphics::new(NAME, size).context("failed to open main window")?;
+    let mut gui = gui::Graphics::new().context("could not open main window")?;
+    // Set initial title
+    gui.lcd.title(util::title(&args.cfg.data.emu.cart));
     // Open debug windows
     #[cfg(feature = "win")]
-    if dbg {
-        gui.dbg.all().context("failed to open debug windows")?;
+    if args.dbg.win {
+        gui.dbg.open().context("could not open debug windows")?;
     };
+    // Draw empty window
+    gui.lcd.redraw(&vec![0; LCD.depth()])?;
     // Return GUI
     Ok(gui)
 }
@@ -330,7 +214,7 @@ pub fn link(cli::Link { host, peer }: &cli::Link) -> Result<Cable> {
         .with_context(|| format!("failed to connect to peer: `{peer}`"))?;
     // Set socket options
     sock.set_nonblocking(true)
-        .context("failed to set non-blocking")?;
+        .context("could not set non-blocking")?;
     // Return completed link
     Ok(sock)
 }
@@ -340,8 +224,16 @@ pub fn link(cli::Link { host, peer }: &cli::Link) -> Result<Cable> {
 pub fn gbd() -> Result<Debugger> {
     // Construct a new `Debugger`
     let mut gbd = Debugger::new();
+    // Install logger reload handle
+    gbd.logger(
+        crate::log::RELOAD
+            .get()
+            .cloned()
+            // unable to get is an application error
+            .expect("unable to get logger handle"),
+    );
     // Initialize prompt handle
-    gbd.prompt(Console::new().context("failed to initialize readline")?);
+    gbd.prompt(Console::new().context("error initializing readline")?);
     // Enable by default
     gbd.enable();
     // Return constructed debugger
@@ -350,7 +242,7 @@ pub fn gbd() -> Result<Debugger> {
 
 /// Builds a tracing instance.
 #[cfg(feature = "log")]
-pub fn trace(Trace { fmt, log }: &Trace) -> Result<Tracer> {
+pub fn log(Trace { fmt, log }: &Trace) -> Result<Tracer> {
     let log = match log.as_deref() {
         // Create a logfile from the path
         Some(path) if path != Path::new("-") => either::Either::Left({

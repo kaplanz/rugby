@@ -12,9 +12,13 @@ mod cli;
 mod dbg;
 mod dir;
 mod drop;
+mod emu;
 mod err;
 mod exe;
+mod gui;
 mod init;
+mod log;
+mod talk;
 mod util;
 
 /// Application name.
