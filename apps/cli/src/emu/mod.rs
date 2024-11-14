@@ -17,7 +17,7 @@ use rugby::prelude::Core;
 use self::ctx::Context;
 use self::msg::{Data, Sync};
 use crate::exe::run::Cli;
-use crate::talk::Channel;
+use crate::talk::{self, Channel};
 use crate::{app, drop, init};
 
 pub mod ctx;
@@ -55,7 +55,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
         .context("tracelog initialization failed")?;
 
     // Emulator loop
-    let res = (|| -> Result<()> {
+    let mut res = (|| -> Result<()> {
         // Initialize context
         let mut ctx = Context::new(&args.cfg.data);
         // Await initial start
@@ -209,6 +209,17 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
 
     // Destroy emulator
     drop::emu(emu, &args.cfg.data).context("shutdown sequence failed")?;
+
+    // Inspect error
+    if let Some(err) = res
+        .as_ref()
+        .err()
+        .and_then(|err| err.downcast_ref::<talk::Error>())
+    {
+        // Ignore disconnect
+        debug!("{err}");
+        res = Ok(());
+    }
     // Propagate errors
     res.context("emulator error occurred")
 }
