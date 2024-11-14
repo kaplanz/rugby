@@ -3,13 +3,13 @@
 use std::sync::mpsc;
 
 use anyhow::{Context as _, Result};
-use log::{debug, info, trace};
+use log::{debug, error, info, trace};
 use rugby::prelude::*;
 use thiserror::Error;
 
 use crate::exe::run::Cli;
 use crate::gui::Frontend;
-use crate::talk::Channel;
+use crate::talk::{self, Channel};
 use crate::{emu, init, util};
 
 pub mod msg;
@@ -71,7 +71,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, emu::Message>) -> Result<()> 
     let title = util::title(&args.cfg.data.emu.cart);
 
     // Frontend loop
-    let res = (|| -> Result<()> {
+    let mut res = (|| -> Result<()> {
         loop {
             // Check for termination
             if app.done() {
@@ -150,8 +150,19 @@ pub fn main(args: &Cli, mut talk: Channel<Message, emu::Message>) -> Result<()> 
         }
     })(); // NOTE: This weird syntax is in lieu of using unstable try blocks.
 
-    // Exit emulator
-    talk.send(emu::Message::Exit)?;
+    // Inspect error
+    if let Some(err) = res
+        .as_ref()
+        .err()
+        .and_then(|err| err.downcast_ref::<talk::Error>())
+    {
+        // Ignore disconnect
+        debug!("{err}");
+        res = Ok(());
+    } else {
+        // Exit emulator
+        talk.send(emu::Message::Exit)?;
+    }
     // Propagate errors
     res.context("frontend error occurred")
 }
