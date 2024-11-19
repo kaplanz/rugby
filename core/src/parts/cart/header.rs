@@ -176,29 +176,29 @@ impl Header {
         // Construct header
         let this = Self {
             // Compare logo data
-            logo: make::logo(head),
+            logo: parse::logo(head),
             // Parse title
-            title: make::title(head)?,
+            title: parse::title(head)?,
             // Parse DMG flag
-            dmg: make::dmg(head),
+            dmg: parse::dmg(head),
             // Parse CGB flag
-            cgb: make::cgb(head)?,
+            cgb: parse::cgb(head)?,
             // Parse SGB flag
-            sgb: make::sgb(head),
+            sgb: parse::sgb(head),
             // Parse cartridge type
-            info: make::info(head)?,
+            info: parse::info(head)?,
             // Parse ROM size
-            romsz: make::romsz(head)?,
+            romsz: parse::romsz(head)?,
             // Parse RAM size
-            ramsz: make::ramsz(head)?,
+            ramsz: parse::ramsz(head)?,
             // Parse RAM size
-            region: make::region(head)?,
+            region: parse::region(head)?,
             // Parse version number
-            version: make::version(head),
+            version: parse::version(head),
             // Parse header checksum
-            hchk: make::hchk(head),
+            hchk: parse::hchk(head),
             // Parse global checksum
-            gchk: make::gchk(head),
+            gchk: parse::gchk(head),
         };
 
         // Validate header checksum
@@ -236,29 +236,29 @@ impl Header {
         // Construct header
         let this = Self {
             // Compare logo data
-            logo: make::logo(head),
+            logo: parse::logo(head),
             // Parse title
-            title: make::title(head)?,
+            title: parse::title(head)?,
             // Parse DMG flag
-            dmg: make::dmg(head),
+            dmg: parse::dmg(head),
             // Parse CGB flag
-            cgb: make::cgb(head)?,
+            cgb: parse::cgb(head)?,
             // Parse SGB flag
-            sgb: make::sgb(head),
+            sgb: parse::sgb(head),
             // Parse cartridge type
-            info: make::info(head)?,
+            info: parse::info(head)?,
             // Parse ROM size
-            romsz: make::romsz(head)?,
+            romsz: parse::romsz(head)?,
             // Parse RAM size
-            ramsz: make::ramsz(head)?,
+            ramsz: parse::ramsz(head)?,
             // Parse RAM size
-            region: make::region(head)?,
+            region: parse::region(head)?,
             // Parse version number
-            version: make::version(head),
+            version: parse::version(head),
             // Parse header checksum
-            hchk: make::hchk(head),
+            hchk: parse::hchk(head),
             // Parse global checksum
-            gchk: make::gchk(head),
+            gchk: parse::gchk(head),
         };
 
         // Validate header checksum
@@ -291,28 +291,28 @@ impl Header {
         let head: &[Byte; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
 
         // Construct header
-        let ramsz = make::ramsz(head);
+        let ramsz = parse::ramsz(head);
         let this = Self {
             // Compare logo data
-            logo: make::logo(head),
+            logo: parse::logo(head),
             // Parse title
-            title: make::title(head).unwrap_or_else(|err| {
+            title: parse::title(head).unwrap_or_else(|err| {
                 let default = Option::default();
                 error!("{err} (default: {default:?})");
                 default
             }),
             // Parse DMG flag
-            dmg: make::dmg(head),
+            dmg: parse::dmg(head),
             // Parse CGB flag
-            cgb: make::cgb(head).unwrap_or_else(|err| {
+            cgb: parse::cgb(head).unwrap_or_else(|err| {
                 let default = bool::default();
                 error!("{err} (default: {default:?})");
                 default
             }),
             // Parse SGB flag
-            sgb: make::sgb(head),
+            sgb: parse::sgb(head),
             // Parse cartridge type
-            info: make::info(head).unwrap_or_else(|err| {
+            info: parse::info(head).unwrap_or_else(|err| {
                 let default = Info::Bare {
                     ram: matches!(ramsz, Ok(ramsz) if ramsz > 0),
                     pwr: false,
@@ -321,7 +321,7 @@ impl Header {
                 default
             }),
             // Parse ROM size
-            romsz: make::romsz(head).unwrap_or_else(|err| {
+            romsz: parse::romsz(head).unwrap_or_else(|err| {
                 let default = 0x8000;
                 error!("{err} (default: {default:?})");
                 default
@@ -333,24 +333,24 @@ impl Header {
                 default
             }),
             // Parse RAM size
-            region: make::region(head).unwrap_or_else(|err| {
+            region: parse::region(head).unwrap_or_else(|err| {
                 let default = Region::Japan;
                 error!("{err} (default: {default:?})");
                 default
             }),
             // Parse version number
-            version: make::version(head),
+            version: parse::version(head),
             // Parse header checksum
-            hchk: make::hchk(head),
+            hchk: parse::hchk(head),
             // Parse global checksum
-            gchk: make::gchk(head),
+            gchk: parse::gchk(head),
         };
 
         Ok(this)
     }
 }
 
-mod make {
+mod parse {
     use log::warn;
     use rugby_arch::{Byte, Word};
 
