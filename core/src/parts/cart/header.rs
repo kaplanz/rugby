@@ -364,11 +364,15 @@ mod parse {
     /// Parse the `title` field from the header.
     pub fn title(head: &[Byte; 0x50]) -> Result<Option<String>> {
         let tlen = if head[0x43] & 0x80 == 0 { 16 } else { 15 };
-        let title = std::str::from_utf8(&head[0x34..0x34 + tlen])
-            .map_err(Error::Title)?
-            .trim_matches('\0')
-            .to_string();
-        Ok(if title.is_empty() { None } else { Some(title) })
+        std::str::from_utf8(&head[0x34..0x34 + tlen])
+            .map_err(Error::Title)
+            .map(|title| {
+                title
+                    .split('\0')
+                    .next()
+                    .filter(|s| !s.is_empty())
+                    .map(String::from)
+            })
     }
 
     /// Parse the `dmg` field from the header.
