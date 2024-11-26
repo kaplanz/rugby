@@ -18,6 +18,9 @@ pub struct Cli {
 #[derive(Clone, Debug, Subcommand)]
 #[non_exhaustive]
 pub enum Document {
+    /// Configuration file.
+    #[clap(disable_help_flag = true)]
+    Cfg,
     /// Shell completions.
     #[clap(arg_required_else_help = true)]
     #[clap(disable_help_flag = true)]
