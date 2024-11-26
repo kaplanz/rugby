@@ -1,4 +1,4 @@
-//! Generate shell files.
+//! Generate static files.
 
 use crate::err::Result;
 
@@ -10,8 +10,33 @@ pub use self::cli::Cli;
 #[allow(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
     match args.document {
+        cli::Document::Cfg => cfg::exec(),
         cli::Document::Cmp { shell } => cmp::exec(shell),
         cli::Document::Man => man::exec(),
+    }
+}
+
+/// Configuration file.
+pub mod cfg {
+    use std::io::Write;
+
+    use anyhow::Context;
+
+    use crate::Result;
+
+    /// [`Cfg`](super::cli::Document::Cfg) entrypoint.
+    pub fn exec() -> Result<()> {
+        // Declare buffer
+        let buf = std::io::stdout();
+        // Generate output
+        gen(buf)
+    }
+
+    /// Generate configuration file.
+    pub fn gen(mut buf: impl Write) -> Result<()> {
+        buf.write_all(include_str!("../../../rugby.toml").as_bytes())
+            .context("could not generate config file")
+            .map_err(Into::into)
     }
 }
 
@@ -44,7 +69,6 @@ pub mod cmp {
 }
 
 /// Manual pages.
-#[allow(unused)]
 pub mod man {
     use std::io::Write;
 
@@ -52,7 +76,7 @@ pub mod man {
     use clap::{Command, CommandFactory};
     use clap_mangen::Man;
 
-    use crate::{Cli, Result, NAME};
+    use crate::{Result, NAME};
 
     /// Manual section.
     ///
