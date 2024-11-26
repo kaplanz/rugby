@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use crate::opt::{Application, Emulation};
+use crate::opt::{Emulator, Frontend};
 
 mod val;
 
@@ -26,7 +26,7 @@ pub trait Join {
     fn merge(&mut self, other: Self);
 }
 
-/// Top-level configuration.
+/// Configuration object.
 #[derive(Debug, Default)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
@@ -35,13 +35,13 @@ pub trait Join {
     serde(default, deny_unknown_fields)
 )]
 pub struct Config {
-    /// Application options.
+    /// Frontend options.
     #[cfg_attr(feature = "clap", clap(flatten))]
-    pub app: Application,
+    pub app: Frontend,
 
-    /// Emulation options.
+    /// Emulator options.
     #[cfg_attr(feature = "clap", clap(flatten))]
-    pub emu: Emulation,
+    pub emu: Emulator,
 }
 
 impl Join for Config {
