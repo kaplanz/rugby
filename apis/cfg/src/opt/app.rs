@@ -5,7 +5,7 @@ use std::path::Path;
 pub use crate::val::{Palette, Speed};
 use crate::Join;
 
-/// Application options.
+/// Frontend options.
 #[derive(Debug, Default)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
@@ -13,7 +13,7 @@ use crate::Join;
     derive(serde::Deserialize),
     serde(default, deny_unknown_fields)
 )]
-pub struct Application {
+pub struct Frontend {
     /// Logging filter.
     ///
     /// A comma-separated list of logging directives.
@@ -47,7 +47,7 @@ pub struct Application {
     pub spd: Option<Speed>,
 }
 
-impl Join for Application {
+impl Join for Frontend {
     fn rebase(&mut self, _: &Path) {}
 
     fn merge(&mut self, other: Self) {
