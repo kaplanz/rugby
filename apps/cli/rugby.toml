@@ -19,29 +19,61 @@
 # parent directory. Use `--conf` on the command-line to provide an alternate
 # location for this file.
 
+#
+## Frontend options.
+#
 [app]
-# Logging level
+
+# Logging level.
+#
+# A comma-separated list of logging directives.
 log = "warn"
-# 2-bit color palette
+
+# 2-bit color palette.
 #
 # Value must be a named preset or customized as follows:
 # palette = { custom = ["#222", "#666", "#aaa", "#ddd"] }
 palette = "mono"
-# Simulated clock speed
+
+# Simulated clock speed.
 #
 # Value must be a named preset or customized as follows:
 # speed   = { fps = 90 }      # runs at 1.50x
 # speed   = { hz  = 3145728 } # runs at 0.75x
 speed = "actual"
 
+
+#
+## Booting options.
+#
 [emu.boot]
-# Boot ROM image file
+
+# Boot ROM image file.
+#
+# A filesystem path to a ROM image file.
 # rom = "path/to/dmg_boot.bin"
 
+
+#
+## Cartridge options.
+#
 [emu.cart]
-# Check cartridge integrity
+
+# Check cartridge integrity.
+#
+# Verifies that both the header and global checksums match the data within the
+# ROM.
 check = false
-# Force cartridge construction
+
+# Force cartridge construction.
+#
+# Causes the cartridge generation to always succeed, even if the ROM does not
+# contain valid data.
 force = false
-# Cartridge RAM persistence
+
+# Cartridge RAM persistence.
+#
+# This option can be used to override the cartridge's hardware support for
+# persistent RAM. When enabled, RAM will be loaded and saved from a file with
+# the same path and name as the ROM, but using the ".sav" extension.
 save = "auto"
