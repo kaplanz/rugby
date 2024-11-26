@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 pub use crate::val::When;
 use crate::Join;
 
-/// Emulation options.
+/// Emulator options.
 #[derive(Debug, Default)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
@@ -13,7 +13,7 @@ use crate::Join;
     derive(serde::Deserialize),
     serde(default, deny_unknown_fields)
 )]
-pub struct Emulation {
+pub struct Emulator {
     /// Booting options.
     #[cfg_attr(feature = "clap", clap(flatten))]
     pub boot: Boot,
@@ -23,7 +23,7 @@ pub struct Emulation {
     pub cart: Cart,
 }
 
-impl Join for Emulation {
+impl Join for Emulator {
     fn rebase(&mut self, root: &Path) {
         self.boot.rebase(root);
         self.cart.rebase(root);
