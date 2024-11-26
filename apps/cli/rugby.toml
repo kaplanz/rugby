@@ -21,12 +21,12 @@
 
 [app]
 # Logging level
-log = "info,rugby_core=error"
+log = "warn"
 # 2-bit color palette
 #
 # Value must be a named preset or customized as follows:
 # palette = { custom = ["#222", "#666", "#aaa", "#ddd"] }
-palette = "morris"
+palette = "mono"
 # Simulated clock speed
 #
 # Value must be a named preset or customized as follows:
@@ -34,14 +34,14 @@ palette = "morris"
 # speed   = { hz  = 3145728 } # runs at 0.75x
 speed = "actual"
 
+[emu.boot]
+# Boot ROM image file
+# rom = "path/to/dmg_boot.bin"
+
 [emu.cart]
 # Check cartridge integrity
-check = true
+check = false
 # Force cartridge construction
 force = false
 # Cartridge RAM persistence
-save = "always"
-
-[emu.boot]
-# Boot ROM image file
-rom = "../../roms/boot/sameboy/dmg_boot.bin"
+save = "auto"
