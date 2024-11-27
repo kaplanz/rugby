@@ -173,7 +173,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             }
             // Send VRAM debug info
             #[cfg(feature = "win")]
-            if args.dbg.win && ctx.count.delta == 0 {
+            if args.dbg.win && video.vsync() {
                 // Collect debug info
                 let info = dmg::dbg::ppu(&emu);
                 talk.send(app::Message::Debug(app::msg::Debug::Vram(info)))?;
