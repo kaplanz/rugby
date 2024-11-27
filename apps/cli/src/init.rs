@@ -11,6 +11,7 @@ use std::sync::mpsc;
 use anyhow::{ensure, Context, Result};
 use log::{debug, info, trace, warn};
 use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
+use rugby::pal::Palette;
 use rugby_cfg::opt;
 #[cfg(feature = "gbd")]
 use rugby_gbd::Debugger;
@@ -198,8 +199,9 @@ pub fn gui(args: &run::Cli) -> Result<gui::Graphics> {
     if args.dbg.win {
         gui.dbg.open().context("could not open debug windows")?;
     };
-    // Draw empty window
-    gui.lcd.redraw(&vec![0; LCD.depth()])?;
+    // Draw initial window
+    let pal = Palette::from(args.cfg.data.app.pal.clone().unwrap_or_default());
+    gui.lcd.redraw(&vec![pal[0].into(); LCD.depth()])?;
     // Return GUI
     Ok(gui)
 }
