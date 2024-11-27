@@ -66,6 +66,13 @@ impl<A: Attributes> Window<A> {
                 window,
                 _attrs: PhantomData,
             })
+            .map(Self::init)
+    }
+
+    /// Initializes a new `Window`.
+    fn init(mut self) -> Self {
+        self.update();
+        self
     }
 
     /// Checks if the window is open.
