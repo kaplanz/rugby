@@ -71,6 +71,17 @@ onMount(() => {
   @import url("https://fonts.googleapis.com/css2?family=Jost:wght@600&display=swap");
 
   :root {
+    @media screen and (max-width: 543px) {
+      background-color: light-dark(#c5c0bd, #1c1a19);
+    }
+
+    @media screen and (min-width: 543px) {
+      background-color: light-dark(#a2c8c8, #2f4f4f);
+    }
+  }
+
+  :global :has(> .rugby) {
+    align-content: center;
     user-select: none;
     -webkit-user-select: none;
 
@@ -79,30 +90,25 @@ onMount(() => {
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
     }
-
-    /* Base background color */
-    @media (prefers-color-scheme: light) {
-      background-color: #c5c0bd;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      background-color: #1c1a19;
-    }
   }
 
   .rugby {
+    background-color: light-dark(#c5c0bd, #1c1a19);
     color: #204786;
     display: flex;
     flex-flow: column;
     height: calc(100% - 3em);
     margin: 0 auto;
     max-width: 460px;
+    max-height: 760px;
     overflow: hidden;
     padding: 1em;
 
     @media screen and (min-width: 543px) {
-      border: solid black;
-      border-radius: 2em;
+      border: solid light-dark(#1c1a19, #5f5e61);
+      border-radius: 1em;
+      border-bottom-right-radius: 4em;
+      box-shadow: 0 10px 30px -10px black;
     }
 
     .btm {
