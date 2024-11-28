@@ -3,13 +3,9 @@ import { onMount } from "svelte";
 
 import { Cartridge, GameBoy } from "/pkg/rugby.js";
 
-// @type {boolean}
-export let run;
-// @type {GameBoy}
-export let emu;
+let { run = $bindable(), emu } = $props();
 
-// @type {FileList}
-let files;
+let files = $state();
 
 export function insert(data) {
   // Stop emulation
@@ -37,7 +33,7 @@ export function upload() {
 }
 </script>
 
-<label on:change={upload}>
+<label onchange={upload}>
   <input type="file" select=".gb,.gbc" bind:files />
 </label>
 
@@ -46,7 +42,7 @@ export function upload() {
     display: none;
   }
 
-  label:has(> input) {
+  label:has(:global(> input)) {
     z-index: 1;
   }
 </style>

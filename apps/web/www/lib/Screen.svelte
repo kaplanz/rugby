@@ -4,7 +4,7 @@ import { onMount } from "svelte";
 const SIZE = { wd: 160, ht: 144 };
 
 // @type {HTMLCanvasElement}
-let canvas;
+let canvas = $state();
 // @type {CanvasRenderingContext2D}
 let ctx;
 
@@ -27,7 +27,7 @@ export function redraw(frame) {
 }
 </script>
 
-<canvas bind:this={canvas} width={SIZE.wd} height={SIZE.ht} />
+<canvas bind:this={canvas} width={SIZE.wd} height={SIZE.ht}></canvas>
 
 <style>
   canvas {

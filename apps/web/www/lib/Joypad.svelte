@@ -2,10 +2,9 @@
 import { default as Input } from "./Button.svelte";
 import DPad from "./DPad.svelte";
 
-import { Button, GameBoy } from "/pkg/rugby.js";
+import { Button } from "/pkg/rugby.js";
 
-// @type {GameBoy}
-export let emu;
+let { emu } = $props();
 
 function keymap(key) {
   return {
@@ -62,7 +61,7 @@ function release(btn) {
 }
 </script>
 
-<svelte:window on:keydown={keydown} on:keyup={keyup} />
+<svelte:window onkeydown={keydown} onkeyup={keyup} />
 
 <div class="vstack">
   <div class="hstack">
@@ -110,7 +109,7 @@ function release(btn) {
     display: flex;
     gap: .5em;
 
-    & div {
+    :global div {
       transform: rotate(-30deg);
     }
   }
