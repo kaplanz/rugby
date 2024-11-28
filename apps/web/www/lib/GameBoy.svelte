@@ -11,12 +11,12 @@ import Stereo from "./Stereo.svelte";
 const FRQ = 4194304;
 const DIV = 32;
 
-const app = {
+const app = $state({
   run: false,
   spd: 1.0,
-};
+});
 const emu = new GameBoy();
-const gui = {};
+const gui = $state({});
 
 const tick = () => {
   for (let cycle = 0; app.run && cycle < (app.spd * FRQ) / DIV; cycle++) {
@@ -44,7 +44,7 @@ onMount(() => {
 </script>
 
 <svelte:window
-  on:touchstart={override}
+  ontouchstart={override}
 />
 
 <div class="rugby">
@@ -105,7 +105,7 @@ onMount(() => {
       border-radius: 2em;
     }
 
-    & .btm {
+    .btm {
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -125,7 +125,7 @@ onMount(() => {
     display: grid;
     padding: 5% 12.5%;
 
-    & > * {
+    :global * {
       grid-column: 1;
       grid-row: 1;
     }
@@ -136,12 +136,12 @@ onMount(() => {
     font-family: "Jost";
     text-align: start;
 
-    & .name {
+    .name {
       font-size: x-large;
       font-style: italic;
     }
 
-    & .mark {
+    .mark {
       font-size: x-small;
     }
   }
