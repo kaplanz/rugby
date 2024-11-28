@@ -44,7 +44,7 @@ function click(event) {
   @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap");
 
   input {
-    border: solid #1c1a19;
+    border: solid light-dark(#1c1a19, #39383a);
     margin: 0;
     padding: 0;
     user-select: none;
@@ -52,14 +52,6 @@ function click(event) {
 
     &:active {
       filter: brightness(60%);
-    }
-
-    @media (prefers-color-scheme: light) {
-      border: solid #1c1a19;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      border: solid #39383a;
     }
   }
 
