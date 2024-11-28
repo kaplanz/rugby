@@ -12,10 +12,10 @@
     "check": "biome check --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.3",
-    "@sveltejs/vite-plugin-svelte": "^3.1.1",
-    "svelte": "^4.2.18",
-    "vite": "^5.3.1",
+    "@biomejs/biome": "1.9.4",
+    "@sveltejs/vite-plugin-svelte": "^4.0.2",
+    "svelte": "^5.2.10",
+    "vite": "^5.4.11",
     "vite-plugin-wasm": "^3.3.0"
   },
   "dependencies": {
