@@ -3,10 +3,7 @@ import { createEventDispatcher } from "svelte";
 
 import { Button } from "/pkg/rugby.js";
 
-// @type {string}
-export let type;
-// @type {Button}
-export let button;
+let { type, button, children } = $props();
 
 const dispatch = createEventDispatcher();
 
@@ -35,12 +32,12 @@ function click(event) {
   <input
     type="button"
     id="input"
-    on:mousedown={click}
-    on:mouseup={click}
-    on:touchstart={click}
-    on:touchend={click}
+    onmousedown={click}
+    onmouseup={click}
+    ontouchstart={click}
+    ontouchend={click}
   />
-  <label for="input"><slot/></label>
+  <label for="input">{@render children?.()}</label>
 </div>
 
 <style>
@@ -79,7 +76,7 @@ function click(event) {
   }
 
   div[type="game"] {
-    & input {
+    input {
       aspect-ratio: 1 / 1;
       background-color: #9a2257;
       border-radius: 100%;
@@ -87,13 +84,13 @@ function click(event) {
   }
 
   div[type="menu"] {
-    & input {
+    input {
       aspect-ratio: 5 / 2;
       background-color: #908d92;
       border-radius: 20% / 50%;
     }
 
-    & label {
+    label {
       font-size: x-small;
     }
   }
