@@ -60,7 +60,7 @@ function click(event) {
   }
 
   input[type="button"] {
-    background-color: #333;
+    background-color: #39383a;
     border: none;
     height: 33%;
     margin: 0;
