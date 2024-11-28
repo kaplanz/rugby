@@ -36,10 +36,10 @@ function click(event) {
 <div
   role="button"
   tabindex={0}
-  on:mousedown={click}
-  on:mouseup={click}
-  on:touchstart={click}
-  on:touchend={click}
+  onmousedown={click}
+  onmouseup={click}
+  ontouchstart={click}
+  ontouchend={click}
 >
   <input type="button" id="up"/>
   <input type="button" id="lt"/>
