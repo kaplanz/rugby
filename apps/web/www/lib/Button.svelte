@@ -44,11 +44,11 @@ function click(event) {
   @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap");
 
   input {
-    border: solid light-dark(#1c1a19, #39383a);
+    border: .5vh solid light-dark(#1c1a19, #39383a);
     margin: 0;
     padding: 0;
     user-select: none;
-    width: 60px;
+    width: 7vh;
 
     &:active {
       filter: brightness(60%);
@@ -73,6 +73,10 @@ function click(event) {
       background-color: #9a2257;
       border-radius: 100%;
     }
+
+    label {
+      font-size: 2vh;
+    }
   }
 
   div[type="menu"] {
@@ -83,7 +87,7 @@ function click(event) {
     }
 
     label {
-      font-size: x-small;
+      font-size: 1.5vh;
     }
   }
 </style>

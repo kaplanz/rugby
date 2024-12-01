@@ -59,7 +59,6 @@ onMount(() => {
     </div>
   </div>
   <div class="btm">
-    <div class="spacer"></div>
     <Joypad bind:this={gui.joypad} {emu} />
     <div class="audio">
       <Stereo />
@@ -93,21 +92,23 @@ onMount(() => {
   }
 
   .rugby {
+    aspect-ratio: 90 / 148;
     background-color: light-dark(#c5c0bd, #1c1a19);
+    box-sizing: border-box;
     color: #204786;
     display: flex;
     flex-flow: column;
     height: calc(100% - 3em);
     margin: 0 auto;
-    max-width: 460px;
-    max-height: 760px;
+    max-height: 740px;
+    max-width: 100%;
     overflow: hidden;
-    padding: 1em;
+    padding: 2vh;
 
     @media screen and (min-width: 543px) {
-      border: solid light-dark(#1c1a19, #5f5e61);
-      border-radius: 1em;
-      border-bottom-right-radius: 4em;
+      border: .5vh solid light-dark(#1c1a19, #5f5e61);
+      border-radius: 4.44% / 2.7%;
+      border-bottom-right-radius: 17.76% 10.8%;
       box-shadow: 0 10px 30px -10px black;
     }
 
@@ -127,7 +128,8 @@ onMount(() => {
   .frame {
     aspect-ratio: 10 / 9;
     background-color: #908d92;
-    border-radius: 10px 10px 50px 10px;
+    border-radius: 4.5% / 5%;
+    border-bottom-right-radius: 13.5% 15%;
     display: grid;
     padding: 5% 12.5%;
 
@@ -143,16 +145,12 @@ onMount(() => {
     text-align: start;
 
     .name {
-      font-size: x-large;
+      font-size: 3vh;
       font-style: italic;
     }
 
     .mark {
-      font-size: x-small;
+      font-size: 1.5vh;
     }
-  }
-
-  .spacer {
-    padding: 1em;
   }
 </style>
