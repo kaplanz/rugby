@@ -84,10 +84,11 @@ function release(btn) {
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 2em;
+    gap: 4vh;
   }
 
   .hstack {
+    align-items: center;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -100,14 +101,13 @@ function release(btn) {
 
   .game {
     display: flex;
-    gap: 1em;
-    width: 8em;
+    gap: 2vh;
     transform: rotate(-30deg);
   }
 
   .menu {
     display: flex;
-    gap: .5em;
+    gap: 1vh;
 
     :global div {
       transform: rotate(-30deg);
