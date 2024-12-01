@@ -56,7 +56,7 @@ function click(event) {
     margin: 0;
     padding: 0;
     position: relative;
-    width: 120px;
+    width: 14vh;
   }
 
   input[type="button"] {
