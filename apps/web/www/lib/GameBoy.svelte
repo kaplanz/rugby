@@ -3,10 +3,10 @@ import { onMount } from "svelte";
 
 import { Cartridge, GameBoy, demo } from "/pkg/rugby.js";
 
-import Insert from "./Insert.svelte";
-import Joypad from "./Joypad.svelte";
-import Screen from "./Screen.svelte";
-import Stereo from "./Stereo.svelte";
+import { default as GamePak } from "./cart/Cartridge.svelte";
+import Joypad from "./joypad/Joypad.svelte";
+import Screen from "./screen/Screen.svelte";
+import Speaker from "./audio/Speaker.svelte";
 
 const FRQ = 4194304;
 const DIV = 32;
@@ -50,7 +50,7 @@ onMount(() => {
 <div class="rugby">
   <div class="top">
     <div class="frame">
-      <Insert bind:this={gui.cart} bind:run={app.run} {emu} />
+      <GamePak bind:this={gui.cart} bind:run={app.run} {emu} />
       <Screen bind:this={gui.video} />
     </div>
     <div class="logo">
@@ -61,7 +61,7 @@ onMount(() => {
   <div class="btm">
     <Joypad bind:this={gui.joypad} {emu} />
     <div class="audio">
-      <Stereo />
+      <Speaker />
     </div>
   </div>
 </div>

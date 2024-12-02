@@ -1,6 +1,6 @@
 <script>
-import { default as Input } from "./Button.svelte";
-import DPad from "./DPad.svelte";
+import { default as Input } from "./button/Button.svelte";
+import DPad from "./button/DPad.svelte";
 
 import { Button } from "/pkg/rugby.js";
 
