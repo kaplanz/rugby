@@ -1,0 +1,25 @@
+{
+  "name": "rugby-web",
+  "type": "module",
+  "collaborators": [
+    "Zakhary Kaplan <me@zakhary.dev>"
+  ],
+  "version": "0.1.0",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaplanz/rugby"
+  },
+  "files": [
+    "rugby_bg.wasm",
+    "rugby.js",
+    "rugby_bg.js",
+    "rugby.d.ts"
+  ],
+  "main": "rugby.js",
+  "types": "rugby.d.ts",
+  "sideEffects": [
+    "./rugby.js",
+    "./snippets/*"
+  ]
+}
