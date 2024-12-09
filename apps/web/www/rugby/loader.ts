@@ -3,7 +3,7 @@ import { customElement, property } from "lit/decorators.js";
 
 import { Cartridge } from "rugby-web";
 
-import { Application } from "../app";
+import type { Application } from "../app";
 
 @customElement("gb-loader")
 export class Loader extends LitElement {
