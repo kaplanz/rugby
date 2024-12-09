@@ -4,7 +4,7 @@ import { customElement, query, state } from "lit/decorators.js";
 import { Cartridge, demo } from "rugby-web";
 
 import { Application } from "../app";
-import { Screen } from "./screen";
+import type { Screen } from "./screen";
 
 import "./joypad";
 import "./screen";
@@ -30,14 +30,14 @@ export class GameBoy extends LitElement {
     // Request update on application state change.
     this.app.draw = () => {
       this.requestUpdate();
-    }
+    };
   }
 
   firstUpdated() {
     // Trigger a re-render to initialize
     this.requestUpdate();
     // Connect components to application
-    this.app.gui.lcd = this.lcd!;
+    this.app.gui.lcd = this.lcd;
   }
 
   connectedCallback() {
@@ -94,7 +94,7 @@ export class GameBoy extends LitElement {
       margin: auto;
 
       aspect-ratio: 90 / 148;
-      height: min(740px, 100dvh);
+      height: min(740px, 148dvw / .9, 100dvh);
       max-width: min(450px, 100dvw);
 
       user-select: none;
@@ -117,8 +117,10 @@ export class GameBoy extends LitElement {
       width: 100%;
 
       border-color: light-dark(#1c1a19, #5f5e61);
+      border-radius: 2.5em;
+      border-bottom-right-radius: 15em;
       border-style: solid;
-      border-width: 0;
+      border-width: .5em;
       box-shadow: 0 10px 30px -10px black;
       box-sizing: border-box;
 
@@ -126,21 +128,6 @@ export class GameBoy extends LitElement {
       color: #204786;
       font-family: "Cabin Variable", sans-serif;
       font-size: min(7.40px, 148dvw / 90, 1dvh);
-
-      @media (min-height: 740px) {
-        border-bottom-width: .5em;
-        border-top-width: .5em;
-      }
-
-      @media (min-width: 450px) {
-        border-left-width: .5em;
-        border-right-width: .5em;
-      }
-
-      @media (min-height: 740px) and (min-width: 450px) {
-        border-radius: 2.5em;
-        border-bottom-right-radius: 15em;
-      }
 
       gb-switch {
         left: 6em;

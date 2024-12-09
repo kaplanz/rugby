@@ -1,6 +1,6 @@
 import { GameBoy } from "rugby-web";
 
-import { Screen } from "./rugby/screen";
+import type { Screen } from "./rugby/screen";
 
 /**
  * Clock frequency.
@@ -28,11 +28,11 @@ export class Application {
    */
   cfg: {
     /** Running status. */
-    run: boolean,
+    run: boolean;
     /** Emulated clock speed. */
-    spd: number,
+    spd: number;
     /** Clock thread handle. */
-    tid?: number,
+    tid?: number;
   } = {
     run: false,
     spd: 1.0,
@@ -49,7 +49,7 @@ export class Application {
   gui = {
     /** Display model. */
     lcd: undefined as Screen | undefined,
-  }
+  };
 
   /**
    * Request application redraw.
@@ -59,7 +59,7 @@ export class Application {
   /**
    * Play or pause emulation.
    */
-  play(enable: boolean = true) {
+  play(enable = true) {
     this.cfg.run = enable;
     this.draw();
   }
@@ -67,10 +67,9 @@ export class Application {
   /**
    * Change emulation speed.
    */
-  tick(speed: number = 0) {
+  tick(speed = 0) {
     // Clear emulation thread
-    if (this.cfg.tid)
-      clearInterval(this.cfg.tid);
+    if (this.cfg.tid) clearInterval(this.cfg.tid);
     // Update internal speed
     this.cfg.spd = speed;
     // Start emulation thread
@@ -79,8 +78,8 @@ export class Application {
   }
 
   /**
-    * Emulates a single cycle.
-    */
+   * Emulates a single cycle.
+   */
   private cycle() {
     // No-op if paused
     if (!this.cfg.run) return;

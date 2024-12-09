@@ -1,8 +1,8 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
-import { Application } from "../app";
-import { Screen } from "./screen";
+import type { Application } from "../app";
+import type { Screen } from "./screen";
 
 @customElement("gb-switch")
 export class Stereo extends LitElement {
