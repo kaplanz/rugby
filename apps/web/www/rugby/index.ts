@@ -133,7 +133,7 @@ export class GameBoy extends LitElement {
       margin: auto;
 
       aspect-ratio: 90 / 148;
-      height: min(740px, 100vh);
+      height: min(740px, 148vw / .9, 100vh);
       max-width: min(450px, 100vw);
 
       user-select: none;
@@ -160,25 +160,12 @@ export class GameBoy extends LitElement {
       position: relative;
       width: 100%;
 
-      border-width: 0;
       border-color: light-dark(#1c1a19, #5f5e61);
+      border-radius: 2.5em;
+      border-bottom-right-radius: 15em;
       border-style: solid;
+      border-width: .5em;
       box-shadow: 0 10px 30px -10px black;
-
-      @media (min-height: 740px) {
-        border-bottom-width: .5em;
-        border-top-width: .5em;
-      }
-
-      @media (min-width: 450px) {
-        border-left-width: .5em;
-        border-right-width: .5em;
-      }
-
-      @media (min-height: 740px) and (min-width: 450px) {
-        border-radius: 2.5em;
-        border-bottom-right-radius: 15em;
-      }
 
       gb-switch {
         left: 6em;
