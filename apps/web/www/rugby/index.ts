@@ -4,8 +4,10 @@ import { customElement, query, state } from "lit/decorators.js";
 import { Cartridge, demo } from "rugby-web";
 
 import { Application } from "../app";
+import type { Dialog } from "./dialog";
 import type { Screen } from "./screen";
 
+import "./dialog";
 import "./joypad";
 import "./screen";
 import "./stereo";
@@ -23,6 +25,17 @@ export class GameBoy extends LitElement {
   /** Graphical display model. */
   @query("gb-screen")
   private lcd!: Screen;
+
+  /** Graphical display model. */
+  @query("gb-dialog")
+  private cfg!: Dialog;
+
+  /**
+   * Opens menu dialog.
+   */
+  menu() {
+    this.cfg.show();
+  }
 
   constructor() {
     super();
@@ -60,6 +73,7 @@ export class GameBoy extends LitElement {
 
   render() {
     return html`
+      <gb-dialog .app=${this.app}></gb-dialog>
       <main>
         <gb-switch .app=${this.app} .lcd=${this.lcd}></gb-switch>
         <div class="top">
@@ -91,11 +105,6 @@ export class GameBoy extends LitElement {
   static styles = css`
     :host {
       display: block;
-      margin: auto;
-
-      aspect-ratio: 90 / 148;
-      height: min(740px, 148dvw / .9, 100dvh);
-      max-width: min(450px, 100dvw);
 
       user-select: none;
       -webkit-user-select: none;
@@ -110,11 +119,15 @@ export class GameBoy extends LitElement {
     main {
       display: flex;
       flex-flow: column;
-      height: 100%;
       justify-content: space-between;
-      padding: 4em;
       position: relative;
-      width: 100%;
+
+      aspect-ratio: 90 / 148;
+      height: min(740px, 148dvw / .9, 100dvh);
+      max-width: min(450px, 100dvw);
+
+      margin: auto;
+      padding: 4em;
 
       border-color: light-dark(#1c1a19, #5f5e61);
       border-radius: 2.5em;
