@@ -3,30 +3,16 @@ import { customElement, query, state } from "lit/decorators.js";
 
 import { Cartridge, demo } from "rugby-web";
 
-import { Screen } from "./screen";
 import { Application } from "../app";
+import { Dialog } from "./dialog";
+import { Screen } from "./screen";
 
+import "./dialog";
 import "./joypad";
 import "./loader";
 import "./screen";
 import "./stereo";
 import "./switch";
-
-/**
- * Clock frequency.
- *
- * @remarks
- * Frequency of the on-board quartz crystal used for timekeeping.
- */
-const FRQ = 4194304;
-/**
- * Clock divider.
- *
- * @remarks
- * As an optimization, we use a clock divider and simulate a batch of `DIV`
- * cycles at a frequency of `FRQ / DIV`.
- */
-const DIV = 32;
 
 /**
  * Game Boy emulator.
@@ -37,68 +23,58 @@ export class GameBoy extends LitElement {
   @state()
   private app = new Application();
 
-  /** Clock thread handle. */
-  private tid?: number;
-
   /** Graphical display model. */
   @query("gb-screen")
   private lcd!: Screen;
 
-  /**
-   * Emulates a single cycle.
-   */
-  private cycle() {
-    // No-op if paused
-    if (!this.app.cfg.run) return;
+  /** Graphical display model. */
+  @query("gb-dialog")
+  private cfg!: Dialog;
 
-    // Iterate pending cycles
-    for (let tick = 0; tick < (this.app.cfg.spd * FRQ) / DIV; tick++) {
-      // Emulate a single cycle
-      this.app.emu.cycle();
-      // Redraw on vertical sync
-      if (this.lcd && this.app.emu.vsync()) {
-        // Get next frame
-        const frame = this.app.emu.frame();
-        // Redraw display
-        this.lcd.redraw(frame);
-      }
-    }
+  /**
+   * Opens menu dialog.
+   */
+  menu() {
+    this.cfg.show();
   }
 
   constructor() {
     super();
 
     // Request update on application state change.
-    this.app.callback = () => {
+    this.app.draw = () => {
       this.requestUpdate();
     }
   }
 
   firstUpdated() {
-    // Trigger a re-render to propagete `lcd`
+    // Trigger a re-render to initialize
     this.requestUpdate();
+    // Connect components to application
+    this.app.gui.lcd = this.lcd!;
   }
 
   connectedCallback() {
     super.connectedCallback();
 
     // Start emulation loop
-    this.tid = setInterval(this.cycle.bind(this), 1000 / DIV);
+    this.app.tick(1.0);
     // Insert a game cartridge
     this.app.emu.insert(new Cartridge(demo()));
     // Enable emulation.
-    this.app.play(true);
+    this.app.play();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
     // Clear emulation loop
-    clearInterval(this.tid);
+    this.app.tick();
   }
 
   render() {
     return html`
+      <gb-dialog .app=${this.app}></gb-dialog>
       <main>
         <gb-switch .app=${this.app} .lcd=${this.lcd}></gb-switch>
         <div class="top">
@@ -130,11 +106,6 @@ export class GameBoy extends LitElement {
   static styles = css`
     :host {
       display: block;
-      margin: auto;
-
-      aspect-ratio: 90 / 148;
-      height: min(740px, 148vw / .9, 100vh);
-      max-width: min(450px, 100vw);
 
       user-select: none;
       -webkit-user-select: none;
@@ -147,18 +118,17 @@ export class GameBoy extends LitElement {
     }
 
     main {
-      background-color: light-dark(#c5c0bd, #1c1a19);
-      box-sizing: border-box;
-      color: #204786;
       display: flex;
       flex-flow: column;
-      font-family: "Cabin Variable", sans-serif;
-      font-size: min(7.40px, 148vw / 90, 1vh);
-      height: 100%;
       justify-content: space-between;
-      padding: 4em;
       position: relative;
-      width: 100%;
+
+      aspect-ratio: 90 / 148;
+      height: min(740px, 148dvw / .9, 100dvh);
+      max-width: min(450px, 100dvw);
+
+      margin: auto;
+      padding: 4em;
 
       border-color: light-dark(#1c1a19, #5f5e61);
       border-radius: 2.5em;
@@ -166,6 +136,12 @@ export class GameBoy extends LitElement {
       border-style: solid;
       border-width: .5em;
       box-shadow: 0 10px 30px -10px black;
+      box-sizing: border-box;
+
+      background-color: light-dark(#c5c0bd, #1c1a19);
+      color: #204786;
+      font-family: "Cabin Variable", sans-serif;
+      font-size: min(7.40px, 148dvw / 90, 1dvh);
 
       gb-switch {
         left: 6em;
