@@ -16,7 +16,7 @@ use crate::dir;
 /// Returns the path to the application's history file.
 #[must_use]
 pub fn history() -> PathBuf {
-    dir::state().join("history.txt")
+    dir::state().join("history")
 }
 
 /// Interface over the user's console.
