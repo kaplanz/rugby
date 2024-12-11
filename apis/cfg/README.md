@@ -16,8 +16,8 @@ Configurable fields are arranged hierarchically as such:
 │  └── spd: enum
 └── emu: object
    ├── boot: object
-   │  ├── rom: path
-   │  └── skip:  bool
+   │  ├── rom:  path
+   │  └── skip: bool
    └── cart: object
       ├── rom:   path
       ├── check: bool
