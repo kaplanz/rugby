@@ -110,7 +110,7 @@ Main components of `rugby` are outlined below.
 
 Several additional frontends are planned for the future:
 
-- [`rugby-ios`](./apps/ios): a native iOS application built with SwiftUI.
+- [`rugby-ios`](./apps/ios): a native iOS application built with [SwiftUI].
 - `rugby-sdl`: a cross-platform application based upon the [SDL] framework.
 
 ## [Testing](./tests/README.md)
@@ -208,8 +208,9 @@ chosen license.
 [web.badge]:  https://img.shields.io/badge/frontend-web-orange
 
 <!-- Organization -->
-[sdl]:  https://www.libsdl.org
-[wasm]: https://webassembly.org
+[sdl]:     https://www.libsdl.org
+[swiftui]: https://developer.apple.com/xcode/swiftui/
+[wasm]:    https://webassembly.org
 
 <!-- References -->
 [dmgcpu]:    https://github.com/emu-russia/dmgcpu
