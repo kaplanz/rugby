@@ -18,6 +18,7 @@
 
 [![dependency status][deps.badge]][deps.hyper]
 [![cli frontend][cli.badge]](./apps/cli)
+[![web frontend][web.badge]](./apps/web)
 
 A cycle accurate emulator of the original 1989 Nintendo Game Boy.
 
@@ -105,12 +106,12 @@ Main components of `rugby` are outlined below.
 
 - [`rugby-cli`](./apps/cli): a command-line interface application with rich
   configuration support and comprehensive debugging options.
+- [`rugby-web`](./apps/web): an online web application powered by [Wasm].
 
 Several additional frontends are planned for the future:
 
 - [`rugby-ios`](./apps/ios): a native iOS application built with SwiftUI.
 - `rugby-sdl`: a cross-platform application based upon the [SDL] framework.
-- [`rugby-web`](./apps/web): an online hosted frontend powered by [Wasm].
 
 ## [Testing](./tests/README.md)
 
@@ -204,6 +205,7 @@ chosen license.
 [cli.badge]:  https://img.shields.io/badge/frontend-cli-blue
 [deps.badge]: https://deps.rs/repo/github/kaplanz/rugby/status.svg
 [deps.hyper]: https://deps.rs/repo/github/kaplanz/rugby
+[web.badge]:  https://img.shields.io/badge/frontend-web-orange
 
 <!-- Organization -->
 [sdl]:  https://www.libsdl.org
