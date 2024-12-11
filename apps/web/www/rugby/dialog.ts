@@ -1,11 +1,15 @@
 import { LitElement, css, html, unsafeCSS } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
+import { Cartridge } from "rugby-web";
+
 import type { Application } from "../app";
 
 import type { SlDialog, SlTabGroup } from "@shoelace-style/shoelace";
 
+import "@shoelace-style/shoelace/dist/components/button/button";
 import "@shoelace-style/shoelace/dist/components/dialog/dialog";
+import "@shoelace-style/shoelace/dist/components/divider/divider";
 import "@shoelace-style/shoelace/dist/components/input/input";
 import "@shoelace-style/shoelace/dist/components/range/range";
 import "@shoelace-style/shoelace/dist/components/switch/switch";
@@ -17,11 +21,31 @@ import shoelaceLight from "@shoelace-style/shoelace/dist/themes/light.css?raw";
 import shoelaceDark from "@shoelace-style/shoelace/dist/themes/dark.css?raw";
 import fontAwesome from "@fortawesome/fontawesome-free/css/all.min.css?raw";
 
+/**
+ * Library database name.
+ */
+const LIB = "games";
+
+/**
+ * Library game.
+ */
+interface Game {
+  /** Identifier */
+  id: number;
+  /** File name */
+  name: string;
+  /** ROM data */
+  data: Uint8Array;
+}
+
 @customElement("gb-dialog")
 export class Dialog extends LitElement {
   /** Application state. */
   @property()
   app!: Application;
+
+  /** Game library. */
+  private lib: Array<Game> = [];
 
   /** Dialog element. */
   @query("sl-dialog")
@@ -30,6 +54,10 @@ export class Dialog extends LitElement {
   /** Tab group element. */
   @query("sl-tab-group")
   private tab!: SlTabGroup;
+
+  /** File select input. */
+  @query("input[type=file]")
+  private rom!: HTMLInputElement;
 
   /**
    * Show the dialog.
@@ -89,6 +117,150 @@ export class Dialog extends LitElement {
   }
 
   /**
+   * Manage game library database.
+   */
+  private database = {
+    /**
+     * Init the library database.
+     */
+    init: async () => {
+      return new Promise<IDBDatabase>((resolve, reject) => {
+        const rq = indexedDB.open(LIB, 1);
+        rq.onupgradeneeded = (_) => {
+          const db = rq.result;
+          if (!db.objectStoreNames.contains(LIB)) {
+            db.createObjectStore(LIB, { keyPath: "id", autoIncrement: true });
+          }
+        };
+        rq.onsuccess = () => resolve(rq.result);
+        rq.onerror = () => reject(rq.error);
+      });
+    },
+
+    /**
+     * Load the library database.
+     */
+    load: async () => {
+      const db = await this.database.init();
+      const tx = db.transaction(LIB, "readonly");
+      const st = tx.objectStore(LIB);
+      const rq = st.getAll();
+      rq.onsuccess = () => {
+        this.lib = rq.result;
+        console.log(`loaded library: ${this.lib.map((game) => game.name)}`);
+        this.requestUpdate();
+      };
+    },
+
+    /**
+     * Drop the library database.
+     */
+    drop: async () => {
+      return new Promise<void>((resolve, reject) => {
+        const rq = indexedDB.deleteDatabase(LIB);
+        rq.onsuccess = () => {
+          this.lib = [];
+          console.log("dropped library");
+          this.requestUpdate();
+          resolve();
+        };
+        rq.onerror = () => reject(rq.error);
+      });
+    },
+
+    /**
+     * Add a game to the library.
+     */
+    add: async (game: { name: string; data: Uint8Array }) => {
+      const db = await this.database.init();
+      const tx = db.transaction(LIB, "readwrite");
+      const st = tx.objectStore(LIB);
+      st.add(game);
+      tx.oncomplete = () => this.database.load();
+    },
+
+    /**
+     * Queries a game in the library.
+     */
+    query: async (id: number) => {
+      const db = await this.database.init();
+      const tx = db.transaction(LIB, "readonly");
+      const st = tx.objectStore(LIB);
+      const rq = st.get(id);
+      return new Promise<Game>((resolve, reject) => {
+        rq.onsuccess = () => resolve(rq.result);
+        rq.onerror = () => reject(rq.result);
+      });
+    },
+
+    /**
+     * Delete a game from the library.
+     */
+    delete: async (id: number) => {
+      const db = await this.database.init();
+      const tx = db.transaction(LIB, "readwrite");
+      const st = tx.objectStore(LIB);
+      st.delete(id);
+      tx.oncomplete = () => this.database.load();
+    },
+
+    /**
+     * Uploads a game from a file.
+     * */
+    upload: async (file: File) => {
+      // Read the uploaded file
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+
+      // When ready, insert into the console
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        // Truncate file extension
+        const name = file.name.split(".").slice(0, -1).join(".");
+
+        // Load provided data
+        let data: Uint8Array;
+        try {
+          // Attempt to fetch result
+          const result = event.target?.result;
+          if (!result) throw new Error("missing file data");
+          // Convert to a byte array
+          data = new Uint8Array(result as ArrayBuffer);
+        } catch (error) {
+          console.error(error);
+          // Extract the error message
+          const msg = error instanceof Error ? error.message : String(error);
+          // Notify the user
+          alert(msg);
+          return;
+        }
+
+        // Add to the database
+        this.database.add({ name, data });
+      };
+    },
+
+    /**
+     * Plays a game form the library.
+     * */
+    play: async (id: number) => {
+      // Pause emulator
+      this.app.play(false);
+      // Retrieve game data
+      const game = await this.database.query(id);
+      // Construct a cartridge
+      const cart = new Cartridge(game.data);
+      console.log("inserted game cartridge");
+      // Reload emulator with cartridge
+      this.app.emu.insert(cart);
+      this.app.emu.reset();
+      // Resume emulation
+      this.app.play();
+      // Hide the dialog
+      this.hide();
+    },
+  };
+
+  /**
    * Change app configuration.
    */
   private settings = {
@@ -119,6 +291,8 @@ export class Dialog extends LitElement {
 
     // Key bindings
     window.addEventListener("keydown", this.handle.bind(this));
+    // Game library
+    this.database.load();
   }
 
   disnnectedCallback() {
@@ -176,9 +350,8 @@ export class Dialog extends LitElement {
               <p>
                 Emulator controls should be fairly self-explanatory, with
                 on-screen buttons corresponding to their emulator inputs. You
-                toggle power by clicking the "OFF &bullet; ON" label on the
-                frame. This menu can be opened by clicking the
-                (&#x2139;&#xfe0e;) button.
+                can toggle power by clicking the "OFF &bullet; ON" label on the
+                frame. Open the menu by clicking the (&#x2139;&#xfe0e;) button.
               </p>
               <h3>Bindings</h3>
               <p>
@@ -212,6 +385,58 @@ export class Dialog extends LitElement {
                 </tbody>
               </table>
             </article>
+          </sl-tab-panel>
+
+          <!-- Library -->
+          <sl-tab slot="nav" panel="library">Library</sl-tab>
+          <sl-tab-panel name="library">
+            <div class="menu">
+              <sl-button @click=${() => this.rom.click()}>
+                <span>Upload</span>
+                <i slot="suffix" class="fa-solid fa-file-arrow-up"></i>
+                <input
+                  type="file"
+                  accept=".gb,.gbc"
+                  style="display: none;"
+                  @change=${
+                    // biome-ignore lint/style/noNonNullAssertion: none
+                    () => this.database.upload(this.rom.files?.item(0)!)
+                  }
+                />
+              </sl-button>
+              <sl-button
+                variant="danger"
+                outline
+                @click=${this.database.drop.bind(this)}
+              >
+                <span>Clear</span>
+                <i slot="suffix" class="fa-regular fa-trash-can"></i>
+              </sl-button>
+            </div>
+            <sl-divider></sl-divider>
+            <ul class="games">
+              ${this.lib.map(
+                (game) => html`
+                <li>
+                  <sl-button
+                    variant="primary"
+                    outline
+                    @click=${() => this.database.play(game.id)}
+                  >
+                    <i class="fa-solid fa-play"></i>
+                  </sl-button>
+                  <span>${game.name}</span>
+                  <sl-button
+                    variant="danger"
+                    outline
+                    @click=${() => this.database.delete(game.id)}
+                  >
+                    <i class="fa-solid fa-xmark"></i>
+                  </sl-button>
+                </li>
+              `,
+              )}
+            </ul>
           </sl-tab-panel>
 
           <!-- Settings -->
@@ -335,6 +560,36 @@ export class Dialog extends LitElement {
               a {
                 color: inherit;
                 text-decoration: none;
+              }
+            }
+          }
+        }
+
+        &[name="library"] {
+          sl-button[variant="danger"] {
+            margin-left: auto;
+          }
+
+          div.menu {
+            display: flex;
+            gap: .5em;
+          }
+
+          ul.games {
+            display: flex;
+            flex-direction: column;
+            gap: .5em;
+
+            list-style-type: none;
+            padding: 0;
+
+            li {
+              display: flex;
+              align-items: center;
+              gap: .5em;
+
+              sl-button::part(base) {
+                border-width: 0;
               }
             }
           }
