@@ -3,7 +3,7 @@
   "display": "standalone",
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/appicon.ico",
       "sizes": "16x16 32x32 57x57 60x60 72x72 76x76 96x96 114x114 120x120 128x128 144x144 152x152 167x167 180x180 192x192 196x196 512x512"
     }
   ]
