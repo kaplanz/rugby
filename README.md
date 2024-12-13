@@ -1,7 +1,7 @@
 # rugby
 
 <p align="center">
-  <img width="100" height="100" src="./docs/assets/img/gameboy.svg"/>
+  <img width="128" height="128" src="./docs/assets/img/icon.png"/>
 </p>
 
 <p align="center">
