@@ -54,7 +54,7 @@ struct Internal<'a> {
     linesz: usize,
 }
 
-impl<'a> Internal<'a> {
+impl Internal<'_> {
     #[inline]
     fn display(self) -> impl Display {
         // Destructure self into constituent parts
