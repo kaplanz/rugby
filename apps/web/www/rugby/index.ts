@@ -243,8 +243,9 @@ export class GameBoy extends LitElement {
             .led {
               aspect-ratio: 1;
               background-color: black;
-              border: .15em solid black;
+              border: .25em solid black;
               border-radius: 50%;
+              box-sizing: border-box;
               display: block;
               left: 1em;
               position: relative;
@@ -252,7 +253,8 @@ export class GameBoy extends LitElement {
 
               &[power] {
                 background-color: red;
-                box-shadow: 0 0 2em red;
+                box-shadow: 0 0 3em .5em red;
+                filter: blur(.2em);
               }
             }
           }
