@@ -14,7 +14,7 @@ struct RugbyApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environment(self.lib)
+                .environment(lib)
         }
     }
 }
