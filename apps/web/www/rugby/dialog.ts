@@ -1,5 +1,5 @@
 import { LitElement, css, html, unsafeCSS } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 
 import { Cartridge } from "rugby-web";
 
@@ -47,6 +47,10 @@ export class Dialog extends LitElement {
   /** Game library. */
   private lib: Array<Game> = [];
 
+  /** Running status. */
+  @state()
+  private run?: boolean;
+
   /** Dialog element. */
   @query("sl-dialog")
   private pum!: SlDialog;
@@ -64,13 +68,29 @@ export class Dialog extends LitElement {
    */
   show() {
     this.pum.show();
-    // Redraw based on app state
-    this.requestUpdate();
+  }
+
+  /**
+   * Show dialog event trigger.
+   */
+  private onShow() {
+    // Store emulator state
+    this.run = this.app.cfg.run;
+    // Pause the emulator
+    this.app.play(false);
   }
 
   /** Hide the dialog. */
   hide() {
     this.pum.hide();
+  }
+
+  /**
+   * Hide dialog event trigger.
+   */
+  private onHide() {
+    // Restore emulator state
+    this.app.play(this.run);
   }
 
   /**
@@ -269,10 +289,8 @@ export class Dialog extends LitElement {
      */
     run: (event: CustomEvent) => {
       // Extract updated value
-      const state = (event.target as HTMLInputElement).checked;
-      console.log(`updated state: ${state ? "running" : "paused"}`);
-      // Update emulator state
-      this.app.play(state);
+      this.run = (event.target as HTMLInputElement).checked;
+      console.log(`updated state: ${this.run ? "running" : "paused"}`);
     },
     /**
      * Change configured speed.
@@ -305,7 +323,10 @@ export class Dialog extends LitElement {
   render() {
     return html`
       <button id="show" @click="${this.show}">&#x2139;&#xfe0e;</button>
-      <sl-dialog>
+      <sl-dialog
+        @sl-show=${this.onShow.bind(this)}
+        @sl-hide=${this.onHide.bind(this)}
+      >
         <sl-tab-group>
 
           <!-- About -->
@@ -444,7 +465,7 @@ export class Dialog extends LitElement {
           <sl-tab-panel name="settings">
             <!-- Enable -->
             <sl-switch
-              ?checked=${this.app.cfg.run}
+              ?checked=${this.run}
               @sl-change=${this.settings.run.bind(this)}
             >
               <span>Enable</span>
