@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 
 pub mod cart;
 
+/// Game Boy model.
 #[derive(Debug, Default)]
 #[wasm_bindgen(inspectable)]
 pub struct GameBoy(pub(crate) dmg::GameBoy);
@@ -21,7 +22,7 @@ impl GameBoy {
 #[wasm_bindgen]
 impl GameBoy {
     /// Checks if enabled.
-    pub fn ready(&mut self) -> bool {
+    pub fn ready(&self) -> bool {
         self.0.ready()
     }
 
@@ -43,6 +44,7 @@ impl GameBoy {
         self.0.inside().video().vsync()
     }
 
+    /// Retrieves the current frame state.
     pub fn frame(&self) -> js_sys::Uint8Array {
         js_sys::Uint8Array::from(
             self.0
