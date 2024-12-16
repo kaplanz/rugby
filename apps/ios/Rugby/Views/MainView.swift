@@ -13,7 +13,7 @@ struct MainView: View {
     var body: some View {
         NavigationStack {
             LibraryView()
-                .fullScreenCover(isPresented: $showSettings) {
+                .sheet(isPresented: $showSettings) {
                     NavigationStack {
                         SettingsView()
                             .toolbar {

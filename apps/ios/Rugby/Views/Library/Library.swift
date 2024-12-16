@@ -14,10 +14,10 @@ class Library {
     var roms: [Game] = load()
 }
 
-public extension UTType {
-    static let gb = UTType(exportedAs: "dev.zakhary.rugby.gb")
-    static let gbc = UTType(exportedAs: "dev.zakhary.rugby.gbc")
-    static let sav = UTType(exportedAs: "dev.zakhary.rugby.sav")
+extension UTType {
+    public static let gb = UTType(exportedAs: "dev.zakhary.rugby.gb")
+    public static let gbc = UTType(exportedAs: "dev.zakhary.rugby.gbc")
+    public static let sav = UTType(exportedAs: "dev.zakhary.rugby.sav")
 }
 
 struct Game: Hashable, Identifiable {
