@@ -1,3 +1,5 @@
+//! Cartridge model.
+
 use rugby::core::dmg;
 use wasm_bindgen::prelude::*;
 
