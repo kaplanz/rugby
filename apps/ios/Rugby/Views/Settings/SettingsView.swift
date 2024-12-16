@@ -83,9 +83,9 @@ enum Speed: Float, CaseIterable, CustomStringConvertible, Identifiable {
     var description: String {
         switch self {
         case .turbo:
-            return "Turbo"
+            "Turbo"
         default:
-            return rawValue.formatted(.percent)
+            rawValue.formatted(.percent)
         }
     }
 

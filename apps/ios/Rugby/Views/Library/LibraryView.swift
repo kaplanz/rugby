@@ -16,10 +16,12 @@ struct LibraryView: View {
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: Array(
-                repeating: .init(.flexible()),
-                count: 2
-            )) {
+            LazyVGrid(
+                columns: Array(
+                    repeating: .init(.flexible()),
+                    count: 2
+                )
+            ) {
                 ForEach(lib.roms, id: \.self) { game in
                     LibraryItem(game: game, play: $play)
                 }

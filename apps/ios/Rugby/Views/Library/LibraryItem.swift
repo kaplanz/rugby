@@ -22,14 +22,17 @@ struct LibraryItem: View {
                         Label("Play", systemImage: "play")
                     }
                     Divider()
-                    Button {} label: {
+                    Button {
+                    } label: {
                         Label("Get Info", systemImage: "info.circle")
                     }
-                    Button {} label: {
+                    Button {
+                    } label: {
                         Label("Rename", systemImage: "pencil")
                     }
                     Divider()
-                    Button(role: .destructive) {} label: {
+                    Button(role: .destructive) {
+                    } label: {
                         Label("Delete", systemImage: "trash")
                     }
                 }
@@ -43,17 +46,19 @@ struct LibraryItem: View {
 }
 
 #Preview {
-    LibraryItem(game: Game(path: Bundle.main.url(
-        forResource: "roms/test/acid2/dmg-acid2",
-        withExtension: "gb"
-    )!), play: .constant(nil))
+    LibraryItem(
+        game: Game(
+            path: Bundle.main.url(
+                forResource: "roms/games/porklike/porklike",
+                withExtension: "gb"
+            )!), play: .constant(nil))
 }
 
 struct LibraryIcon: View {
     @State var icon: Image?
 
     var body: some View {
-        return (icon ?? Image(systemName: "questionmark.app"))
+        (icon ?? Image(systemName: "questionmark.app"))
             .aspectRatio(contentMode: .fit)
             .frame(width: 160, height: 144)
             .background(.white)
