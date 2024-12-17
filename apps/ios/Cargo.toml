@@ -10,7 +10,8 @@ license = { workspace = true }
 
 [lib]
 name = "rugby"
-crate-type = ["cdylib"]
+crate-type = ["staticlib"]
 
 [dependencies]
+rugby = { workspace = true }
 uniffi = { version = "0.28.2", features = ["cli"] }
