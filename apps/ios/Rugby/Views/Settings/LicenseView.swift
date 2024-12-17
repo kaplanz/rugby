@@ -30,7 +30,7 @@ class License: ObservableObject {
     func load(path: String) {
         if let path = Bundle.main.path(forResource: path, ofType: nil) {
             do {
-                let text = try String(contentsOfFile: path)
+                let text = try String(contentsOfFile: path, encoding: .utf8)
                 DispatchQueue.main.async {
                     self.text = text
                 }
