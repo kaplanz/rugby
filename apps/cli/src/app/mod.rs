@@ -103,7 +103,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, emu::Message>) -> Result<()> 
                         // Update title with statistics
                         if let Some(gui) = app.gui.win.as_mut() {
                             gui.lcd
-                                .title(&format!("{title} ({frame:.1} FPS)", frame = stats.rate(),));
+                                .title(&format!("{title} ({frame:.1} FPS)", frame = stats.rate()));
                         }
                     }
                     Message::Video(frame) => {
