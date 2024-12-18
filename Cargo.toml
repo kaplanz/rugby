@@ -56,6 +56,7 @@ rugby-cfg = { version = "0.1.0", path = "apis/cfg" }
 rugby-core = { version = "0.1.0", path = "core" }
 rugby-gbd = { version = "0.1.0", path = "apis/gbd" }
 serde = { version = "1.0.214", features = ["derive"] }
+size = "0.4.1"
 thiserror = "2.0.3"
 toml = "0.8.19"
 wrange = { version = "0.1.0", path = "crates/wrange" }
