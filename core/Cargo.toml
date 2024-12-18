@@ -13,6 +13,7 @@ hexd = { workspace = true }
 itertools = { workspace = true, optional = true }
 log = { workspace = true }
 rugby-arch = { workspace = true }
+size = { workspace = true }
 thiserror = { workspace = true }
 
 [features]
