@@ -127,7 +127,11 @@ pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
         file.read_exact(&mut buf)
             .with_context(|| format!("failed to read: `{}`", path.display()))?;
         let nbytes = buf.len();
-        debug!("read {nbytes} bytes: `{}`", path.display());
+        debug!(
+            "read {size}: `{path}`",
+            size = size::Size::from_bytes(nbytes),
+            path = path.display(),
+        );
         // Use ROM contents
         buf
     };
@@ -161,7 +165,11 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
             .take(0x0080_0000)
             .read_to_end(&mut buf)
             .with_context(|| format!("failed to read: `{}`", path.display()))?;
-        debug!("read {nbytes} bytes: `{}`", path.display());
+        debug!(
+            "read {size}: `{path}`",
+            size = size::Size::from_bytes(nbytes),
+            path = path.display(),
+        );
         // Use ROM contents
         buf
     };
