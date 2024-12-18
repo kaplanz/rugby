@@ -113,17 +113,17 @@ mod make {
         match read.cmp(&head.romsz) {
             Ordering::Less => {
                 warn!(
-                    "loaded {init} bytes; remaining {diff} bytes uninitialized",
-                    init = read,
-                    diff = head.romsz - read
+                    "loaded {init}; remaining {diff} uninitialized",
+                    init = size::Size::from_bytes(read),
+                    diff = size::Size::from_bytes(head.romsz - read),
                 );
             }
-            Ordering::Equal => info!("loaded {read} bytes"),
+            Ordering::Equal => info!("loaded {read}", read = size::Size::from_bytes(read)),
             Ordering::Greater => {
                 warn!(
-                    "loaded {init} bytes; remaining {diff} bytes truncated",
-                    init = head.romsz,
-                    diff = read - head.romsz
+                    "loaded {init}; remaining {diff} truncated",
+                    init = size::Size::from_bytes(head.romsz),
+                    diff = size::Size::from_bytes(read - head.romsz),
                 );
             }
         }
@@ -208,7 +208,7 @@ impl Mbc for Body {
             Body::Mbc3(mbc) => mbc.flash(buf),
             Body::Mbc5(mbc) => mbc.flash(buf),
         }
-        .inspect(|nbytes| info!("flashed {nbytes} bytes"))
+        .inspect(|&nbytes| info!("flashed {size}", size = size::Size::from_bytes(nbytes)))
     }
 
     /// Dumps the contents of the cartridge's RAM.
@@ -219,7 +219,7 @@ impl Mbc for Body {
             Body::Mbc3(mbc) => mbc.dump(buf),
             Body::Mbc5(mbc) => mbc.dump(buf),
         }
-        .inspect(|nbytes| info!("dumped {nbytes} bytes"))
+        .inspect(|&nbytes| info!("dumped {size}", size = size::Size::from_bytes(nbytes)))
     }
 }
 
