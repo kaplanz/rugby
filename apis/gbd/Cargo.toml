@@ -21,5 +21,6 @@ pest = { version = "2.7.14" }
 pest_derive = { version = "2.7.14" }
 png = { workspace = true }
 rugby = { workspace = true, features = ["debug"] }
+size = { workspace = true }
 thiserror = { workspace = true }
 wrange = { workspace = true }
