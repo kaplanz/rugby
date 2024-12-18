@@ -1508,6 +1508,7 @@ dependencies = [
  "rugby-gbd",
  "rustyline",
  "serde",
+ "size",
  "sysexits",
  "thiserror 2.0.3",
  "toml 0.8.19",
@@ -1523,6 +1524,7 @@ dependencies = [
  "itertools",
  "log",
  "rugby-arch",
+ "size",
  "thiserror 2.0.3",
 ]
 
@@ -1542,6 +1544,7 @@ dependencies = [
  "pest_derive",
  "png",
  "rugby",
+ "size",
  "thiserror 2.0.3",
  "wrange",
 ]
@@ -1782,6 +1785,12 @@ name = "siphasher"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38b58827f4464d87d377d175e90bf58eb00fd8716ff0a62f80356b5e61555d0d"
+
+[[package]]
+name = "size"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fed904c7fb2856d868b92464fc8fa597fce366edea1a9cbfaa8cb5fe080bd6d"
 
 [[package]]
 name = "slab"
