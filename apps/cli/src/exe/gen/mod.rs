@@ -52,7 +52,7 @@ pub mod cmp {
     /// [`Cmp`](super::cli::Document::Cmp) entrypoint.
     pub fn exec(shell: Shell) -> Result<()> {
         // Build command
-        let mut cmd = crate::Cli::command().flatten_help(true);
+        let mut cmd = crate::cli::Command::command().flatten_help(true);
         cmd.build();
         // Declare buffer
         let buf = std::io::stdout();
