@@ -1,10 +1,10 @@
 //! Command-line interface.
 
-use clap::{Args, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 
 /// [Gen](super::exec) options.
-#[derive(Args, Debug)]
+#[derive(Debug, Parser)]
 #[clap(arg_required_else_help = true)]
 #[clap(flatten_help = true)]
 #[group(id = "Gen")]
@@ -16,6 +16,7 @@ pub struct Cli {
 
 /// Generated document.
 #[derive(Debug, Subcommand)]
+#[clap(disable_help_subcommand = true)]
 #[non_exhaustive]
 pub enum Document {
     /// Configuration file.
@@ -27,5 +28,20 @@ pub enum Document {
     Cmp { shell: Shell },
     /// Manual pages.
     #[clap(disable_help_flag = true)]
-    Man,
+    Man {
+        #[clap(value_name = "COMMAND")]
+        cmd: Option<Command>,
+    },
+}
+
+/// Execution mode.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, ValueEnum)]
+#[non_exhaustive]
+pub enum Command {
+    /// Emulate provided ROM.
+    Run,
+    /// Print ROM information.
+    Info,
+    /// Generate static files.
+    Gen,
 }
