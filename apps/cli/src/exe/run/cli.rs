@@ -2,12 +2,12 @@
 
 use std::net::SocketAddr;
 
-use clap::Args;
+use clap::{Args, Parser};
 
 use crate::cli::Settings;
 
 /// [Run](super::exec) options.
-#[derive(Args, Debug)]
+#[derive(Debug, Parser)]
 #[clap(arg_required_else_help = true)]
 #[group(id = "Run")]
 pub struct Cli {
