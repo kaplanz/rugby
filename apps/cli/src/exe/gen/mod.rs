@@ -12,7 +12,7 @@ pub fn main(args: Cli) -> Result<()> {
     match args.document {
         cli::Document::Cfg => cfg::exec(),
         cli::Document::Cmp { shell } => cmp::exec(shell),
-        cli::Document::Man => man::exec(),
+        cli::Document::Man { cmd } => man::exec(cmd),
     }
 }
 
@@ -76,6 +76,7 @@ pub mod man {
     use clap::{Command, CommandFactory};
     use clap_mangen::Man;
 
+    use super::cli::Command as Subcommand;
     use crate::{Result, NAME};
 
     /// Manual section.
@@ -93,9 +94,15 @@ pub mod man {
     pub const MANSECT: &str = "6";
 
     /// [`Man`](super::cli::Document::Man) entrypoint.
-    pub fn exec() -> Result<()> {
+    pub fn exec(cmd: Option<Subcommand>) -> Result<()> {
         // Build command
-        let mut cmd = crate::Cli::command().flatten_help(true);
+        let mut cmd = match cmd {
+            None => crate::Cli::command(),
+            Some(Subcommand::Run) => crate::exe::run::Cli::command(),
+            Some(Subcommand::Info) => crate::exe::info::Cli::command(),
+            Some(Subcommand::Gen) => crate::exe::gen::Cli::command(),
+        }
+        .flatten_help(true);
         cmd.build();
         // Declare buffer
         let mut buf = std::io::stdout();
