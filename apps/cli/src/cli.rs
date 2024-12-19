@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use clap::{Args, Parser, Subcommand, ValueHint};
+use clap::{Args, Parser, ValueHint};
 
 use crate::cfg::Config;
 use crate::{exe, NAME};
@@ -15,7 +15,6 @@ use crate::{exe, NAME};
 #[clap(name = NAME, author, version, about, long_about)]
 #[clap(arg_required_else_help = true)]
 #[clap(args_conflicts_with_subcommands = true)]
-#[clap(disable_help_subcommand = true)]
 #[clap(subcommand_precedence_over_arg = true)]
 #[clap(subcommand_negates_reqs = true)]
 pub struct Cli {
@@ -33,7 +32,9 @@ pub struct Cli {
 }
 
 /// Execution mode.
-#[derive(Debug, Subcommand)]
+#[derive(Debug, Parser)]
+#[clap(name = NAME)]
+#[clap(disable_help_subcommand = true)]
 #[non_exhaustive]
 pub enum Command {
     /// Emulate provided ROM.
