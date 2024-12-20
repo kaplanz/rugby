@@ -5,7 +5,7 @@ use clap_complete::Shell;
 
 use super::NAME;
 
-/// [Gen](super::exec) options.
+/// Generate static files.
 #[derive(Debug, Parser)]
 #[clap(name = NAME)]
 #[clap(arg_required_else_help = true)]
