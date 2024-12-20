@@ -49,6 +49,10 @@ fn main() -> Exit {
                 // rugby gen
                 exe::gen::main(*cli)
             }
+            Command::Help(cli) => {
+                // rugby help
+                exe::help::main(*cli)
+            }
         },
     );
 
