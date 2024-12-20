@@ -30,6 +30,7 @@ Commands:
   run   Emulate provided ROM
   info  Print ROM information
   gen   Generate static files
+  help  Show help information
 
 Arguments:
   [ROM]  Cartridge ROM image file

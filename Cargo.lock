@@ -1517,6 +1517,7 @@ dependencies = [
  "serde",
  "size",
  "sysexits",
+ "tempfile",
  "thiserror 2.0.3",
  "toml 0.8.19",
  "tracing-subscriber",
