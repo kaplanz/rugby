@@ -1,10 +1,15 @@
 //! Generate static files.
 
+use constcat::concat;
+
 use crate::err::Result;
 
 pub mod cli;
 
 pub use self::cli::Cli;
+
+/// Subcommand name.
+pub const NAME: &str = concat!(crate::NAME, "-gen");
 
 /// [`Gen`](crate::cli::Command::Gen) entrypoint.
 #[allow(clippy::needless_pass_by_value)]
