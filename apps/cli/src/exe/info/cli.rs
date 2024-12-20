@@ -5,7 +5,7 @@ use rugby_cfg::opt::emu::Cart;
 
 use super::NAME;
 
-/// [Info](super::exec) options.
+/// Print ROM information.
 #[derive(Debug, Parser)]
 #[clap(name = NAME)]
 #[clap(arg_required_else_help = true)]
