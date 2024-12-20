@@ -3,8 +3,11 @@
 use clap::Parser;
 use rugby_cfg::opt::emu::Cart;
 
+use super::NAME;
+
 /// [Info](super::exec) options.
 #[derive(Debug, Parser)]
+#[clap(name = NAME)]
 #[clap(arg_required_else_help = true)]
 #[group(id = "Info")]
 pub struct Cli {

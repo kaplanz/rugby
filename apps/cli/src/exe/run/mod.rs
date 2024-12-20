@@ -4,6 +4,7 @@ use std::path::Path;
 use std::thread;
 
 use anyhow::Context as _;
+use constcat::concat;
 use log::trace;
 use rugby_cfg::Join;
 
@@ -13,6 +14,9 @@ use crate::{app, cfg, emu, talk};
 pub mod cli;
 
 pub use self::cli::Cli;
+
+/// Subcommand name.
+pub const NAME: &str = concat!(crate::NAME, "-run");
 
 /// [`Run`](crate::cli::Command::Run) entrypoint.
 pub fn main(mut args: Cli) -> Result<()> {
