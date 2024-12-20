@@ -3,8 +3,11 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 
+use super::NAME;
+
 /// [Gen](super::exec) options.
 #[derive(Debug, Parser)]
+#[clap(name = NAME)]
 #[clap(arg_required_else_help = true)]
 #[clap(flatten_help = true)]
 #[group(id = "Gen")]
