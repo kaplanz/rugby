@@ -43,6 +43,8 @@ pub enum Command {
     Info(Box<exe::info::Cli>),
     /// Generate static files.
     Gen(Box<exe::gen::Cli>),
+    /// Show help information.
+    Help(Box<exe::help::Cli>),
 }
 
 /// Configuration options.
