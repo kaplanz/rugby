@@ -7,7 +7,7 @@ use clap::{Args, Parser};
 use super::NAME;
 use crate::cli::Settings;
 
-/// [Run](super::exec) options.
+/// Emulate provided ROM.
 #[derive(Debug, Parser)]
 #[clap(name = NAME)]
 #[clap(arg_required_else_help = true)]
