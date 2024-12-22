@@ -81,8 +81,8 @@ impl Serial for Frontend {
         let sent = link.send(&buf)?;
         debug!(
             "transmitted {sent} (downloaded {read})",
-            sent = size::Size::from_bytes(sent),
-            read = size::Size::from_bytes(read),
+            sent = bfmt::Size::from(sent),
+            read = bfmt::Size::from(read),
         );
         trace!("serial tx: {buf:?}");
         Ok(read)
@@ -108,8 +108,8 @@ impl Serial for Frontend {
         let wrote = rx.write(buf)?;
         debug!(
             "received {recvd} (uploaded {wrote})",
-            recvd = size::Size::from_bytes(recvd),
-            wrote = size::Size::from_bytes(wrote),
+            recvd = bfmt::Size::from(recvd),
+            wrote = bfmt::Size::from(wrote),
         );
         trace!("serial rx: {buf:?}");
         Ok(wrote)
