@@ -471,8 +471,8 @@ impl Display for Header {
         writeln!(f, "├──────────────────┤")?;
         writeln!(f, "│ MBC: {:>11} │", self.info)?;
         writeln!(f, "├──────────────────┤")?;
-        writeln!(f, "│ ROM: {:>9} B │", self.romsz)?;
-        writeln!(f, "│ RAM: {:>9} B │", self.ramsz)?;
+        writeln!(f, "│ ROM: {:>11.0} │", bfmt::Size::from(self.romsz))?;
+        writeln!(f, "│ RAM: {:>11.0} │", bfmt::Size::from(self.ramsz))?;
         writeln!(f, "├──────────────────┤")?;
         writeln!(f, "│ Region: {:>8} │", self.region)?;
         writeln!(
