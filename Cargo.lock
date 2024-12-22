@@ -161,6 +161,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bfmt"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.3",
+]
+
+[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
