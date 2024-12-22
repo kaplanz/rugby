@@ -9,11 +9,11 @@ license = { workspace = true }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+bfmt = { workspace = true }
 hexd = { workspace = true }
 itertools = { workspace = true, optional = true }
 log = { workspace = true }
 rugby-arch = { workspace = true }
-size = { workspace = true }
 thiserror = { workspace = true }
 
 [features]
