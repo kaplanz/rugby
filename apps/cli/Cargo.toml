@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 advise = { workspace = true }
 anyhow = { workspace = true }
+bfmt = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
 clap_complete = "4.5.37"
 clap_mangen = "0.2.24"
@@ -29,7 +30,6 @@ rugby-cfg = { workspace = true, features = ["clap", "serde"] }
 rugby-gbd = { workspace = true, optional = true }
 rustyline = { version = "14.0.0", optional = true }
 serde = { workspace = true }
-size = { workspace = true }
 sysexits = "0.8.5"
 tempfile = "3.14.0"
 thiserror = { workspace = true }

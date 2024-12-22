@@ -283,7 +283,7 @@ pub fn read_range(emu: &mut GameBoy, range: Wrange<u16>) -> Result<()> {
     // Load all reads
     let data: Vec<_> = iter.map(|addr| emu.main.soc.cpu.read(addr)).collect();
     // Display results
-    advise::info!("read {size}:", size = size::Size::from_bytes(data.len()));
+    advise::info!("read {size}:", size = bfmt::Size::from(data.len()));
     let data = format!("{}", hexd::Printer::<u8>::new(start.into(), &data));
     for line in data.split('\n') {
         advise::info!("{line}");
@@ -321,7 +321,7 @@ pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
             // Decode assuming ASCII representation
             let text = std::str::from_utf8(&data);
             // Display results
-            advise::info!("received {size}", size = size::Size::from_bytes(nbytes));
+            advise::info!("received {size}", size = bfmt::Size::from(nbytes));
             if nbytes > 0 {
                 advise::debug!("raw: {data:?}");
                 match text {
@@ -335,12 +335,9 @@ pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
             let nbytes = emu.main.soc.ser.tx().write(&data)?;
             let extra = data.len() - nbytes;
             // Display results
-            advise::info!("transmitted {size}", size = size::Size::from_bytes(nbytes));
+            advise::info!("transmitted {size}", size = bfmt::Size::from(nbytes));
             if extra > 0 {
-                advise::warn!(
-                    "could not transmit {size}",
-                    size = size::Size::from_bytes(extra)
-                );
+                advise::warn!("could not transmit {size}", size = bfmt::Size::from(extra));
             }
         }
     }
@@ -454,7 +451,7 @@ pub fn write_range(emu: &mut GameBoy, range: Wrange<u16>, byte: u8) -> Result<()
         advise::warn!("ignored some writes in ${start:04x}..${end:04x} <- {byte:02x}");
     }
     // Display results
-    advise::info!("write {size}:", size = size::Size::from_bytes(nbytes));
+    advise::info!("write {size}:", size = bfmt::Size::from(nbytes));
     let data = format!("{}", hexd::Printer::<u8>::new(start.into(), &data));
     for line in data.split('\n') {
         advise::info!("{line}");

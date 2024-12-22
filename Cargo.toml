@@ -43,6 +43,7 @@ license = "MIT OR Apache-2.0"
 [workspace.dependencies]
 advise = "0.1.0"
 anyhow = "1.0.93"
+bfmt = { version = "0.1.0", path = "crates/bfmt" }
 chex = { version = "0.1.0", path = "crates/chex" }
 clap = { version = "4.5.20", features = ["derive"] }
 hexd = { version = "0.1.0", path = "crates/hexd" }
@@ -56,7 +57,6 @@ rugby-cfg = { version = "0.1.0", path = "apis/cfg" }
 rugby-core = { version = "0.1.0", path = "core" }
 rugby-gbd = { version = "0.1.0", path = "apis/gbd" }
 serde = { version = "1.0.214", features = ["derive"] }
-size = "0.4.1"
 thiserror = "2.0.3"
 toml = "0.8.19"
 wrange = { version = "0.1.0", path = "crates/wrange" }
