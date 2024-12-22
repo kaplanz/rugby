@@ -129,7 +129,7 @@ pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
         let nbytes = buf.len();
         debug!(
             "read {size}: `{path}`",
-            size = size::Size::from_bytes(nbytes),
+            size = bfmt::Size::from(nbytes),
             path = path.display(),
         );
         // Use ROM contents
@@ -167,7 +167,7 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
             .with_context(|| format!("failed to read: `{}`", path.display()))?;
         debug!(
             "read {size}: `{path}`",
-            size = size::Size::from_bytes(nbytes),
+            size = bfmt::Size::from(nbytes),
             path = path.display(),
         );
         // Use ROM contents
