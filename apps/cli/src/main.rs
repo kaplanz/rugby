@@ -30,6 +30,10 @@ const NAME: &str = env!("CARGO_CRATE_NAME");
 fn main() -> Exit {
     // Parse args
     let args = Cli::parse();
+    // Set verbosity
+    log::VERBOSE
+        .set(args.log)
+        .expect("unable to set logger verbosity");
 
     // Execute subcommand
     let out = args.cmd.map_or_else(
