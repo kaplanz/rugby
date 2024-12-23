@@ -41,10 +41,12 @@ pub fn main(args: Cli) -> Result<()> {
     debug!("wrote temporary manpage: {}", tmp.path().display());
 
     // Spawn manual documentation process
+    debug!("launching `man`");
     let exit = process::Command::new("man")
         .arg(tmp.path())
         .status()
         .context("could not open manual page")?;
+    debug!("{exit}");
 
     // Forward exit status
     if let Some(code) = exit.code() {
