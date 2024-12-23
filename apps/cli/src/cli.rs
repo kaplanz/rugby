@@ -3,6 +3,7 @@
 use std::path::PathBuf;
 
 use clap::{Args, Parser, ValueHint};
+use clap_verbosity_flag::Verbosity;
 
 use crate::cfg::Config;
 use crate::{exe, NAME};
@@ -29,6 +30,11 @@ pub struct Cli {
     /// [`Command::Run`] is treated as the default command if none is provided.
     #[clap(flatten)]
     pub run: exe::run::Cli,
+
+    // Logging verbosity.
+    #[clap(flatten)]
+    #[clap(next_help_heading = "Logging")]
+    pub log: Verbosity,
 }
 
 /// Execution mode.

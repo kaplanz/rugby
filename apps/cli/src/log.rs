@@ -1,6 +1,7 @@
 use std::sync::OnceLock;
 
 use anyhow::{Context, Result};
+use clap_verbosity_flag::Verbosity;
 #[cfg(feature = "gbd")]
 use rugby_gbd::Filter;
 use tracing_subscriber::filter::LevelFilter;
@@ -13,17 +14,20 @@ type Reload = reload::Handle<EnvFilter, Registry>;
 /// Global logger reload handle.
 pub static RELOAD: OnceLock<Handle> = OnceLock::new();
 
+/// Global logger verbosity.
+pub static VERBOSE: OnceLock<Verbosity> = OnceLock::new();
+
 /// Initializes the global logger.
 ///
 /// # Note
 ///
 /// Afterwards, the global logger's reload handle can be accessed via
 /// [`RELOAD`].
-pub fn init(filter: &str) -> Result<()> {
+pub fn init(filter: Option<&str>) -> Result<()> {
     // Build and configure an environment filter
     let filter = EnvFilter::builder()
         .with_default_directive(LevelFilter::WARN.into())
-        .parse(filter)
+        .parse(filter.unwrap_or(&VERBOSE.get().context("missing logging filter")?.to_string()))
         .with_context(|| format!("failed to parse: {filter:?}"))?;
     // Wrap it inside a reload layer
     let (filter, reload) = reload::Layer::new(filter);
