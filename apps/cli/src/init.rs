@@ -82,7 +82,9 @@ pub fn app(args: &Cli) -> Result<App> {
 /// Builds an emulator instance.
 pub fn emu(cfg: &Config) -> Result<GameBoy> {
     // Load cart ROM
-    let mut cart = self::cart(&cfg.emu.cart).context("invalid cartridge")?;
+    let mut cart = self::cart(&cfg.emu.cart)
+        .context("invalid cartridge")?
+        .inspect(|cart| info!("cartridge header:\n{}", cart.header()));
     // Load cart RAM
     if let Some(cart) = cart.as_mut() {
         util::rom::flash(&cfg.emu.cart, cart).context("error flashing save RAM")?;
@@ -190,7 +192,7 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
         Cartridge::new
     }(&rom)
     .with_context(|| format!("failed to load: `{}`", path.display()))?;
-    info!("loaded cartridge:\n{}", cart.header());
+    info!("loaded cartridge");
 
     // Return success
     Ok(Some(cart))
