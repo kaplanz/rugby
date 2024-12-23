@@ -30,10 +30,8 @@ pub fn main(mut args: Cli) -> Result<()> {
         cfg
     });
     // Initialize logger
-    #[cfg_attr(not(feature = "gbd"), allow(unused))]
-    crate::log::init(args.cfg.data.app.log.as_deref().unwrap_or_default())
-        .context("logger initialization failed")?;
-    // Log previous steps
+    crate::log::init(args.cfg.data.app.log.as_deref()).context("logger initialization failed")?;
+    // Log arguments
     trace!("{args:#?}");
 
     // Run application
