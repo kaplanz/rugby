@@ -5,7 +5,7 @@ use std::process;
 use anyhow::Context;
 use clap::CommandFactory;
 use constcat::concat;
-use log::debug;
+use log::{debug, trace};
 
 use crate::err::Result;
 use crate::exe::gen::man;
@@ -20,6 +20,11 @@ pub const NAME: &str = concat!(crate::NAME, "-help");
 /// [`Help`](crate::cli::Command::Help) entrypoint.
 #[allow(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
+    // Initialize logger
+    crate::log::init(None).context("logger initialization failed")?;
+    // Log arguments
+    trace!("{args:#?}");
+
     // Build command
     let mut cmd = match args.cmd {
         None => crate::Cli::command(),

@@ -46,8 +46,12 @@ Features:
       --host <ADDR>  Link cable local address
       --peer <ADDR>  Link cable peer address
 
+Logging:
+  -l, --log <FILTER>  Logging filter [env: RUGBY_LOG=]
+  -v, --verbose...    Increase logging verbosity
+  -q, --quiet...      Decrease logging verbosity
+
 Settings:
-  -l, --log <FILTER>     Logging filter [env: RUGBY_LOG=]
   -p, --palette <COLOR>  2-bit color palette [possible values: autumn-chill,
                          blk-aqu, blue-dream, coldfire, coral, demichrome,
                          earth, ice-cream, legacy, mist, mono, morris,
