@@ -1,6 +1,8 @@
 //! Generate static files.
 
+use anyhow::Context;
 use constcat::concat;
+use log::trace;
 
 use crate::err::Result;
 
@@ -14,6 +16,12 @@ pub const NAME: &str = concat!(crate::NAME, "-gen");
 /// [`Gen`](crate::cli::Command::Gen) entrypoint.
 #[allow(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
+    // Initialize logger
+    crate::log::init(None).context("logger initialization failed")?;
+    // Log arguments
+    trace!("{args:#?}");
+
+    // Execute subcommand
     match args.document {
         cli::Document::Cfg => cfg::exec(),
         cli::Document::Cmp { shell } => cmp::exec(shell),
