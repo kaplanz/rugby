@@ -26,8 +26,8 @@ Emulate the Nintendo Game Boy
 Usage: rugby [OPTIONS] <COMMAND>
 
 Commands:
-  check  Analyze provided ROM
-  run    Emulate provided ROM
+  check  Analyze provided ROM [aliases: c]
+  run    Emulate provided ROM [aliases: r]
   gen    Generate static files
   help   Show help information
 

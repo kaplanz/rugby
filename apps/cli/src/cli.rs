@@ -33,12 +33,15 @@ pub struct Cli {
 #[non_exhaustive]
 pub enum Command {
     /// Analyze provided ROM.
+    #[clap(visible_alias = "c")]
     Check(Box<exe::check::Cli>),
     /// Emulate provided ROM.
+    #[clap(visible_alias = "r")]
     Run(Box<exe::run::Cli>),
     /// Generate static files.
     Gen(Box<exe::gen::Cli>),
     /// Show help information.
+    #[clap(alias = "man")]
     Help(Box<exe::help::Cli>),
 }
 
