@@ -1,4 +1,4 @@
-//! Print ROM information.
+//! Analyze provided ROM.
 
 use anyhow::Context;
 use constcat::concat;
@@ -12,9 +12,9 @@ pub mod cli;
 pub use self::cli::Cli;
 
 /// Subcommand name.
-pub const NAME: &str = concat!(crate::NAME, "-info");
+pub const NAME: &str = concat!(crate::NAME, "-check");
 
-/// [`Info`](crate::cli::Command::Info) entrypoint.
+/// [`Check`](crate::cli::Command::Check) entrypoint.
 #[allow(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
     // Initialize logger
