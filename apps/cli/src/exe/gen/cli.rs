@@ -41,10 +41,10 @@ pub enum Document {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, ValueEnum)]
 #[non_exhaustive]
 pub enum Command {
+    /// Analyze provided ROM.
+    Check,
     /// Emulate provided ROM.
     Run,
-    /// Print ROM information.
-    Info,
     /// Generate static files.
     Gen,
 }

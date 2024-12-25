@@ -32,10 +32,10 @@ pub struct Cli {
 #[clap(disable_help_subcommand = true)]
 #[non_exhaustive]
 pub enum Command {
+    /// Analyze provided ROM.
+    Check(Box<exe::check::Cli>),
     /// Emulate provided ROM.
     Run(Box<exe::run::Cli>),
-    /// Print ROM information.
-    Info(Box<exe::info::Cli>),
     /// Generate static files.
     Gen(Box<exe::gen::Cli>),
     /// Show help information.

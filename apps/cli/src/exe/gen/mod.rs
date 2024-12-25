@@ -111,8 +111,8 @@ pub mod man {
         // Build command
         let mut cmd = match cmd {
             None => crate::Cli::command(),
+            Some(Subcommand::Check) => crate::exe::check::Cli::command(),
             Some(Subcommand::Run) => crate::exe::run::Cli::command(),
-            Some(Subcommand::Info) => crate::exe::info::Cli::command(),
             Some(Subcommand::Gen) => crate::exe::gen::Cli::command(),
         }
         .flatten_help(true);
