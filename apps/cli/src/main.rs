@@ -37,13 +37,13 @@ fn main() -> Exit {
 
     // Execute subcommand
     let out = match args.cmd {
+        Command::Check(cli) => {
+            // rugby check
+            exe::check::main(*cli)
+        }
         Command::Run(cli) => {
             // rugby run
             exe::run::main(*cli)
-        }
-        Command::Info(cli) => {
-            // rugby info
-            exe::info::main(*cli)
         }
         Command::Gen(cli) => {
             // rugby gen
