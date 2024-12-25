@@ -36,29 +36,24 @@ fn main() -> Exit {
         .expect("unable to set logger verbosity");
 
     // Execute subcommand
-    let out = args.cmd.map_or_else(
-        // default subcommand
-        || exe::run::main(args.run),
-        // perform subcommand
-        |cmd| match cmd {
-            Command::Run(cli) => {
-                // rugby run
-                exe::run::main(*cli)
-            }
-            Command::Info(cli) => {
-                // rugby info
-                exe::info::main(*cli)
-            }
-            Command::Gen(cli) => {
-                // rugby gen
-                exe::gen::main(*cli)
-            }
-            Command::Help(cli) => {
-                // rugby help
-                exe::help::main(*cli)
-            }
-        },
-    );
+    let out = match args.cmd {
+        Command::Run(cli) => {
+            // rugby run
+            exe::run::main(*cli)
+        }
+        Command::Info(cli) => {
+            // rugby info
+            exe::info::main(*cli)
+        }
+        Command::Gen(cli) => {
+            // rugby gen
+            exe::gen::main(*cli)
+        }
+        Command::Help(cli) => {
+            // rugby help
+            exe::help::main(*cli)
+        }
+    };
 
     // Return exit status
     match out {
