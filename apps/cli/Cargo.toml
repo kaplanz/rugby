@@ -17,14 +17,13 @@ advise = { workspace = true }
 anyhow = { workspace = true }
 bfmt = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
-clap-verbosity-flag = "3.0.2"
+clap-verbosity-flag = { version = "3.0.2", features = ["tracing"] }
 clap_complete = "4.5.37"
 clap_mangen = "0.2.24"
 constcat = "0.5.1"
 ctrlc = "3.4.5"
 derive_more = { version = "1.0.0", features = ["display"] }
 either = "1.13.0"
-itertools = { workspace = true }
 log = { workspace = true }
 minifb = "0.27.0"
 rugby = { workspace = true }
