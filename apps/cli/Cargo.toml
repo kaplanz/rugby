@@ -24,6 +24,7 @@ constcat = "0.5.1"
 ctrlc = "3.4.5"
 derive_more = { version = "1.0.0", features = ["display"] }
 either = "1.13.0"
+itertools = { workspace = true }
 log = { workspace = true }
 minifb = "0.27.0"
 rugby = { workspace = true }
