@@ -15,21 +15,10 @@ use crate::{exe, NAME};
 #[derive(Debug, Parser)]
 #[clap(name = NAME, author, version, about, long_about)]
 #[clap(arg_required_else_help = true)]
-#[clap(args_conflicts_with_subcommands = true)]
-#[clap(subcommand_precedence_over_arg = true)]
-#[clap(subcommand_negates_reqs = true)]
 pub struct Cli {
     /// Execution mode.
     #[clap(subcommand)]
-    pub cmd: Option<Command>,
-
-    /// [Run](cmd::run::exec) options.
-    ///
-    /// # Note
-    ///
-    /// [`Command::Run`] is treated as the default command if none is provided.
-    #[clap(flatten)]
-    pub run: exe::run::Cli,
+    pub cmd: Command,
 
     // Logging verbosity.
     #[clap(flatten)]

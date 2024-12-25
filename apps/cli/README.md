@@ -23,8 +23,7 @@ To see usage information, run the `rugby` executable with the `-h` flag (use
 ```
 Emulate the Nintendo Game Boy
 
-Usage: rugby [OPTIONS] [ROM]
-       rugby <COMMAND>
+Usage: rugby [OPTIONS] <COMMAND>
 
 Commands:
   run   Emulate provided ROM
@@ -32,44 +31,13 @@ Commands:
   gen   Generate static files
   help  Show help information
 
-Arguments:
-  [ROM]  Cartridge ROM image file
-
 Options:
-      --conf <PATH>  Configuration file [env: RUGBY_CONF=]
-  -h, --help         Print help (see more with '--help')
-  -V, --version      Print version
-
-Features:
-  -x, --exit         Exit after instantiation
-  -H, --headless     Run in headless mode (command-line only)
-      --host <ADDR>  Link cable local address
-      --peer <ADDR>  Link cable peer address
+  -h, --help     Print help (see more with '--help')
+  -V, --version  Print version
 
 Logging:
-  -l, --log <FILTER>  Logging filter [env: RUGBY_LOG=]
-  -v, --verbose...    Increase logging verbosity
-  -q, --quiet...      Decrease logging verbosity
-
-Settings:
-  -p, --palette <COLOR>  2-bit color palette [possible values: autumn-chill,
-                         blk-aqu, blue-dream, coldfire, coral, demichrome,
-                         earth, ice-cream, legacy, mist, mono, morris,
-                         purple-dawn, rustic, velvet-cherry]
-  -s, --speed <FREQ>     Simulated clock speed [possible values: half, actual,
-                         double, max]
-  -b, --boot [<PATH>]    Boot ROM image file
-  -c, --check            Check cartridge integrity
-  -f, --force            Force cartridge construction
-  -S, --save <WHEN>      Cartridge RAM persistence [possible values: never,
-                         auto, always]
-
-Debug:
-  -i, --gbd              Enable interactive debugging
-      --trace <FORMAT>   Enable introspective tracing [possible values: binjgb,
-                         doctor]
-      --tracelog <PATH>  Output tracing logfile
-      --win              Enable VRAM debug windows
+  -v, --verbose...  Increase logging verbosity
+  -q, --quiet...    Decrease logging verbosity
 ```
 
 ### Configuration
