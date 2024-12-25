@@ -28,8 +28,8 @@ pub fn main(args: Cli) -> Result<()> {
     // Build command
     let mut cmd = match args.cmd {
         None => crate::Cli::command(),
+        Some(cli::Command::Check) => crate::exe::check::Cli::command(),
         Some(cli::Command::Run) => crate::exe::run::Cli::command(),
-        Some(cli::Command::Info) => crate::exe::info::Cli::command(),
         Some(cli::Command::Gen) => crate::exe::gen::Cli::command(),
     }
     .flatten_help(true);
