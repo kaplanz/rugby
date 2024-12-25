@@ -2,10 +2,8 @@ use std::sync::OnceLock;
 
 use anyhow::{Context, Result};
 use clap_verbosity_flag::Verbosity;
-use itertools::Itertools;
 #[cfg(feature = "gbd")]
 use rugby_gbd::Filter;
-use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{fmt, reload, EnvFilter, Layer, Registry};
@@ -25,18 +23,17 @@ pub static VERBOSE: OnceLock<Verbosity> = OnceLock::new();
 /// Afterwards, the global logger's reload handle can be accessed via
 /// [`RELOAD`].
 pub fn init(filter: Option<&str>) -> Result<()> {
+    // Extract verbosity flag
+    let verbose = VERBOSE.get().context("missing logging filter")?;
     // Build and configure an environment filter
     let filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::WARN.into())
+        .with_default_directive(verbose.tracing_level_filter().into())
         .parse({
-            // Extract verbosity flag
-            let verbose = VERBOSE.get().context("missing logging filter")?;
-            // Get command-line verbosity
-            let cli = verbose.is_present().then(|| verbose.to_string());
-            // Get environment log filter
-            let env = filter.map(ToString::to_string);
-            // Combine supplied filters
-            [env, cli].into_iter().flatten().join(",")
+            if verbose.is_present() {
+                ""
+            } else {
+                filter.unwrap_or_default()
+            }
         })
         .with_context(|| format!("failed to parse: {filter:?}"))?;
     // Wrap it inside a reload layer
