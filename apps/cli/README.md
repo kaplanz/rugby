@@ -26,10 +26,10 @@ Emulate the Nintendo Game Boy
 Usage: rugby [OPTIONS] <COMMAND>
 
 Commands:
-  run   Emulate provided ROM
-  info  Print ROM information
-  gen   Generate static files
-  help  Show help information
+  check  Analyze provided ROM
+  run    Emulate provided ROM
+  gen    Generate static files
+  help   Show help information
 
 Options:
   -h, --help     Print help (see more with '--help')
