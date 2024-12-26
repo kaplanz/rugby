@@ -1,6 +1,6 @@
 # Memory
 
-The following is a detailed diagram of Game Boy's memory architecture [^sono].
+The following is a detailed diagram of Game Boy's memory architecture.[^sono]
 
 ```mermaid
 graph TD
@@ -80,7 +80,6 @@ graph TD
     VRAM x--x  VRAMIF
 ```
 
-<!-- Footnotes -->
 [^sono]: Adapted from private communications with [Sono]. Used with permission.
 
 <!-- Reference-style links -->
