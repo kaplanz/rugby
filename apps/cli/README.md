@@ -15,30 +15,44 @@ to build this frontend.
 
 ## Usage
 
-### Command-line
+### Commands
 
-To see usage information, run the `rugby` executable with the `-h` flag (use
-`--help` for more detailed descriptions):
+As a single-binary application, `rugby` provides several useful commands
+(outlined below). To see usage information, run the executable with the `-h`
+flag (use `--help` for more detailed descriptions).
 
-```
-Emulate the Nintendo Game Boy
+#### `check`
 
-Usage: rugby [OPTIONS] <COMMAND>
+Attempts to construct the provided ROM without performing any emulation. On
+success, ROM information is printed to the console.
 
-Commands:
-  check  Analyze provided ROM [aliases: c]
-  run    Emulate provided ROM [aliases: r]
-  gen    Generate static files
-  help   Show help information
+#### `run`
 
-Options:
-  -h, --help     Print help (see more with '--help')
-  -V, --version  Print version
+Emulates the provided ROM. See options to customize emulation behaviour
+[below](#configuration).
 
-Logging:
-  -v, --verbose...  Increase logging verbosity
-  -q, --quiet...    Decrease logging verbosity
-```
+#### `gen`
+
+Generates static files for the command-line application which are printed to
+console. Currently implements the following subcommands:
+
+- `cfg`: Configuration file.
+- `cmp`: Shell completions.
+- `cfg`: Manual pages.
+
+> [!NOTE]
+>
+> Save the contents of a generated file by piping the output of the command,
+> e.g.:
+>
+> ```
+> rugby gen cfg > ~/.config/rugby/config.toml
+> ```
+
+#### `help`
+
+Opens the manual page for the corresponding command. Can also be specified using
+the alias `man`.
 
 ### Configuration
 
@@ -56,7 +70,16 @@ Any relative paths specified in this file are resolved relative to this file's
 parent directory. Use `--conf` on the command-line to provide an alternate
 location for this file.
 
-The default configuration could be found [here][config].
+The default configuration could either be found [here](./rugby.toml), or
+generated with:
+
+```
+rugby gen cfg
+```
+
+> [!NOTE]
+>
+> Configuration options are documented in the [`rugby-cfg`][cfg] crate.
 
 ### Debugging
 
@@ -66,7 +89,7 @@ be run to control and monitor execution of the console. While running with GBD
 enabled, CTRL-C could be used to interrupt emulation and present the prompt.
 
 To list and get help with GBD, use the `help` command at the prompt or see its
-[documentation](/gbd/README.md).
+[documentation][gbd].
 
 ## Progress
 
@@ -93,7 +116,8 @@ For information regarding licensure, please see the project's [README][license].
 [win.badge]: https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=fff
 
 <!-- Usage -->
-[config]:  ./rugby.toml
+[cfg]: /apis/cfg/README.md
+[gbd]: /apis/gbd/README.md
 
 <!-- License -->
 [license]: /README.md#license
