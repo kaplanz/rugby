@@ -42,9 +42,5 @@ support for the Game Boy Color (CGB) is planned.
 
 For information regarding licensure, please see the project's [README][license].
 
-<!--
-  Reference-style links
--->
-
-<!-- License -->
+<!-- Reference-style links -->
 [license]: /README.md#license
