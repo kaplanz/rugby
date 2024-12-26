@@ -16,7 +16,7 @@
 
 ---
 
-[![dependency status][deps.badge]][deps.hyper]
+[![dependencies][dep.badge]][dep.hyper]
 [![cli frontend][cli.badge]](./apps/cli)
 [![web frontend][web.badge]](./apps/web)
 
@@ -202,10 +202,10 @@ chosen license.
 -->
 
 <!-- Badges -->
-[cli.badge]:  https://img.shields.io/badge/frontend-cli-blue
-[deps.badge]: https://deps.rs/repo/github/kaplanz/rugby/status.svg
-[deps.hyper]: https://deps.rs/repo/github/kaplanz/rugby
-[web.badge]:  https://img.shields.io/badge/frontend-web-orange
+[cli.badge]: https://img.shields.io/badge/frontend-cli-blue
+[dep.badge]: https://deps.rs/repo/github/kaplanz/rugby/status.svg
+[dep.hyper]: https://deps.rs/repo/github/kaplanz/rugby
+[web.badge]: https://img.shields.io/badge/frontend-web-orange
 
 <!-- Organization -->
 [sdl]:     https://www.libsdl.org
