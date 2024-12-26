@@ -79,7 +79,7 @@ rugby gen cfg
 
 > [!NOTE]
 >
-> Configuration options are documented in the [`rugby-cfg`][cfg] crate.
+> Configuration options are documented in the [`rugby-cfg`][cfg.doc] crate.
 
 ### Debugging
 
@@ -89,7 +89,7 @@ be run to control and monitor execution of the console. While running with GBD
 enabled, CTRL-C could be used to interrupt emulation and present the prompt.
 
 To list and get help with GBD, use the `help` command at the prompt or see its
-[documentation][gbd].
+[documentation][gbd.doc].
 
 ## Progress
 
@@ -106,18 +106,12 @@ To list and get help with GBD, use the `help` command at the prompt or see its
 
 For information regarding licensure, please see the project's [README][license].
 
-<!--
-  Reference-style links
--->
+<!-- Reference-style links -->
+[cfg.doc]: /apis/cfg/README.md
+[gbd.doc]: /apis/gbd/README.md
+[license]: /README.md#license
 
 <!-- Badges -->
 [mac.badge]: https://img.shields.io/badge/macOS-000?logo=apple&logoColor=fff
 [nix.badge]: https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=000
 [win.badge]: https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=fff
-
-<!-- Usage -->
-[cfg]: /apis/cfg/README.md
-[gbd]: /apis/gbd/README.md
-
-<!-- License -->
-[license]: /README.md#license

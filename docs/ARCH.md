@@ -5,6 +5,9 @@ highlighting key areas of focus used within accurate emulator development.
 
 ![][dmg.pcb][^rev6]
 
+[^rev6]: "Game Boy (Rev 6) Motherboard" by [Joonas Javanainen][gekkio] is
+    licensed under [CC BY 4.0][cc-by-4].
+
 ## Notation
 
 Within this document, addresses are always represented in hexadecimal, such as
@@ -45,7 +48,7 @@ At a high level, the motherboard contains the following ASICs:
     └────────────────────┘       └──────────────┘
                                        WRAM
 ```
-[^gram]
+[^ascii]
 
 > [!NOTE]
 > See the [memory architecture](./ARCH.md) for a more precise diagram.
@@ -54,6 +57,9 @@ At a high level, the motherboard contains the following ASICs:
 > More research is needed to determine exactly how components are laid out
 > within the LR36902. For example, the DMA and OAM may not be embedded within
 > the PPU.
+
+[^ascii]: ASCII diagram is based upon the detailed [schematic][dmg.sch] by
+    [Joonas Javanainen][gekkio] licensed under [CC BY 4.0][cc-by-4].
 
 ### Memory Map
 
@@ -66,9 +72,9 @@ The Game Boy's CPU uses the following 16-bit address decoding scheme:
 | `8000..=9FFF` |  8 KiB | VRAM | Video RAM        | LH5164LN | Video     |
 | `A000..=BFFF` |  8 KiB | ERAM | External RAM     | Variable | External  | [^cart]
 | `C000..=DFFF` |  8 KiB | WRAM | Work RAM         | LH5164LN | External  |
-| `E000..=FDFF` | 7680 B | Echo | Echo RAM         | LH5164LN | External  | [^nuse][^eram]
+| `E000..=FDFF` | 7680 B | Echo | Echo RAM         | LH5164LN | External  | [^none][^eram]
 | `FE00..=FE9F` |  160 B |  OAM | Object memory    | LR35902  | Internal  |
-| `FEA0..=FEFF` |   96 B |      | Unmapped         |          | Internal  | [^nuse]
+| `FEA0..=FEFF` |   96 B |      | Unmapped         |          | Internal  | [^none]
 | `FF00..=FF7F` |  128 B |  Reg | I/O registers    | LR35902  | Internal  |
 | `FF80..=FFFE` |  127 B | HRAM | High RAM         | LR35902  | Internal  |
 | `FFFF..=FFFF` |    1 B |   IE | Interrupt enable | LR35902  | Internal  |
@@ -77,6 +83,14 @@ The Game Boy's CPU uses the following 16-bit address decoding scheme:
 > Performing a read to an unmapped region in memory will always
 > return the `0xFF` byte. More generally, unmapped wires have a pull-up resistor
 > that, when read, yields as logic-high.
+
+[^boot]: Boot ROM will become unmapped automatically upon completion, after
+    which it is no longer accessible until a reset.
+[^cart]: Cartridge slot memory traffic is handled by the Memory Bank Controller
+    (MBC) used by included in the physical cartridge.
+[^none]: Nintendo says use of this area is prohibited.
+[^eram]: Echo RAM is simply a mirror of WRAM, accessible due to a quirk in how
+    addresses are decoded. See [above](#echo-ram) for more details.
 
 ### Memory Bus
 
@@ -139,7 +153,7 @@ bus.
 The most common way to cause a bus conflict is with a DMA. While a DMA is
 occurring, it has priority access to the OAM and the target address bus. In the
 event that the CPU performs a memory access that would use the same bus as the
-DMA's target, the CPU will always "lose" the access to the DMA [^dma]. The
+DMA's target, the CPU will always "lose" the access to the DMA.[^dma] The
 result is that the CPU will read the same value that happens to be copied in the
 corresponding DMA cycle. A consequence of this is that even CPU instruction
 fetches can fail in this way, causing execution on the DMA's data.
@@ -148,30 +162,11 @@ As a workaround, Nintendo recommends copying a small subroutine to HRAM, which
 the CPU always has exclusive access to (via the I-Bus), to execute until the DMA
 is complete.
 
-<!-- Footnotes -->
-[^rev6]: "Game Boy (Rev 6) Motherboard" by [Joonas Javanainen][gekkio] is
-         licensed under [CC BY 4.0][lic.cc4].
-[^boot]: Boot ROM will become unmapped automatically upon completion, after
-         which it is no longer accessible until a reset.
-[^cart]: Cartridge slot memory traffic is handled by the Memory Bank Controller
-         (MBC) used by included in the physical cartridge.
-[^gram]: ASCII diagram is based upon the detailed [schematic][dmg.sch] by
-         [Joonas Javanainen][gekkio] licensed under [CC BY 4.0][lic.cc4].
-[^nuse]: Nintendo says use of this area is prohibited.
-[^eram]: Echo RAM is simply a mirror of WRAM, accessible due to a quirk in how
-         addresses are decoded. See [above](#echo-ram) for more details.
-[^dma]:  See the discussion at Gekkio/mooneye-gb#39.
+[^dma]: See the discussion at Gekkio/mooneye-gb#39.
 
-<!--
-  Reference-style links
--->
-
-[dmg.pcb]:  https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/DMG-CPU-06.jpg
-
-<!-- Schematic -->
+<!-- Reference-style links -->
+[cc-by-4]:  https://creativecommons.org/licenses/by/4.0/
 [conflict]: https://en.wikipedia.org/wiki/Bus_contention
-
-<!-- Footnotes -->
+[dmg.pcb]:  https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/DMG-CPU-06.jpg
 [dmg.sch]:  https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/schematic/DMG-CPU-06.pdf
 [gekkio]:   https://github.com/Gekkio/gb-schematics
-[lic.cc4]:  http://creativecommons.org/licenses/by/4.0/
