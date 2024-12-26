@@ -43,6 +43,11 @@ The following is a table of supported configurable fields:
 | `emu.cart.force` | Force cartridge construction. | `-f/--force`   | `bool`   |   ✓   |   ✓   |        |
 | `emu.cart.save`  | Cartridge RAM persistence.    | `-S/--save`    | `enum`   |   ✓   |   ✓   | [^sav] |
 
+[^log]: Must be a valid log filter as parsed by the frontend. See filter
+    directives using [`tracing`][filter] as an example.
+[^pal]: Only applicable on the DMG model. On CGB, the palette will be ignored.
+[^sav]: Specifies when the cartridge RAM should be loaded/saved to disk.
+
 ### Types
 
 All the expected primitive types for options are supported:
@@ -63,34 +68,20 @@ These may be combined into an `object`, which is simply a collection of fields.
 
 All enumerated types are described below:
 
-- `palette`: color palette selection, see [variants][pal]; can be customized as
-  an array of 4 colors (parsed in hex).
-- `speed`: simulated clock frequency, see [variants][spd]; can be specified
+- `palette`: color palette selection, see [variants][src.pal]; can be customized
+  as an array of 4 colors (parsed in hex).
+- `speed`: simulated clock frequency, see [variants][src.spd]; can be specified
   either as a frame rate (`fps`) or frequency (`hz`).
-- `when`: choice of when to enable an option, [variants][when] are: `never`,
+- `when`: choice of when to enable an option, [variants][src.when] are: `never`,
   `auto`, and `always`.
 
 ## License
 
 For information regarding licensure, please see the project's [README][license].
 
-<!-- Footnotes -->
-[^log]: Must be a valid log filter as parsed by the frontend. See filter
-    directives using [`tracing`][filter] as an example.
-[^pal]: Only applicable on the DMG model. On CGB, the palette will be ignored.
-[^sav]: Specifies when the cartridge RAM should be loaded/saved to disk.
-
-<!--
-  Reference-style links
--->
-
-<!-- Options -->
-[pal]:  ./src/val.rs#L33
-[spd]:  ./src/val.rs#L102
-[when]: ./src/val.rs#L14
-
-<!-- License -->
-[license]: /README.md#license
-
-<!-- Footnotes -->
-[filter]: https://tracing.rs/tracing_subscriber/filter/struct.envfilter#directives
+<!-- Reference-style links -->
+[filter]:   https://tracing.rs/tracing_subscriber/filter/struct.envfilter#directives
+[license]:  /README.md#license
+[src.pal]:  ./src/val.rs#L33
+[src.spd]:  ./src/val.rs#L102
+[src.when]: ./src/val.rs#L14

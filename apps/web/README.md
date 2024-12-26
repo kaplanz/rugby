@@ -1,13 +1,13 @@
-# [rugby-web][this]
+# [rugby-web][website]
 
 [![bun runtime][bun.badge]][bun.hyper]
 [![lit element][lit.badge]][lit.hyper]
-[![webassembly][wasm.badge]][wasm.hyper]
+[![webassembly][asm.badge]][asm.hyper]
 
 This frontend is a web application that runs entirely on-browser, enabling it to
 be hosted as static files (no server code). It supports uploading games from a
 file, which persist locally as temporary storage (similar to cookies). You can
-play use it live [here][this].
+play use it live [here][website].
 
 ## Build
 
@@ -80,19 +80,14 @@ There are also key bindings for the application:
 
 For information regarding licensure, please see the project's [README][license].
 
-<!--
-  Reference-style links
--->
-
-[this]:  https://rugby.zakhary.dev
+<!-- Reference-style links -->
+[license]: /README.md#license
+[website]: https://rugby.zakhary.dev
 
 <!-- Badges -->
-[bun.badge]:  https://img.shields.io/badge/Bun-black?logo=bun&logoColor=f9f1e1
-[bun.hyper]:  https://bun.sh
-[lit.badge]:  https://img.shields.io/badge/Lit-334eff?logo=lit
-[lit.hyper]:  https://lit.dev
-[wasm.badge]: https://img.shields.io/badge/WebAssembly-654FF0?logo=webassembly&logoColor=white
-[wasm.hyper]: https://webassembly.org
-
-<!-- License -->
-[license]: /README.md#license
+[asm.badge]: https://img.shields.io/badge/WebAssembly-654FF0?logo=webassembly&logoColor=white
+[asm.hyper]: https://webassembly.org
+[bun.badge]: https://img.shields.io/badge/Bun-black?logo=bun&logoColor=f9f1e1
+[bun.hyper]: https://bun.sh
+[lit.badge]: https://img.shields.io/badge/Lit-334eff?logo=lit
+[lit.hyper]: https://lit.dev
