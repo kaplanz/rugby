@@ -9,8 +9,8 @@ Outlined below is current testing results for various integration test suites.
 [![acid2 origin][acid2.git.badge]][acid2.git.hyper]
 [![acid2 source][acid2.src.badge]][acid2.src.hyper]
 
-A clever re-imagining of the [Web Standards Project's Acid2][wsp.acid2]
-rendering test for the Game Boy's PPU.
+A clever re-imagining of the [Web Standards Project's Acid2][acid2] rendering
+test for the Game Boy's PPU.
 
 #### Results
 
@@ -258,9 +258,9 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 Attribution of all included open-source software is listed in the project's
 [README][attrib].
 
-<!--
-  Reference-style links
--->
+<!-- Reference-style links -->
+[acid2]: https://webstandards.org/files/acid2/test.html
+[attrib]: /README.md#attribution
 
 <!-- Badges -->
 [acid2.git.badge]:    https://img.shields.io/badge/acid2-origin-2188a7?logo=github
@@ -279,9 +279,3 @@ Attribution of all included open-source software is listed in the project's
 [mooneye.git.hyper]:  https://github.com/Gekkio/mooneye-test-suite
 [mooneye.src.badge]:  https://img.shields.io/badge/mooneye-source-a72145?logo=rust
 [mooneye.src.hyper]:  ./mooneye.rs
-
-<!-- Integration -->
-[wsp.acid2]: https://webstandards.org/files/acid2/test.html
-
-<!-- Attribution -->
-[attrib]: /README.md#attribution

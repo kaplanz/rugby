@@ -77,9 +77,5 @@ Aliases: `br`, `b`
 
 For information regarding licensure, please see the project's [README][license].
 
-<!--
-  Reference-style links
--->
-
-<!-- License -->
+<!-- Reference-style links -->
 [license]: /README.md#license
