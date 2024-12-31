@@ -61,16 +61,17 @@ Aliases: `br`, `b`
   - [ ] Instruction opcode
   - [ ] I/O operation (read/write)
   - [ ] Softbreak (`ld b, b`)
-  - [ ] Dynamic condition
-- [x] Memory peek/poke
-- [x] Register manipulation
+  - [ ] Dynamic conditions
+- [x] Memory
+  - [x] Peek/poke address
+- [x] Registers
   - [ ] APU
   - [x] CPU
   - [x] Interrupts
   - [x] PPU
   - [x] Serial
   - [x] Timer
-- [x] Peripheral control
+- [x] Peripherals
   - [x] Serial interface
 
 ## License

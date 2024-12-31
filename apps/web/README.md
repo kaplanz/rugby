@@ -62,7 +62,7 @@ There are also key bindings for the application:
     - [x] Keyboard events
     - [x] Mouse events
     - [x] Touch events
-  - [x] Screen
+  - [x] Video
     - [ ] Custom palettes
 - [x] Frontend
   - [x] Documentation
