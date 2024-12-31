@@ -101,8 +101,8 @@ impl Block for Motherboard {
             self.soc.ppu.cycle();
         }
         // Serial: 8192 Hz
-        if self.soc.ser.ready() && self.clk % 512 == 0 {
-            self.soc.ser.cycle();
+        if self.soc.sio.ready() && self.clk % 512 == 0 {
+            self.soc.sio.cycle();
         }
         // Timer: 4 MiHz
         if self.soc.tma.ready() {
