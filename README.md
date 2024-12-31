@@ -1,26 +1,15 @@
-# rugby
-
-<p align="center">
+<h1 align="center">
   <img width="128" height="128" src="./docs/assets/img/icon.png"/>
-</p>
+  <p>Rugby</p>
+</h1>
 
 <p align="center">
-  <q>
-    A delayed game is eventually good, but a rushed game is forever bad.
-  </q>
-  &mdash;
-  <i>
-    Shigeru Miyamoto
-  </i>
+  A cycle accurate emulator of the original 1989 Nintendo Game Boy.
 </p>
-
----
 
 [![dependencies][dep.badge]][dep.hyper]
 [![cli frontend][cli.badge]](./apps/cli)
 [![web frontend][web.badge]](./apps/web)
-
-A cycle accurate emulator of the original 1989 Nintendo Game Boy.
 
 > [!IMPORTANT]
 >
