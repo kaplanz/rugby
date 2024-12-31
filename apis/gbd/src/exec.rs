@@ -252,7 +252,7 @@ pub fn load(emu: &GameBoy, loc: Select) -> Result<()> {
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Serial(reg) => {
-            let byte: u8 = emu.main.soc.ser.load(reg);
+            let byte: u8 = emu.main.soc.sio.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Timer(reg) => {
@@ -303,7 +303,7 @@ pub fn reset(gbd: &mut Debugger, emu: &mut GameBoy) -> Result<()> {
 }
 
 pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
-    let ser = &mut emu.main.soc.ser;
+    let sio = &mut emu.main.soc.sio;
     match mode {
         Serial::Peek | Serial::Recv => {
             // Receive serial data
@@ -311,11 +311,11 @@ pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
             let nbytes = match mode {
                 // Peek without draining output buffer
                 Serial::Peek => {
-                    data.extend_from_slice(ser.rx().fill_buf()?);
+                    data.extend_from_slice(sio.rx().fill_buf()?);
                     data.len()
                 }
                 // Read, consuming output buffer
-                Serial::Recv => ser.rx().read_to_end(&mut data)?,
+                Serial::Recv => sio.rx().read_to_end(&mut data)?,
                 Serial::Send(_) => unreachable!(),
             };
             // Decode assuming ASCII representation
@@ -332,7 +332,7 @@ pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
         }
         Serial::Send(data) => {
             // Transmit serial data
-            let nbytes = emu.main.soc.ser.tx().write(&data)?;
+            let nbytes = emu.main.soc.sio.tx().write(&data)?;
             let extra = data.len() - nbytes;
             // Display results
             advise::info!("transmitted {size}", size = bfmt::Size::from(nbytes));
@@ -400,7 +400,7 @@ pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
                 return Err(Error::Value);
             };
             // Perform the store
-            soc.ser.store(reg, byte);
+            soc.sio.store(reg, byte);
         }
         Select::Timer(reg) => {
             // Extract the byte

@@ -32,7 +32,7 @@ pub struct Chip {
     /// Picture processing unit
     pub ppu: Ppu,
     /// Serial communications port.
-    pub ser: Serial,
+    pub sio: Serial,
     /// Hardware timer.
     pub tma: Timer,
 }
@@ -49,7 +49,7 @@ impl Chip {
             cpu: Cpu::new(noc.cpu(), pic.line.clone()),
             joy: Joypad::new(pic.line.clone()),
             ppu: Ppu::new(vram, mem.oam.clone(), dma.reg.clone(), pic.line.clone()),
-            ser: Serial::new(pic.line.clone()),
+            sio: Serial::new(pic.line.clone()),
             tma: Timer::new(pic.line.clone()),
             dma,
             mem,
@@ -69,7 +69,7 @@ impl Block for Chip {
         self.dma.reset();
         self.joy.reset();
         self.ppu.reset();
-        self.ser.reset();
+        self.sio.reset();
         self.tma.reset();
     }
 }
@@ -81,7 +81,7 @@ impl Mmio for Chip {
         self.mem.attach(bus);
         self.pic.attach(bus);
         self.ppu.attach(bus);
-        self.ser.attach(bus);
+        self.sio.attach(bus);
         self.tma.attach(bus);
     }
 }
