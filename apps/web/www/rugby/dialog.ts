@@ -7,6 +7,7 @@ import type { Application } from "../app";
 
 import type { SlDialog, SlTabGroup } from "@shoelace-style/shoelace";
 
+import "@shoelace-style/shoelace/dist/components/badge/badge";
 import "@shoelace-style/shoelace/dist/components/button/button";
 import "@shoelace-style/shoelace/dist/components/dialog/dialog";
 import "@shoelace-style/shoelace/dist/components/divider/divider";
@@ -353,7 +354,10 @@ export class Dialog extends LitElement {
             </article>
             <footer>
               <nav>
-                <a href="https://github.com/kaplanz/rugby" target=”_blank”>
+                <a href="https://github.com/kaplanz/rugby/tree/${
+                  // @ts-ignore
+                  BUILD.COMMIT
+                }" target=”_blank”>
                   <i class="fa-brands fa-github"></i>
                 </a>
                 <a href="https://zakhary.dev" target=”_blank”>
