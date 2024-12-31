@@ -28,11 +28,11 @@ opt-level = 3
 
 [workspace]
 members = [
-    "apis/*",
-    "apps/*",
-    "arch",
-    "core",
-    "crates/*",
+  "apis/*",
+  "apps/*",
+  "arch",
+  "core",
+  "crates/*",
 ]
 
 [workspace.package]
