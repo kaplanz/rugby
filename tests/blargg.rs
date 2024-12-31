@@ -64,7 +64,7 @@ mod check {
     /// tests which print lots of information that scrolls off screen.
     pub fn console(emu: &mut GameBoy) -> Result<()> {
         // Extract serial output
-        let buf = emu.main.soc.ser.rx().fill_buf()?;
+        let buf = emu.main.soc.sio.rx().fill_buf()?;
         // Calculate pass/fail conditions
         let repr = String::from_utf8_lossy(buf);
         let pass = repr.contains("Passed");
