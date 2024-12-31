@@ -93,14 +93,30 @@ To list and get help with GBD, use the `help` command at the prompt or see its
 
 ## Progress
 
-- [x] Static configuration
-  - [x] Palette customization
-  - [x] Frequency selection
-  - [ ] Re-mappable joypad
-- [x] Debugging support
-  - [x] Interactive debugging
-  - [x] CPU state logging
-  - [x] PPU VRAM visualizer
+- [x] Emulator
+  - [ ] Audio
+  - [x] Joypad
+    - [x] Keyboard inputs
+    - [ ] Custom bindings
+  - [x] Video
+    - [x] Custom palettes
+- [x] Frontend
+  - [x] App settings
+    - [x] Configuration file
+  - [x] Command-line interface
+    - [x] Generate static files
+      - [x] Configuration file
+      - [x] Shell completions
+      - [x] Manual pages
+  - [x] Features
+    - [x] Change clock speed
+- [x] Debugging
+  - [ ] Dynamic TUI application
+  - [x] Interactive debug prompt
+    - [x] Peek/poke memory
+    - [x] Peek/poke registers
+  - [x] CPU state log tracing
+  - [x] Video RAM visualizer
 
 ## License
 
