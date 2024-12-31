@@ -79,7 +79,7 @@ rugby gen cfg
 
 > [!NOTE]
 >
-> Configuration options are documented in the [`rugby-cfg`][cfg.doc] crate.
+> Configuration options are [documented][cfg.doc] in the `rugby-cfg` crate.
 
 ### Debugging
 
