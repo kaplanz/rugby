@@ -196,11 +196,11 @@ impl core::has::Serial for GameBoy {
     type Serial = Serial;
 
     fn serial(&self) -> &Self::Serial {
-        &self.main.soc.ser
+        &self.main.soc.sio
     }
 
     fn serial_mut(&mut self) -> &mut Self::Serial {
-        &mut self.main.soc.ser
+        &mut self.main.soc.sio
     }
 }
 
