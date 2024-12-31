@@ -9,13 +9,13 @@ support for the Game Boy Color (CGB) is planned.
 
 ## Progress
 
-- [ ] Implementation
+- [x] Functional implementation
   - [ ] Audio (APU)
   - [x] Cartridges
-    - [ ] Save RAM to disk
-    - [ ] Support hardware
+    - [x] Save RAM to disk
+    - [ ] Support controllers
       - [x] MBC1
-      - [ ] MBC3
+      - [x] MBC3
       - [x] MBC5
   - [x] Interrupts (PIC)
   - [x] Graphics (PPU)
@@ -30,7 +30,8 @@ support for the Game Boy Color (CGB) is planned.
     - [ ] Implementation accuracy
       - [x] Multi-cycle instructions
       - [x] Timed memory accesses
-      - [ ] Timing precision
+      - [ ] Precise cycle timings
+  - [x] Serial
   - [x] Timer
     - [x] Functional correctness
     - [x] Implementation accuracy
