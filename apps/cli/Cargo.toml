@@ -40,15 +40,15 @@ xdir = { workspace = true }
 
 [features]
 default = [
-    "gbd",
-    "log",
-    "win"
+  "gbd",
+  "log",
+  "win",
 ]
 debug = ["rugby/debug"]
 gbd = [
-    "debug",
-    "dep:rugby-gbd",
-    "dep:rustyline",
+  "debug",
+  "dep:rugby-gbd",
+  "dep:rustyline",
 ]
 log = ["debug"]
 win = ["debug"]
