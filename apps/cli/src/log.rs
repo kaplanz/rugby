@@ -1,4 +1,3 @@
-use std::io::IsTerminal;
 use std::sync::OnceLock;
 
 use anyhow::{Context, Result};
@@ -45,7 +44,7 @@ pub fn init(filter: Option<&str>) -> Result<()> {
         // unable to set is an application error
         .expect("unable to set logger handle");
     // Check if colors enabled
-    let color = std::env::var_os("NO_COLOR").is_none() && std::io::stdout().is_terminal();
+    let color = supports_color::on(supports_color::Stream::Stdout).is_some();
     // Install global logger
     tracing_subscriber::registry()
         .with(fmt::layer().with_ansi(color).with_filter(filter))
