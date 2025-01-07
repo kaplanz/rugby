@@ -64,6 +64,8 @@ crates are used with the structure as follows:
 │  ├── hexd/         # hex dump printer
 │  └── wrange/       # wrapping ranges
 ├── docs/            # documentation
+├── lib/             # library frontends
+│  └── retro/        # libretro port
 ├── roms/            # open-source ROMs
 │  ├── boot/         # boot ROM images
 │  ├── games/        # playable demos
@@ -101,6 +103,10 @@ Several additional frontends are planned for the future:
 
 - [`rugby-ios`](./apps/ios): a native iOS application built with [SwiftUI].
 - `rugby-sdl`: a cross-platform application based upon the [SDL] framework.
+
+#### Libraries
+
+- [`libretro`](./lib/retro): implementation of the libretro API.
 
 ## [Testing](./tests/README.md)
 
