@@ -41,6 +41,9 @@ pub use rugby_core as core;
 
 pub use crate::core::api as emu;
 
+/// Name of this crate.
+pub const NAME: &str = env!("CARGO_CRATE_NAME");
+
 /// A prelude for conveniently writing emulator code.
 ///
 /// The purpose of this module is to alleviate imports of many common traits by
