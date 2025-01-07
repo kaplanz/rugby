@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 
 use clap::Parser;
+use rugby::NAME;
 
 use crate::cli::{Cli, Command};
 use crate::err::{Exit, Result};
@@ -20,11 +21,6 @@ mod init;
 mod log;
 mod talk;
 mod util;
-
-/// Application name.
-///
-/// This may be used for base subdirectories.
-const NAME: &str = env!("CARGO_CRATE_NAME");
 
 /// Application entry.
 fn main() -> Exit {
