@@ -20,7 +20,7 @@ clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
 clap-verbosity-flag = { version = "3.0.2", features = ["tracing"] }
 clap_complete = "4.5.37"
 clap_mangen = "0.2.24"
-constcat = "0.5.1"
+constcat = { workspace = true }
 ctrlc = "3.4.5"
 derive_more = { version = "1.0.0", features = ["display"] }
 either = "1.13.0"
