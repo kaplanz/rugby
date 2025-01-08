@@ -102,7 +102,8 @@ Main components of `rugby` are outlined below.
 Several additional frontends are planned for the future:
 
 - [`rugby-ios`](./apps/ios): a native iOS application built with [SwiftUI].
-- `rugby-sdl`: a cross-platform application based upon the [SDL] framework.
+- ~`rugby-sdl`: a cross-platform application based upon the [SDL] framework.~
+  - No longer planned, use `rugby-cli` or `libretro` instead.
 
 #### Libraries
 
