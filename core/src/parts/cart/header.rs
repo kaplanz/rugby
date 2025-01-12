@@ -164,6 +164,18 @@ pub struct Header {
 }
 
 impl Header {
+    /// Formats a version number as a revision string
+    #[must_use]
+    pub fn revision(&self) -> String {
+        format!(
+            "v{}.{}",
+            ((self.version & 0xf0) >> 4) + 1,
+            self.version & 0x0f
+        )
+    }
+}
+
+impl Header {
     /// Constructs a new `Header`.
     ///
     /// # Errors
@@ -475,15 +487,7 @@ impl Display for Header {
         writeln!(f, "│ RAM: {:>11.0} │", bfmt::Size::from(self.ramsz))?;
         writeln!(f, "├──────────────────┤")?;
         writeln!(f, "│ Region: {:>8} │", self.region)?;
-        writeln!(
-            f,
-            "│ Version: {:>7} │",
-            format!(
-                "v{}.{}",
-                ((self.version & 0xf0) >> 4) + 1,
-                self.version & 0x0f
-            )
-        )?;
+        writeln!(f, "│ Version: {:>7} │", self.revision())?;
         writeln!(f, "├──────────────────┤")?;
         writeln!(f, "│ Header:       {:0>2x} │", self.hchk)?;
         writeln!(f, "│ Global:     {:0>4x} │", self.gchk)?;
