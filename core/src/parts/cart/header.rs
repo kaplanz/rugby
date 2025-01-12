@@ -469,16 +469,8 @@ impl Display for Header {
         writeln!(f, "┌──────────────────┐")?;
         writeln!(f, "│ {:^16} │", self.title.as_deref().unwrap_or("Unknown"))?;
         writeln!(f, "├──────────────────┤")?;
-        writeln!(
-            f,
-            "│ Model: {:>9} │",
-            match (self.dmg, self.cgb) {
-                (false, false) => "None",
-                (false, true) => "CGB",
-                (true, false) => "DMG",
-                (true, true) => "DMG + CGB",
-            }
-        )?;
+        writeln!(f, "│ DMG: {:>11} │", self.dmg)?;
+        writeln!(f, "│ CGB: {:>11} │", self.cgb)?;
         writeln!(f, "│ SGB: {:>11} │", self.sgb)?;
         writeln!(f, "├──────────────────┤")?;
         writeln!(f, "│ MBC: {:>11} │", self.info)?;
