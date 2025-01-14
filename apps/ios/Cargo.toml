@@ -13,5 +13,6 @@ name = "rugby"
 crate-type = ["staticlib"]
 
 [dependencies]
+bfmt = { workspace = true }
 rugby = { workspace = true }
-uniffi = { version = "0.28.2", features = ["cli"] }
+uniffi = { version = "0.28.3", features = ["cli"] }
