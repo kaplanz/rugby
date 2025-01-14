@@ -8,45 +8,44 @@
 import SwiftUI
 
 struct LibraryView: View {
-    @Environment(Library.self) var lib
-    @State private var showEmulator = false
-    @State private var showImporter = false
+    @Environment(Library.self) private var lib
 
-    @State private var play: Game?
+    /// Present file import dialog.
+    @State private var file = false
 
     var body: some View {
         ScrollView {
             LazyVGrid(
-                columns: Array(
-                    repeating: .init(.flexible()),
-                    count: 2
-                )
+                columns: [
+                    GridItem(.adaptive(minimum: 172), alignment: .top)
+                ]
             ) {
-                ForEach(lib.roms, id: \.self) { game in
-                    LibraryItem(game: game, play: $play)
+                ForEach(
+                    lib.games.sorted(by: {
+                        $0.name.lowercased() < $1.name.lowercased()
+                    }), id: \.self
+                ) { game in
+                    GameItem(game: game)
                 }
             }
         }
-        .navigationTitle("Library")
-        .sheet(item: $play) { game in
-            EmulatorView(game: game)
-        }
+        .background(.regularMaterial)
         .toolbar {
-            Button {
-                showImporter.toggle()
-            } label: {
-                Label("Import", systemImage: "plus")
+            Button("Import", systemImage: "plus") {
+                file.toggle()
             }
             .fileImporter(
-                isPresented: $showImporter,
-                allowedContentTypes: [.gb, .gbc],
+                isPresented: $file,
+                allowedContentTypes: [.dmg, .cgb],
                 allowsMultipleSelection: true
-            ) { res in
-                switch res {
-                case let .success(file):
-                    print(file)
+            ) { result in
+                switch result {
+                case let .success(files):
+                    for file in files {
+                        lib.insert(src: file)
+                    }
                 case let .failure(error):
-                    print(error.localizedDescription)
+                    fatalError(error.localizedDescription)
                 }
             }
         }
@@ -56,6 +55,6 @@ struct LibraryView: View {
 #Preview {
     NavigationStack {
         LibraryView()
-            .environment(Library())
     }
+    .environment(Library())
 }

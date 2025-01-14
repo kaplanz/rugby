@@ -1630,6 +1630,7 @@ dependencies = [
 name = "rugby-ios"
 version = "0.1.0"
 dependencies = [
+ "bfmt",
  "rugby",
  "uniffi",
 ]
