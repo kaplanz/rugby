@@ -8,35 +8,45 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var showSettings = false
+    @Environment(GameBoy.self) private var emu
+
+    /// Manage application settings.
+    @State private var manage = false
 
     var body: some View {
+        @Bindable var emu = emu
+
         NavigationStack {
             LibraryView()
-                .sheet(isPresented: $showSettings) {
+                .navigationTitle("Library")
+                .sheet(isPresented: $manage) {
                     NavigationStack {
                         SettingsView()
+                            .navigationTitle("Settings")
                             .toolbar {
-                                Button {
-                                    showSettings.toggle()
-                                } label: {
-                                    Text("Done").bold()
+                                Button("Done") {
+                                    manage.toggle()
                                 }
+                                .bold()
                             }
                     }
                 }
                 .toolbar {
-                    Button {
-                        showSettings.toggle()
-                    } label: {
-                        Label("Settings", systemImage: "gearshape")
+                    Button("Settings", systemImage: "gearshape") {
+                        manage.toggle()
                     }
                 }
+        }
+        .fullScreenCover(isPresented: $emu.show) {
+            NavigationStack {
+                EmulatorView()
+            }
         }
     }
 }
 
 #Preview {
     MainView()
+        .environment(GameBoy())
         .environment(Library())
 }

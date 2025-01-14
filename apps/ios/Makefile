@@ -73,5 +73,6 @@ $(FFI): $(LIBS)
 .PHONY: pkg
 pkg: $(XCFW)
 $(XCFW): $(LIBS) $(FFI)
+	@rm -rf $(XCFW)
 	xcodebuild -create-xcframework -output $(XCFW) \
 		$(foreach LIB,$(LIBS),-library $(LIB) -headers $(FFI))
