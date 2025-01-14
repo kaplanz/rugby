@@ -34,7 +34,7 @@ class License: ObservableObject {
                 DispatchQueue.main.async {
                     self.text = text
                 }
-            } catch let error as NSError {
+            } catch let error {
                 print(error.localizedDescription)
             }
         }
