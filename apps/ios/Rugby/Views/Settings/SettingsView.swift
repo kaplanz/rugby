@@ -40,7 +40,7 @@ struct SettingsView: View {
                 ) {
                     Label("Website", systemImage: "globe")
                 }
-                Menu {
+                Menu("License", systemImage: "doc.text") {
                     NavigationLink {
                         LicenseView(license: License(path: "LICENSE-MIT"))
                     } label: {
@@ -51,20 +51,23 @@ struct SettingsView: View {
                     } label: {
                         Label("Apache-2.0", systemImage: "bird")
                     }
-                } label: {
-                    Label("License", systemImage: "doc.text")
                 }
             } header: {
                 Text("About")
             }
         }
-        .navigationTitle("Settings")
+    }
+}
+
+#Preview {
+    NavigationStack {
+        SettingsView()
     }
 }
 
 enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
-    case legacy
     case mono
+
     // impl CustomStringConvertible
     var description: String {
         rawValue.capitalized
@@ -91,10 +94,4 @@ enum Speed: Float, CaseIterable, CustomStringConvertible, Identifiable {
 
     // impl Identifiable
     var id: Self { self }
-}
-
-#Preview {
-    NavigationStack {
-        SettingsView()
-    }
 }
