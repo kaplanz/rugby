@@ -10,35 +10,46 @@
 		961689832C29BD2700E28B7D /* LICENSE-MIT in Resources */ = {isa = PBXBuildFile; fileRef = 9616897F2C29BD2700E28B7D /* LICENSE-MIT */; };
 		961689842C29BD2700E28B7D /* LICENSE-APACHE in Resources */ = {isa = PBXBuildFile; fileRef = 961689802C29BD2700E28B7D /* LICENSE-APACHE */; };
 		961689852C29BD2700E28B7D /* roms in Resources */ = {isa = PBXBuildFile; fileRef = 961689812C29BD2700E28B7D /* roms */; };
-		9645B6912C287472003DD6D5 /* LibraryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9645B6902C287472003DD6D5 /* LibraryItem.swift */; };
+		96172F4E2D307FC7009EFCFA /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96172F4D2D307FC7009EFCFA /* Game.swift */; };
+		961C7D702D30575C00277AB4 /* GameBoy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961C7D6F2D30575C00277AB4 /* GameBoy.swift */; };
+		9645B6912C287472003DD6D5 /* GameItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9645B6902C287472003DD6D5 /* GameItem.swift */; };
 		965FE8722C24C66400768828 /* RugbyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965FE8712C24C66400768828 /* RugbyApp.swift */; };
 		965FE8742C24C66400768828 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965FE8732C24C66400768828 /* MainView.swift */; };
 		965FE8762C24C66500768828 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 965FE8752C24C66500768828 /* Assets.xcassets */; };
 		965FE8792C24C66500768828 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 965FE8782C24C66500768828 /* Preview Assets.xcassets */; };
+		968F2C622D349EE6001C136D /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 968F2C612D349EE6001C136D /* Algorithms */; };
+		968F2C642D3577E7001C136D /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968F2C632D3577E7001C136D /* Joypad.swift */; };
+		968F2C662D3577F8001C136D /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968F2C652D3577F8001C136D /* Screen.swift */; };
 		96A6C4332D10CDEE009BD762 /* RugbyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96A6C4322D10CDEE009BD762 /* RugbyKit */; };
 		96AFA7122C24CF5800FB2A25 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7112C24CF5800FB2A25 /* SettingsView.swift */; };
 		96AFA7162C24D20C00FB2A25 /* EmulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7152C24D20C00FB2A25 /* EmulatorView.swift */; };
 		96AFA7182C24D24600FB2A25 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7172C24D24600FB2A25 /* LibraryView.swift */; };
 		96AFA71C2C25C73300FB2A25 /* LicenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA71B2C25C73300FB2A25 /* LicenseView.swift */; };
 		96AFA7292C2614F300FB2A25 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7282C2614F300FB2A25 /* Library.swift */; };
+		96EC84492D3178C40034F030 /* GameInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EC84482D3178C40034F030 /* GameInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9616897F2C29BD2700E28B7D /* LICENSE-MIT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "LICENSE-MIT"; path = "../../../../LICENSE-MIT"; sourceTree = "<group>"; };
 		961689802C29BD2700E28B7D /* LICENSE-APACHE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "LICENSE-APACHE"; path = "../../../../LICENSE-APACHE"; sourceTree = "<group>"; };
 		961689812C29BD2700E28B7D /* roms */ = {isa = PBXFileReference; lastKnownFileType = folder; name = roms; path = ../../../../roms; sourceTree = "<group>"; };
+		96172F4D2D307FC7009EFCFA /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		9618C0D32D10C38900D6FDFE /* pkg */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = pkg; sourceTree = "<group>"; };
-		9645B6902C287472003DD6D5 /* LibraryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryItem.swift; sourceTree = "<group>"; };
+		961C7D6F2D30575C00277AB4 /* GameBoy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBoy.swift; sourceTree = "<group>"; };
+		9645B6902C287472003DD6D5 /* GameItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameItem.swift; sourceTree = "<group>"; };
 		965FE86E2C24C66400768828 /* Rugby.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rugby.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		965FE8712C24C66400768828 /* RugbyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RugbyApp.swift; sourceTree = "<group>"; };
 		965FE8732C24C66400768828 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		965FE8752C24C66500768828 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		965FE8782C24C66500768828 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		968F2C632D3577E7001C136D /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
+		968F2C652D3577F8001C136D /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		96AFA7112C24CF5800FB2A25 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		96AFA7152C24D20C00FB2A25 /* EmulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorView.swift; sourceTree = "<group>"; };
 		96AFA7172C24D24600FB2A25 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		96AFA71B2C25C73300FB2A25 /* LicenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseView.swift; sourceTree = "<group>"; };
 		96AFA7282C2614F300FB2A25 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		96EC84482D3178C40034F030 /* GameInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				968F2C622D349EE6001C136D /* Algorithms in Frameworks */,
 				96A6C4332D10CDEE009BD762 /* RugbyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,6 +65,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		96172F502D307FFA009EFCFA /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				961C7D6F2D30575C00277AB4 /* GameBoy.swift */,
+				96AFA7282C2614F300FB2A25 /* Library.swift */,
+				96172F4D2D307FC7009EFCFA /* Game.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		9618C0D42D10C8C000D6FDFE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				965FE8712C24C66400768828 /* RugbyApp.swift */,
+				96172F502D307FFA009EFCFA /* Model */,
 				96AFA70F2C24CF2B00FB2A25 /* Views */,
 				965FE8752C24C66500768828 /* Assets.xcassets */,
 				9645B6892C287348003DD6D5 /* Includes */,
@@ -132,6 +155,8 @@
 			isa = PBXGroup;
 			children = (
 				96AFA7152C24D20C00FB2A25 /* EmulatorView.swift */,
+				968F2C652D3577F8001C136D /* Screen.swift */,
+				968F2C632D3577E7001C136D /* Joypad.swift */,
 			);
 			path = Emulator;
 			sourceTree = "<group>";
@@ -139,9 +164,9 @@
 		96AFA7142C24D1E200FB2A25 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				96AFA7282C2614F300FB2A25 /* Library.swift */,
 				96AFA7172C24D24600FB2A25 /* LibraryView.swift */,
-				9645B6902C287472003DD6D5 /* LibraryItem.swift */,
+				9645B6902C287472003DD6D5 /* GameItem.swift */,
+				96EC84482D3178C40034F030 /* GameInfo.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -190,6 +215,9 @@
 				Base,
 			);
 			mainGroup = 965FE8652C24C66400768828;
+			packageReferences = (
+				968F2C602D349EE6001C136D /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+			);
 			productRefGroup = 965FE86F2C24C66400768828 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -220,11 +248,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				96AFA7162C24D20C00FB2A25 /* EmulatorView.swift in Sources */,
+				96172F4E2D307FC7009EFCFA /* Game.swift in Sources */,
 				96AFA7292C2614F300FB2A25 /* Library.swift in Sources */,
-				9645B6912C287472003DD6D5 /* LibraryItem.swift in Sources */,
+				968F2C662D3577F8001C136D /* Screen.swift in Sources */,
+				9645B6912C287472003DD6D5 /* GameItem.swift in Sources */,
+				961C7D702D30575C00277AB4 /* GameBoy.swift in Sources */,
 				96AFA7182C24D24600FB2A25 /* LibraryView.swift in Sources */,
+				968F2C642D3577E7001C136D /* Joypad.swift in Sources */,
 				96AFA71C2C25C73300FB2A25 /* LicenseView.swift in Sources */,
 				965FE8742C24C66400768828 /* MainView.swift in Sources */,
+				96EC84492D3178C40034F030 /* GameInfo.swift in Sources */,
 				965FE8722C24C66400768828 /* RugbyApp.swift in Sources */,
 				96AFA7122C24CF5800FB2A25 /* SettingsView.swift in Sources */,
 			);
@@ -360,6 +393,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Rugby/Preview Content\"";
+				DEVELOPMENT_TEAM = 6WHL4R56VQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rugby/Info.plist;
@@ -391,6 +425,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Rugby/Preview Content\"";
+				DEVELOPMENT_TEAM = 6WHL4R56VQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rugby/Info.plist;
@@ -437,7 +472,23 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		968F2C602D349EE6001C136D /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		968F2C612D349EE6001C136D /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 968F2C602D349EE6001C136D /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
 		96A6C4322D10CDEE009BD762 /* RugbyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RugbyKit;
