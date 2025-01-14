@@ -7,32 +7,122 @@
 
 import SwiftUI
 
-extension Color {
-    public static let shell = Color(
-        #colorLiteral(red: 0.7724417448, green: 0.7521434426, blue: 0.7400485873, alpha: 1))
-    public static let cover = Color(
-        #colorLiteral(red: 0.5647058824, green: 0.5529411765, blue: 0.5725490196, alpha: 1))
-    public static let button = Color(
-        #colorLiteral(red: 0.6039215686, green: 0.1333333333, blue: 0.3411764706, alpha: 1))
-    public static let screen = Color(
-        #colorLiteral(red: 0.5490196078, green: 0.6274509804, blue: 0.3529411765, alpha: 1))
-    public static let navy = Color(
-        #colorLiteral(red: 0.1254901961, green: 0.2784313725, blue: 0.5254901961, alpha: 1))
-}
-
 struct EmulatorView: View {
-    @State var game: Game
+    @Environment(GameBoy.self) private var emu
+
+    /// Emulator paused.
+    @State private var paused = false
+    /// About this game.
+    @State private var detail = false
+    /// Manage this game.
+    @State private var manage = false
 
     var body: some View {
-        Text(game.name)
+        GeometryReader { geo in
+            if geo.size.height > geo.size.width {
+                VStack {
+                    Screen()
+                    Spacer()
+                    Joypad()
+                }
+            } else {
+                HStack {
+                    Joypad(part: .left)
+                    Spacer()
+                    Screen()
+                    Spacer()
+                    Joypad(part: .right)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Background())
+        .onChange(of: paused) {
+            if paused {
+                emu.pause()
+            } else {
+                emu.resume()
+            }
+        }
+        .toolbar {
+            Menu("Help", systemImage: "ellipsis.circle") {
+                Button {
+                    paused.toggle()
+                } label: {
+                    paused
+                        ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
+                }
+                Button("Reset", systemImage: "arrow.clockwise") {
+                    emu.reset()
+                }
+                Divider()
+                Button("Get Info", systemImage: "info.circle") {
+                    detail.toggle()
+                }
+                Button("Manage", systemImage: "gearshape") {
+                    manage.toggle()
+                }
+                Divider()
+                Button("Exit", systemImage: "xmark.circle", role: .destructive) {
+                    emu.stop()
+                }
+            }
+            .labelStyle(.iconOnly)
+        }
+        .sheet(isPresented: $detail) {
+            NavigationStack {
+                GameInfo(game: emu.game!)
+                    .navigationTitle("Info")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        Button("Done") {
+                            detail.toggle()
+                        }
+                        .bold()
+                    }
+                    .onAppear {
+                        emu.pause()
+                    }
+                    .onDisappear {
+                        emu.pause(paused)
+                    }
+            }
+        }
+        .sheet(isPresented: $manage) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle(emu.game!.name)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        Button("Done") {
+                            manage.toggle()
+                        }
+                        .bold()
+                    }
+                    .onAppear {
+                        emu.pause()
+                    }
+                    .onDisappear {
+                        emu.pause(paused)
+                    }
+            }
+        }
     }
 }
 
 #Preview {
-    EmulatorView(
-        game: Game(
-            path: Bundle.main.url(
-                forResource: "roms/games/porklike/porklike",
-                withExtension: "gb"
-            )!))
+    EmulatorView()
+        .environment(GameBoy())
+}
+
+private struct Background: View {
+    var body: some View {
+        Color.shell
+            .overlay {
+                Image("Noise")
+                    .resizable(resizingMode: .tile)
+                    .opacity(0.15)
+            }
+            .ignoresSafeArea()
+    }
 }
