@@ -37,13 +37,6 @@ struct EmulatorView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Background())
-        .onChange(of: paused) {
-            if paused {
-                emu.pause()
-            } else {
-                emu.resume()
-            }
-        }
         .toolbar {
             Menu("Help", systemImage: "ellipsis.circle") {
                 Button {
@@ -80,12 +73,6 @@ struct EmulatorView: View {
                         }
                         .bold()
                     }
-                    .onAppear {
-                        emu.pause()
-                    }
-                    .onDisappear {
-                        emu.pause(paused)
-                    }
             }
         }
         .sheet(isPresented: $manage) {
@@ -99,13 +86,16 @@ struct EmulatorView: View {
                         }
                         .bold()
                     }
-                    .onAppear {
-                        emu.pause()
-                    }
-                    .onDisappear {
-                        emu.pause(paused)
-                    }
             }
+        }
+        .onChange(of: paused) {
+            emu.pause(paused)
+        }
+        .onChange(of: detail) {
+            emu.pause(detail || paused)
+        }
+        .onChange(of: manage) {
+            emu.pause(manage || paused)
         }
     }
 }
