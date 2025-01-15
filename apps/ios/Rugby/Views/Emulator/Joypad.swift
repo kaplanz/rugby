@@ -51,19 +51,39 @@ struct Joypad: View {
 
     var game: some View {
         HStack {
-            Image("Game")
-            Image("Game")
+            VStack(spacing: 0) {
+                Image("Game")
+                Text("B")
+            }
+            VStack(spacing: 0) {
+                Image("Game")
+                Text("A")
+            }
         }
+        .font(.custom("Orbitron", size: 16))
+        .fontWeight(.heavy)
+        .foregroundStyle(.brand)
+        .textCase(.uppercase)
         .rotationEffect(.degrees(-30))
     }
 
     var menu: some View {
         HStack {
-            Image("Menu")
-                .rotationEffect(.degrees(-30))
-            Image("Menu")
-                .rotationEffect(.degrees(-30))
+            VStack(spacing: 0) {
+                Image("Menu")
+                Text("Select")
+            }
+            .rotationEffect(.degrees(-30))
+            VStack(spacing: 0) {
+                Image("Menu")
+                Text("Start")
+            }
+            .rotationEffect(.degrees(-30))
         }
+        .font(.custom("Orbitron", size: 12))
+        .fontWeight(.heavy)
+        .foregroundStyle(.brand)
+        .textCase(.uppercase)
     }
 
     enum Part {
