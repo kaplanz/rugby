@@ -44,6 +44,8 @@ class GameBoy {
         case reset
         /// Stop emulator.
         case stop
+        /// Input event.
+        case input(RugbyKit.Button, Bool)
     }
 
     init() {
@@ -85,6 +87,9 @@ class GameBoy {
                 case .reset:
                     // Soft reset
                     emu.reset()
+                case .input(let button, let pressed):
+                    // Forward input
+                    (pressed ? emu.press : emu.release)(button)
                 }
             }
 
@@ -146,6 +151,11 @@ class GameBoy {
         // Save last frame
         game?.icon = frame.flatMap(Self.render(frame:))
         game = nil
+    }
+
+    /// Forward input event.
+    func input(_ button: RugbyKit.Button, pressed: Bool) {
+        talk.send(.input(button, pressed))
     }
 
     /// Redraws the screen.
