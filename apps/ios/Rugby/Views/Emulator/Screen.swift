@@ -23,14 +23,26 @@ struct Screen: View {
     }
 
     var body: some View {
-        Image(uiImage: image ?? empty)
-            .resizable()
-            .interpolation(.none)
-            .padding(6)
-            .border(.black, width: 6)
-            .clipShape(.rect(cornerRadius: 4))
-            .scaledToFit()
-            .padding(6)
+        VStack(alignment: .leading, spacing: 0) {
+            Image(uiImage: image ?? empty)
+                .resizable()
+                .interpolation(.none)
+                .padding(6)
+                .border(.black, width: 6)
+                .clipShape(.rect(cornerRadius: 4))
+                .scaledToFit()
+            HStack(alignment: .firstTextBaseline) {
+                Text("Rugby")
+                    .font(.custom("Pretendo", size: 20))
+                Text("Game Boy")
+                    .font(.custom("Cabin", size: 36))
+                    .fontWeight(.semibold)
+                    .italic()
+                    .textCase(.uppercase)
+            }
+            .foregroundStyle(.brand)
+        }
+        .padding(6)
     }
 }
 
