@@ -8,6 +8,7 @@ use uniffi::Object;
 uniffi::setup_scaffolding!();
 
 pub mod cart;
+pub mod keys;
 
 /// Game Boy model.
 #[derive(Debug, Default, Object)]
