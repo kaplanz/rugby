@@ -42,7 +42,10 @@ struct GameInfo: View {
                     .fontWeight(.medium)
                 Button("Play") {
                     dismiss()
-                    emu.play(game)
+                    // Only play if not playing anything
+                    if emu.game == nil {
+                        emu.play(game)
+                    }
                 }
                 .bold()
                 .buttonStyle(.borderedProminent)
