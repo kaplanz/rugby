@@ -287,7 +287,7 @@ impl Block for Debugger {
             .bpts
             .get(&self.pc)
             .and_then(Option::as_ref)
-            .map_or(false, |bpt| !bpt.disable && bpt.ignore == 0);
+            .is_some_and(|bpt| !bpt.disable && bpt.ignore == 0);
         // Should we enable the debugger?
         edge && (!step || bpt)
     }
