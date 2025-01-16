@@ -123,6 +123,7 @@ private struct DPadInput: View {
                     }
                 }
         }
+        .sensoryFeedback(.impact, trigger: input)
         .onChange(of: input) { prev, next in
             for button in next.subtracting(prev) {
                 emu.input(button, pressed: true)
@@ -204,6 +205,7 @@ private struct GameButton: View {
                     isPressed = false
                 }
         )
+        .sensoryFeedback(.impact, trigger: isPressed)
         .onChange(of: isPressed) {
             emu.input(role, pressed: isPressed)
         }
@@ -251,6 +253,7 @@ private struct MenuButton: View {
                     isPressed = false
                 }
         )
+        .sensoryFeedback(.impact, trigger: isPressed)
         .onChange(of: isPressed) {
             emu.input(role, pressed: isPressed)
         }
