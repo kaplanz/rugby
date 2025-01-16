@@ -124,20 +124,20 @@ mod tests {
 
     #[test]
     fn map_overlapping_works() {
-        let a = Bus::from([(0x0000..=0x9fff, Shared::dev(Ram::from([0x55; 0xa000])))]);
-        let b = Bus::from([(0x6000..=0xffff, Shared::dev(Ram::from([0xaa; 0xa000])))]);
+        let a = Bus::from([(0x0000..=0x09ff, Shared::dev(Ram::from([0x55; 0x0a00])))]);
+        let b = Bus::from([(0x0600..=0x0fff, Shared::dev(Ram::from([0xaa; 0x0a00])))]);
         let c = Bus::from([
-            (0x0000..=0xffff, Shared::dev(a)),
-            (0x0000..=0xffff, Shared::dev(b)),
+            (0x0000..=0x0fff, Shared::dev(a)),
+            (0x0000..=0x0fff, Shared::dev(b)),
         ]);
         assert_eq!(
             [
                 c.read(0x0000),
-                c.read(0x5fff),
-                c.read(0x6000),
-                c.read(0x9fff),
-                c.read(0xa000),
-                c.read(0xffff),
+                c.read(0x05ff),
+                c.read(0x0600),
+                c.read(0x09ff),
+                c.read(0x0a00),
+                c.read(0x0fff),
             ],
             [Ok(0x55), Ok(0x55), Ok(0x55), Ok(0x55), Ok(0xaa), Ok(0xaa)]
         );
