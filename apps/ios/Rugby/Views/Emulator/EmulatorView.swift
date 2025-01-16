@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EmulatorView: View {
     @Environment(GameBoy.self) private var emu
+    @Environment(\.scenePhase) var scenePhase
 
     /// Emulator paused.
     @State private var paused = false
@@ -96,6 +97,10 @@ struct EmulatorView: View {
         }
         .onChange(of: manage) {
             emu.pause(manage || paused)
+        }
+        .onChange(of: scenePhase) {
+            let hidden = scenePhase != .active
+            emu.pause(hidden || paused)
         }
     }
 }
