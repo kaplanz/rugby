@@ -37,7 +37,7 @@ class GameBoy {
     /// Emulator control messages
     private enum Message {
         /// Start emulation with game.
-        case play(Game)
+        case play(Cartridge)
         /// Pause emulator.
         case pause(Bool)
         /// Reset emulator.
@@ -66,11 +66,16 @@ class GameBoy {
             // Handle messages
             let sub = await self.talk.sink { msg in
                 switch msg {
-                case .play(let game):
+                case .play(let cart):
                     // Hard reset
                     emu = RugbyKit.GameBoy()
                     // Insert cartridge
-                    emu.insert(rom: game.data)
+                    do {
+                        try emu.insert(cart: cart)
+                    } catch let error {
+                        // Crash on unknown errors
+                        fatalError(error.localizedDescription)
+                    }
                     // Start emulation
                     run = true
                 case .pause(let pause):
@@ -126,8 +131,10 @@ class GameBoy {
     func play(_ game: Game) {
         // Retain game
         self.game = game
+        // Construct cartridge
+        let cart = (try? Cartridge(rom: game.data))!
         // Send to emulator
-        talk.send(.play(game))
+        talk.send(.play(cart))
     }
 
     /// Pause emulation.
