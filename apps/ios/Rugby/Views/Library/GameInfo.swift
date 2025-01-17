@@ -18,16 +18,6 @@ struct GameInfo: View {
     /// Game instance.
     @State var game: Game
 
-    /// Game cartridge.
-    var cart: Cartridge {
-        (try? .init(rom: game.data))!
-    }
-
-    /// Cartridge header.
-    var info: Header {
-        cart.header()
-    }
-
     var body: some View {
         List {
             Section {
@@ -55,19 +45,19 @@ struct GameInfo: View {
             .listRowSeparator(.hidden, edges: .top)
             Section("Information") {
                 Row("Title") {
-                    Text(info.title ?? "Unknown")
+                    Text(game.info.title ?? "Unknown")
                 }
                 Row("Version") {
-                    Text(info.version)
+                    Text(game.info.version)
                 }
                 Row("Region") {
-                    Text(info.region)
+                    Text(game.info.region)
                 }
                 Row("Compatible") {
                     let support = [
-                        (title: "DMG", allow: info.dmg, color: Color.blue),
-                        (title: "CGB", allow: info.cgb, color: Color.purple),
-                        (title: "SGB", allow: info.sgb, color: Color.red),
+                        (title: "DMG", allow: game.info.dmg, color: Color.blue),
+                        (title: "CGB", allow: game.info.cgb, color: Color.purple),
+                        (title: "SGB", allow: game.info.sgb, color: Color.red),
                     ]
                     .filter { $0.allow }
                     ForEach(support, id: \.title) {
@@ -77,23 +67,23 @@ struct GameInfo: View {
             }
             Section("Cartridge") {
                 Row("Kind") {
-                    Text(info.cart)
+                    Text(game.info.cart)
                 }
                 Row("ROM") {
-                    Text(info.romsz)
+                    Text(game.info.romsz)
                 }
                 Row("RAM") {
-                    Text(info.ramsz)
+                    Text(game.info.ramsz)
                 }
             }
             Section("Checksum") {
                 Row("Header") {
-                    Text(String(format: "%02X", info.hchk))
+                    Text(String(format: "%02X", game.info.hchk))
                         .monospaced()
                         .textSelection(.enabled)
                 }
                 Row("Global") {
-                    Text(String(format: "%04X", info.gchk))
+                    Text(String(format: "%04X", game.info.gchk))
                         .monospaced()
                         .textSelection(.enabled)
                 }
@@ -142,7 +132,7 @@ struct GameInfo: View {
 
 #Preview {
     GameInfo(
-        game: Game(
+        game: try! Game(
             path: Bundle.main.url(
                 forResource: "roms/games/porklike/porklike",
                 withExtension: "gb"
