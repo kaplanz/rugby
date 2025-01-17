@@ -63,10 +63,13 @@ struct EmulatorView: View {
             }
             .labelStyle(.iconOnly)
         }
-        .alert("Something went wrong...", isPresented: Binding(
-            get: { emu.error != nil },
-            set: { if !$0 { emu.error = nil } }
-        ), presenting: emu.error) { _ in
+        .alert(
+            "Error",
+            isPresented: Binding(
+                get: { emu.error != nil },
+                set: { if !$0 { emu.error = nil } }
+            ), presenting: emu.error
+        ) { _ in
             Button("Okay", role: .cancel) {
                 emu.stop()
             }
