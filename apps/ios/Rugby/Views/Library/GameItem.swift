@@ -101,7 +101,7 @@ struct GameItem: View {
 
 #Preview {
     GameItem(
-        game: Game(
+        game: try! Game(
             path: Bundle.main.url(
                 forResource: "roms/games/porklike/porklike",
                 withExtension: "gb"
