@@ -28,11 +28,17 @@ class GameBoy {
         }
     }
 
+    /// Emulation error.
+    var error: Error?
+
     /// Most recent frame data.
     private(set) var frame: Data?
 
     /// Communication channel.
     private var talk: PassthroughSubject<Message, Never>
+
+    /// Error propagation channel.
+    private let oops = PassthroughSubject<Error, Never>()
 
     /// Emulator control messages
     private enum Message {
@@ -51,6 +57,11 @@ class GameBoy {
     init() {
         // Initialize communication channel
         talk = PassthroughSubject()
+
+        // Handle received error messages
+        let _ = oops.sink { msg in
+            self.error = msg
+        }
 
         // Start emulator task
         Task.detached {
@@ -129,10 +140,18 @@ class GameBoy {
     func play(_ game: Game) {
         // Retain game
         self.game = game
-        // Construct cartridge
-        let cart = (try? Cartridge(rom: game.data))!
-        // Send to emulator
-        talk.send(.play(cart))
+        do {
+            // Construct cartridge
+            let cart = try Cartridge(rom: game.data)
+            // Send to emulator
+            talk.send(.play(cart))
+        } catch let error as RugbyKit.Error {
+            // Report error
+            self.error = error
+        } catch let error {
+            // Crash on unknown errors
+            fatalError(error.localizedDescription)
+        }
     }
 
     /// Pause emulation.
