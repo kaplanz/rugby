@@ -33,6 +33,9 @@ struct LibraryView: View {
                 }
             }
         }
+        .refreshable {
+            lib.reload()
+        }
         .background(.regularMaterial)
         .toolbar {
             Button("Import", systemImage: "plus") {
@@ -78,6 +81,17 @@ struct LibraryView: View {
                         file.stopAccessingSecurityScopedResource()
                     }
             }
+        }
+        .alert(
+            "Error",
+            isPresented: Binding(
+                get: { lib.error.first != nil },
+                set: { if !$0 && !lib.error.isEmpty { lib.error.removeFirst() } }
+            ), presenting: lib.error.first
+        ) { _ in
+            Button("Okay", role: .cancel) {}
+        } message: { error in
+            Text(String(describing: error))
         }
         .sheet(
             isPresented: Binding(
@@ -126,9 +140,16 @@ private struct ErrorList: View {
 
 #Preview {
     NavigationStack {
-        ErrorList(errors: .constant([
-            (file: URL(string: "/path/to/Camera.gb")!, error: RugbyKit.Error.Message("unsupported cartridge: Camera")),
-            (file: URL(string: "/path/to/Random.gb")!, error: RugbyKit.Error.Message("bad cartridge header"))
-        ]))
+        ErrorList(
+            errors: .constant([
+                (
+                    file: URL(string: "/path/to/Camera.gb")!,
+                    error: RugbyKit.Error.Message("unsupported cartridge: Camera")
+                ),
+                (
+                    file: URL(string: "/path/to/Random.gb")!,
+                    error: RugbyKit.Error.Message("bad cartridge header")
+                ),
+            ]))
     }
 }
