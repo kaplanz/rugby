@@ -54,10 +54,8 @@ class GameBoy {
 
         // Start emulator task
         Task.detached {
-            // Construct emulator
-            var emu = RugbyKit.GameBoy()
-
             // Initialize state
+            var emu = RugbyKit.GameBoy()
             var run = false
 
             // Create profiler

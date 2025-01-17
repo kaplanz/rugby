@@ -51,6 +51,7 @@ struct GameInfo: View {
                 .buttonStyle(.borderedProminent)
                 .clipShape(.rect(cornerRadius: .infinity))
             }
+            .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
             Section("Information") {
                 Row("Title") {
@@ -195,9 +196,9 @@ private struct Row<Content: View>: View {
             Spacer()
             value
                 .multilineTextAlignment(.trailing)
+                .textSelection(.enabled)
         }
         .font(.footnote)
-        .textSelection(.enabled)
         .listRowSeparator(.hidden, edges: .top)
         .listRowSeparator(.visible, edges: .bottom)
         .alignmentGuide(.listRowSeparatorLeading) { row in
