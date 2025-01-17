@@ -47,4 +47,4 @@ impl Aspect {
 pub trait Pixel: Copy + Default {}
 
 /// Video framebuffer.
-pub type Frame<P, const D: usize> = [P; D];
+pub type Frame<P> = Box<[P]>;
