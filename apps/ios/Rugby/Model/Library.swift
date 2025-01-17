@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RugbyKit
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -19,8 +20,11 @@ extension UTType {
 class Library {
     private let root = URL.documentsDirectory
 
-    /// Array of all titles in the library.
+    /// Library games.
     var games: [Game] = []
+
+    /// Library errors.
+    var error: [any Swift.Error] = []
 
     init() {
         reload()
@@ -51,10 +55,8 @@ class Library {
             .flatMap { dir in
                 [UTType.dmg, UTType.cgb].compactMap({ ext in
                     // Check if ROM exists with extension
-                    let rom =
-                        dir
-                        .appending(path: dir.lastPathComponent)
-                        .appendingPathExtension(for: ext)
+                    let rom = dir.appending(path: dir.lastPathComponent).appendingPathExtension(
+                        for: ext)
                     if fs.fileExists(atPath: rom.path(percentEncoded: false)) {
                         return rom
                     } else {
@@ -63,9 +65,16 @@ class Library {
                 })
             }
             // Construct game
-            .map { Game(path: $0) }
+            .compactMap {
+                do {
+                    return try Game(path: $0)
+                } catch let error {
+                    self.error.append(error)
+                    return nil
+                }
+            }
         } catch let error {
-            log.error("filesystem: \(error.localizedDescription)")
+            self.error.append(error)
         }
     }
 
@@ -113,10 +122,7 @@ class Library {
                 try fs.moveItem(at: file, to: dest)
             }
             // Rename game directory
-            let dst =
-                src
-                .deletingLastPathComponent()
-                .appendingPathComponent(name)
+            let dst = src.deletingLastPathComponent().appendingPathComponent(name)
             try fs.moveItem(at: src, to: dst)
         } catch let error {
             log.error("filesystem: \(error.localizedDescription)")
