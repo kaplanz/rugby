@@ -20,12 +20,12 @@ struct GameInfo: View {
 
     /// Game cartridge.
     var cart: Cartridge {
-        .init(rom: game.data)
+        (try? .init(rom: game.data))!
     }
 
-    /// Game information.
-    var info: Info {
-        cart.info()
+    /// Cartridge header.
+    var info: Header {
+        cart.header()
     }
 
     var body: some View {

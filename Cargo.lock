@@ -1606,6 +1606,7 @@ version = "0.1.0"
 dependencies = [
  "bfmt",
  "rugby",
+ "thiserror 2.0.11",
  "uniffi",
 ]
 

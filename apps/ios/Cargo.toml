@@ -15,4 +15,5 @@ crate-type = ["staticlib"]
 [dependencies]
 bfmt = { workspace = true }
 rugby = { workspace = true }
+thiserror = { workspace = true }
 uniffi = { version = "0.28.3", features = ["cli"] }
