@@ -10,6 +10,7 @@ use rugby::app::serial::Serial;
 use rugby::app::video::Video;
 use rugby::core::dmg::{self, Button};
 use rugby::emu::part::joypad::Event;
+use rugby::emu::part::video::Frame;
 use rugby::pal::Palette;
 
 pub mod win;
@@ -119,7 +120,7 @@ impl Serial for Frontend {
 impl Video for Frontend {
     type Pixel = dmg::ppu::Color;
 
-    fn draw(&mut self, frame: &[Self::Pixel]) {
+    fn draw(&mut self, frame: Frame<Self::Pixel>) {
         // Extract GUI
         let Some(gui) = self.win.as_mut() else {
             return;

@@ -108,7 +108,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, emu::Message>) -> Result<()> 
                     }
                     Message::Video(frame) => {
                         // Draw next frame
-                        app.gui.draw(&frame);
+                        app.gui.draw(frame);
                         // Send acknowledgment
                         talk.send(emu::Message::Sync(emu::msg::Sync::Video))?;
                     }
