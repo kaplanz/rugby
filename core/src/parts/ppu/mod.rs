@@ -33,7 +33,7 @@ pub const RATE: u32 = 70224;
 pub const LCD: Aspect = Aspect { wd: 160, ht: 144 };
 
 /// Display framebuffer.
-pub type Frame = video::Frame<Color, { LCD.depth() }>;
+pub type Frame = video::Frame<Color>;
 
 /// Video RAM.
 ///
@@ -161,7 +161,7 @@ impl Internal {
 impl Default for Internal {
     fn default() -> Self {
         Self {
-            buf: [Color::default(); LCD.depth()],
+            buf: vec![Color::default(); LCD.depth()].into_boxed_slice(),
             dot: u16::default(),
             ywin: Byte::default(),
             mode: Mode::default(),
