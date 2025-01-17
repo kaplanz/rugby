@@ -8,9 +8,7 @@ pub trait Video {
     /// Pixel data.
     type Pixel: Pixel;
 
-    /// Checks for the start of vertical sync.
-    ///
-    /// Signals that the frame is ready to be rendered.
+    /// Checks if a frame is ready to be rendered.
     #[must_use]
     fn vsync(&self) -> bool;
 
