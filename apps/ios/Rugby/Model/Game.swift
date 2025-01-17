@@ -23,7 +23,7 @@ class Game: Equatable, Hashable, Identifiable {
 
     var data: Data {
         do {
-            return try Data([UInt8](Data(contentsOf: path)))
+            return try Data(contentsOf: path)
         } catch let error {
             fatalError(error.localizedDescription)
         }
