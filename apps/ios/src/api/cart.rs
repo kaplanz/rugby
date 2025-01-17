@@ -67,6 +67,11 @@ impl Cartridge {
         })
     }
 
+    /// Checks if the game is currently in use.
+    fn busy(&self) -> bool {
+        self.game.lock().is_ok_and(|cart| cart.is_some())
+    }
+
     /// Retrieves the cartridge header.
     #[uniffi::method]
     pub fn header(&self) -> Header {
