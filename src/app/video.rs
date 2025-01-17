@@ -1,6 +1,6 @@
 //! Video API.
 
-use crate::emu::part::video::Pixel;
+use crate::emu::part::video::{Frame, Pixel};
 
 /// Video interface.
 pub trait Video {
@@ -10,5 +10,5 @@ pub trait Video {
     ///
     /// The video output is updated using the framebuffer provided by the
     /// emulator.
-    fn draw(&mut self, frame: &[Self::Pixel]);
+    fn draw(&mut self, frame: Frame<Self::Pixel>);
 }
