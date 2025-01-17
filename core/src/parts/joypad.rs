@@ -16,13 +16,21 @@ use crate::api::part::joypad::{Event, Input, Joypad as Api, State};
 #[rustfmt::skip]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Button {
+    /// Game button: A
     A      = 0b0010_0001,
+    /// Game button: B
     B      = 0b0010_0010,
+    /// Menu button: Select
     Select = 0b0010_0100,
+    /// Menu button: Start
     Start  = 0b0010_1000,
+    /// D-pad input: Right
     Right  = 0b0001_0001,
+    /// D-pad input: Left
     Left   = 0b0001_0010,
+    /// D-pad input: Up
     Up     = 0b0001_0100,
+    /// D-pad input: Down
     Down   = 0b0001_1000,
 }
 

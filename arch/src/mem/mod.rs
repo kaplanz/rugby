@@ -19,8 +19,6 @@ mod rom;
 pub use self::ram::Ram;
 pub use self::rom::Rom;
 
-pub type Result<T, E = Error> = std::result::Result<T, E>;
-
 /// Addressable memory-mapped interface.
 pub trait Memory: Debug {
     /// Reads from the specified address.
@@ -110,6 +108,9 @@ impl Memory for Vec<Byte> {
         self.as_mut_slice().write(addr, data)
     }
 }
+
+/// A convenient type alias for [`Result`](std::result::Result).
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by a [memory](Memory) operation.
 #[derive(Clone, Debug, Error, Eq, PartialEq)]
