@@ -49,7 +49,7 @@ class GameBoy {
 
     init() {
         // Start emulator task
-        Task.detached {
+        Task.detached(priority: .userInitiated) {
             // Initialize state
             var emu = RugbyKit.GameBoy()
             var run = false
