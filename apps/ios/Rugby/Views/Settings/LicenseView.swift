@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct LicenseView: View {
-    @ObservedObject var license: License
+    let path: String
+
+    private var file: License {
+        License(path: path)
+    }
 
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
-            Text(license.text)
+            Text(file.text)
                 .monospaced()
                 .font(.caption)
         }
@@ -20,27 +24,15 @@ struct LicenseView: View {
     }
 }
 
-class License: ObservableObject {
-    @Published var text = String()
+private struct License {
+    let path: String
 
-    init(path: String) {
-        load(path: path)
-    }
-
-    func load(path: String) {
-        if let path = Bundle.main.path(forResource: path, ofType: nil) {
-            do {
-                let text = try String(contentsOfFile: path, encoding: .utf8)
-                DispatchQueue.main.async {
-                    self.text = text
-                }
-            } catch let error {
-                print(error.localizedDescription)
-            }
-        }
+    var text: String {
+        let path = Bundle.main.path(forResource: path, ofType: nil)!
+        return try! String(contentsOfFile: path, encoding: .utf8)
     }
 }
 
 #Preview {
-    LicenseView(license: License(path: "LICENSE-MIT"))
+    LicenseView(path: "LICENSE-MIT")
 }
