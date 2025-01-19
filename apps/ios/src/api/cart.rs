@@ -15,15 +15,24 @@ impl GameBoy {
     /// [ejected](Self::eject).
     #[uniffi::method]
     pub fn insert(&self, cart: Arc<Cartridge>) -> Result<()> {
+        // Eject previous cartridge, if any
+        if self.eject() {
+            return Err("inserted cartiridge without previous eject"
+                .to_string()
+                .into());
+        }
         // Take unique ownership of this cartridge's game.
-        let cart = cart
+        let game = cart
             .game
             .try_lock()
             .map_err(|err| err.to_string())?
             .take()
             .ok_or("cartridge is missing game data".to_string())?;
         // Insert the cartridge
-        self.0.write().unwrap().insert(cart);
+        self.emu.write().unwrap().insert(game);
+        // Retain cartridge
+        self.pak.write().unwrap().replace(cart);
+
         Ok(())
     }
 
@@ -33,7 +42,21 @@ impl GameBoy {
     /// see if a cartridge was ejected.
     #[uniffi::method]
     pub fn eject(&self) -> bool {
-        self.0.write().unwrap().eject().is_some()
+        // Retrieve cartridge
+        let Some(cart) = self.pak.write().unwrap().take() else {
+            return false;
+        };
+        // Eject inserted game
+        let Some(game) = self.emu.write().unwrap().eject() else {
+            return false;
+        };
+        // Ensure game matches cartridge
+        if cart.header() != game.header().into() {
+            return false;
+        }
+        // Restore ownership of this cartridge's game
+        cart.game.lock().unwrap().replace(game);
+        true
     }
 }
 
@@ -94,7 +117,7 @@ unsafe impl Sync for Cartridge {}
 /// Cartridge header.
 ///
 /// Information about the cartridge ROM.
-#[derive(Clone, Debug, uniffi::Record)]
+#[derive(Clone, Debug, Eq, PartialEq, uniffi::Record)]
 pub struct Header {
     /// Internal game title.
     pub title: Option<String>,

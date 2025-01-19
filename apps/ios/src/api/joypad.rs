@@ -14,7 +14,7 @@ impl GameBoy {
     /// this is a no-op.
     #[uniffi::method]
     pub fn press(&self, key: Button) {
-        self.0
+        self.emu
             .write()
             .unwrap()
             .inside_mut()
@@ -28,7 +28,7 @@ impl GameBoy {
     /// pressed, this is a no-op.
     #[uniffi::method]
     pub fn release(&self, key: Button) {
-        self.0
+        self.emu
             .write()
             .unwrap()
             .inside_mut()
