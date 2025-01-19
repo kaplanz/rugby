@@ -1,6 +1,6 @@
 //! Emulator API.
 
-use std::sync::RwLock;
+use std::sync::{Arc, RwLock};
 
 use rugby::arch::Block;
 use rugby::core::dmg;
@@ -12,7 +12,12 @@ pub mod video;
 /// Game Boy (DMG) emulator model.
 #[derive(Debug, Default, uniffi::Object)]
 #[uniffi::export(Debug)]
-pub struct GameBoy(RwLock<dmg::GameBoy>);
+pub struct GameBoy {
+    /// Internal emulator model.
+    emu: RwLock<dmg::GameBoy>,
+    /// External cartridge model.
+    pak: RwLock<Option<Arc<cart::Cartridge>>>,
+}
 
 #[uniffi::export]
 impl GameBoy {
@@ -24,7 +29,10 @@ impl GameBoy {
     /// Use [`Self::reset`] for a soft reset.
     #[uniffi::constructor]
     pub fn new() -> Self {
-        Self(RwLock::new(dmg::GameBoy::new()))
+        Self {
+            emu: dmg::GameBoy::new().into(),
+            pak: None.into(),
+        }
     }
 }
 
@@ -39,7 +47,7 @@ impl GameBoy {
     /// This should generally be checked before calling [`Self::cycle`].
     #[uniffi::method]
     pub fn ready(&self) -> bool {
-        self.0.read().unwrap().ready()
+        self.emu.read().unwrap().ready()
     }
 
     /// Emulates a single cycle.
@@ -53,7 +61,7 @@ impl GameBoy {
     /// of 4 MiHz).
     #[uniffi::method]
     pub fn cycle(&self) {
-        self.0.write().unwrap().cycle();
+        self.emu.write().unwrap().cycle();
     }
 
     /// Performs a soft reset.
@@ -67,7 +75,7 @@ impl GameBoy {
     /// [`Self::new`].
     #[uniffi::method]
     pub fn reset(&self) {
-        self.0.write().unwrap().reset();
+        self.emu.write().unwrap().reset();
     }
 }
 
