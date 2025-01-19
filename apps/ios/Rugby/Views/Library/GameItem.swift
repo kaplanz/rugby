@@ -35,7 +35,7 @@ struct GameItem: View {
                         detail.toggle()
                     }
                     RenameButton()
-                    Button("Manage", systemImage: "gearshape") {
+                    Button("Settings", systemImage: "gearshape") {
                         manage.toggle()
                     }
                     Divider()
