@@ -58,7 +58,7 @@ struct EmulatorView: View {
                 Button("Get Info", systemImage: "info.circle") {
                     detail.toggle()
                 }
-                Button("Manage", systemImage: "gearshape") {
+                Button("Settings", systemImage: "gearshape") {
                     manage.toggle()
                 }
                 Divider()
