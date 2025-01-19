@@ -68,7 +68,7 @@ struct GameItem: View {
                 lib.delete(game: game)
             }
         } message: {
-            Text("This item will be deleted immediately. You can't undo this action.")
+            Text("This item will be moved to the trash.")
         }
         .sheet(isPresented: $detail) {
             NavigationStack {
