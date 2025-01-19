@@ -138,7 +138,7 @@ class Library {
         do {
             // Remove game directory
             let dir = game.path.deletingLastPathComponent()
-            try fs.removeItem(at: dir)
+            try fs.trashItem(at: dir, resultingItemURL: nil)
         } catch let error {
             log.error("filesystem: \(error.localizedDescription)")
         }
