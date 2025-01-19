@@ -18,6 +18,11 @@ struct EmulatorView: View {
     /// Manage this game.
     @State private var manage = false
 
+    /// Should the emulator be running?
+    private var enable: Bool {
+        !paused && !detail && !manage && scenePhase == .active
+    }
+
     var body: some View {
         GeometryReader { geo in
             if geo.size.height > geo.size.width {
@@ -102,18 +107,8 @@ struct EmulatorView: View {
                     }
             }
         }
-        .onChange(of: paused) {
-            emu.pause(paused)
-        }
-        .onChange(of: detail) {
-            emu.pause(detail || paused)
-        }
-        .onChange(of: manage) {
-            emu.pause(manage || paused)
-        }
-        .onChange(of: scenePhase) {
-            let hidden = scenePhase != .active
-            emu.pause(hidden || paused)
+        .onChange(of: enable) {
+            emu.pause(!enable)
         }
     }
 }
