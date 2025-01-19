@@ -21,11 +21,7 @@ class GameBoy {
         get {
             game != nil
         }
-        set {
-            if !newValue {
-                stop()
-            }
-        }
+        set {}
     }
 
     /// Emulation error.
@@ -85,6 +81,10 @@ class GameBoy {
                 case .stop:
                     // Stop emulation
                     run = false
+                    // Eject cartridge
+                    if !emu.eject() {
+                        fatalError("mismatch while ejecting cartridge")
+                    }
                     // Reset emulator
                     fallthrough
                 case .reset:
