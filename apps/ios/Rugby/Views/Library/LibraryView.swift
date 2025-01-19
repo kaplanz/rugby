@@ -89,7 +89,7 @@ struct LibraryView: View {
                 set: { if !$0 && !lib.error.isEmpty { lib.error.removeFirst() } }
             ), presenting: lib.error.first
         ) { _ in
-            Button("Okay", role: .cancel) {}
+            Button("OK", role: .cancel) {}
         } message: { error in
             Text(String(describing: error))
         }

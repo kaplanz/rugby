@@ -75,7 +75,7 @@ struct EmulatorView: View {
                 set: { if !$0 { emu.error = nil } }
             ), presenting: emu.error
         ) { _ in
-            Button("Okay", role: .cancel) {
+            Button("OK", role: .cancel) {
                 emu.stop()
             }
         } message: { error in
