@@ -40,20 +40,37 @@ struct SettingsView: View {
                 ) {
                     Label("Website", systemImage: "globe")
                 }
-                Menu("License", systemImage: "doc.text") {
+                Menu {
                     NavigationLink {
-                        LicenseView(license: License(path: "LICENSE-MIT"))
+                        LicenseView(path: "LICENSE-MIT")
                     } label: {
                         Label("MIT", systemImage: "building.columns")
                     }
                     NavigationLink {
-                        LicenseView(license: License(path: "LICENSE-APACHE"))
+                        LicenseView(path: "LICENSE-APACHE")
                     } label: {
                         Label("Apache-2.0", systemImage: "bird")
                     }
+                } label: {
+                    Label("License", systemImage: "doc.text")
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             } header: {
                 Text("About")
+            } footer: {
+                let vers = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+                Text("Version \(vers)")
+            }
+            Section {
+                NavigationLink {
+                    CreditsView()
+                } label: {
+                    Label("Credits", systemImage: "person.2")
+                        .foregroundStyle(Color.accentColor)
+                }
+            } footer: {
+                let date = Date.now.formatted(.dateTime.year())
+                Text("Copyright &copy; \(date) Zakhary Kaplan")
             }
         }
     }
