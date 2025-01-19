@@ -40,6 +40,7 @@ struct Screen: View {
                     .italic()
                     .textCase(.uppercase)
             }
+            .baselineOffset(5)
             .foregroundStyle(.brand)
         }
         .padding(6)
