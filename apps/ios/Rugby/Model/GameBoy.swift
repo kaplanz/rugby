@@ -107,9 +107,7 @@ class GameBoy {
                     continue
                 }
                 // Tick emulator
-                if emu.ready() {
-                    emu.cycle()
-                }
+                emu.cycle()
                 // Tick display
                 if emu.vsync() {
                     await self.redraw(frame: emu.frame())
