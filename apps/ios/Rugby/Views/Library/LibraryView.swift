@@ -14,9 +14,6 @@ struct LibraryView: View {
     /// Present file import dialog.
     @State private var file = false
 
-    /// List of file import errors.
-    @State private var importErrors: [(file: URL, error: RugbyKit.Error)] = []
-
     var body: some View {
         ScrollView {
             LazyVGrid(
@@ -67,7 +64,7 @@ struct LibraryView: View {
                             return true
                         } catch let error as RugbyKit.Error {
                             // Retain cartridge errors
-                            importErrors.append((file: file, error: error))
+                            lib.error.append(error)
                             return false
                         } catch let error {
                             // Crash on unknown errors
@@ -86,22 +83,14 @@ struct LibraryView: View {
             "Error",
             isPresented: Binding(
                 get: { lib.error.first != nil },
-                set: { if !$0 && !lib.error.isEmpty { lib.error.removeFirst() } }
+                set: { _ in }
             ), presenting: lib.error.first
         ) { _ in
-            Button("OK", role: .cancel) {}
+            Button("OK", role: .cancel) {
+                lib.error.removeFirst()
+            }
         } message: { error in
             Text(String(describing: error))
-        }
-        .sheet(
-            isPresented: Binding(
-                get: { !importErrors.isEmpty },
-                set: { if !$0 { importErrors.removeAll() } }
-            )
-        ) {
-            NavigationStack {
-                ErrorList(errors: $importErrors)
-            }
         }
     }
 }
@@ -111,45 +100,4 @@ struct LibraryView: View {
         LibraryView()
     }
     .environment(Library())
-}
-
-private struct ErrorList: View {
-    /// List of file import errors.
-    @Binding var errors: [(file: URL, error: RugbyKit.Error)]
-
-    var body: some View {
-        List(errors, id: \.file) { file, error in
-            Section(file.deletingPathExtension().lastPathComponent) {
-                Label {
-                    Text(error.localizedDescription)
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle")
-                        .foregroundStyle(.yellow)
-                }
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            Button("Clear", role: .destructive) {
-                errors.removeAll()
-            }
-            .bold()
-        }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        ErrorList(
-            errors: .constant([
-                (
-                    file: URL(string: "/path/to/Camera.gb")!,
-                    error: RugbyKit.Error.Message("unsupported cartridge: Camera")
-                ),
-                (
-                    file: URL(string: "/path/to/Random.gb")!,
-                    error: RugbyKit.Error.Message("bad cartridge header")
-                ),
-            ]))
-    }
 }
