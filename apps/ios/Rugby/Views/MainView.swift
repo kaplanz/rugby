@@ -23,6 +23,7 @@ struct MainView: View {
                     NavigationStack {
                         SettingsView()
                             .navigationTitle("Settings")
+                            .navigationBarTitleDisplayMode(.inline)
                             .toolbar {
                                 Button("Done") {
                                     manage.toggle()

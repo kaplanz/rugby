@@ -15,24 +15,28 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            // Application
+            // Header
             Section {
-                Picker("Palette", selection: $pal) {
-                    ForEach(Palette.allCases) { pal in
-                        Text(pal.description)
+                HStack(spacing: 20) {
+                    Image(uiImage: UIImage(named: "AppIcon60x60")!)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80)
+                        .clipShape(.rect(cornerRadius: 18, style: .continuous))
+                    VStack(alignment: .leading) {
+                        Text(Build.NAME)
+                            .bold()
+                            .font(.title)
+                        Text("Version \(Build.VERSION)")
+                            .foregroundStyle(.secondary)
                     }
                 }
-                .pickerStyle(.navigationLink)
-                Picker("Speed", selection: $spd) {
-                    ForEach(Speed.allCases) { spd in
-                        Text(spd.description)
-                    }
-                }
-            } header: {
-                Text("Application")
             }
+            .listRowBackground(Color.clear)
+            .listSectionSpacing(10)
             // About
             Section {
+                // Website
                 Link(
                     destination: URL(
                         string: "https://github.com/kaplanz/rugby"
@@ -40,28 +44,25 @@ struct SettingsView: View {
                 ) {
                     Label("Website", systemImage: "globe")
                 }
-                Menu {
+                // License
+                DisclosureGroup {
                     NavigationLink {
                         LicenseView(path: "LICENSE-MIT")
                     } label: {
                         Label("MIT", systemImage: "building.columns")
+                            .foregroundStyle(Color.accentColor)
                     }
                     NavigationLink {
                         LicenseView(path: "LICENSE-APACHE")
                     } label: {
                         Label("Apache-2.0", systemImage: "bird")
+                            .foregroundStyle(Color.accentColor)
                     }
                 } label: {
                     Label("License", systemImage: "doc.text")
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundStyle(Color.accentColor)
                 }
-            } header: {
-                Text("About")
-            } footer: {
-                let vers = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
-                Text("Version \(vers)")
-            }
-            Section {
+                // Credit
                 NavigationLink {
                     CreditsView()
                 } label: {
@@ -69,8 +70,23 @@ struct SettingsView: View {
                         .foregroundStyle(Color.accentColor)
                 }
             } footer: {
-                let date = Date.now.formatted(.dateTime.year())
-                Text("Copyright &copy; \(date) Zakhary Kaplan")
+                Text("Copyright &copy; \(Build.DATE.formatted(.dateTime.year())) Zakhary Kaplan")
+            }
+            // Application
+            Section("Application") {
+                // Palette
+                Picker("Palette", selection: $pal) {
+                    ForEach(Palette.allCases) { pal in
+                        Text(pal.description)
+                    }
+                }
+                .pickerStyle(.navigationLink)
+                // Speed
+                Picker("Speed", selection: $spd) {
+                    ForEach(Speed.allCases) { spd in
+                        Text(spd.description)
+                    }
+                }
             }
         }
     }
