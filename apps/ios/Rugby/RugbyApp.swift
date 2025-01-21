@@ -12,6 +12,9 @@ import SwiftUI
 /// Global logger.
 let log = Logger()
 
+/// Global configuration.
+var cfg = Settings()
+
 struct Build {
     /// Application name.
     static let NAME = Bundle.main.infoDictionary?["CFBundleName"] as! String
