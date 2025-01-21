@@ -83,7 +83,7 @@ struct EmulatorView: View {
         }
         .sheet(isPresented: $detail) {
             NavigationStack {
-                GameInfo(game: emu.game!)
+                GameDetails(game: emu.game!)
                     .toolbar {
                         Button("Done") {
                             detail.toggle()
