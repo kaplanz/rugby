@@ -18,12 +18,9 @@ struct MainView: View {
 
         NavigationStack {
             LibraryView()
-                .navigationTitle("Library")
                 .sheet(isPresented: $manage) {
                     NavigationStack {
                         SettingsView()
-                            .navigationTitle("Settings")
-                            .navigationBarTitleDisplayMode(.inline)
                             .toolbar {
                                 Button("Done") {
                                     manage.toggle()

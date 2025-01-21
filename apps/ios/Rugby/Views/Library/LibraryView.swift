@@ -34,6 +34,7 @@ struct LibraryView: View {
             lib.reload()
         }
         .background(.regularMaterial)
+        .navigationTitle("Library")
         .toolbar {
             Button("Import", systemImage: "plus") {
                 file.toggle()
