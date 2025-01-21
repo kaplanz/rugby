@@ -33,7 +33,8 @@
 		96AFA7292C2614F300FB2A25 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7282C2614F300FB2A25 /* Library.swift */; };
 		96C676762D3EA602001B1DB6 /* GameHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C676752D3EA602001B1DB6 /* GameHeader.swift */; };
 		96C676782D3EA72B001B1DB6 /* AppHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C676772D3EA72B001B1DB6 /* AppHeader.swift */; };
-		96EC84492D3178C40034F030 /* GameInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EC84482D3178C40034F030 /* GameInfo.swift */; };
+		96C6767A2D3EAD0D001B1DB6 /* GameIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C676792D3EAD0D001B1DB6 /* GameIcon.swift */; };
+		96EC84492D3178C40034F030 /* GameDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EC84482D3178C40034F030 /* GameDetails.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,7 +64,8 @@
 		96AFA7282C2614F300FB2A25 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		96C676752D3EA602001B1DB6 /* GameHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameHeader.swift; sourceTree = "<group>"; };
 		96C676772D3EA72B001B1DB6 /* AppHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppHeader.swift; sourceTree = "<group>"; };
-		96EC84482D3178C40034F030 /* GameInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInfo.swift; sourceTree = "<group>"; };
+		96C676792D3EAD0D001B1DB6 /* GameIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameIcon.swift; sourceTree = "<group>"; };
+		96EC84482D3178C40034F030 /* GameDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDetails.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,8 +196,9 @@
 			children = (
 				96AFA7172C24D24600FB2A25 /* LibraryView.swift */,
 				9645B6902C287472003DD6D5 /* GameItem.swift */,
-				96EC84482D3178C40034F030 /* GameInfo.swift */,
+				96EC84482D3178C40034F030 /* GameDetails.swift */,
 				96C676752D3EA602001B1DB6 /* GameHeader.swift */,
+				96C676792D3EAD0D001B1DB6 /* GameIcon.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -288,12 +291,13 @@
 				96C676762D3EA602001B1DB6 /* GameHeader.swift in Sources */,
 				968F2C662D3577F8001C136D /* Screen.swift in Sources */,
 				9645B6912C287472003DD6D5 /* GameItem.swift in Sources */,
+				96C6767A2D3EAD0D001B1DB6 /* GameIcon.swift in Sources */,
 				961C7D702D30575C00277AB4 /* GameBoy.swift in Sources */,
 				96AFA7182C24D24600FB2A25 /* LibraryView.swift in Sources */,
 				968F2C642D3577E7001C136D /* Joypad.swift in Sources */,
 				96AFA71C2C25C73300FB2A25 /* LicenseView.swift in Sources */,
 				965FE8742C24C66400768828 /* MainView.swift in Sources */,
-				96EC84492D3178C40034F030 /* GameInfo.swift in Sources */,
+				96EC84492D3178C40034F030 /* GameDetails.swift in Sources */,
 				965FE8722C24C66400768828 /* RugbyApp.swift in Sources */,
 				96AFA7122C24CF5800FB2A25 /* SettingsView.swift in Sources */,
 			);
