@@ -55,3 +55,21 @@ impl Join for Config {
         self.emu.merge(other.emu);
     }
 }
+
+/// Deserializing configuration.
+#[cfg(feature = "toml")]
+pub mod de {
+    use std::str::FromStr;
+
+    pub use toml::de::Error;
+
+    use crate::Config;
+
+    impl FromStr for Config {
+        type Err = Error;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            toml::from_str(s)
+        }
+    }
+}
