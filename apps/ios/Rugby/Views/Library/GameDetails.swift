@@ -11,7 +11,7 @@ import RugbyKit
 import SwiftUI
 import zlib
 
-struct GameInfo: View {
+struct GameDetails: View {
     @Environment(GameBoy.self) var emu
     @Environment(\.dismiss) var dismiss
 
@@ -115,7 +115,7 @@ struct GameInfo: View {
 }
 
 #Preview {
-    GameInfo(
+    GameDetails(
         game: try! Game(
             path: Bundle.main.url(
                 forResource: "roms/games/porklike/porklike",
