@@ -11,8 +11,22 @@
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>gb</string>
+				<string>dev.zakhary.rugby.gb</string>
 			</array>
+			<key>NSUbiquitousDocumentUserActivityType</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).gb</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Game Boy Color</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>dev.zakhary.rugby.gbc</string>
+			</array>
+			<key>NSUbiquitousDocumentUserActivityType</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).gbc</string>
 		</dict>
 	</array>
 	<key>GCSupportedGameControllers</key>
@@ -31,47 +45,6 @@
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.data</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>Game Boy</string>
-			<key>UTTypeIconFiles</key>
-			<array/>
-			<key>UTTypeIdentifier</key>
-			<string>dev.zakhary.rugby.gb</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>gb</string>
-				</array>
-			</dict>
-		</dict>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.data</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>Game Boy Color</string>
-			<key>UTTypeIconFiles</key>
-			<array/>
-			<key>UTTypeIdentifier</key>
-			<string>dev.zakhary.rugby.gbc</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>gbc</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
