@@ -11,7 +11,7 @@ struct Screen: View {
     @Environment(GameBoy.self) var emu
 
     private var image: UIImage? {
-        emu.frame.flatMap(GameBoy.render(frame:))
+        emu.frame.flatMap(emu.render(frame:))
     }
 
     private var empty: UIImage {
