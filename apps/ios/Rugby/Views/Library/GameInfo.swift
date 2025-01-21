@@ -20,29 +20,9 @@ struct GameInfo: View {
 
     var body: some View {
         List {
-            Section {
-                HStack {
-                    Spacer()
-                    GameIcon(game: game)
-                        .shadow(radius: 4)
-                    Spacer()
-                }
-                Text(game.name)
-                    .font(.title2)
-                    .fontWeight(.medium)
-                Button("Play") {
-                    dismiss()
-                    // Only play if not playing anything
-                    if emu.game == nil {
-                        emu.play(game)
-                    }
-                }
-                .bold()
-                .buttonStyle(.borderedProminent)
-                .clipShape(.rect(cornerRadius: .infinity))
-            }
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden, edges: .top)
+            // Header
+            GameHeader(game: game)
+            // Information
             Section("Information") {
                 Row("Title") {
                     Text(game.info.title ?? "Unknown")
@@ -65,6 +45,7 @@ struct GameInfo: View {
                     }
                 }
             }
+            // Cartridge
             Section("Cartridge") {
                 Row("Kind") {
                     Text(game.info.cart)
@@ -76,6 +57,7 @@ struct GameInfo: View {
                     Text(game.info.ramsz)
                 }
             }
+            // Checksum
             Section("Checksum") {
                 Row("Header") {
                     Text(String(format: "%02X", game.info.hchk))
@@ -127,6 +109,8 @@ struct GameInfo: View {
         }
         .listStyle(.plain)
         .environment(\.defaultMinListRowHeight, 32.5)
+        .navigationTitle("Info")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
