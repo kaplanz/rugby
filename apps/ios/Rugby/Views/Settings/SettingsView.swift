@@ -16,10 +16,9 @@ struct SettingsView: View {
         self.game = game
     }
 
-    @State private var pal = Palette.mono
-    @State private var spd = Speed.actual
-
     var body: some View {
+        @Bindable var cfg = cfg
+
         Form {
             // Header
             if let game = game {
@@ -30,14 +29,14 @@ struct SettingsView: View {
             // Application
             Section("Application") {
                 // Palette
-                Picker("Palette", selection: $pal) {
+                Picker("Palette", selection: $cfg.pal) {
                     ForEach(Palette.allCases) { pal in
-                        Text(pal.description)
+                        PaletteView(pal: pal)
                     }
                 }
                 .pickerStyle(.navigationLink)
                 // Speed
-                Picker("Speed", selection: $spd) {
+                Picker("Speed", selection: $cfg.spd) {
                     ForEach(Speed.allCases) { spd in
                         Text(spd.description)
                     }
@@ -53,35 +52,4 @@ struct SettingsView: View {
     NavigationStack {
         SettingsView()
     }
-}
-
-enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
-    case mono
-
-    // impl CustomStringConvertible
-    var description: String {
-        rawValue.capitalized
-    }
-
-    // impl Identifiable
-    var id: Self { self }
-}
-
-enum Speed: Float, CaseIterable, CustomStringConvertible, Identifiable {
-    case half = 0.5
-    case actual = 1.0
-    case double = 2.0
-    case turbo = 0.0
-    // impl CustomStringConvertible
-    var description: String {
-        switch self {
-        case .turbo:
-            "Turbo"
-        default:
-            rawValue.formatted(.percent)
-        }
-    }
-
-    // impl Identifiable
-    var id: Self { self }
 }
