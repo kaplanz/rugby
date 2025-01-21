@@ -73,8 +73,6 @@ struct GameItem: View {
         .sheet(isPresented: $detail) {
             NavigationStack {
                 GameInfo(game: game)
-                    .navigationTitle("Info")
-                    .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         Button("Done") {
                             detail.toggle()
@@ -85,9 +83,7 @@ struct GameItem: View {
         }
         .sheet(isPresented: $manage) {
             NavigationStack {
-                SettingsView()
-                    .navigationTitle(game.name)
-                    .navigationBarTitleDisplayMode(.inline)
+                SettingsView(game: game)
                     .toolbar {
                         Button("Done") {
                             manage.toggle()
