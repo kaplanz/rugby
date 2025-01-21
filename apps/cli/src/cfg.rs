@@ -4,9 +4,9 @@ use std::io::ErrorKind::NotFound;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
+use rugby_cfg::de;
 pub use rugby_cfg::Config;
 use thiserror::Error;
-use toml::from_str as parse;
 
 use crate::dir;
 
@@ -33,8 +33,9 @@ pub fn load(path: &Path) -> Result<Config> {
         Ok(body) => Ok(body),
     }
     .and_then(|body| {
-        // If a configuration file was read, parse it.
-        parse(&body)
+        body
+            // If a configuration file was read, parse it.
+            .parse()
             // Parsing errors should be mapped into a separate variant.
             .map_err(Into::into)
     })
@@ -51,5 +52,5 @@ pub enum Error {
     Read(#[from] io::Error),
     /// Parse error.
     #[error("error parsing config")]
-    Parse(#[from] toml::de::Error),
+    Parse(#[from] de::Error),
 }
