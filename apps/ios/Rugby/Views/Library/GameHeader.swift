@@ -41,13 +41,12 @@ struct GameHeader: View {
 }
 
 #Preview {
-    GameHeader(
-        game: try! Game(
-            path: Bundle.main.url(
-                forResource: "roms/games/porklike/porklike",
-                withExtension: "gb"
-            )!
-        )
-    )
-    .environment(GameBoy())
+    if let game = Bundle
+        .main
+        .url(forResource: "porklike", withExtension: "gb")
+        .flatMap({ try? Game(path: $0) })
+    {
+        GameHeader(game: game)
+            .environment(GameBoy())
+    }
 }
