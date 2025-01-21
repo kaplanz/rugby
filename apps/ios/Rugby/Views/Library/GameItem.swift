@@ -72,7 +72,7 @@ struct GameItem: View {
         }
         .sheet(isPresented: $detail) {
             NavigationStack {
-                GameInfo(game: game)
+                GameDetails(game: game)
                     .toolbar {
                         Button("Done") {
                             detail.toggle()
@@ -106,24 +106,4 @@ struct GameItem: View {
     )
     .environment(GameBoy())
     .environment(Library())
-}
-
-struct GameIcon: View {
-    @State var game: Game
-
-    private var image: Image? {
-        game.icon.flatMap(Image.init(uiImage:))
-    }
-
-    var body: some View {
-        (image ?? Image(systemName: "questionmark.app"))
-            .frame(width: 160, height: 144)
-            .background(.ultraThinMaterial)
-            .clipShape(.rect(cornerRadius: 15))
-            .contentShape(.contextMenuPreview, .rect(cornerRadius: 15))
-            .overlay {
-                RoundedRectangle(cornerRadius: 15)
-                    .stroke(.foreground.secondary)
-            }
-    }
 }
