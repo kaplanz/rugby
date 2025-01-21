@@ -84,8 +84,6 @@ struct EmulatorView: View {
         .sheet(isPresented: $detail) {
             NavigationStack {
                 GameInfo(game: emu.game!)
-                    .navigationTitle("Info")
-                    .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         Button("Done") {
                             detail.toggle()
@@ -96,9 +94,7 @@ struct EmulatorView: View {
         }
         .sheet(isPresented: $manage) {
             NavigationStack {
-                SettingsView()
-                    .navigationTitle(emu.game!.name)
-                    .navigationBarTitleDisplayMode(.inline)
+                SettingsView(game: emu.game)
                     .toolbar {
                         Button("Done") {
                             manage.toggle()

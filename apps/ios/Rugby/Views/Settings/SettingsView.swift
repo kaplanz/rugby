@@ -10,67 +10,22 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
 
+    let game: Game?
+
+    init(game: Game? = nil) {
+        self.game = game
+    }
+
     @State private var pal = Palette.mono
     @State private var spd = Speed.actual
 
     var body: some View {
         Form {
             // Header
-            Section {
-                HStack(spacing: 20) {
-                    Image(uiImage: UIImage(named: "AppIcon60x60")!)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80)
-                        .clipShape(.rect(cornerRadius: 18, style: .continuous))
-                    VStack(alignment: .leading) {
-                        Text(Build.NAME)
-                            .bold()
-                            .font(.title)
-                        Text("Version \(Build.VERSION)")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-            .listRowBackground(Color.clear)
-            .listSectionSpacing(10)
-            // About
-            Section {
-                // Website
-                Link(
-                    destination: URL(
-                        string: "https://github.com/kaplanz/rugby"
-                    )!
-                ) {
-                    Label("Website", systemImage: "globe")
-                }
-                // License
-                DisclosureGroup {
-                    NavigationLink {
-                        LicenseView(path: "LICENSE-MIT")
-                    } label: {
-                        Label("MIT", systemImage: "building.columns")
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    NavigationLink {
-                        LicenseView(path: "LICENSE-APACHE")
-                    } label: {
-                        Label("Apache-2.0", systemImage: "bird")
-                            .foregroundStyle(Color.accentColor)
-                    }
-                } label: {
-                    Label("License", systemImage: "doc.text")
-                        .foregroundStyle(Color.accentColor)
-                }
-                // Credit
-                NavigationLink {
-                    CreditsView()
-                } label: {
-                    Label("Credits", systemImage: "person.2")
-                        .foregroundStyle(Color.accentColor)
-                }
-            } footer: {
-                Text("Copyright &copy; \(Build.DATE.formatted(.dateTime.year())) Zakhary Kaplan")
+            if let game = game {
+                GameHeader(game: game)
+            } else {
+                AppHeader()
             }
             // Application
             Section("Application") {
@@ -89,6 +44,8 @@ struct SettingsView: View {
                 }
             }
         }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
