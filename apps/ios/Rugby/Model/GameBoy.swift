@@ -139,6 +139,10 @@ class GameBoy {
     /// Pause emulation.
     func pause(_ state: Bool = true) {
         talk.send(.pause(state))
+        // Save paused frame
+        if state {
+            game?.icon = image
+        }
     }
 
     /// Resume emulation.
