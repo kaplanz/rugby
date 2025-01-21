@@ -168,7 +168,7 @@ class GameBoy {
         let (wd, ht) = (160, 144)
 
         // Convert frame to data
-        let buf = frame.map { cfg.pal.data[Int($0)] }
+        let buf = frame.map { cfg.pal.data[Int($0)].bigEndian }
 
         // Convert the buffer of UInt32 into raw bytes
         let bytes = buf.withUnsafeBufferPointer { bufferPointer in
@@ -197,7 +197,7 @@ class GameBoy {
                 bitsPerPixel: bitsPerComponent * bytesPerPixel,
                 bytesPerRow: bytesPerRow,
                 space: colorSpace,
-                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue),
                 provider: dataProvider!,
                 decode: nil,
                 shouldInterpolate: true,
