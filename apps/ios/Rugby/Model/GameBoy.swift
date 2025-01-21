@@ -30,6 +30,11 @@ class GameBoy {
     /// Most recent frame data.
     private(set) var frame: Data?
 
+    /// Move recent frame image.
+    var image: UIImage? {
+        frame.flatMap(render(frame:))
+    }
+
     /// Communication channel.
     private var talk = PassthroughSubject<Message, Never>()
 
@@ -149,8 +154,9 @@ class GameBoy {
     /// Stop emulation.
     func stop() {
         talk.send(.stop)
-        // Save last frame
-        game?.icon = frame.flatMap(render(frame:))
+        // Save final frame
+        game?.icon = image
+        // Remove game
         game = nil
     }
 
@@ -164,7 +170,8 @@ class GameBoy {
         self.frame = frame
     }
 
-    func render(frame: Data) -> UIImage? {
+    /// Renders the screen to an image.
+    private func render(frame: Data) -> UIImage? {
         let (wd, ht) = (160, 144)
 
         // Convert frame to data
