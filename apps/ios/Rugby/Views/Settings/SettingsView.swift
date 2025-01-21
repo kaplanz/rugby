@@ -31,7 +31,10 @@ struct SettingsView: View {
                 // Palette
                 Picker("Palette", selection: $cfg.pal) {
                     ForEach(Palette.allCases) { pal in
-                        PaletteView(pal: pal)
+                        HStack {
+                            PaletteIcon(pal: pal)
+                            Text(pal.description)
+                        }
                     }
                 }
                 .pickerStyle(.navigationLink)
