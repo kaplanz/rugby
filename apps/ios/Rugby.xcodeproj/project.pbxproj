@@ -3,322 +3,155 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		961689832C29BD2700E28B7D /* LICENSE-MIT in Resources */ = {isa = PBXBuildFile; fileRef = 9616897F2C29BD2700E28B7D /* LICENSE-MIT */; };
-		961689842C29BD2700E28B7D /* LICENSE-APACHE in Resources */ = {isa = PBXBuildFile; fileRef = 961689802C29BD2700E28B7D /* LICENSE-APACHE */; };
-		961689852C29BD2700E28B7D /* roms in Resources */ = {isa = PBXBuildFile; fileRef = 961689812C29BD2700E28B7D /* roms */; };
-		96172F4E2D307FC7009EFCFA /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96172F4D2D307FC7009EFCFA /* Game.swift */; };
-		961C7D702D30575C00277AB4 /* GameBoy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961C7D6F2D30575C00277AB4 /* GameBoy.swift */; };
-		9645B6912C287472003DD6D5 /* GameItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9645B6902C287472003DD6D5 /* GameItem.swift */; };
-		965FE8722C24C66400768828 /* RugbyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965FE8712C24C66400768828 /* RugbyApp.swift */; };
-		965FE8742C24C66400768828 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965FE8732C24C66400768828 /* MainView.swift */; };
-		965FE8762C24C66500768828 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 965FE8752C24C66500768828 /* Assets.xcassets */; };
-		965FE8792C24C66500768828 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 965FE8782C24C66500768828 /* Preview Assets.xcassets */; };
-		9661729B2D3D7C6500B5D037 /* CreditsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9661729A2D3D7C6500B5D037 /* CreditsView.swift */; };
-		966C3C542D3EC122008A16A0 /* Palette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966C3C532D3EC122008A16A0 /* Palette.swift */; };
-		968E9C392D3758EE006EB718 /* Pretendo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 968E9C382D3758EE006EB718 /* Pretendo.ttf */; };
-		968E9C3D2D375AAF006EB718 /* Orbitron.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 968E9C3C2D375AAF006EB718 /* Orbitron.ttf */; };
-		968E9C3F2D3762CF006EB718 /* Cabin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 968E9C3E2D3762CF006EB718 /* Cabin.ttf */; };
-		968E9C432D376530006EB718 /* Cabin-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 968E9C422D376530006EB718 /* Cabin-Italic.ttf */; };
-		968F2C622D349EE6001C136D /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 968F2C612D349EE6001C136D /* Algorithms */; };
-		968F2C642D3577E7001C136D /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968F2C632D3577E7001C136D /* Joypad.swift */; };
-		968F2C662D3577F8001C136D /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968F2C652D3577F8001C136D /* Screen.swift */; };
-		96A6C4332D10CDEE009BD762 /* RugbyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96A6C4322D10CDEE009BD762 /* RugbyKit */; };
-		96AFA7122C24CF5800FB2A25 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7112C24CF5800FB2A25 /* SettingsView.swift */; };
-		96AFA7162C24D20C00FB2A25 /* EmulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7152C24D20C00FB2A25 /* EmulatorView.swift */; };
-		96AFA7182C24D24600FB2A25 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7172C24D24600FB2A25 /* LibraryView.swift */; };
-		96AFA71C2C25C73300FB2A25 /* LicenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA71B2C25C73300FB2A25 /* LicenseView.swift */; };
-		96AFA7292C2614F300FB2A25 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AFA7282C2614F300FB2A25 /* Library.swift */; };
-		96C676762D3EA602001B1DB6 /* GameHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C676752D3EA602001B1DB6 /* GameHeader.swift */; };
-		96C676782D3EA72B001B1DB6 /* AppHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C676772D3EA72B001B1DB6 /* AppHeader.swift */; };
-		96C6767A2D3EAD0D001B1DB6 /* GameIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C676792D3EAD0D001B1DB6 /* GameIcon.swift */; };
-		96C6767C2D3EADAF001B1DB6 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C6767B2D3EADAF001B1DB6 /* Settings.swift */; };
-		96C6767E2D3EAF1C001B1DB6 /* PaletteIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C6767D2D3EAF1C001B1DB6 /* PaletteIcon.swift */; };
-		96EC84492D3178C40034F030 /* GameDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EC84482D3178C40034F030 /* GameDetails.swift */; };
+		96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0C2D40299D009ED7D7 /* RugbyKit */; };
+		96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0F2D4029A5009ED7D7 /* Algorithms */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9616897F2C29BD2700E28B7D /* LICENSE-MIT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "LICENSE-MIT"; path = "../../../../LICENSE-MIT"; sourceTree = "<group>"; };
-		961689802C29BD2700E28B7D /* LICENSE-APACHE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "LICENSE-APACHE"; path = "../../../../LICENSE-APACHE"; sourceTree = "<group>"; };
-		961689812C29BD2700E28B7D /* roms */ = {isa = PBXFileReference; lastKnownFileType = folder; name = roms; path = ../../../../roms; sourceTree = "<group>"; };
-		96172F4D2D307FC7009EFCFA /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
-		9618C0D32D10C38900D6FDFE /* pkg */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = pkg; sourceTree = "<group>"; };
-		961C7D6F2D30575C00277AB4 /* GameBoy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameBoy.swift; sourceTree = "<group>"; };
-		9645B6902C287472003DD6D5 /* GameItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameItem.swift; sourceTree = "<group>"; };
-		965FE86E2C24C66400768828 /* Rugby.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rugby.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		965FE8712C24C66400768828 /* RugbyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RugbyApp.swift; sourceTree = "<group>"; };
-		965FE8732C24C66400768828 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		965FE8752C24C66500768828 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		965FE8782C24C66500768828 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		9661729A2D3D7C6500B5D037 /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
-		966C3C532D3EC122008A16A0 /* Palette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Palette.swift; sourceTree = "<group>"; };
-		968E9C382D3758EE006EB718 /* Pretendo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Pretendo.ttf; sourceTree = "<group>"; };
-		968E9C3C2D375AAF006EB718 /* Orbitron.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Orbitron.ttf; sourceTree = "<group>"; };
-		968E9C3E2D3762CF006EB718 /* Cabin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Cabin.ttf; sourceTree = "<group>"; };
-		968E9C422D376530006EB718 /* Cabin-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Cabin-Italic.ttf"; sourceTree = "<group>"; };
-		968F2C632D3577E7001C136D /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
-		968F2C652D3577F8001C136D /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
-		96AFA7112C24CF5800FB2A25 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		96AFA7152C24D20C00FB2A25 /* EmulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorView.swift; sourceTree = "<group>"; };
-		96AFA7172C24D24600FB2A25 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
-		96AFA71B2C25C73300FB2A25 /* LicenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseView.swift; sourceTree = "<group>"; };
-		96AFA7282C2614F300FB2A25 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
-		96C676752D3EA602001B1DB6 /* GameHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameHeader.swift; sourceTree = "<group>"; };
-		96C676772D3EA72B001B1DB6 /* AppHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppHeader.swift; sourceTree = "<group>"; };
-		96C676792D3EAD0D001B1DB6 /* GameIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameIcon.swift; sourceTree = "<group>"; };
-		96C6767B2D3EADAF001B1DB6 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
-		96C6767D2D3EAF1C001B1DB6 /* PaletteIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteIcon.swift; sourceTree = "<group>"; };
-		96EC84482D3178C40034F030 /* GameDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDetails.swift; sourceTree = "<group>"; };
+		9695680B2D4028A700AA8A83 /* Rugby.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rugby.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9695681D2D4028D200AA8A83 /* Exceptions for "Rugby" folder in "Rugby" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9695680A2D4028A700AA8A83 /* Rugby */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9695680D2D4028A700AA8A83 /* Rugby */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9695681D2D4028D200AA8A83 /* Exceptions for "Rugby" folder in "Rugby" target */,
+			);
+			path = Rugby;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
-		965FE86B2C24C66400768828 /* Frameworks */ = {
+		969568082D4028A700AA8A83 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				968F2C622D349EE6001C136D /* Algorithms in Frameworks */,
-				96A6C4332D10CDEE009BD762 /* RugbyKit in Frameworks */,
+				96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */,
+				96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		96172F502D307FFA009EFCFA /* Model */ = {
+		969568022D4028A700AA8A83 = {
 			isa = PBXGroup;
 			children = (
-				961C7D6F2D30575C00277AB4 /* GameBoy.swift */,
-				96AFA7282C2614F300FB2A25 /* Library.swift */,
-				96172F4D2D307FC7009EFCFA /* Game.swift */,
-				96C6767B2D3EADAF001B1DB6 /* Settings.swift */,
-				966C3C532D3EC122008A16A0 /* Palette.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		9618C0D42D10C8C000D6FDFE /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				9618C0D32D10C38900D6FDFE /* pkg */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		9645B6892C287348003DD6D5 /* Includes */ = {
-			isa = PBXGroup;
-			children = (
-				961689802C29BD2700E28B7D /* LICENSE-APACHE */,
-				9616897F2C29BD2700E28B7D /* LICENSE-MIT */,
-				961689812C29BD2700E28B7D /* roms */,
-			);
-			path = Includes;
-			sourceTree = "<group>";
-		};
-		965FE8652C24C66400768828 = {
-			isa = PBXGroup;
-			children = (
-				965FE8702C24C66400768828 /* Rugby */,
-				9618C0D42D10C8C000D6FDFE /* Frameworks */,
-				965FE86F2C24C66400768828 /* Products */,
+				9695680D2D4028A700AA8A83 /* Rugby */,
+				9695680C2D4028A700AA8A83 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		965FE86F2C24C66400768828 /* Products */ = {
+		9695680C2D4028A700AA8A83 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				965FE86E2C24C66400768828 /* Rugby.app */,
+				9695680B2D4028A700AA8A83 /* Rugby.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		965FE8702C24C66400768828 /* Rugby */ = {
-			isa = PBXGroup;
-			children = (
-				965FE8712C24C66400768828 /* RugbyApp.swift */,
-				96172F502D307FFA009EFCFA /* Model */,
-				96AFA70F2C24CF2B00FB2A25 /* Views */,
-				965FE8752C24C66500768828 /* Assets.xcassets */,
-				968E9C3B2D375A3A006EB718 /* Fonts */,
-				9645B6892C287348003DD6D5 /* Includes */,
-				965FE8772C24C66500768828 /* Preview Content */,
-			);
-			path = Rugby;
-			sourceTree = "<group>";
-		};
-		965FE8772C24C66500768828 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				965FE8782C24C66500768828 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		968E9C3B2D375A3A006EB718 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-				968E9C3E2D3762CF006EB718 /* Cabin.ttf */,
-				968E9C422D376530006EB718 /* Cabin-Italic.ttf */,
-				968E9C3C2D375AAF006EB718 /* Orbitron.ttf */,
-				968E9C382D3758EE006EB718 /* Pretendo.ttf */,
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
-		96AFA70F2C24CF2B00FB2A25 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				965FE8732C24C66400768828 /* MainView.swift */,
-				96AFA7132C24D1CD00FB2A25 /* Emulator */,
-				96AFA7142C24D1E200FB2A25 /* Library */,
-				96AFA7102C24CF4300FB2A25 /* Settings */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		96AFA7102C24CF4300FB2A25 /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				96AFA7112C24CF5800FB2A25 /* SettingsView.swift */,
-				96C676772D3EA72B001B1DB6 /* AppHeader.swift */,
-				96AFA71B2C25C73300FB2A25 /* LicenseView.swift */,
-				9661729A2D3D7C6500B5D037 /* CreditsView.swift */,
-				96C6767D2D3EAF1C001B1DB6 /* PaletteIcon.swift */,
-			);
-			path = Settings;
-			sourceTree = "<group>";
-		};
-		96AFA7132C24D1CD00FB2A25 /* Emulator */ = {
-			isa = PBXGroup;
-			children = (
-				96AFA7152C24D20C00FB2A25 /* EmulatorView.swift */,
-				968F2C652D3577F8001C136D /* Screen.swift */,
-				968F2C632D3577E7001C136D /* Joypad.swift */,
-			);
-			path = Emulator;
-			sourceTree = "<group>";
-		};
-		96AFA7142C24D1E200FB2A25 /* Library */ = {
-			isa = PBXGroup;
-			children = (
-				96AFA7172C24D24600FB2A25 /* LibraryView.swift */,
-				9645B6902C287472003DD6D5 /* GameItem.swift */,
-				96EC84482D3178C40034F030 /* GameDetails.swift */,
-				96C676752D3EA602001B1DB6 /* GameHeader.swift */,
-				96C676792D3EAD0D001B1DB6 /* GameIcon.swift */,
-			);
-			path = Library;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		965FE86D2C24C66400768828 /* Rugby */ = {
+		9695680A2D4028A700AA8A83 /* Rugby */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 965FE87C2C24C66500768828 /* Build configuration list for PBXNativeTarget "Rugby" */;
+			buildConfigurationList = 969568192D4028A800AA8A83 /* Build configuration list for PBXNativeTarget "Rugby" */;
 			buildPhases = (
-				965FE86A2C24C66400768828 /* Sources */,
-				965FE86B2C24C66400768828 /* Frameworks */,
-				965FE86C2C24C66400768828 /* Resources */,
+				969568072D4028A700AA8A83 /* Sources */,
+				969568082D4028A700AA8A83 /* Frameworks */,
+				969568092D4028A700AA8A83 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				9695680D2D4028A700AA8A83 /* Rugby */,
+			);
 			name = Rugby;
+			packageProductDependencies = (
+				96EFDD0C2D40299D009ED7D7 /* RugbyKit */,
+				96EFDD0F2D4029A5009ED7D7 /* Algorithms */,
+			);
 			productName = Rugby;
-			productReference = 965FE86E2C24C66400768828 /* Rugby.app */;
+			productReference = 9695680B2D4028A700AA8A83 /* Rugby.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		965FE8662C24C66400768828 /* Project object */ = {
+		969568032D4028A700AA8A83 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					965FE86D2C24C66400768828 = {
-						CreatedOnToolsVersion = 15.4;
+					9695680A2D4028A700AA8A83 = {
+						CreatedOnToolsVersion = 16.2;
 					};
 				};
 			};
-			buildConfigurationList = 965FE8692C24C66400768828 /* Build configuration list for PBXProject "Rugby" */;
-			compatibilityVersion = "Xcode 14.0";
+			buildConfigurationList = 969568062D4028A700AA8A83 /* Build configuration list for PBXProject "Rugby" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 965FE8652C24C66400768828;
+			mainGroup = 969568022D4028A700AA8A83;
+			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				968F2C602D349EE6001C136D /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				96EFDD0B2D40299D009ED7D7 /* XCLocalSwiftPackageReference "pkg" */,
+				96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 			);
-			productRefGroup = 965FE86F2C24C66400768828 /* Products */;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9695680C2D4028A700AA8A83 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				965FE86D2C24C66400768828 /* Rugby */,
+				9695680A2D4028A700AA8A83 /* Rugby */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		965FE86C2C24C66400768828 /* Resources */ = {
+		969568092D4028A700AA8A83 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				961689842C29BD2700E28B7D /* LICENSE-APACHE in Resources */,
-				968E9C432D376530006EB718 /* Cabin-Italic.ttf in Resources */,
-				968E9C392D3758EE006EB718 /* Pretendo.ttf in Resources */,
-				968E9C3F2D3762CF006EB718 /* Cabin.ttf in Resources */,
-				961689832C29BD2700E28B7D /* LICENSE-MIT in Resources */,
-				961689852C29BD2700E28B7D /* roms in Resources */,
-				965FE8792C24C66500768828 /* Preview Assets.xcassets in Resources */,
-				968E9C3D2D375AAF006EB718 /* Orbitron.ttf in Resources */,
-				965FE8762C24C66500768828 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		965FE86A2C24C66400768828 /* Sources */ = {
+		969568072D4028A700AA8A83 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96AFA7162C24D20C00FB2A25 /* EmulatorView.swift in Sources */,
-				9661729B2D3D7C6500B5D037 /* CreditsView.swift in Sources */,
-				96172F4E2D307FC7009EFCFA /* Game.swift in Sources */,
-				96AFA7292C2614F300FB2A25 /* Library.swift in Sources */,
-				96C676782D3EA72B001B1DB6 /* AppHeader.swift in Sources */,
-				96C676762D3EA602001B1DB6 /* GameHeader.swift in Sources */,
-				96C6767C2D3EADAF001B1DB6 /* Settings.swift in Sources */,
-				966C3C542D3EC122008A16A0 /* Palette.swift in Sources */,
-				968F2C662D3577F8001C136D /* Screen.swift in Sources */,
-				9645B6912C287472003DD6D5 /* GameItem.swift in Sources */,
-				96C6767E2D3EAF1C001B1DB6 /* PaletteIcon.swift in Sources */,
-				96C6767A2D3EAD0D001B1DB6 /* GameIcon.swift in Sources */,
-				961C7D702D30575C00277AB4 /* GameBoy.swift in Sources */,
-				96AFA7182C24D24600FB2A25 /* LibraryView.swift in Sources */,
-				968F2C642D3577E7001C136D /* Joypad.swift in Sources */,
-				96AFA71C2C25C73300FB2A25 /* LicenseView.swift in Sources */,
-				965FE8742C24C66400768828 /* MainView.swift in Sources */,
-				96EC84492D3178C40034F030 /* GameDetails.swift in Sources */,
-				965FE8722C24C66400768828 /* RugbyApp.swift in Sources */,
-				96AFA7122C24CF5800FB2A25 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		965FE87A2C24C66500768828 /* Debug */ = {
+		969568172D4028A800AA8A83 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -370,7 +203,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -381,7 +214,7 @@
 			};
 			name = Debug;
 		};
-		965FE87B2C24C66500768828 /* Release */ = {
+		969568182D4028A800AA8A83 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -427,7 +260,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -437,26 +270,24 @@
 			};
 			name = Release;
 		};
-		965FE87D2C24C66500768828 /* Debug */ = {
+		9695681A2D4028A800AA8A83 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Rugby/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 6WHL4R56VQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rugby/Info.plist;
 				INFOPLIST_KEY_GCSupportsControllerUserInteraction = YES;
-				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -470,26 +301,24 @@
 			};
 			name = Debug;
 		};
-		965FE87E2C24C66500768828 /* Release */ = {
+		9695681B2D4028A800AA8A83 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Rugby/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 6WHL4R56VQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rugby/Info.plist;
 				INFOPLIST_KEY_GCSupportsControllerUserInteraction = YES;
-				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -506,28 +335,35 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		965FE8692C24C66400768828 /* Build configuration list for PBXProject "Rugby" */ = {
+		969568062D4028A700AA8A83 /* Build configuration list for PBXProject "Rugby" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				965FE87A2C24C66500768828 /* Debug */,
-				965FE87B2C24C66500768828 /* Release */,
+				969568172D4028A800AA8A83 /* Debug */,
+				969568182D4028A800AA8A83 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		965FE87C2C24C66500768828 /* Build configuration list for PBXNativeTarget "Rugby" */ = {
+		969568192D4028A800AA8A83 /* Build configuration list for PBXNativeTarget "Rugby" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				965FE87D2C24C66500768828 /* Debug */,
-				965FE87E2C24C66500768828 /* Release */,
+				9695681A2D4028A800AA8A83 /* Debug */,
+				9695681B2D4028A800AA8A83 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		96EFDD0B2D40299D009ED7D7 /* XCLocalSwiftPackageReference "pkg" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = pkg;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
-		968F2C602D349EE6001C136D /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+		96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
 			requirement = {
@@ -538,16 +374,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		968F2C612D349EE6001C136D /* Algorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 968F2C602D349EE6001C136D /* XCRemoteSwiftPackageReference "swift-algorithms" */;
-			productName = Algorithms;
-		};
-		96A6C4322D10CDEE009BD762 /* RugbyKit */ = {
+		96EFDD0C2D40299D009ED7D7 /* RugbyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RugbyKit;
 		};
+		96EFDD0F2D4029A5009ED7D7 /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 965FE8662C24C66400768828 /* Project object */;
+	rootObject = 969568032D4028A700AA8A83 /* Project object */;
 }
