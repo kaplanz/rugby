@@ -150,7 +150,7 @@ class GameBoy {
     func stop() {
         talk.send(.stop)
         // Save last frame
-        game?.icon = frame.flatMap(Self.render(frame:))
+        game?.icon = frame.flatMap(render(frame:))
         game = nil
     }
 
@@ -164,12 +164,11 @@ class GameBoy {
         self.frame = frame
     }
 
-    static func render(frame: Data) -> UIImage? {
+    func render(frame: Data) -> UIImage? {
         let (wd, ht) = (160, 144)
 
         // Convert frame to data
-        let pal: [UInt32] = [0xffff_ffff, 0xffaa_aaaa, 0xff55_5555, 0xff00_0000]
-        let buf = frame.map { pal[Int($0)] }
+        let buf = frame.map { cfg.pal.data[Int($0)] }
 
         // Convert the buffer of UInt32 into raw bytes
         let bytes = buf.withUnsafeBufferPointer { bufferPointer in
