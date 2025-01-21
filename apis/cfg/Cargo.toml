@@ -12,7 +12,12 @@ license = { workspace = true }
 clap = { workspace = true, optional = true, features = ["env"] }
 rugby = { workspace = true }
 serde = { workspace = true, optional = true }
+toml = { workspace = true, optional = true }
 
 [features]
 clap = ["dep:clap"]
 serde = ["dep:serde"]
+toml = [
+  "serde",
+  "dep:toml",
+]
