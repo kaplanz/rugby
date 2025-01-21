@@ -40,6 +40,15 @@ struct RugbyApp: App {
             MainView()
                 .environment(emu)
                 .environment(lib)
+                .onOpenURL { url in
+                    // Add to library
+                    lib.insert(src: url)
+                    // Play in emulator
+                    let name = url.deletingPathExtension().lastPathComponent
+                    if let game = lib.games.first(where: { $0.name == name }) {
+                        emu.play(game)
+                    }
+                }
         }
     }
 
