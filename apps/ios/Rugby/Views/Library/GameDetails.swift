@@ -115,15 +115,14 @@ struct GameDetails: View {
 }
 
 #Preview {
-    GameDetails(
-        game: try! Game(
-            path: Bundle.main.url(
-                forResource: "roms/games/porklike/porklike",
-                withExtension: "gb"
-            )!
-        )
-    )
-    .environment(GameBoy())
+    if let game = Bundle
+        .main
+        .url(forResource: "porklike", withExtension: "gb")
+        .flatMap({ try? Game(path: $0) })
+    {
+        GameDetails(game: game)
+            .environment(GameBoy())
+    }
 }
 
 private struct Section<Content: View>: View {
