@@ -11,9 +11,9 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 extension UTType {
-    public static let dmg = UTType(exportedAs: "dev.zakhary.rugby.gb")
-    public static let cgb = UTType(exportedAs: "dev.zakhary.rugby.gbc")
-    public static let sav = UTType(exportedAs: "dev.zakhary.rugby.sav")
+    public static let dmg = UTType(importedAs: "dev.zakhary.rugby.gb")
+    public static let cgb = UTType(importedAs: "dev.zakhary.rugby.gbc")
+    public static let sav = UTType(importedAs: "dev.zakhary.rugby.sav")
 }
 
 @Observable
