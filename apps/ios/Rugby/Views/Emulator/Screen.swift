@@ -10,10 +10,6 @@ import SwiftUI
 struct Screen: View {
     @Environment(GameBoy.self) var emu
 
-    private var image: UIImage? {
-        emu.frame.flatMap(emu.render(frame:))
-    }
-
     private var empty: UIImage {
         ImageRenderer(
             content: Rectangle()
@@ -24,7 +20,7 @@ struct Screen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Image(uiImage: image ?? empty)
+            Image(uiImage: emu.image ?? empty)
                 .resizable()
                 .interpolation(.none)
                 .padding(6)
