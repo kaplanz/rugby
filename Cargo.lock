@@ -1534,6 +1534,7 @@ dependencies = [
  "clap",
  "rugby",
  "serde",
+ "toml 0.8.19",
 ]
 
 [[package]]
@@ -1562,7 +1563,6 @@ dependencies = [
  "sysexits",
  "tempfile",
  "thiserror 2.0.11",
- "toml 0.8.19",
  "tracing-subscriber",
  "xdir",
 ]
