@@ -28,12 +28,11 @@ struct GameIcon: View {
 }
 
 #Preview {
-    GameIcon(
-        game: try! Game(
-            path: Bundle.main.url(
-                forResource: "roms/games/porklike/porklike",
-                withExtension: "gb"
-            )!
-        )
-    )
+    if let game = Bundle
+        .main
+        .url(forResource: "porklike", withExtension: "gb")
+        .flatMap({ try? Game(path: $0) })
+    {
+        GameIcon(game: game)
+    }
 }
