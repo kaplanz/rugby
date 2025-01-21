@@ -28,12 +28,14 @@ class GameBoy {
     var error: Error?
 
     /// Most recent frame data.
-    private(set) var frame: Data?
+    private(set) var frame: Data? {
+        didSet {
+            image = frame.flatMap(render(frame:))
+        }
+    }
 
     /// Move recent frame image.
-    var image: UIImage? {
-        frame.flatMap(render(frame:))
-    }
+    private(set) var image: UIImage? = nil
 
     /// Communication channel.
     private var talk = PassthroughSubject<Message, Never>()
