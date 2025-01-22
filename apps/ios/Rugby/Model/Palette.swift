@@ -88,7 +88,7 @@ enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
 
 extension Palette {
     /// Palette data.
-    class Data: Collection, Identifiable, RandomAccessCollection {
+    final class Data: Collection, Identifiable, RandomAccessCollection, Sendable {
         let c0: UInt32
         let c1: UInt32
         let c2: UInt32
