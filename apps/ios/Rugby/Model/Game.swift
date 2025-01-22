@@ -13,12 +13,12 @@ import UniformTypeIdentifiers
 class Game: Equatable, Hashable, Identifiable {
     /// Game ROM path.
     let path: URL
-
     /// Game ROM data.
     let data: Data
-
     /// Game cartridge.
     let cart: Cartridge
+    /// Game configuration.
+    let conf: Settings
 
     init(path: URL) throws {
         // Initialize game path
@@ -27,6 +27,8 @@ class Game: Equatable, Hashable, Identifiable {
         self.data = try Data(contentsOf: path)
         // Initialize game cartridge
         self.cart = try Cartridge(rom: data)
+        // Initialize game configuration
+        self.conf = Settings(path: path.deletingPathExtension().appendingPathExtension("toml"))
     }
 
     /// Game name.

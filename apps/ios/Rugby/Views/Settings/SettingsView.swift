@@ -18,7 +18,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        @Bindable var cfg = emu.cfg
+        @Bindable var cfg = emu.cfg.data
 
         Form {
             // Header
