@@ -9,6 +9,19 @@ import Foundation
 
 @Observable
 class Settings {
+    /// Configuration file.
+    let path: URL
+    /// Configuration data.
+    let data: Config
+
+    init(path: URL) {
+        self.path = path
+        self.data = Config()
+    }
+}
+
+@Observable
+class Config {
     /// Palette selection.
     var pal = Palette.mono
     /// Emulation speed.
