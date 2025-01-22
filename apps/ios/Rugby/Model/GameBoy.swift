@@ -14,7 +14,7 @@ import SwiftUI
 @Observable
 class GameBoy {
     /// Global configuration.
-    var cfg = Settings()
+    var cfg = Settings(path: Library.root)
 
     /// Selected game to play.
     private(set) var game: Game?
@@ -184,7 +184,7 @@ class GameBoy {
         let (wd, ht) = (160, 144)
 
         // Convert frame to data
-        let buf = frame.map { cfg.pal.data[Int($0)].bigEndian }
+        let buf = frame.map { cfg.data.pal.data[Int($0)].bigEndian }
 
         // Convert the buffer of UInt32 into raw bytes
         let bytes = buf.withUnsafeBufferPointer { bufferPointer in

@@ -18,7 +18,7 @@ extension UTType {
 
 @Observable
 class Library {
-    private let root = URL.documentsDirectory
+    static let root = URL.documentsDirectory
 
     /// Library games.
     var games: [Game] = []
@@ -37,12 +37,12 @@ class Library {
         do {
             // Ensure root directory exists
             try fs.createDirectory(
-                at: root,
+                at: Self.root,
                 withIntermediateDirectories: true
             )
             // Query game directories
             games = try fs.contentsOfDirectory(
-                at: root,
+                at: Self.root,
                 includingPropertiesForKeys: nil
             )
             // Find directories
@@ -88,7 +88,7 @@ class Library {
         let fs = FileManager.default
         do {
             // Create game directory
-            let dir = root.appending(path: src.deletingPathExtension().lastPathComponent)
+            let dir = Self.root.appending(path: src.deletingPathExtension().lastPathComponent)
             try fs.createDirectory(at: dir, withIntermediateDirectories: true)
             // Copy game ROM
             let rom = dir.appending(path: src.lastPathComponent)
