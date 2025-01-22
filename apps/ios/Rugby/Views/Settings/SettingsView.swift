@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(GameBoy.self) private var emu
     @Environment(\.openURL) private var openURL
 
     let game: Game?
@@ -17,7 +18,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        @Bindable var cfg = cfg
+        @Bindable var cfg = emu.cfg
 
         Form {
             // Header
@@ -54,5 +55,6 @@ struct SettingsView: View {
 #Preview {
     NavigationStack {
         SettingsView()
+            .environment(GameBoy())
     }
 }
