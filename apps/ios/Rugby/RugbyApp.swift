@@ -35,8 +35,6 @@ struct RugbyApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environment(emu)
-                .environment(lib)
                 .onOpenURL { url in
                     // Add to library
                     lib.insert(src: url)
@@ -47,6 +45,8 @@ struct RugbyApp: App {
                     }
                 }
         }
+        .environment(emu)
+        .environment(lib)
     }
 
     func initGameController() {
