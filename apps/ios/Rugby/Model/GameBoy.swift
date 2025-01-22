@@ -5,7 +5,7 @@
 //  Created by Zakhary Kaplan on 2025-01-09.
 //
 
-import Combine
+@preconcurrency import Combine
 import Foundation
 import RugbyKit
 import SwiftUI
@@ -13,6 +13,9 @@ import SwiftUI
 @MainActor
 @Observable
 class GameBoy {
+    /// Global configuration.
+    var cfg = Settings()
+
     /// Selected game to play.
     private(set) var game: Game?
 
