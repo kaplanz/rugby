@@ -67,7 +67,9 @@ struct RugbyApp: App {
         .environment(emu)
         .environment(lib)
     }
+}
 
+extension RugbyApp {
     func initGameController() {
         // Start looking for wireless controllers
         GCController.startWirelessControllerDiscovery {
