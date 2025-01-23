@@ -18,11 +18,11 @@ extension UTType {
 
 @Observable
 class Library {
+    /// Filesystem root.
     static let root = URL.documentsDirectory
 
     /// Library games.
     var games: [Game] = []
-
     /// Library errors.
     var error: [any Swift.Error] = []
 

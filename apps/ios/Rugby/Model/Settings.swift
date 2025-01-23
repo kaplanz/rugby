@@ -29,13 +29,14 @@ class Config {
 }
 
 /// Emulation speed.
-enum Speed: Float, CaseIterable, CustomStringConvertible, Identifiable {
+enum Speed: Float, CaseIterable {
     case half = 0.5
     case actual = 1.0
     case double = 2.0
     case turbo = 0.0
+}
 
-    // impl CustomStringConvertible
+extension Speed: CustomStringConvertible {
     var description: String {
         switch self {
         case .turbo:
@@ -44,7 +45,8 @@ enum Speed: Float, CaseIterable, CustomStringConvertible, Identifiable {
             rawValue.formatted(.percent)
         }
     }
+}
 
-    // impl Identifiable
+extension Speed: Identifiable {
     var id: Self { self }
 }
