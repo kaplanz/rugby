@@ -88,7 +88,7 @@ enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
 
 extension Palette {
     /// Palette data.
-    final class Data: Collection, Identifiable, RandomAccessCollection, Sendable {
+    final class Data: Identifiable, Sendable {
         let c0: UInt32
         let c1: UInt32
         let c2: UInt32
@@ -100,27 +100,28 @@ extension Palette {
             self.c2 = c2
             self.c3 = c3
         }
+    }
+}
 
-        // impl Collection
-        public var startIndex: Int { 0 }
+extension Palette.Data: Collection, RandomAccessCollection {
+    public var startIndex: Int { 0 }
 
-        public var endIndex: Int { 4 }
+    public var endIndex: Int { 4 }
 
-        public func index(after i: Index) -> Index {
-            i + 1
+    public func index(after i: Index) -> Index {
+        i + 1
+    }
+
+    public subscript(position: Int) -> UInt32 {
+        var value: UInt32
+        switch position {
+        case 0: value = c0
+        case 1: value = c1
+        case 2: value = c2
+        case 3: value = c3
+        default: fatalError()
         }
-
-        public subscript(position: Int) -> UInt32 {
-            var value: UInt32
-            switch position {
-            case 0: value = c0
-            case 1: value = c1
-            case 2: value = c2
-            case 3: value = c3
-            default: fatalError()
-            }
-            return value | 0xFF00_0000
-        }
+        return value | 0xFF00_0000
     }
 }
 
