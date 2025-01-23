@@ -10,7 +10,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 @Observable
-class Game: Equatable, Hashable, Identifiable {
+class Game {
     /// Game ROM path.
     let path: URL
     /// Game ROM data.
@@ -65,17 +65,20 @@ class Game: Equatable, Hashable, Identifiable {
             }
         }
     }
+}
 
-    // impl Equatable
+extension Game: Equatable {
     static func == (lhs: Game, rhs: Game) -> Bool {
         lhs.path == rhs.path
     }
+}
 
-    // impl Hashable
+extension Game: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(path)
     }
+}
 
-    // impl Identifiable
+extension Game: Identifiable {
     var id: URL { path }
 }
