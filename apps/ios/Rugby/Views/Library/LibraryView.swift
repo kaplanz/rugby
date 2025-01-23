@@ -51,26 +51,8 @@ struct LibraryView: View {
                 // Iterate over selected files
                 files
                     .filter { file in
-                        // Acquire access permission
-                        if !file.startAccessingSecurityScopedResource() {
-                            fatalError("failed to securely access path: “\(file)”")
-                        }
                         // Ensure valid ROM
-                        do {
-                            // Read the file data
-                            let data = try Data(contentsOf: file)
-                            // Try to construct a cartridge
-                            let _ = try Cartridge(rom: data)
-                            // Return on success
-                            return true
-                        } catch let error as RugbyKit.Error {
-                            // Retain cartridge errors
-                            lib.error.append(error)
-                            return false
-                        } catch let error {
-                            // Crash on unknown errors
-                            fatalError(error.localizedDescription)
-                        }
+                        return (try? lib.precheck(url: file)) ?? false
                     }
                     .forEach { file in
                         // Attempt to add to library
