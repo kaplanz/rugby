@@ -148,7 +148,7 @@ class GameBoy {
                 // Determine sync delay
                 if let speed = speed, speed > 0 {
                     // Calculate expected delay
-                    let delay = (.nanoseconds(16_742_707) / 70_224) * (Double(count) / speed)
+                    let delay = (.seconds(1) / 4_194_304) * (Double(count) / speed)
                     // Schedule next wake
                     awake = time + delay
                 } else {
