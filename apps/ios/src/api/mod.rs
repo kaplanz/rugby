@@ -44,21 +44,26 @@ impl GameBoy {
     /// # Returns
     ///
     /// Returns the number of cycles emulated.
-    #[uniffi::method]
-    pub fn run(&self) -> u32 {
+    #[uniffi::method(default(timeout = Some(70224)))]
+    pub fn run(&self, timeout: Option<u32>) -> u32 {
         // Define cycle count
         let mut idx = 0;
         // Unlock emulator
         let mut emu = self.emu.write().unwrap();
-        // Loop until vsync
-        let mut done = false;
-        while !done {
+        // Loop until vsync or timeout
+        loop {
+            // Check for timeout
+            if timeout.is_some_and(|max| idx >= max) {
+                break;
+            }
             // Tick emulator
             emu.cycle();
             // Increment count
             idx += 1;
             // Check for vsync
-            done = emu.inside().video().vsync();
+            if emu.inside().video().vsync() {
+                break;
+            }
         }
         // Return cycle count
         idx
