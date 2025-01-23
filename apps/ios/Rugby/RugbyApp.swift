@@ -37,23 +37,9 @@ struct RugbyApp: App {
         WindowGroup {
             MainView()
                 .onOpenURL { url in
-                    // Acquire access permission
-                    if !url.startAccessingSecurityScopedResource() {
-                        fatalError("failed to securely access path: “\(url)”")
-                    }
                     // Ensure valid ROM
-                    do {
-                        // Read the file data
-                        let data = try Data(contentsOf: url)
-                        // Try to construct a cartridge
-                        let _ = try Cartridge(rom: data)
-                    } catch let error as RugbyKit.Error {
-                        // Retain cartridge errors
-                        lib.error.append(error)
+                    guard let valid = try? lib.precheck(url: url), valid else {
                         return
-                    } catch let error {
-                        // Crash on unknown errors
-                        fatalError(error.localizedDescription)
                     }
                     // Add to library
                     lib.insert(src: url)
