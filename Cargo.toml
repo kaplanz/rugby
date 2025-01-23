@@ -48,6 +48,7 @@ bfmt = { version = "0.1.0", path = "crates/bfmt" }
 chex = { version = "0.1.0", path = "crates/chex" }
 clap = { version = "4.5.26", features = ["derive"] }
 constcat = "0.5.1"
+either = "1.13.0"
 hexd = { version = "0.1.0", path = "crates/hexd" }
 itertools = "0.14.0"
 log = "0.4.25"
