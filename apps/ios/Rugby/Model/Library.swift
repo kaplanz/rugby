@@ -78,6 +78,31 @@ class Library {
         }
     }
 
+    /// Checks if a game ROM is valid.
+    func precheck(url: URL) throws -> Bool {
+        // Acquire access permission
+        if !url.startAccessingSecurityScopedResource() {
+            throw Self.Error.access
+        }
+        // Ensure valid ROM
+        var valid = false
+        do {
+            // Read the file data
+            let data = try Data(contentsOf: url)
+            // Try to construct a cartridge
+            let _ = try Cartridge(rom: data)
+            // Mark as valid
+            valid = true
+        } catch let error as RugbyKit.Error {
+            // Retain cartridge errors
+            self.error.append(error)
+        }
+        // Release access permission
+        url.stopAccessingSecurityScopedResource()
+        // Return validity
+        return valid
+    }
+
     /// Inserts a new title into the library.
     func insert(src: URL) {
         // Acquire access permission
@@ -144,5 +169,13 @@ class Library {
         }
         // Reload game library
         reload()
+    }
+}
+
+extension Library {
+    /// An error caused by an library operations.
+    enum Error: Swift.Error {
+        /// Unable to access file.
+        case access
     }
 }
