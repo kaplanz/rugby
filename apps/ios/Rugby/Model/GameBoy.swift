@@ -60,11 +60,16 @@ class GameBoy {
     init() {
         // Start emulator task
         Task.detached(priority: .userInitiated) {
-            // Initialize state
+            // Initialize emulator
             var emu = RugbyKit.GameBoy()
+            // Initialize state
             var run = false
-
-            // Create profiler
+            // Initialize clock
+            typealias Clock = ContinuousClock
+            let clock: Clock = .init()
+            var awake: Clock.Instant?
+            let speed: Double? = 1.0
+            // Initialize profiler
             var prof = Profiler()
 
             // Handle messages
@@ -111,19 +116,38 @@ class GameBoy {
             // Emulator loop
             while true {
                 // Check if idle
-                if !run {
+                let idle = !run || (awake.map { $0  > .now } ?? false)
+                // Enter idle loop
+                if idle {
                     // No work to be done... yield to other tasks
                     await Task.yield()
                     // When woken, check if ready to work
                     continue
                 }
-                // Emulate until vsync
+
+                // Record pre-emulation time
+                let time = clock.now
+
+                // Emulate next frame
                 let count = emu.run()
-                // Redraw newest frame
-                await self.redraw(frame: emu.frame())
+                // Redraw updated frame
+                if emu.vsync() {
+                    await self.redraw(frame: emu.frame())
+                }
+
                 // Update profiler
                 if let rate = prof.tick(by: count) {
                     log.trace("frame rate: \(rate)")
+                }
+
+                // Determine sync delay
+                if let speed = speed, speed > 0 {
+                    // Calculate expected delay
+                    let delay = (.nanoseconds(16_742_707) / 70_224) * (Double(count) / speed)
+                    // Schedule next wake
+                    awake = time + delay
+                } else {
+                    awake = nil
                 }
             }
 
