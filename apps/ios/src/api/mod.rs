@@ -4,6 +4,7 @@ use std::sync::{Arc, RwLock};
 
 use rugby::arch::Block;
 use rugby::core::dmg;
+use rugby::prelude::*;
 
 pub mod cart;
 pub mod joypad;
@@ -33,6 +34,34 @@ impl GameBoy {
             emu: dmg::GameBoy::new().into(),
             pak: None.into(),
         }
+    }
+
+    /// Runs the emulator for a number of cycles.
+    ///
+    /// This simply [cycles](Self::cycle) the emulator until the next frame is
+    /// ready. It is practically useful mostly as an optimization.
+    ///
+    /// # Returns
+    ///
+    /// Returns the number of cycles emulated.
+    #[uniffi::method]
+    pub fn run(&self) -> u32 {
+        // Define cycle count
+        let mut idx = 0;
+        // Unlock emulator
+        let mut emu = self.emu.write().unwrap();
+        // Loop until vsync
+        let mut done = false;
+        while !done {
+            // Tick emulator
+            emu.cycle();
+            // Increment count
+            idx += 1;
+            // Check for vsync
+            done = emu.inside().video().vsync();
+        }
+        // Return cycle count
+        idx
     }
 }
 
