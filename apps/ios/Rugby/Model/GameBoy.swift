@@ -116,14 +116,12 @@ class GameBoy {
                     // When woken, check if ready to work
                     continue
                 }
-                // Tick emulator
-                emu.cycle()
-                // Tick display
-                if emu.vsync() {
-                    await self.redraw(frame: emu.frame())
-                }
-                // Tick profiler
-                if let rate = prof.tick() {
+                // Emulate until vsync
+                let count = emu.run()
+                // Redraw newest frame
+                await self.redraw(frame: emu.frame())
+                // Update profiler
+                if let rate = prof.tick(by: count) {
                     log.trace("frame rate: \(rate)")
                 }
             }
@@ -232,14 +230,16 @@ class GameBoy {
 ///
 /// Calculates the running frame rate of an emulator task,
 private struct Profiler {
-    private var count = 0
+    private var count: UInt32 = 0
     private var timer = DispatchTime.now()
 
     mutating func reset() {
         self = .init()
     }
 
-    mutating func tick() -> Double? {
+    mutating func tick(by update: UInt32 = 1) -> Double? {
+        // Increment counter
+        count += update
         // Calculate elapsed time
         let check = DispatchTime.now()
         let delta = Double(check.uptimeNanoseconds - timer.uptimeNanoseconds) / 1_000_000_000
@@ -251,9 +251,6 @@ private struct Profiler {
             // Reset properties
             count = 0
             timer = check
-        } else {
-            // Increment counter
-            count += 1
         }
         return rate
     }
