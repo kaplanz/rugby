@@ -45,6 +45,9 @@ struct SettingsView: View {
                         Text(spd.description)
                     }
                 }
+                .onChange(of: cfg.spd) { _, speed in
+                    emu.clock(speed: speed.rawValue)
+                }
             }
         }
         .navigationTitle("Settings")

@@ -29,7 +29,7 @@ class Config {
 }
 
 /// Emulation speed.
-enum Speed: Float, CaseIterable {
+enum Speed: Double, CaseIterable {
     case half = 0.5
     case actual = 1.0
     case double = 2.0
