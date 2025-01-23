@@ -80,6 +80,8 @@ class GameBoy {
                         // Crash on unknown errors
                         fatalError(error.localizedDescription)
                     }
+                    // Reset profiler
+                    prof.reset()
                     // Start emulation
                     run = true
                 case .pause(let pause):
@@ -107,7 +109,6 @@ class GameBoy {
             }
 
             // Emulator loop
-            prof.reset()
             while true {
                 // Check if idle
                 if !run {
@@ -230,8 +231,10 @@ class GameBoy {
 ///
 /// Calculates the running frame rate of an emulator task,
 private struct Profiler {
+    /// Cycle counter.
     private var count: UInt32 = 0
-    private var timer = DispatchTime.now()
+    /// Statistics timer.
+    private var timer = ContinuousClock.now
 
     mutating func reset() {
         self = .init()
@@ -241,16 +244,15 @@ private struct Profiler {
         // Increment counter
         count += update
         // Calculate elapsed time
-        let check = DispatchTime.now()
-        let delta = Double(check.uptimeNanoseconds - timer.uptimeNanoseconds) / 1_000_000_000
+        let delta = timer.duration(to: .now)
         // Report every second
         var rate: Double? = nil
-        if delta > 1 {
+        if delta > .seconds(1) {
             // Update profiled rate
-            rate = (Double(count) / 70244.0) * delta
+            rate = (Double(count) / 70_244.0) * (.seconds(1) / delta)
             // Reset properties
             count = 0
-            timer = check
+            timer = .now
         }
         return rate
     }
