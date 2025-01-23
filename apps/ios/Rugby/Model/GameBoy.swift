@@ -55,6 +55,8 @@ class GameBoy {
         case stop
         /// Input event.
         case input(RugbyKit.Button, Bool)
+        /// Clock retiming.
+        case clock(Double?)
     }
 
     init() {
@@ -68,7 +70,7 @@ class GameBoy {
             typealias Clock = ContinuousClock
             let clock: Clock = .init()
             var awake: Clock.Instant?
-            let speed: Double? = 1.0
+            var speed: Double? = 1.0
             // Initialize profiler
             var prof = Profiler()
 
@@ -110,6 +112,9 @@ class GameBoy {
                 case .input(let button, let pressed):
                     // Forward input
                     (pressed ? emu.press : emu.release)(button)
+                case .clock(let modifier):
+                    // Update speed
+                    speed = modifier
                 }
             }
 
@@ -195,6 +200,11 @@ class GameBoy {
     /// Forward input event.
     func input(_ button: RugbyKit.Button, pressed: Bool) {
         talk.send(.input(button, pressed))
+    }
+
+    /// Forward speed change.
+    func clock(speed: Double?) {
+        talk.send(.clock(speed))
     }
 
     /// Redraws the screen.
