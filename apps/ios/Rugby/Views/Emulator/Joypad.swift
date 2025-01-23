@@ -99,7 +99,6 @@ private struct DPadInput: View {
     var body: some View {
         Group {
             Image("DPad")
-                .padding(10)
                 .overlay {
                     DPadTouchArea(press: $touch)
                 }
