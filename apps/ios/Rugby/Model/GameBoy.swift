@@ -37,6 +37,15 @@ class GameBoy {
         }
     }
 
+    /// Recent gameplay statistics.
+    private(set) var stats = Stats()
+
+    /// Gameplay statistics.
+    struct Stats {
+        /// Frame rate.
+        var rate: Double?
+    }
+
     /// Move recent frame image.
     private(set) var image: UIImage? = nil
 
@@ -142,7 +151,11 @@ class GameBoy {
 
                 // Update profiler
                 if let rate = prof.tick(by: count) {
+                    // Retain frame rate
                     log.trace("frame rate: \(rate)")
+                    DispatchQueue.main.async {
+                        self.stats.rate = rate
+                    }
                 }
 
                 // Determine sync delay
