@@ -18,11 +18,37 @@ struct EmulatorView: View {
     /// Manage this game.
     @State private var manage = false
 
+    /// Emulation play status.
+    @State private var status: Status? {
+        didSet {
+            if let status {
+                switch status {
+                case .sprint:
+                    emu.clock(speed: nil)
+                case .rewind:
+                    print("unimplemented")
+                }
+            } else {
+                emu.clock(speed: emu.cfg.data.spd.rawValue)
+            }
+        }
+    }
+
+    /// Emulation play status.
+    enum Status {
+        /// Fast forward.
+        case sprint
+        /// Rewind history.
+        case rewind
+    }
+
     /// Extra toolbar items.
     @State private var extras = Extras()
 
     /// Extra toolbar items.
     struct Extras {
+        /// Quick controls.
+        var ctrl = false
         /// Frame rate.
         var rate = false
     }
@@ -55,40 +81,10 @@ struct EmulatorView: View {
         .background(Background())
         .toolbar {
             ToolbarItemGroup(placement: .topBarLeading) {
-                if extras.rate, let rate = emu.stats.rate {
-                    Text(String(format: "%.1f FPS", rate))
-                        .bold()
-                        .foregroundStyle(Color.accentColor)
-                }
+                toolbarLeft
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Menu("Help", systemImage: "ellipsis.circle") {
-                    Button {
-                        paused.toggle()
-                    } label: {
-                        paused
-                        ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
-                    }
-                    Button("Reset", systemImage: "arrow.clockwise") {
-                        emu.reset()
-                    }
-                    Divider()
-                    Menu("Toolbar", systemImage: "switch.2") {
-                        Toggle("Frequency", systemImage: "stopwatch", isOn: $extras.rate)
-                    }
-                    Divider()
-                    Button("Get Info", systemImage: "info.circle") {
-                        detail.toggle()
-                    }
-                    Button("Settings", systemImage: "gearshape") {
-                        manage.toggle()
-                    }
-                    Divider()
-                    Button("Exit", systemImage: "xmark.circle", role: .destructive) {
-                        emu.stop()
-                    }
-                }
-                .labelStyle(.iconOnly)
+                toolbarMenu
             }
         }
         .alert(
@@ -129,6 +125,66 @@ struct EmulatorView: View {
         .onChange(of: enable) {
             emu.pause(!enable)
         }
+    }
+
+    var toolbarLeft: some View {
+        Group {
+            if extras.rate, let rate = emu.stats.rate {
+                Text(String(format: "%.1f FPS", rate))
+                    .bold()
+                    .foregroundStyle(Color.accentColor)
+            }
+            if extras.ctrl {
+                Button {
+                    status = (status == .rewind) ? nil : .rewind
+                } label: {
+                    Image(systemName: status == .rewind ? "backward.fill" : "backward")
+                }
+                .disabled(true)
+                Button {
+                    paused.toggle()
+                } label: {
+                    Image(systemName: paused ? "play" : "pause.fill")
+                }
+                .frame(width: 25)
+                Button {
+                    status = (status == .sprint) ? nil : .sprint
+                } label: {
+                    Image(systemName: status == .sprint ? "forward.fill" : "forward")
+                }
+            }
+        }
+    }
+
+    var toolbarMenu: some View {
+        Menu("Help", systemImage: "ellipsis.circle") {
+            Button {
+                paused.toggle()
+            } label: {
+                paused
+                ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
+            }
+            Button("Reset", systemImage: "arrow.counterclockwise") {
+                emu.reset()
+            }
+            Divider()
+            Menu("Toolbar", systemImage: "switch.2") {
+                Toggle("Frequency", systemImage: "stopwatch", isOn: $extras.rate)
+                Toggle("Playback", systemImage: "av.remote", isOn: $extras.ctrl)
+            }
+            Divider()
+            Button("Get Info", systemImage: "info.circle") {
+                detail.toggle()
+            }
+            Button("Settings", systemImage: "gearshape") {
+                manage.toggle()
+            }
+            Divider()
+            Button("Exit", systemImage: "xmark.circle", role: .destructive) {
+                emu.stop()
+            }
+        }
+        .labelStyle(.iconOnly)
     }
 }
 
