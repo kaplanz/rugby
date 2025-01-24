@@ -18,6 +18,15 @@ struct EmulatorView: View {
     /// Manage this game.
     @State private var manage = false
 
+    /// Extra toolbar items.
+    @State private var extras = Extras()
+
+    /// Extra toolbar items.
+    struct Extras {
+        /// Frame rate.
+        var rate = false
+    }
+
     /// Should the emulator be running?
     private var enable: Bool {
         !paused && !detail && !manage && scenePhase == .active
@@ -45,29 +54,42 @@ struct EmulatorView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Background())
         .toolbar {
-            Menu("Help", systemImage: "ellipsis.circle") {
-                Button {
-                    paused.toggle()
-                } label: {
-                    paused
-                        ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
-                }
-                Button("Reset", systemImage: "arrow.clockwise") {
-                    emu.reset()
-                }
-                Divider()
-                Button("Get Info", systemImage: "info.circle") {
-                    detail.toggle()
-                }
-                Button("Settings", systemImage: "gearshape") {
-                    manage.toggle()
-                }
-                Divider()
-                Button("Exit", systemImage: "xmark.circle", role: .destructive) {
-                    emu.stop()
+            ToolbarItemGroup(placement: .topBarLeading) {
+                if extras.rate, let rate = emu.stats.rate {
+                    Text(String(format: "%.1f FPS", rate))
+                        .bold()
+                        .foregroundStyle(Color.accentColor)
                 }
             }
-            .labelStyle(.iconOnly)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Menu("Help", systemImage: "ellipsis.circle") {
+                    Button {
+                        paused.toggle()
+                    } label: {
+                        paused
+                        ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
+                    }
+                    Button("Reset", systemImage: "arrow.clockwise") {
+                        emu.reset()
+                    }
+                    Divider()
+                    Menu("Toolbar", systemImage: "switch.2") {
+                        Toggle("Frequency", systemImage: "stopwatch", isOn: $extras.rate)
+                    }
+                    Divider()
+                    Button("Get Info", systemImage: "info.circle") {
+                        detail.toggle()
+                    }
+                    Button("Settings", systemImage: "gearshape") {
+                        manage.toggle()
+                    }
+                    Divider()
+                    Button("Exit", systemImage: "xmark.circle", role: .destructive) {
+                        emu.stop()
+                    }
+                }
+                .labelStyle(.iconOnly)
+            }
         }
         .alert(
             "Error",
@@ -111,8 +133,10 @@ struct EmulatorView: View {
 }
 
 #Preview {
-    EmulatorView()
-        .environment(GameBoy())
+    NavigationStack {
+        EmulatorView()
+    }
+    .environment(GameBoy())
 }
 
 private struct Background: View {
