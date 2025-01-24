@@ -30,6 +30,7 @@ struct EmulatorView: View {
                     Screen()
                     Spacer()
                     Joypad()
+                    Spacer()
                 }
             } else {
                 HStack {
