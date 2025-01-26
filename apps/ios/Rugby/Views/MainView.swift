@@ -46,7 +46,7 @@ struct MainView: View {
 
     var tint: Color {
         // Define palette color
-        let hex = emu.cfg.data.pal.data.avg
+        let hex = emu.cfg.data.pal.data.last!
         let rgb = (
             r: Double((hex >> 16) & 0xFF) / 255,
             g: Double((hex >> 08) & 0xFF) / 255,
