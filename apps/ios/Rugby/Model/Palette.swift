@@ -103,22 +103,6 @@ extension Palette {
     }
 }
 
-extension Palette.Data {
-    /// Average color.
-    var avg: UInt32 {
-        var rgb = (r: UInt32(0), g: UInt32(0), b: UInt32(0))
-        for col in self {
-            rgb.r += (col >> 16) & 0xFF
-            rgb.g += (col >> 08) & 0xFF
-            rgb.b += (col >> 00) & 0xFF
-        }
-        return 0
-        | ((rgb.r / 4) & 0xFF) << 16
-        | ((rgb.g / 4) & 0xFF) << 08
-        | ((rgb.b / 4) & 0xFF) << 00
-    }
-}
-
 extension Palette.Data: Collection, RandomAccessCollection {
     public var startIndex: Int { 0 }
 
