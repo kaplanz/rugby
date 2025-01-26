@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     @Environment(GameBoy.self) private var emu
+    @Environment(\.colorScheme) var colorScheme
 
     /// Manage application settings.
     @State private var manage = false
@@ -40,6 +41,29 @@ struct MainView: View {
                 EmulatorView()
             }
         }
+        .tint(tint)
+    }
+
+    var tint: Color {
+        // Define palette color
+        let hex = emu.cfg.data.pal.data.avg
+        let rgb = (
+            r: Double((hex >> 16) & 0xFF) / 255,
+            g: Double((hex >> 08) & 0xFF) / 255,
+            b: Double((hex >> 00) & 0xFF) / 255
+        )
+        let pal = UIColor(red: rgb.r, green: rgb.g, blue: rgb.b, alpha: 1.0)
+        // Define tinting color
+        var hsl = (h: CGFloat(), s: CGFloat(), l: CGFloat())
+
+        // Use palette for hue/saturation/brightness
+        pal.getHue(&hsl.h, saturation: &hsl.s, brightness: &hsl.l, alpha: nil)
+
+        // Update color values
+        hsl.s *= colorScheme == .light ? 2.0 : 1.0
+        hsl.l = colorScheme == .light ? 0.5 : 1.0
+
+        return Color(hue: hsl.h, saturation: hsl.s, brightness: hsl.l)
     }
 }
 
