@@ -4,6 +4,7 @@
 
 # Package
 CRATE ?= rugby
+XCODE ?= RugbyKit
 
 
 # --------------------
@@ -23,13 +24,16 @@ PKG = ./pkg
 # --------------------
 
 # Target platforms
-DEVS = aarch64-apple-ios aarch64-apple-ios-sim
+DEVS = aarch64-apple-darwin aarch64-apple-ios aarch64-apple-ios-sim
 
 # Static libraries
 LIBS = $(DEVS:%=$(BUILD)/%/release/lib$(CRATE).a)
 
+# Swift sources
+SRCS = $(PKG)/Sources/$(XCODE)
+
 # Xcode framework
-XCFW = $(PKG)/RugbyKit.xcframework
+XFWK = $(PKG)/$(XCODE).xcframework
 
 
 # --------------------
@@ -46,33 +50,43 @@ build: lib ffi pkg
 
 # Clean all
 .PHONY: clean
-clean:
-	rm -rfv $(BUILD)
+clean: clean-pkg
+	@rm -rfv $(BUILD)
+
+# Clean packages
+.PHONY: clean-pkg
+clean-pkg:
+	@rm -rfv $(SRCS) $(XFWK)
 
 # Static libraries
 .PHONY: lib
 lib: $(LIBS)
 
 $(BUILD)/%/release/lib$(CRATE).a:
-	cargo build --lib --release --target-dir $(BUILD) --target $*
+	@cargo build --lib --release --target-dir $(BUILD) --target $*
 
 # Swift bindings
 .PHONY: ffi
 ffi: $(FFI)
 
 $(FFI): $(LIBS)
-	cargo build --bin uniffi
-	cargo run -q --bin uniffi --                  \
+	@cargo build --quiet --bin uniffi
+	@cargo run -q --bin uniffi --                 \
 		$(firstword $(LIBS))                  \
 		$(FFI)                                \
 		--module-name $(CRATE)FFI             \
-		--swift-sources --headers --modulemap \
-		--modulemap-filename module.modulemap
+		--modulemap-filename module.modulemap \
+		--headers --modulemap
+	@cargo run -q --bin uniffi --                 \
+		$(firstword $(LIBS))                  \
+		$(SRCS)                               \
+		--module-name $(CRATE)FFI             \
+		--swift-sources
 
 # Xcode framework
 .PHONY: pkg
-pkg: $(XCFW)
-$(XCFW): $(LIBS) $(FFI)
-	@rm -rf $(XCFW)
-	xcodebuild -create-xcframework -output $(XCFW) \
+pkg: $(XFWK)
+$(XFWK): $(LIBS) $(FFI)
+	@rm -rf $(XFWK)
+	@xcodebuild -create-xcframework -output $(XFWK) \
 		$(foreach LIB,$(LIBS),-library $(LIB) -headers $(FFI))
