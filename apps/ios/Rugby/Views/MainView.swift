@@ -52,16 +52,17 @@ struct MainView: View {
             g: Double((hex >> 08) & 0xFF) / 255,
             b: Double((hex >> 00) & 0xFF) / 255
         )
-        let pal = UIColor(red: rgb.r, green: rgb.g, blue: rgb.b, alpha: 1.0)
         // Define tinting color
-        var hsl = (h: CGFloat(), s: CGFloat(), l: CGFloat())
-
-        // Use palette for hue/saturation/brightness
-        pal.getHue(&hsl.h, saturation: &hsl.s, brightness: &hsl.l, alpha: nil)
-
-        // Update color values
-        hsl.s *= colorScheme == .light ? 2.0 : 1.0
-        hsl.l = colorScheme == .light ? 0.5 : 1.0
+        let hsl = (
+            h: (1 +
+                atan2(
+                    sqrt(3) * (rgb.g - rgb.b),
+                    2 * rgb.r - rgb.g - rgb.b
+                ) / (2 * .pi)
+            ).truncatingRemainder(dividingBy: 1.0),
+            s: (rgb.r == rgb.g) && (rgb.g == rgb.b) ? 0 : 0.6,
+            l: colorScheme == .light ? 0.6 : 0.9
+        )
 
         return Color(hue: hsl.h, saturation: hsl.s, brightness: hsl.l)
     }
