@@ -8,7 +8,8 @@ import PackageDescription
 let package = Package(
     name: "rugby",
     platforms: [
-        .iOS(.v18)
+        .iOS(.v18),
+        .macOS(.v15),
     ],
     products: [
         // Products define the executables and libraries a package produces,
@@ -26,12 +27,10 @@ let package = Package(
         // dependencies.
         .target(
             name: "RugbyKit",
-            dependencies: ["RugbyFFI"],
-            path: "RugbyKit.xcframework/ios-arm64/Headers",
-            sources: ["rugby.swift"]
+            dependencies: ["rugbyFFI"]
         ),
         .binaryTarget(
-            name: "RugbyFFI",
+            name: "rugbyFFI",
             // Swift packages importing this locally will not be able to import
             // the Rust core unless you use a relative path.
             path: "RugbyKit.xcframework"
