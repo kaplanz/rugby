@@ -129,10 +129,15 @@ class GameBoy {
 
             // Emulator loop
             while true {
-                // Check if idle
-                let idle = !run || (awake.map { $0  > .now } ?? false)
-                // Enter idle loop
-                if idle {
+                // Sleep while paused
+                if !run {
+                    // Use delay that is negligible in human time
+                    try? await Task.sleep(for: .milliseconds(10))
+                    // Once woken, restart loop to determine state
+                    continue
+                }
+                // Yield while idle
+                if let awake = awake, awake > .now {
                     // No work to be done... yield to other tasks
                     await Task.yield()
                     // When woken, check if ready to work
