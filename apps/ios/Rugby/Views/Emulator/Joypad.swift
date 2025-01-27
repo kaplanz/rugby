@@ -192,7 +192,7 @@ private struct GameButton: View {
             Text(String(describing: role))
                 .font(.custom("Orbitron", size: 16))
                 .fontWeight(.heavy)
-                .foregroundStyle(.brand)
+                .foregroundStyle(.text)
                 .textCase(.uppercase)
         }
         .gesture(
@@ -240,7 +240,7 @@ private struct MenuButton: View {
             Text(String(describing: role))
                 .font(.custom("Orbitron", size: 12))
                 .fontWeight(.heavy)
-                .foregroundStyle(.brand)
+                .foregroundStyle(.text)
                 .textCase(.uppercase)
         }
         .gesture(
