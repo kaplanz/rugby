@@ -259,7 +259,7 @@ class GameBoy {
                 bitsPerPixel: bitsPerComponent * bytesPerPixel,
                 bytesPerRow: bytesPerRow,
                 space: colorSpace,
-                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue),
+                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue),
                 provider: dataProvider!,
                 decode: nil,
                 shouldInterpolate: true,
