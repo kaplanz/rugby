@@ -37,7 +37,7 @@ struct Screen: View {
                     .textCase(.uppercase)
             }
             .baselineOffset(5)
-            .foregroundStyle(.brand)
+            .foregroundStyle(.text)
         }
         .padding(6)
     }
