@@ -121,7 +121,7 @@ extension Palette.Data: Collection, RandomAccessCollection {
         case 3: value = c3
         default: fatalError()
         }
-        return value | 0xFF00_0000
+        return value
     }
 }
 
