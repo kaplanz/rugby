@@ -136,16 +136,18 @@ class GameBoy {
                     // Once woken, restart loop to determine state
                     continue
                 }
-                // Yield while idle
+                // Sleep until awake
                 if let awake = awake, awake > .now {
-                    // No work to be done... yield to other tasks
-                    await Task.yield()
-                    // When woken, check if ready to work
-                    continue
+                    // No work to be done... sleep until woken
+                    try? await Task.sleep(until: awake)
+                    // Once woken, perform this cycle's work
+                } else {
+                    // When lagging behind, reset clock
+                    awake = nil
                 }
 
-                // Record pre-emulation time
-                let time = clock.now
+                // Record pre-emulation timestamp
+                let prior = clock.now
 
                 // Emulate next frame
                 let count = emu.run()
@@ -168,7 +170,7 @@ class GameBoy {
                     // Calculate expected delay
                     let delay = (.seconds(1) / 4_194_304) * (Double(count) / speed)
                     // Schedule next wake
-                    awake = time + delay
+                    awake = (awake ?? prior) + delay
                 } else {
                     awake = nil
                 }
