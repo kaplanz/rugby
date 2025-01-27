@@ -74,7 +74,7 @@ class GameBoy {
             // Initialize emulator
             var emu = RugbyKit.GameBoy()
             // Initialize state
-            var run = false
+            var pause = true
             // Initialize clock
             typealias Clock = ContinuousClock
             let clock: Clock = .init()
@@ -99,16 +99,16 @@ class GameBoy {
                     // Reset profiler
                     prof.reset()
                     // Start emulation
-                    run = true
-                case .pause(let pause):
-                    run = !pause
+                    pause = false
+                case .pause(let state):
+                    pause = state
                     // Reset profiler
-                    if run {
+                    if !pause {
                         prof.reset()
                     }
                 case .stop:
                     // Stop emulation
-                    run = false
+                    pause = true
                     // Eject cartridge
                     if !emu.eject() {
                         fatalError("mismatch while ejecting cartridge")
@@ -130,7 +130,7 @@ class GameBoy {
             // Emulator loop
             while true {
                 // Sleep while paused
-                if !run {
+                if pause {
                     // Use delay that is negligible in human time
                     try? await Task.sleep(for: .milliseconds(10))
                     // Once woken, restart loop to determine state
