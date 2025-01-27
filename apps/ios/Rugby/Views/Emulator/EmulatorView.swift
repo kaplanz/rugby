@@ -132,7 +132,7 @@ struct EmulatorView: View {
             if extras.rate, let rate = emu.stats.rate {
                 Text(String(format: "%.1f FPS", rate))
                     .bold()
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(.tint)
             }
             if extras.ctrl {
                 Button {
