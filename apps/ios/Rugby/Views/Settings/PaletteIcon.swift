@@ -11,8 +11,8 @@ struct PaletteIcon: View {
     let pal: Palette
 
     var body: some View {
-        LazyHGrid(
-            rows: [
+        LazyVGrid(
+            columns: [
                 .init(spacing: 2),
                 .init(spacing: 2),
             ],
