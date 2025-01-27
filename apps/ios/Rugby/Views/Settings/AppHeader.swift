@@ -44,24 +44,24 @@ struct AppHeader: View {
                     LicenseView(path: "LICENSE-MIT")
                 } label: {
                     Label("MIT", systemImage: "building.columns")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(.tint)
                 }
                 NavigationLink {
                     LicenseView(path: "LICENSE-APACHE")
                 } label: {
                     Label("Apache-2.0", systemImage: "bird")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(.tint)
                 }
             } label: {
                 Label("License", systemImage: "doc.text")
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(.tint)
             }
             // Credit
             NavigationLink {
                 CreditsView()
             } label: {
                 Label("Credits", systemImage: "person.2")
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(.tint)
             }
             .disabled(true)
         } footer: {
