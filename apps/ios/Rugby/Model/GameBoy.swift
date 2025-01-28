@@ -187,6 +187,8 @@ class GameBoy {
         self.game = game
         // Send to emulator
         talk.send(.play(game.cart))
+        // Reset clock speed
+        clock(speed: cfg.data.spd.rawValue)
     }
 
     /// Pause emulation.
