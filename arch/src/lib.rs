@@ -22,6 +22,31 @@ pub type Byte = u8;
 /// Native architecture word.
 pub type Word = u16;
 
+/// Interface for accessing values according to a bitmask.
+pub trait Bitmask<M>
+where
+    M: Copy + Into<Self>,
+    Self: Sized,
+{
+    /// Tests whether a given control bit is set.
+    #[must_use]
+    fn test(&self, mask: M) -> bool;
+
+    /// Updates a given control bit's value.
+    fn set(&mut self, mask: M, value: bool);
+
+    /// Atomically overwrite a bit, returning the old value.
+    #[must_use]
+    fn test_and_set(&mut self, mask: M, value: bool) -> bool {
+        // Test old value.
+        let old = self.test(mask);
+        // Set new value.
+        self.set(mask, value);
+        // Return old value
+        old
+    }
+}
+
 /// Shared memory-mapped device.
 #[derive(Debug, Default)]
 pub struct Shared<T: ?Sized>(Inner<T>);
