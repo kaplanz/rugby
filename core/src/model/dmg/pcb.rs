@@ -63,6 +63,10 @@ impl Block for Motherboard {
             self.soc.cpu.wake();
         }
 
+        // APU: 4 MiHz
+        if self.soc.apu.ready() {
+            self.soc.apu.cycle();
+        }
         // CPU: 1 MiHz
         if self.soc.cpu.ready() && self.clk % 4 == 0 {
             self.soc.cpu.cycle();
