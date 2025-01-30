@@ -39,9 +39,26 @@ impl Chip {
     pub fn new(mem: &Bank, noc: &Mmap) -> Self {
         // Interrupt controller
         let pic = pic::Pic::default();
+        // Hardware timer
+        let tma = timer::Timer {
+            reg: timer::Control::default(),
+            etc: timer::Internal::default(),
+            int: pic.line.clone(),
+        };
 
         // Audio processing unit
-        let apu = apu::Apu::default();
+        let apu = apu::Apu {
+            mem: apu::Bank {
+                wave: mem.wave.clone(),
+            },
+            reg: apu::Control::default(),
+            seq: apu::Sequencer {
+                bit: bool::default(),
+                clk: u8::default(),
+                div: tma.reg.div.clone(),
+            },
+            etc: apu::Internal::default(),
+        };
         // Central processing unit
         let cpu = cpu::Cpu {
             bus: noc.cpu(),
@@ -82,12 +99,6 @@ impl Chip {
         let sio = serial::Serial {
             reg: serial::Control::default(),
             etc: serial::Internal::default(),
-            int: pic.line.clone(),
-        };
-        // Hardware timer
-        let tma = timer::Timer {
-            reg: timer::Control::default(),
-            etc: timer::Internal::default(),
             int: pic.line.clone(),
         };
 
