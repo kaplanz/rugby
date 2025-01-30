@@ -7,7 +7,7 @@ use log::trace;
 use num::traits::{WrappingAdd, WrappingSub};
 use num::{Bounded, Integer};
 use pest::iterators::Pair;
-use rugby::core::dmg::{cpu, pic, ppu, serial, timer};
+use rugby::core::dmg::{apu, cpu, pic, ppu, serial, timer};
 use thiserror::Error;
 use wrange::Wrange;
 
@@ -174,7 +174,13 @@ pub fn command(input: Pair<Rule>) -> Result<Command> {
                 .map(self::location)
                 .collect::<Result<Vec<_>>>()?;
             let value = match locs.first().exception()? {
-                Select::Byte(_) | Select::Pic(_) | Select::Ppu(_) | Select::Serial(_) | Select::Timer(_) => Value::Byte(
+                Select::Apu(_)
+                    | Select::Byte(_)
+                    | Select::Pic(_)
+                    | Select::Ppu(_)
+                    | Select::Serial(_)
+                    | Select::Timer(_)
+                    => Value::Byte(
                     self::integer(value.clone()) // attempt both `u8` and `i8`
                         .or_else(|_| self::integer::<i8>(value).map(|int| int as u8))?,
                 ),
@@ -367,6 +373,33 @@ pub fn keyword(pair: Pair<Rule>) -> Result<Keyword> {
 pub fn location(pair: Pair<Rule>) -> Result<Select> {
     // Extract the register rule
     Ok(match pair.as_rule() {
+        Rule::Apu => {
+            let reg = pair.into_inner().next().exception()?;
+            Select::Apu(match reg.as_rule() {
+                Rule::Nr10 => apu::Select::Nr10,
+                Rule::Nr11 => apu::Select::Nr11,
+                Rule::Nr12 => apu::Select::Nr12,
+                Rule::Nr13 => apu::Select::Nr13,
+                Rule::Nr14 => apu::Select::Nr14,
+                Rule::Nr21 => apu::Select::Nr21,
+                Rule::Nr22 => apu::Select::Nr22,
+                Rule::Nr23 => apu::Select::Nr23,
+                Rule::Nr24 => apu::Select::Nr24,
+                Rule::Nr30 => apu::Select::Nr30,
+                Rule::Nr31 => apu::Select::Nr31,
+                Rule::Nr32 => apu::Select::Nr32,
+                Rule::Nr33 => apu::Select::Nr33,
+                Rule::Nr34 => apu::Select::Nr34,
+                Rule::Nr41 => apu::Select::Nr41,
+                Rule::Nr42 => apu::Select::Nr42,
+                Rule::Nr43 => apu::Select::Nr43,
+                Rule::Nr44 => apu::Select::Nr44,
+                Rule::Nr50 => apu::Select::Nr50,
+                Rule::Nr51 => apu::Select::Nr51,
+                Rule::Nr52 => apu::Select::Nr52,
+                rule => return rule.exception(),
+            })
+        }
         Rule::Byte => {
             let reg = pair.into_inner().next().exception()?;
             Select::Byte(match reg.as_rule() {
