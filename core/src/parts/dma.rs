@@ -21,22 +21,22 @@ pub struct Dma {
 
 impl Block for Dma {
     fn ready(&self) -> bool {
-        !matches!(self.reg.borrow().state, State::Off)
+        !matches!(self.reg.borrow().mode, Mode::Off)
     }
 
     fn cycle(&mut self) {
-        // Determine next state
-        let state = match self.reg.borrow().state {
-            State::Off => {
+        // Perform DMA
+        let mode = match self.reg.borrow().mode {
+            Mode::Off => {
                 unreachable!("cannot to cycle DMA while disabled");
             }
-            State::Req(src) => {
+            Mode::Req(src) => {
                 // FIXME: Disable OAM
                 // Initiate transfer
                 trace!("started: 0xfe00 <- {src:#04x}00");
-                State::On { hi: src, lo: 0x00 }
+                Mode::On { hi: src, lo: 0x00 }
             }
-            State::On { hi, lo } => {
+            Mode::On { hi, lo } => {
                 // Transfer single byte
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
@@ -45,17 +45,17 @@ impl Block for Dma {
                 // Increment transfer index
                 let lo = lo.saturating_add(1);
                 if usize::from(lo) < self.mem.borrow().inner().len() {
-                    State::On { hi, lo }
+                    Mode::On { hi, lo }
                 } else {
                     // FIXME: Enable OAM
                     // Complete transfer
                     debug!("finished: 0xfe00 <- {hi:#04x}00");
-                    State::Off
+                    Mode::Off
                 }
             }
         };
-        // Update the state
-        self.reg.borrow_mut().state = state;
+        // Determine next mode
+        self.reg.borrow_mut().mode = mode;
     }
 
     fn reset(&mut self) {
@@ -67,9 +67,9 @@ impl Block for Dma {
 #[derive(Debug, Default)]
 pub struct Control {
     /// DMA progress.
-    state: State,
+    mode: Mode,
     /// DMA source page.
-    mpage: Byte,
+    page: Byte,
 }
 
 impl Block for Control {
@@ -93,28 +93,28 @@ impl Register for Control {
     type Value = Byte;
 
     fn load(&self) -> Self::Value {
-        self.mpage.load()
+        self.page.load()
     }
 
     fn store(&mut self, value: Self::Value) {
-        match self.state {
-            State::Off => {
+        match self.mode {
+            Mode::Off => {
                 // Request a new transfer
-                self.state = State::Req(value);
+                self.mode = Mode::Req(value);
                 debug!("request: 0xfe00 <- {:#04x}00", value);
             }
-            State::Req(_) | State::On { .. } => {
+            Mode::Req(_) | Mode::On { .. } => {
                 warn!("ignored request; already in progress");
             }
         }
         // Always update stored value
-        self.mpage.store(value);
+        self.page.store(value);
     }
 }
 
-/// DMA Transfer State.
+/// DMA transfer mode.
 #[derive(Debug, Default)]
-enum State {
+enum Mode {
     /// Disabled.
     #[default]
     Off,
