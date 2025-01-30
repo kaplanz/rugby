@@ -73,26 +73,17 @@ pub enum Select {
 /// Audio processing unit.
 #[derive(Debug, Default)]
 pub struct Apu {
-    /// Audio registers.
-    pub reg: Control,
     /// Audio memory.
     pub mem: Bank,
+    /// Audio registers.
+    pub reg: Control,
     /// Audio internals.
-    #[allow(unused)]
-    etc: Internal,
+    pub etc: Internal,
 }
 
 /// Audio internals.
 #[derive(Debug, Default)]
-struct Internal {}
-
-impl Apu {
-    /// Constructs a new `Apu`.
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
+pub struct Internal {}
 
 impl Api for Apu {}
 
@@ -113,7 +104,6 @@ impl Block for Apu {
 impl Mmio for Apu {
     fn attach(&self, bus: &mut Bus) {
         self.reg.attach(bus);
-        self.mem.attach(bus);
     }
 }
 
@@ -171,6 +161,17 @@ impl Port<Byte> for Apu {
             Select::Nr44 => self.reg.nr44.store(value),
         }
     }
+}
+
+/// Audio memory.
+///
+/// |     Address     | Size | Name | Description |
+/// |:---------------:|------|------|-------------|
+/// | `$FF30..=$FF3F` | 16 B | WAVE | Wave RAM    |
+#[derive(Debug, Default)]
+pub struct Bank {
+    /// Wave RAM.
+    pub wave: Shared<Wave>,
 }
 
 /// Audio registers.
@@ -305,25 +306,6 @@ impl Mmio for Control {
         bus.map(0xff21..=0xff21, self.nr42.clone().into());
         bus.map(0xff22..=0xff22, self.nr43.clone().into());
         bus.map(0xff23..=0xff23, self.nr44.clone().into());
-    }
-}
-
-/// Audio memory.
-///
-/// |     Address     | Size | Name | Description |
-/// |:---------------:|------|------|-------------|
-/// | `$FF30..=$FF3F` | 16 B | WAVE | Wave RAM    |
-#[derive(Debug, Default)]
-pub struct Bank {
-    /// Wave RAM.
-    pub wave: Shared<Wave>,
-}
-
-impl Block for Bank {}
-
-impl Mmio for Bank {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff30..=0xff40, self.wave.clone().into());
     }
 }
 

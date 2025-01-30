@@ -118,6 +118,9 @@ pub enum Error {
     /// Device is unavailable.
     #[error("device is unavailable")]
     Busy,
+    /// Device is disabled.
+    #[error("device is disabled")]
+    Disabled,
     /// Unsupported operation.
     #[error("unsupported operation")]
     Misuse,

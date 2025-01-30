@@ -42,14 +42,14 @@ pub struct Serial {
     /// Serial registers.
     pub reg: Control,
     /// Serial internals.
-    etc: Internal,
+    pub etc: Internal,
     /// Interrupt line.
-    int: pic::Line,
+    pub int: pic::Line,
 }
 
 /// Serial internals.
 #[derive(Debug, Default)]
-struct Internal {
+pub struct Internal {
     /// In-progress byte.
     ip: Byte,
     /// Received queue.
@@ -65,16 +65,6 @@ impl Internal {
 }
 
 impl Serial {
-    /// Constructs a new `Serial`.
-    #[must_use]
-    pub fn new(int: pic::Line) -> Self {
-        Self {
-            reg: Control::default(),
-            etc: Internal::default(),
-            int,
-        }
-    }
-
     /// Perform a tick of the external clock.
     pub fn tick(&mut self) {
         // Only tick if transferring on external clock

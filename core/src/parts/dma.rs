@@ -11,27 +11,12 @@ pub use super::ppu::Oam;
 /// Direct memory access unit.
 #[derive(Debug)]
 pub struct Dma {
+    /// DMA bus.
+    pub bus: Bus,
+    /// DMA memory.
+    pub mem: Shared<Oam>,
     /// DMA register.
     pub reg: Shared<Control>,
-    // Memory
-    oam: Shared<Oam>,
-    // Shared
-    bus: Bus,
-}
-
-impl Dma {
-    /// Constructs a new `Dma`
-    #[must_use]
-    pub fn new(bus: Bus, oam: Shared<Oam>) -> Self {
-        Self {
-            // Control
-            reg: Shared::default(),
-            // Memory
-            oam,
-            // Shared
-            bus,
-        }
-    }
 }
 
 impl Block for Dma {
@@ -55,11 +40,11 @@ impl Block for Dma {
                 // Transfer single byte
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
-                self.oam.write(lo as Word, data).unwrap();
+                self.mem.write(lo as Word, data).unwrap();
                 trace!("copied: $fe{lo:02x} <- ${addr:04x}, data: {data:#04x}");
                 // Increment transfer index
                 let lo = lo.saturating_add(1);
-                if usize::from(lo) < self.oam.borrow().inner().len() {
+                if usize::from(lo) < self.mem.borrow().inner().len() {
                     State::On { hi, lo }
                 } else {
                     // FIXME: Enable OAM
