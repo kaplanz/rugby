@@ -3,12 +3,15 @@
 //! Frontend for `rugby` compliant with the `libretro` specification.
 
 #![warn(clippy::pedantic)]
+// Allowed lints: rustc
+#![allow(non_camel_case_types)]
+// Allowed lints: clippy
 #![allow(clippy::doc_markdown)]
 #![allow(clippy::missing_panics_doc)]
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
 #![allow(clippy::wildcard_imports)]
-#![allow(non_camel_case_types)]
+// Allowed lints: rustdoc
 #![allow(rustdoc::broken_intra_doc_links)]
 
 use std::ffi::CStr;
