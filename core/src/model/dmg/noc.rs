@@ -51,7 +51,7 @@ use super::pcb::Motherboard;
 /// | `$FFFF..=$FFFF` |    1 B | `pic`    | Interrupt enable | Internal  |
 ///
 /// [map]: https://gbdev.io/pandocs/Memory_Map.html
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Mmap {
     /// Internal bus.
     pub ibus: Shared<Bus>,
