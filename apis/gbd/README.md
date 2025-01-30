@@ -65,7 +65,7 @@ Aliases: `br`, `b`
 - [x] Memory
   - [x] Peek/poke address
 - [x] Registers
-  - [ ] APU
+  - [x] APU
   - [x] CPU
   - [x] Interrupts
   - [x] PPU
