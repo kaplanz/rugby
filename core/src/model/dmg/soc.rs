@@ -58,6 +58,7 @@ impl Chip {
             bus: noc.dma(),
             mem: mem.oam.clone(),
             reg: Shared::new(dma::Control::default()),
+            noc: noc.clone(),
         };
         // Joypad controller
         let joy = joypad::Joypad {
