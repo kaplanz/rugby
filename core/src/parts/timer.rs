@@ -74,10 +74,6 @@ impl Timer {
 }
 
 impl Block for Timer {
-    fn ready(&self) -> bool {
-        true
-    }
-
     #[rustfmt::skip]
     fn cycle(&mut self) {
         // Increment the divider every T-cycle.
