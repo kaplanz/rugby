@@ -18,7 +18,10 @@ type Range = RangeInclusive<Word>;
 /// [bus]: https://en.wikipedia.org/wiki/Bus_(computing)
 #[derive(Debug, Default)]
 pub struct Bus {
-    map: Map,
+    /// Memory map.
+    mmap: Map,
+    /// Lock status.
+    lock: bool,
 }
 
 impl Bus {
@@ -30,19 +33,33 @@ impl Bus {
 
     /// Clears the bus, removing all devices.
     pub fn clear(&mut self) {
-        self.map.clear();
+        self.mmap.clear();
     }
 
     /// Maps a device to the provided range.
     pub fn map(&mut self, range: Range, dev: Device) {
-        self.map.map(range, dev);
+        self.mmap.map(range, dev);
     }
 
     /// Unmaps and returns a device.
     ///
     /// Returns `None` if device is not mapped.
     pub fn unmap(&mut self, dev: &Device) -> bool {
-        self.map.unmap(dev)
+        self.mmap.unmap(dev)
+    }
+
+    /// Locks the bus.
+    ///
+    /// When locked, read/write operations will always [fail](Error::Busy).
+    pub fn busy(&mut self) {
+        self.lock = true;
+    }
+
+    /// Unlocks the bus.
+    ///
+    /// When locked, read/write operations will always [fail](Error::Busy).
+    pub fn free(&mut self) {
+        self.lock = false;
     }
 }
 
@@ -58,7 +75,12 @@ impl<const N: usize> From<[(Range, Device); N]> for Bus {
 
 impl Memory for Bus {
     fn read(&self, addr: Word) -> Result<Byte> {
-        self.map
+        // No-op if locked
+        if self.lock {
+            return Err(Error::Busy);
+        }
+        // Read if unlocked
+        self.mmap
             .select(addr)
             .flat_map(|it| {
                 it.entry
@@ -71,7 +93,12 @@ impl Memory for Bus {
     }
 
     fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
-        self.map
+        // No-op if locked
+        if self.lock {
+            return Err(Error::Busy);
+        }
+        // Write if unlocked
+        self.mmap
             .select(addr)
             .flat_map(|it| {
                 it.entry
@@ -103,7 +130,7 @@ mod tests {
     #[test]
     fn new_works() {
         let bus = Bus::new();
-        assert_eq!(bus.map.iter().count(), 0);
+        assert_eq!(bus.mmap.iter().count(), 0);
     }
 
     #[test]
@@ -115,7 +142,7 @@ mod tests {
     fn clear_works() {
         let mut bus = setup();
         bus.clear();
-        assert_eq!(bus.map.iter().count(), 0);
+        assert_eq!(bus.mmap.iter().count(), 0);
     }
 
     #[test]
