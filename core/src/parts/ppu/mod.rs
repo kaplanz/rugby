@@ -128,10 +128,10 @@ pub enum Select {
 /// Picture processing unit.
 #[derive(Debug)]
 pub struct Ppu {
-    /// Graphics memory.
-    pub mem: Bank,
     /// Graphics registers.
     pub reg: Control,
+    /// Graphics memory.
+    pub mem: Bank,
     /// Graphics internals.
     pub etc: Internal,
     /// Interrupt line.

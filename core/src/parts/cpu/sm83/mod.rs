@@ -80,10 +80,10 @@ pub enum Select16 {
 pub struct Cpu {
     /// Processor bus.
     pub bus: Bus,
-    /// Processor memory.
-    pub mem: Bank,
     /// Processor registers.
     pub reg: Control,
+    /// Processor memory.
+    pub mem: Bank,
     /// Processor internals.
     pub etc: Internal,
     /// Interrupt line.

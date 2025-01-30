@@ -73,10 +73,10 @@ pub enum Select {
 /// Audio processing unit.
 #[derive(Debug, Default)]
 pub struct Apu {
-    /// Audio memory.
-    pub mem: Bank,
     /// Audio registers.
     pub reg: Control,
+    /// Audio memory.
+    pub mem: Bank,
     /// Audio internals.
     pub etc: Internal,
 }
