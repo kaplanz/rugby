@@ -14,10 +14,10 @@ use crate::dmg::Mmap;
 pub struct Dma {
     /// DMA bus.
     pub bus: Bus,
-    /// DMA memory.
-    pub mem: Shared<Oam>,
     /// DMA register.
     pub reg: Shared<Control>,
+    /// DMA memory.
+    pub mem: Shared<Oam>,
     /// Network-on-chip.
     pub noc: Mmap,
 }
