@@ -2,12 +2,21 @@ use std::iter;
 
 use rugby_arch::mio::Bus;
 
-use super::*;
-use crate::parts::pic::Pic;
+use super::super::*;
 
 fn setup() -> Cpu {
     let bus = Bus::default();
-    Cpu::new(bus, Pic::new().line)
+    let pic = pic::Pic::default();
+    Cpu {
+        bus,
+        mem: Bank {
+            wram: Shared::new(Wram::from([Byte::default(); 0x2000])),
+            hram: Shared::new(Hram::from([Byte::default(); 0x007f])),
+        },
+        reg: Control::default(),
+        etc: Internal::default(),
+        int: pic.line,
+    }
 }
 
 #[test]

@@ -130,7 +130,7 @@ impl Memory for Bank {
         if self.ready() {
             self.boot.read(addr)
         } else {
-            Err(Error::Busy)
+            Err(Error::Disabled)
         }
     }
 
@@ -138,7 +138,7 @@ impl Memory for Bank {
         if self.ready() {
             self.boot.write(addr, data)
         } else {
-            Err(Error::Busy)
+            Err(Error::Disabled)
         }
     }
 }
