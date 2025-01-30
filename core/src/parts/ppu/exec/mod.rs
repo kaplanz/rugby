@@ -1,4 +1,4 @@
-use ppu::{Interrupt, Lcdc, Ppu, LCD};
+use ppu::{Lcdc, Ppu, LCD};
 use rugby_arch::reg::Register;
 use rugby_arch::Byte;
 
@@ -7,6 +7,7 @@ use self::hblank::HBlank;
 use self::scan::Scan;
 use self::vblank::VBlank;
 use super::super::ppu;
+use crate::dmg::pic::Interrupt;
 
 pub mod draw;
 pub mod hblank;

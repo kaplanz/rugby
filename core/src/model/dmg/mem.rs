@@ -1,30 +1,30 @@
-//! Embedded memory blocks.
+//! Embedded memory.
 
 use rugby_arch::mem::Ram;
-use rugby_arch::mio::Mmio;
 use rugby_arch::{Byte, Shared};
 
 pub use super::apu::Wave;
-pub use super::ppu::Oam;
+pub use super::cpu::{Hram, Wram};
+pub use super::ppu::{Oam, Vram};
 
-/// High RAM.
-///
-/// 127 byte RAM only accessible by the [CPU], used to prevent memory corruption
-/// during [DMA].
-///
-/// [cpu]: super::cpu
-/// [dma]: super::dma
-pub type Hram = Ram<[Byte; 0x007f]>;
+/// Sharp LH5164N (64K SRAM).
+pub type Sram = Ram<[Byte; 0x2000]>;
 
-/// Embedded memory.
+/// Memory bank.
 ///
 /// |     Address     |  Size  | Name | Description   |
 /// |:---------------:|--------|------|---------------|
+/// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
+/// | `$C000..=$DFFF` |  8 KiB | WRAM | Work RAM      |
 /// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
 /// | `$FF30..=$FF3F` |   16 B | WAVE | Wave RAM      |
 /// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
 #[derive(Debug)]
 pub struct Bank {
+    /// Video RAM.
+    pub vram: Shared<Vram>,
+    /// Work RAM.
+    pub wram: Shared<Wram>,
     /// Object memory.
     pub oam: Shared<Oam>,
     /// Wave memory.
@@ -33,28 +33,24 @@ pub struct Bank {
     pub hram: Shared<Hram>,
 }
 
-impl Bank {
-    /// Constructs a new `Bank`.
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
+#[rustfmt::skip]
 impl Default for Bank {
     fn default() -> Self {
         Self {
-            oam: Shared::new(Ram::from([Byte::default(); 0x00a0])),
-            wave: Shared::new(Ram::from([Byte::default(); 0x0010])),
-            hram: Shared::new(Ram::from([Byte::default(); 0x007f])),
+            vram: Shared::new(Vram::from([Byte::default(); 0x2000])),
+            wram: Shared::new(Wram::from([Byte::default(); 0x2000])),
+            oam:  Shared::new( Oam::from([Byte::default(); 0x00a0])),
+            wave: Shared::new(Wave::from([Byte::default(); 0x0010])),
+            hram: Shared::new(Hram::from([Byte::default(); 0x007f])),
         }
     }
 }
 
-impl Mmio for Bank {
-    fn attach(&self, bus: &mut rugby_arch::mio::Bus) {
-        bus.map(0xfe00..=0xfe9f, self.oam.clone().into());
-        bus.map(0xff30..=0xff3f, self.wave.clone().into());
-        bus.map(0xff80..=0xfffe, self.hram.clone().into());
+impl Bank {
+    /// Constructs a new `Bank`.
+    #[must_use]
+    #[rustfmt::skip]
+    pub fn new() -> Self {
+        Self::default()
     }
 }
