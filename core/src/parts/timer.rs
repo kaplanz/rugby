@@ -30,14 +30,14 @@ pub struct Timer {
     /// Timer registers.
     pub reg: Control,
     /// Timer internals.
-    etc: Internal,
+    pub etc: Internal,
     /// Interrupt line.
-    int: pic::Line,
+    pub int: pic::Line,
 }
 
 /// Timer internals.
 #[derive(Debug, Default)]
-struct Internal {
+pub struct Internal {
     /// Previous AND result.
     and: bool,
 }
@@ -99,7 +99,7 @@ impl Block for Timer {
         }
 
         // Check if TIMA should be incremented
-        let this = self.andres();      // calculate AND result
+        let this = self.andres();         // calculate AND result
         let tick = self.etc.and && !this; // check for falling edge
         self.etc.and = this;              // store for next cycle
 
@@ -386,7 +386,7 @@ mod tests {
     #[test]
     fn tima_reload_works() {
         // Configure 65536 Hz timer (64 cycles)
-        let mut timer = Timer::new(pic::Pic::new().line);
+        let mut timer = Timer::new(pic::Pic::default().line);
         timer.reg.tac.store(0b110);
         timer.reg.tma.store(0xfe);
         timer.reg.tima.store(0xfe);
@@ -424,7 +424,7 @@ mod tests {
 
     #[test]
     fn tima_write_reloading_working() {
-        let line = pic::Pic::new().line;
+        let line = pic::Pic::default().line;
         // Test 1
         {
             // Configure 65536 Hz timer (64 cycles)
@@ -572,7 +572,7 @@ mod tests {
 
     #[test]
     fn tma_write_reloading_working() {
-        let line = pic::Pic::new().line;
+        let line = pic::Pic::default().line;
         // Test 1
         {
             // Configure 65536 Hz timer (64 cycles)

@@ -60,7 +60,12 @@ impl Memory for Bus {
     fn read(&self, addr: Word) -> Result<Byte> {
         self.map
             .select(addr)
-            .flat_map(|it| it.entry.borrow().read(addr - it.base()))
+            .flat_map(|it| {
+                it.entry
+                    .try_borrow()
+                    .map_err(|_| Error::Busy)?
+                    .read(addr - it.base())
+            })
             .next()
             .ok_or(Error::Range)
     }
@@ -68,7 +73,12 @@ impl Memory for Bus {
     fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
         self.map
             .select(addr)
-            .flat_map(|it| it.entry.borrow_mut().write(addr - it.base(), data))
+            .flat_map(|it| {
+                it.entry
+                    .try_borrow_mut()
+                    .map_err(|_| Error::Busy)?
+                    .write(addr - it.base(), data)
+            })
             .next()
             .ok_or(Error::Range)
     }
