@@ -1,6 +1,7 @@
 //! Game Boy Debugger (GBD).
 
 #![warn(clippy::pedantic)]
+// Allowed lints: clippy
 #![allow(clippy::result_large_err)]
 
 use std::fmt::{Debug, Display, Write};
