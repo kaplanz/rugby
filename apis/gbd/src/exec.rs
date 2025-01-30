@@ -235,6 +235,10 @@ pub fn loads(emu: &GameBoy, locs: Vec<Select>) -> Result<()> {
 pub fn load(emu: &GameBoy, loc: Select) -> Result<()> {
     // Perform the load
     match loc {
+        Select::Apu(reg) => {
+            let byte: u8 = emu.main.soc.apu.load(reg);
+            advise::info!("{reg:?}: {byte:#04x}");
+        }
         Select::Byte(reg) => {
             let byte: u8 = emu.main.soc.cpu.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
@@ -362,6 +366,14 @@ pub fn stores(emu: &mut GameBoy, locs: Vec<Select>, value: Value) -> Result<()> 
 pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
     let soc = &mut emu.main.soc;
     match loc {
+        Select::Apu(reg) => {
+            // Extract the byte
+            let Value::Byte(byte) = value else {
+                return Err(Error::Value);
+            };
+            // Perform the store
+            soc.apu.store(reg, byte);
+        }
         Select::Byte(reg) => {
             // Extract the byte
             let Value::Byte(byte) = value else {
