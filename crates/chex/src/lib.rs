@@ -22,6 +22,7 @@
 //! ```
 
 #![warn(clippy::pedantic)]
+// Allowed lints: clippy
 #![allow(clippy::unreadable_literal)]
 
 use std::fmt::Display;
