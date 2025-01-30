@@ -1,59 +1,105 @@
 //! System-on-chip.
 
-use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::{Block, Shared};
 
-use super::cpu::Cpu;
-use super::joypad::Joypad;
 use super::mem::Bank;
 use super::noc::Mmap;
-use super::pic::Pic;
-use super::ppu::{Ppu, Vram};
-use super::serial::Serial;
-use super::timer::Timer;
-use crate::parts::apu::Apu;
-use crate::parts::dma::Dma;
+use super::{apu, cpu, dma, joypad, pic, ppu, serial, timer};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
 pub struct Chip {
     /// Audio processing unit.
-    pub apu: Apu,
+    pub apu: apu::Apu,
     /// Central processing unit.
-    pub cpu: Cpu,
-    /// Direct memory access controller.
-    pub dma: Dma,
+    pub cpu: cpu::Cpu,
+    /// Direct memory access unit.
+    pub dma: dma::Dma,
     /// Joypad controller.
-    pub joy: Joypad,
-    /// Embedded memory.
-    pub mem: Bank,
-    /// Programmable interrupt controller.
-    pub pic: Pic,
+    pub joy: joypad::Joypad,
+    /// Interrupt controller.
+    pub pic: pic::Pic,
     /// Picture processing unit
-    pub ppu: Ppu,
+    pub ppu: ppu::Ppu,
     /// Serial communications port.
-    pub sio: Serial,
+    pub sio: serial::Serial,
     /// Hardware timer.
-    pub tma: Timer,
+    pub tma: timer::Timer,
 }
 
 impl Chip {
-    /// Constructs a new `SoC`.
+    /// Constructs a new `Chip`.
+    ///
+    /// # Note
+    ///
+    /// This is actually much more complicated than simply initializing each
+    /// component, as there is a somewhat complicated dependency chain between
+    /// which parts are connected to each other.
     #[must_use]
-    pub fn new(noc: &Mmap, vram: Shared<Vram>) -> Self {
-        let mem = Bank::new();
-        let dma = Dma::new(noc.dma(), mem.oam.clone());
-        let pic = Pic::new();
+    pub fn new(mem: &Bank, noc: &Mmap) -> Self {
+        // Interrupt controller
+        let pic = pic::Pic::default();
+
+        // Audio processing unit
+        let apu = apu::Apu::default();
+        // Central processing unit
+        let cpu = cpu::Cpu {
+            bus: noc.cpu(),
+            mem: cpu::Bank {
+                wram: mem.wram.clone(),
+                hram: mem.hram.clone(),
+            },
+            reg: cpu::Control::default(),
+            etc: cpu::Internal::default(),
+            int: pic.line.clone(),
+        };
+        // Direct memory access unit
+        let dma = dma::Dma {
+            bus: noc.dma(),
+            mem: mem.oam.clone(),
+            reg: Shared::new(dma::Control::default()),
+        };
+        // Joypad controller
+        let joy = joypad::Joypad {
+            reg: Shared::new(joypad::Control::default()),
+            int: pic.line.clone(),
+        };
+        // Picture processing unit
+        let ppu = ppu::Ppu {
+            mem: ppu::Bank {
+                vram: mem.vram.clone(),
+                oam: mem.oam.clone(),
+            },
+            reg: ppu::Control {
+                dma: dma.reg.clone(),
+                ..Default::default()
+            },
+            etc: ppu::Internal::default(),
+            int: pic.line.clone(),
+        };
+        // Serial communications port
+        let sio = serial::Serial {
+            reg: serial::Control::default(),
+            etc: serial::Internal::default(),
+            int: pic.line.clone(),
+        };
+        // Hardware timer
+        let tma = timer::Timer {
+            reg: timer::Control::default(),
+            etc: timer::Internal::default(),
+            int: pic.line.clone(),
+        };
+
+        // Finish construction
         Self {
-            apu: Apu::new(),
-            cpu: Cpu::new(noc.cpu(), pic.line.clone()),
-            joy: Joypad::new(pic.line.clone()),
-            ppu: Ppu::new(vram, mem.oam.clone(), dma.reg.clone(), pic.line.clone()),
-            sio: Serial::new(pic.line.clone()),
-            tma: Timer::new(pic.line.clone()),
+            apu,
+            cpu,
             dma,
-            mem,
+            joy,
             pic,
+            ppu,
+            sio,
+            tma,
         }
     }
 }
@@ -71,17 +117,5 @@ impl Block for Chip {
         self.ppu.reset();
         self.sio.reset();
         self.tma.reset();
-    }
-}
-
-impl Mmio for Chip {
-    fn attach(&self, bus: &mut Bus) {
-        self.apu.attach(bus);
-        self.joy.attach(bus);
-        self.mem.attach(bus);
-        self.pic.attach(bus);
-        self.ppu.attach(bus);
-        self.sio.attach(bus);
-        self.tma.attach(bus);
     }
 }
