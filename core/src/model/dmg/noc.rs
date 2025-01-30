@@ -1,7 +1,9 @@
 //! Network-on-chip.
 
-use rugby_arch::mio::Bus;
+use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::Shared;
+
+use super::pcb::Motherboard;
 
 /// Memory-mapped I/O.
 ///
@@ -32,16 +34,16 @@ use rugby_arch::Shared;
 ///
 /// |     Address     |  Size  |  Module  | Description      |    Bus    |
 /// |:---------------:|-------:|----------|------------------|-----------|
-/// | `$FF00..=$FF00` |    1 B | `joypad` | Controller       | Internal  |
-/// | `$FF01..=$FF02` |    2 B | `serial` | Serial I/O       | Internal  |
+/// | `$FF00..=$FF00` |    1 B | `joypad` | Joypad           | Internal  |
+/// | `$FF01..=$FF02` |    2 B | `serial` | Serial           | Internal  |
 /// | `$FF03..=$FF03` |    1 B | ---      | ---              | ---       |
-/// | `$FF04..=$FF07` |    4 B | `timer`  | Timer I/O        | Internal  |
+/// | `$FF04..=$FF07` |    4 B | `timer`  | Timer            | Internal  |
 /// | `$FF08..=$FF0E` |    7 B | ---      | ---              | ---       |
 /// | `$FF0F..=$FF0F` |    1 B | `pic`    | Interrupt flag   | Internal  |
 /// | `$FF10..=$FF26` |   23 B | `apu`    | Audio            | Internal  |
 /// | `$FF27..=$FF2F` |    9 B | ---      | ---              | ---       |
 /// | `$FF30..=$FF3F` |   16 B | `apu`    | Wave RAM         | Internal  |
-/// | `$FF40..=$FF4B` |   12 B | `ppu`    | LCD              | Internal  |
+/// | `$FF40..=$FF4B` |   12 B | `ppu`    | Graphics         | Internal  |
 /// | `$FF4C..=$FF4F` |    4 B | ---      | ---              | ---       |
 /// | `$FF50..=$FF50` |    1 B | `boot`   | Boot disable     | Internal  |
 /// | `$FF51..=$FF7F` |   47 B | ---      | ---              | ---       |
@@ -82,5 +84,46 @@ impl Mmap {
             (0x0000..=0xffff, self.ebus.clone().into()), // External
             (0x0000..=0xffff, self.vbus.clone().into()), // Video
         ])
+    }
+}
+
+#[rustfmt::skip]
+impl Motherboard {
+    /// Connect memory-mapped I/O.
+    pub(super) fn mmap(&self) {
+        self.ibus();
+        self.ebus();
+        self.vbus();
+    }
+
+    /// Connect internal bus.
+    fn ibus(&self) {
+        let mut ibus = self.noc.ibus.borrow_mut();
+        // Memory map
+        ibus.map(0xfe00..=0xfe9f, self.mem.oam .clone().into()); // OAM
+        ibus.map(0xff30..=0xff3f, self.mem.wave.clone().into()); // WAVE
+        ibus.map(0xff80..=0xfffe, self.mem.hram.clone().into()); // HRAM
+        // I/O registers
+        self.soc.apu.attach(&mut ibus); // Audio
+        self.soc.joy.attach(&mut ibus); // Joypad
+        self.soc.pic.attach(&mut ibus); // Interrupts
+        self.soc.ppu.attach(&mut ibus); // Graphics
+        self.soc.sio.attach(&mut ibus); // Serial
+        self.soc.tma.attach(&mut ibus); // Timer
+    }
+
+    /// Connect external bus.
+    fn ebus(&self) {
+        let mut ebus = self.noc.ebus.borrow_mut();
+        // Memory map
+        ebus.map(0xc000..=0xdfff, self.mem.wram.clone().into()); // WRAM
+        ebus.map(0xe000..=0xffff, self.mem.wram.clone().into()); // ECHO
+    }
+
+    /// Connect video bus.
+    fn vbus(&self) {
+        let mut vbus = self.noc.vbus.borrow_mut();
+        // Memory map
+        vbus.map(0x8000..=0x9fff, self.mem.vram.clone().into()); // VRAM
     }
 }

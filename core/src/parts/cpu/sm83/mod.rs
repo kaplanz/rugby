@@ -3,16 +3,31 @@
 use std::fmt::{Debug, Display};
 
 use log::{debug, error, trace, warn};
-use rugby_arch::mem::Memory;
+use rugby_arch::mem::{Memory, Ram};
 use rugby_arch::mio::Bus;
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Block, Byte, Word};
+use rugby_arch::{Block, Byte, Shared, Word};
 
 use self::insn::Instruction;
 use crate::api::part::proc::Processor;
-use crate::parts::pic;
+use crate::dmg::mem::Sram;
+use crate::dmg::pic;
 
 pub mod insn;
+
+/// Work RAM.
+///
+/// 8 KiB RAM used as general-purpose transient memory.
+pub type Wram = Sram;
+
+/// High RAM.
+///
+/// 127 byte RAM only accessible by the [CPU], used to prevent memory corruption
+/// during [DMA].
+///
+/// [cpu]: super::cpu
+/// [dma]: super::dma
+pub type Hram = Ram<[Byte; 0x007f]>;
 
 /// Processor byte select.
 ///
@@ -63,19 +78,21 @@ pub enum Select16 {
 /// Central processing unit.
 #[derive(Debug)]
 pub struct Cpu {
+    /// Processor bus.
+    pub bus: Bus,
+    /// Processor memory.
+    pub mem: Bank,
     /// Processor registers.
     pub reg: Control,
     /// Processor internals.
-    etc: Internal,
-    /// Internal bus.
-    bus: Bus,
+    pub etc: Internal,
     /// Interrupt line.
-    int: pic::Line,
+    pub int: pic::Line,
 }
 
 /// Processor internals.
 #[derive(Debug, Default)]
-struct Internal {
+pub struct Internal {
     /// Prefix instruction.
     prefix: bool,
     /// Execution stage.
@@ -97,17 +114,6 @@ impl Internal {
 }
 
 impl Cpu {
-    /// Constructs a new `Cpu`.
-    #[must_use]
-    pub fn new(bus: Bus, int: pic::Line) -> Self {
-        Self {
-            reg: Control::default(),
-            etc: Internal::default(),
-            bus,
-            int,
-        }
-    }
-
     /// Gets the CPU's execution stage.
     #[must_use]
     pub fn stage(&self) -> &Stage {
@@ -296,6 +302,20 @@ impl Processor for Cpu {
     fn wake(&mut self) {
         self.etc.run = Status::Enabled;
     }
+}
+
+/// Processor memory.
+///
+/// |     Address     |  Size  | Name | Description   |
+/// |:---------------:|--------|------|---------------|
+/// | `$C000..=$DFFF` |  8 KiB | WRAM | Work RAM      |
+/// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
+#[derive(Debug)]
+pub struct Bank {
+    /// Work RAM.
+    pub wram: Shared<Wram>,
+    /// High RAM.
+    pub hram: Shared<Hram>,
 }
 
 /// Processor registers.
