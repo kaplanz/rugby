@@ -7,6 +7,7 @@ use rugby_arch::reg::Register;
 use rugby_arch::{Block, Byte, Shared, Word};
 
 pub use super::ppu::Oam;
+use crate::dmg::Mmap;
 
 /// Direct memory access unit.
 #[derive(Debug)]
@@ -17,6 +18,8 @@ pub struct Dma {
     pub mem: Shared<Oam>,
     /// DMA register.
     pub reg: Shared<Control>,
+    /// Network-on-chip.
+    pub noc: Mmap,
 }
 
 impl Block for Dma {
@@ -31,12 +34,14 @@ impl Block for Dma {
                 unreachable!("cannot to cycle DMA while disabled");
             }
             Mode::Req(src) => {
-                // FIXME: Disable OAM
                 // Initiate transfer
                 trace!("started: 0xfe00 <- {src:#04x}00");
                 Mode::On { hi: src, lo: 0x00 }
             }
             Mode::On { hi, lo } => {
+                // Free system buses
+                self.noc.ebus.borrow_mut().free();
+                self.noc.vbus.borrow_mut().free();
                 // Transfer single byte
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
@@ -45,9 +50,12 @@ impl Block for Dma {
                 // Increment transfer index
                 let lo = lo.saturating_add(1);
                 if usize::from(lo) < self.mem.borrow().inner().len() {
+                    // Lock system buses
+                    self.noc.ebus.borrow_mut().busy();
+                    self.noc.vbus.borrow_mut().busy();
+                    // Continue transfer
                     Mode::On { hi, lo }
                 } else {
-                    // FIXME: Enable OAM
                     // Complete transfer
                     debug!("finished: 0xfe00 <- {hi:#04x}00");
                     Mode::Off
