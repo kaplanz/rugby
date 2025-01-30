@@ -4,7 +4,12 @@
 //! components of the Nintendo Game Boy family of consoles.
 
 #![warn(clippy::pedantic)]
+// Allowed lints: rustc
+#![allow(unused_parens)]
+// Allowed lints: clippy
 #![allow(clippy::similar_names)]
+#![allow(clippy::unreadable_literal)]
+#![allow(clippy::unusual_byte_groupings)]
 
 mod model;
 mod parts;
