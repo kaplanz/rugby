@@ -7,10 +7,9 @@ use rugby_arch::{Block, Byte, Shared};
 
 use self::exec::hblank::HBlank;
 use self::exec::vblank::VBlank;
-use super::dma::Control as Dma;
-use super::pic::{self, Interrupt};
+use super::{dma, pic};
 use crate::api::part::video::{self, Aspect, Video as Api};
-use crate::dmg::pcb::Sram;
+use crate::dmg::mem::Sram;
 
 mod blk;
 mod exec;
@@ -129,19 +128,19 @@ pub enum Select {
 /// Picture processing unit.
 #[derive(Debug)]
 pub struct Ppu {
-    /// Graphics registers.
-    pub reg: Control,
     /// Graphics memory.
     pub mem: Bank,
+    /// Graphics registers.
+    pub reg: Control,
     /// Graphics internals.
-    etc: Internal,
+    pub etc: Internal,
     /// Interrupt line.
-    int: pic::Line,
+    pub int: pic::Line,
 }
 
 /// Graphics internals.
 #[derive(Debug)]
-struct Internal {
+pub struct Internal {
     /// Framebuffer.
     buf: Frame,
     /// Cycle count.
@@ -170,17 +169,6 @@ impl Default for Internal {
 }
 
 impl Ppu {
-    /// Constructs a new `Ppu`.
-    #[must_use]
-    pub fn new(vram: Shared<Vram>, oam: Shared<Oam>, dma: Shared<Dma>, int: pic::Line) -> Self {
-        Self {
-            reg: Control::new(dma),
-            mem: Bank { vram, oam },
-            etc: Internal::default(),
-            int,
-        }
-    }
-
     /// Gets the current execution cycle.
     #[must_use]
     pub fn dot(&self) -> u16 {
@@ -287,6 +275,20 @@ impl Port<Byte> for Ppu {
     }
 }
 
+/// Graphics memory.
+///
+/// |     Address     |  Size  | Name | Description   |
+/// |:---------------:|--------|------|---------------|
+/// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
+/// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
+#[derive(Debug)]
+pub struct Bank {
+    /// Video RAM.
+    pub vram: Shared<Vram>,
+    /// Object memory.
+    pub oam: Shared<Oam>,
+}
+
 /// Graphics registers.
 ///
 /// | Address | Size | Name | Description                   |
@@ -304,7 +306,7 @@ impl Port<Byte> for Ppu {
 /// | `$FF4A` | Byte | WY   | Window Y position             |
 /// | `$FF4B` | Byte | WX   | Window X position             |
 #[rustfmt::skip]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Control {
     /// LCD control
     pub lcdc: Shared<Byte>,
@@ -319,7 +321,7 @@ pub struct Control {
     /// LY compare
     pub lyc:  Shared<Byte>,
     /// OAM DMA source address
-    pub dma:  Shared<Dma>,
+    pub dma:  Shared<dma::Control>,
     /// BG palette data
     pub bgp:  Shared<Byte>,
     /// OBJ palette 0 data
@@ -330,28 +332,6 @@ pub struct Control {
     pub wy:   Shared<Byte>,
     /// Window X position
     pub wx:   Shared<Byte>,
-}
-
-impl Control {
-    /// Constructs a new `Control`.
-    #[rustfmt::skip]
-    #[must_use]
-    pub fn new(dma: Shared<Dma>) -> Self {
-        Self {
-            lcdc: Shared::default(),
-            stat: Shared::default(),
-            scy:  Shared::default(),
-            scx:  Shared::default(),
-            ly:   Shared::default(),
-            lyc:  Shared::default(),
-            dma,
-            bgp:  Shared::default(),
-            obp0: Shared::default(),
-            obp1: Shared::default(),
-            wy:   Shared::default(),
-            wx:   Shared::default(),
-        }
-    }
 }
 
 impl Block for Control {
@@ -373,20 +353,6 @@ impl Mmio for Control {
         bus.map(0xff4a..=0xff4a, self.wy.clone().into());
         bus.map(0xff4b..=0xff4b, self.wx.clone().into());
     }
-}
-
-/// Graphics memory.
-///
-/// |     Address     |  Size  | Name | Description   |
-/// |:---------------:|--------|------|---------------|
-/// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
-/// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
-#[derive(Debug)]
-pub struct Bank {
-    /// Video RAM.
-    pub vram: Shared<Vram>,
-    /// Object memory.
-    pub oam: Shared<Oam>,
 }
 
 /// Graphics control register.

@@ -89,20 +89,9 @@ impl From<Byte> for Mode {
 #[derive(Debug)]
 pub struct Joypad {
     /// Joypad register.
-    pub con: Shared<Control>,
+    pub reg: Shared<Control>,
     /// Interrupt line.
-    int: pic::Line,
-}
-
-impl Joypad {
-    /// Constructs a new `Joypad`.
-    #[must_use]
-    pub fn new(int: pic::Line) -> Self {
-        Self {
-            con: Shared::new(Control::default()),
-            int,
-        }
-    }
+    pub int: pic::Line,
 }
 
 impl Api for Joypad {
@@ -110,7 +99,7 @@ impl Api for Joypad {
 
     fn recv(&mut self, events: impl IntoIterator<Item = Event<Self::Button>>) {
         // Borrow controller state
-        let mut con = self.con.borrow_mut();
+        let mut con = self.reg.borrow_mut();
         let mode = con.mode;
         let keys = &mut con.keys;
         // Update pressed keys
@@ -141,13 +130,13 @@ impl Api for Joypad {
 
 impl Block for Joypad {
     fn reset(&mut self) {
-        self.con.reset();
+        self.reg.reset();
     }
 }
 
 impl Mmio for Joypad {
     fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff00..=0xff00, self.con.clone().into());
+        bus.map(0xff00..=0xff00, self.reg.clone().into());
     }
 }
 
