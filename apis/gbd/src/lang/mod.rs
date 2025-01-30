@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
 
 use displaydoc::Display;
-use rugby::core::dmg::{cpu, pic, ppu, serial, timer};
+use rugby::core::dmg::{apu, cpu, pic, ppu, serial, timer};
 use wrange::Wrange;
 
 use super::Tick;
@@ -432,6 +432,7 @@ pub enum Keyword {
 /// Register select.
 #[derive(Clone, Debug)]
 pub enum Select {
+    Apu(apu::Select),
     Byte(cpu::Select8),
     Word(cpu::Select16),
     Pic(pic::Select),
