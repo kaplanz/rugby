@@ -15,6 +15,7 @@
 //! ```
 
 #![warn(clippy::pedantic)]
+// Allowed lints: clippy
 #![allow(clippy::reversed_empty_ranges)]
 
 use std::ops::{Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive};
