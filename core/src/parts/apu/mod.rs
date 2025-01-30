@@ -5,6 +5,7 @@ use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Bitmask, Block, Byte, Shared};
 
+use super::timer;
 use crate::api::part::audio::Audio as Api;
 
 pub mod ch1;
@@ -18,6 +19,58 @@ pub mod ch4;
 ///
 /// [wave]: https://gbdev.io/pandocs/Audio_Registers.html#ff30ff3f--wave-pattern-ram
 pub type Wave = Ram<[Byte; 0x0010]>;
+
+/// Audio sequencer.
+///
+/// # Note
+///
+/// Also referred to as the frame sequencer, this determines how often each
+/// channel's features should be clocked. It is driven by [timer], specifically
+/// the falling edge of the [divider register](timer::reg::Div)'s bit 4.
+#[derive(Debug)]
+pub struct Sequencer {
+    /// `DIV[4]` last measured value.
+    ///
+    /// Used to detect the falling edge.
+    pub bit: bool,
+    /// `DIV-APU` sequence value.
+    ///
+    /// This will tick at approx. 512 Hz, with extra ticks potentially
+    /// occurring when the timer's divider is reset.
+    pub clk: u8,
+    /// Clock driver.
+    ///
+    /// Uses `DIV[4]` from the [timer].
+    pub div: Shared<timer::reg::Div>,
+}
+
+impl Sequencer {
+    /// Clocking bit to test.
+    ///
+    /// APU will clock a cycle whenever the masked bit falls.
+    const MASK: u8 = 0b0001_0000;
+}
+
+impl Block for Sequencer {
+    fn ready(&self) -> bool {
+        // Check for falling edge
+        let next = self.div.load() & Self::MASK != 0;
+        !self.bit && next
+    }
+
+    fn cycle(&mut self) {
+        // Fetch current clock bit
+        let next = self.div.load() & Self::MASK != 0;
+        // Check for falling edge
+        if !self.bit && next {
+            // Only tick the internal clock value on the falling edge of the
+            // timer's divider.
+            self.clk = self.clk.wrapping_add(1);
+        }
+        // Store current clock bit
+        self.bit = next;
+    }
+}
 
 /// Audio register select.
 ///
@@ -71,12 +124,14 @@ pub enum Select {
 }
 
 /// Audio processing unit.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Apu {
     /// Audio registers.
     pub reg: Control,
     /// Audio memory.
     pub mem: Bank,
+    /// Audio sequencer.
+    pub seq: Sequencer,
     /// Audio internals.
     pub etc: Internal,
 }
@@ -88,12 +143,12 @@ pub struct Internal {}
 impl Api for Apu {}
 
 impl Block for Apu {
-    fn ready(&self) -> bool {
-        true
-    }
-
     fn cycle(&mut self) {
-        todo!()
+        // Cycle frame sequencer
+        //
+        // This ensures we can detect falling edges as they occur. The frame
+        // sequencer is always cycled, even while the APU is disabled.
+        self.seq.cycle();
     }
 
     fn reset(&mut self) {
