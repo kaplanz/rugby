@@ -288,7 +288,7 @@ impl Memory for Ram {
     fn read(&self, addr: Word) -> Result<Byte> {
         // Error when disabled
         if self.ctl.ena.load() == 0 {
-            return Err(Error::Busy);
+            return Err(Error::Disabled);
         }
         // Perform adjusted read
         let index = self.adjust(addr);
@@ -298,7 +298,7 @@ impl Memory for Ram {
     fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
         // Error when disabled
         if self.ctl.ena.load() == 0 {
-            return Err(Error::Busy);
+            return Err(Error::Disabled);
         }
         // Perform adjusted write
         let index = self.adjust(addr);

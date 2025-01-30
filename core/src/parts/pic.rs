@@ -161,14 +161,6 @@ impl Default for Pic {
     }
 }
 
-impl Pic {
-    /// Constructs a new `Pic`.
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
 impl Block for Pic {
     fn reset(&mut self) {
         self.reg.reset();

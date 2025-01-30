@@ -68,7 +68,7 @@ fn bus_all_works() {
     // Video RAM
     (0x8000..=0x9fff).for_each(|addr| bus.write(addr, 0x03));
     (0x0000..=0x1fff)
-        .map(|addr: Word| emu.main.vram.read(addr).unwrap())
+        .map(|addr: Word| emu.main.mem.vram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x03));
     // External RAM
     if let Some(cart) = &emu.cart {
@@ -88,12 +88,12 @@ fn bus_all_works() {
     // Object memory
     (0xfe00..=0xfe9f).for_each(|addr| bus.write(addr, 0x05));
     (0x0000..=0x009f)
-        .map(|addr: Word| emu.main.soc.mem.oam.read(addr).unwrap())
+        .map(|addr: Word| emu.main.mem.oam.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x05));
-    // Controller
+    // Joypad
     (0xff00..=0xff00).for_each(|addr| bus.write(addr, 0x60));
     (0x0000..=0x0000) // NOTE: Only bits 0x30 are writable
-        .map(|addr| emu.main.soc.joy.con.read(addr).unwrap())
+        .map(|addr| emu.main.soc.joy.reg.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0xef));
     // Serial
     (0xff01..=0xff03).for_each(|addr| bus.write(addr, 0x07));
@@ -156,7 +156,7 @@ fn bus_all_works() {
     // High RAM
     (0xff80..=0xfffe).for_each(|addr| bus.write(addr, 0x0e));
     (0x0000..=0x007e)
-        .map(|addr: Word| emu.main.soc.mem.hram.read(addr).unwrap())
+        .map(|addr: Word| emu.main.mem.hram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x0e));
     // Interrupt enable
     (0xffff..=0xffff).for_each(|addr| bus.write(addr, 0x0f));
