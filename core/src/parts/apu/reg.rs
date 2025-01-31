@@ -217,3 +217,244 @@ impl Register for Nr50 {
         self.0 = value;
     }
 }
+
+/// Channel 1 sweep.
+///
+/// See more details [here][nr10].
+///
+/// [nr10]: https://gbdev.io/pandocs/Audio_Registers.html#ff10--nr10-channel-1-sweep
+#[bitfield(u8, order = msb)]
+pub struct Nr10 {
+    /// `NR10[7]`: Padding.
+    #[bits(1)]
+    __: u8,
+    /// `NR10[6:4]`: Pace of sweep iterations.
+    #[bits(3)]
+    pub pace: u8,
+    /// `NR10[3]`: Direction of sweep period.
+    ///
+    /// - `0`: increase period
+    /// - `1`: decrease period
+    #[bits(1)]
+    pub sign: bool,
+    /// `NR10[2:0]`: Individual step modifier.
+    #[bits(3)]
+    pub step: u8,
+}
+
+impl Nr10 {
+    /// Unusable bit mask.
+    const UNUSABLE: Byte = 0b1_000_0_000;
+}
+
+impl Memory for Nr10 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr10 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0 | Self::UNUSABLE
+    }
+
+    fn store(&mut self, mut value: Self::Value) {
+        value &= !Self::UNUSABLE;
+        self.0 = value;
+    }
+}
+
+/// Channel 1 length timer & duty cycle.
+///
+/// See more details [here][nr11].
+///
+/// [nr11]: https://gbdev.io/pandocs/Audio_Registers.html#ff11--nr11-channel-1-length-timer--duty-cycle
+#[bitfield(u8, order = msb)]
+pub struct Nr11 {
+    /// `NR11[7:6]`: Waveform duty cycle.
+    #[bits(2)]
+    pub duty: usize,
+    /// `NR11[5:0]`: Initial length timer. (Write-only)
+    #[bits(6)]
+    pub step: u8,
+}
+
+impl Nr11 {
+    /// Readable bit mask.
+    const READABLE: Byte = 0b11_000000;
+
+    /// Writable bit mask.
+    const WRITABLE: Byte = 0b11_111111;
+}
+
+impl Memory for Nr11 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr11 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0 | !Self::READABLE
+    }
+
+    fn store(&mut self, mut value: Self::Value) {
+        value &= Self::WRITABLE;
+        self.0 = value;
+    }
+}
+
+/// Channel 1 volume & envelope
+///
+/// See more details [here][nr12].
+///
+/// [nr12]: https://gbdev.io/pandocs/Audio_Registers.html#ff12--nr12-channel-1-volume--envelope
+#[bitfield(u8, order = msb)]
+pub struct Nr12 {
+    /// `NR12[7:4]`: Initial volume.
+    #[bits(4)]
+    pub ivol: u8,
+    /// `NR12[3]`: Envelope direction.
+    ///
+    /// - `0`: decrease volume
+    /// - `1`: increase volume
+    #[bits(1)]
+    pub sign: bool,
+    /// `NR12[2:0]`: Envelope pace.
+    #[bits(3)]
+    pub pace: u8,
+}
+
+impl Memory for Nr12 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr12 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0
+    }
+
+    fn store(&mut self, value: Self::Value) {
+        self.0 = value;
+    }
+}
+
+/// Channel 1 period low.
+///
+/// See more details [here][nr13].
+///
+/// [nr13]: https://gbdev.io/pandocs/Audio_Registers.html#ff13--nr13-channel-1-period-low-write-only
+#[bitfield(u8, order = msb)]
+pub struct Nr13 {
+    /// `NR13[7:0]`: Period low. (Write-only)
+    #[bits(8)]
+    pub clk_lo: u8,
+}
+
+impl Nr13 {
+    /// Readable bit mask.
+    const READABLE: Byte = 0b00000000;
+
+    /// Writable bit mask.
+    const WRITABLE: Byte = 0b11111111;
+}
+
+impl Memory for Nr13 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr13 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0 | !Self::READABLE
+    }
+
+    fn store(&mut self, mut value: Self::Value) {
+        value &= Self::WRITABLE;
+        self.0 = value;
+    }
+}
+
+/// Channel 1 period high & control.
+///
+/// See more details [here][nr14].
+///
+/// [nr14]: https://gbdev.io/pandocs/Audio_Registers.html#ff14--nr14-channel-1-period-high--control
+#[bitfield(u8, order = msb)]
+pub struct Nr14 {
+    /// `NR14[7]`: Channel trigger. (Write-only)
+    #[bits(1)]
+    pub trigger: bool,
+    /// `NR14[6]`: Length enable.
+    #[bits(1)]
+    pub length: bool,
+    /// `NR14[5:3]`: Padding.
+    #[bits(3)]
+    __: u8,
+    /// `NR14[2:0]`: Period high. (Write-only)
+    #[bits(3)]
+    pub clk_hi: u8,
+}
+
+impl Nr14 {
+    /// Readable bit mask.
+    const READABLE: Byte = 0b0_1_000_000;
+
+    /// Writable bit mask.
+    const WRITABLE: Byte = 0b1_1_000_111;
+}
+
+impl Memory for Nr14 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr14 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0 | !Self::READABLE
+    }
+
+    fn store(&mut self, mut value: Self::Value) {
+        value &= Self::WRITABLE;
+        self.0 = value;
+    }
+}
