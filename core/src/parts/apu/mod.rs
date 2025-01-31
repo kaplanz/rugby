@@ -138,7 +138,13 @@ pub struct Apu {
 
 /// Audio internals.
 #[derive(Debug, Default)]
-pub struct Internal {}
+pub struct Internal {
+    /// Master clock divider.
+    ///
+    /// While the APU is externally clocked at 4 MiHz, channels are clocked at
+    /// either 1 MiHz (CH1, CH2, CH4) or 2 MiHz (CH3).
+    div: u8,
+}
 
 impl Api for Apu {}
 
@@ -149,6 +155,9 @@ impl Block for Apu {
         // This ensures we can detect falling edges as they occur. The frame
         // sequencer is always cycled, even while the APU is disabled.
         self.seq.cycle();
+
+        // Cycle internal clock divider
+        self.etc.div = self.etc.div.wrapping_add(1);
     }
 
     fn reset(&mut self) {
