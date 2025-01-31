@@ -3,15 +3,19 @@
 use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Bitmask, Block, Byte, Shared};
+use rugby_arch::{Block, Byte, Shared};
 
 use super::timer;
 use crate::api::part::audio::Audio as Api;
+
+mod reg;
 
 pub mod ch1;
 pub mod ch2;
 pub mod ch3;
 pub mod ch4;
+
+pub use self::reg::*;
 
 /// Wave RAM.
 ///
@@ -150,6 +154,43 @@ impl Api for Apu {}
 
 impl Block for Apu {
     fn cycle(&mut self) {
+        // Check if the APU is enabled before clocking.
+        //
+        // Most of the APU's functionality isn't powered when disabled. However,
+        // some components (namely the NR52 register and the sequencer) are
+        // always active.
+        if self.reg.nr52.borrow().enable() {
+            // Frame sequencer
+            //
+            // Ticks at around 512 Hz. Used to sequence channel features.
+            if self.seq.ready() {
+                // Length: 256 Hz
+                //
+                // Ticks every even cycle.
+                if self.seq.clk & 0b001 == 0b000 {
+                    // TODO: Tick length timers
+                }
+                // Envelope: 64 Hz
+                //
+                // Ticks every 8 cycles, offset by 7.
+                if self.seq.clk & 0b111 == 0b111 {
+                    // TODO: Tick volume envelope
+                }
+                // CH1 Freq: 128 Hz
+                //
+                // Ticks every 4 cycles, offset by 2.
+                if self.seq.clk & 0b011 == 0b010 {
+                    // TODO: Tick frequency sweep
+                }
+            }
+
+            // TODO: Cycle channels
+        } else {
+            // When disabled, all registers are reset and in read-only mode. We
+            // can emulate this by constantly resetting these components.
+            self.reset();
+        }
+
         // Cycle frame sequencer
         //
         // This ensures we can detect falling edges as they occur. The frame
@@ -268,11 +309,11 @@ pub struct Bank {
 #[derive(Debug, Default)]
 pub struct Control {
     /// Audio master control.
-    pub nr52: Shared<Byte>,
+    pub nr52: Shared<Nr52>,
     /// Sound panning.
-    pub nr51: Shared<Byte>,
+    pub nr51: Shared<Nr51>,
     /// Master volume & VIN panning.
-    pub nr50: Shared<Byte>,
+    pub nr50: Shared<Nr50>,
     /// CH1 period sweep.
     pub nr10: Shared<Byte>,
     /// CH1 length timer & duty cycle.
@@ -370,177 +411,5 @@ impl Mmio for Control {
         bus.map(0xff21..=0xff21, self.nr42.clone().into());
         bus.map(0xff22..=0xff22, self.nr43.clone().into());
         bus.map(0xff23..=0xff23, self.nr44.clone().into());
-    }
-}
-
-/// Audio master control.
-///
-/// See more details [here][nr52].
-///
-/// [nr52]: https://gbdev.io/pandocs/Audio_Registers.html#ff26--nr52-audio-master-control
-#[derive(Clone, Copy, Debug)]
-pub enum Nr52 {
-    /// `NR52[7]`: Audio enable.
-    ///
-    /// This controls whether the APU is powered on at all (akin to [LCDC bit
-    /// 7][lcdc.7]). Turning the APU off drains less power (around 16%), but
-    /// clears all APU registers and makes them read-only until turned back on,
-    /// except NR521. Turning the APU off, however, does not affect [Wave
-    /// RAM](Wave), which can always be read/written, nor the [DIV-APU] counter.
-    ///
-    /// [lcdc.7]: super::ppu::Lcdc::Enable
-    Enable = 0b1000_0000,
-    /// `NR52[3]`: Channel 4 enabled. (Read-only)
-    ///
-    /// Allows checking whether this channel is active. Writing to this bit does
-    /// **not** enable or disable the channel.
-    Ch4Ena = 0b0000_1000,
-    /// `NR52[2]`: Channel 3 enabled. (Read-only)
-    ///
-    /// Allows checking whether this channel is active. Writing to this bit does
-    /// **not** enable or disable the channel.
-    Ch3Ena = 0b0000_0100,
-    /// `NR52[1]`: Channel 2 enabled. (Read-only)
-    ///
-    /// Allows checking whether this channel is active. Writing to this bit does
-    /// **not** enable or disable the channel.
-    Ch2Ena = 0b0000_0010,
-    /// `NR52[0]`: Channel 1 enabled. (Read-only)
-    ///
-    /// Allows checking whether this channel is active. Writing to this bit does
-    /// **not** enable or disable the channel.
-    Ch1Ena = 0b0000_0001,
-}
-
-impl Bitmask<Nr52> for Byte {
-    fn test(&self, mask: Nr52) -> bool {
-        let mask = mask as Self;
-        self & mask != 0
-    }
-
-    fn set(&mut self, mask: Nr52, value: bool) {
-        let mask = mask as Self;
-        let wide = !Byte::from(value).wrapping_sub(1);
-        *self ^= (*self ^ wide) & mask;
-    }
-}
-
-impl From<Nr52> for Byte {
-    fn from(value: Nr52) -> Self {
-        value as _
-    }
-}
-
-/// Sound panning.
-///
-/// Each channel can be panned hard left, center, hard right, or ignored
-/// entirely.
-///
-/// Setting a bit to 1 enables the channel to go into the selected output.
-///
-/// # Note
-///
-/// Selecting or de-selecting a channel whose [DAC] is enabled will [cause an audio
-/// pop][pop].
-///
-/// See more details [here][nr51].
-///
-/// [dac]:  https://gbdev.io/pandocs/Audio_details.html#dacs
-/// [pop]:  https://gbdev.io/pandocs/Audio_details.html#mixer
-/// [nr51]: https://gbdev.io/pandocs/Audio_Registers.html#ff25--nr51-sound-panning
-#[derive(Clone, Copy, Debug)]
-pub enum Nr51 {
-    /// `NR51[7]`: Channel 4 left.
-    Ch4L = 0b1000_0000,
-    /// `NR51[6]`: Channel 3 left.
-    Ch3L = 0b0100_0000,
-    /// `NR51[5]`: Channel 2 left.
-    Ch2L = 0b0010_0000,
-    /// `NR51[4]`: Channel 1 left.
-    Ch1L = 0b0001_0000,
-    /// `NR51[3]`: Channel 4 right.
-    Ch4R = 0b0000_1000,
-    /// `NR51[2]`: Channel 3 right.
-    Ch3R = 0b0000_0100,
-    /// `NR51[1]`: Channel 2 right.
-    Ch2R = 0b0000_0010,
-    /// `NR51[0]`: Channel 1 right.
-    Ch1R = 0b0000_0001,
-}
-
-impl Bitmask<Nr51> for Byte {
-    fn test(&self, mask: Nr51) -> bool {
-        let mask = mask as Self;
-        self & mask != 0
-    }
-
-    fn set(&mut self, mask: Nr51, value: bool) {
-        let mask = mask as Self;
-        let wide = !Byte::from(value).wrapping_sub(1);
-        *self ^= (*self ^ wide) & mask;
-    }
-}
-
-impl From<Nr51> for Byte {
-    fn from(value: Nr51) -> Self {
-        value as _
-    }
-}
-
-/// Master volume & VIN panning.
-///
-/// See more details [here][nr50].
-///
-/// [nr50]: https://gbdev.io/pandocs/Audio_Registers.html#ff24--nr50-master-volume--vin-panning
-#[derive(Clone, Copy, Debug)]
-pub enum Nr50 {
-    /// `NR50[7]`: VIN left.
-    ///
-    /// Work exactly like the bits in [NR51](Nr51). Should be set at 0 if
-    /// external sound hardware is not being used.
-    VinL = 0b1000_0000,
-    /// `NR50[6]`: Left volume.
-    ///
-    /// Specifies the master volume for the left output.
-    ///
-    /// # Note
-    ///
-    /// A value of 0 is treated as a volume of 1 (very quiet), and a value of 7
-    /// is treated as a volume of 8 (no volume reduction). Importantly, the
-    /// amplifier **never mutes** a non-silent input.
-    VolL = 0b0111_0000,
-    /// `NR50[5]`: VIN right.
-    ///
-    /// Work exactly like the bits in [NR51](Nr51). Should be set at 0 if
-    /// external sound hardware is not being used.
-    VinR = 0b0000_1000,
-    /// `NR50[0]`: Right volume.
-    ///
-    /// Specifies the master volume for the right output.
-    ///
-    /// # Note
-    ///
-    /// A value of 0 is treated as a volume of 1 (very quiet), and a value of 7
-    /// is treated as a volume of 8 (no volume reduction). Importantly, the
-    /// amplifier **never mutes** a non-silent input.
-    VolR = 0b0000_0111,
-}
-
-impl Bitmask<Nr50> for Byte {
-    fn test(&self, mask: Nr50) -> bool {
-        let mask = mask as Self;
-        self & mask != 0
-    }
-
-    fn set(&mut self, mask: Nr50, value: bool) {
-        let mask = mask as Self;
-        let wide = !Byte::from(value).wrapping_sub(1);
-        *self ^= (*self ^ wide) & mask;
-    }
-}
-
-impl From<Nr50> for Byte {
-    fn from(value: Nr50) -> Self {
-        value as _
     }
 }
