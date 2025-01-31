@@ -47,17 +47,25 @@ impl Chip {
         };
 
         // Audio processing unit
-        let apu = apu::Apu {
-            mem: apu::Bank {
-                wave: mem.wave.clone(),
-            },
-            reg: apu::Control::default(),
-            seq: apu::Sequencer {
-                bit: bool::default(),
-                clk: u8::default(),
-                div: tma.reg.div.clone(),
-            },
-            etc: apu::Internal::default(),
+        let apu = {
+            let reg = apu::Control::default();
+            apu::Apu {
+                mem: apu::Bank {
+                    wave: mem.wave.clone(),
+                },
+                ch1: apu::ch1::Channel {
+                    out: f32::default(),
+                    reg: apu::ch1::Control::with(&reg),
+                    etc: apu::ch1::Internal::default(),
+                },
+                reg,
+                seq: apu::Sequencer {
+                    bit: bool::default(),
+                    clk: u8::default(),
+                    div: tma.reg.div.clone(),
+                },
+                etc: apu::Internal::default(),
+            }
         };
         // Central processing unit
         let cpu = cpu::Cpu {

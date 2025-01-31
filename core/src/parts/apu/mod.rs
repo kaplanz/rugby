@@ -134,6 +134,8 @@ pub struct Apu {
     pub reg: Control,
     /// Audio memory.
     pub mem: Bank,
+    /// Channel 1.
+    pub ch1: ch1::Channel,
     /// Audio sequencer.
     pub seq: Sequencer,
     /// Audio internals.
@@ -168,23 +170,31 @@ impl Block for Apu {
                 //
                 // Ticks every even cycle.
                 if self.seq.clk & 0b001 == 0b000 {
-                    // TODO: Tick length timers
+                    // Tick length timers
+                    self.ch1.length();
                 }
                 // Envelope: 64 Hz
                 //
                 // Ticks every 8 cycles, offset by 7.
                 if self.seq.clk & 0b111 == 0b111 {
-                    // TODO: Tick volume envelope
+                    // Tick volume envelope
+                    self.ch1.volume();
                 }
                 // CH1 Freq: 128 Hz
                 //
                 // Ticks every 4 cycles, offset by 2.
                 if self.seq.clk & 0b011 == 0b010 {
-                    // TODO: Tick frequency sweep
+                    // Tick frequency sweep
+                    self.ch1.sweep();
                 }
             }
 
-            // TODO: Cycle channels
+            // Cycle channels
+            //
+            // Channel 1: 1 MiHz
+            if self.ch1.ready() && self.etc.div % 4 == 0 {
+                self.ch1.cycle();
+            }
         } else {
             // When disabled, all registers are reset and in read-only mode. We
             // can emulate this by constantly resetting these components.
@@ -197,11 +207,16 @@ impl Block for Apu {
         // sequencer is always cycled, even while the APU is disabled.
         self.seq.cycle();
 
+        // Update channel status
+        let mut nr52 = self.reg.nr52.borrow_mut();
+        nr52.set_ch1_on(self.ch1.ready());
+
         // Cycle internal clock divider
         self.etc.div = self.etc.div.wrapping_add(1);
     }
 
     fn reset(&mut self) {
+        self.ch1.reset();
         self.reg.reset();
     }
 }
@@ -315,15 +330,15 @@ pub struct Control {
     /// Master volume & VIN panning.
     pub nr50: Shared<Nr50>,
     /// CH1 period sweep.
-    pub nr10: Shared<Byte>,
+    pub nr10: Shared<Nr10>,
     /// CH1 length timer & duty cycle.
-    pub nr11: Shared<Byte>,
+    pub nr11: Shared<Nr11>,
     /// CH1 volume & envelope.
-    pub nr12: Shared<Byte>,
+    pub nr12: Shared<Nr12>,
     /// CH1 period low.
-    pub nr13: Shared<Byte>,
+    pub nr13: Shared<Nr13>,
     /// CH1 period high & control.
-    pub nr14: Shared<Byte>,
+    pub nr14: Shared<Nr14>,
     /// CH2 length timer & duty cycle.
     pub nr21: Shared<Byte>,
     /// CH2 volume & envelope.
