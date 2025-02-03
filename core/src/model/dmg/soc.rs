@@ -58,6 +58,11 @@ impl Chip {
                     reg: apu::ch1::Control::with(&reg),
                     etc: apu::ch1::Internal::default(),
                 },
+                ch2: apu::ch2::Channel {
+                    out: f32::default(),
+                    reg: apu::ch2::Control::with(&reg),
+                    etc: apu::ch2::Internal::default(),
+                },
                 reg,
                 seq: apu::Sequencer {
                     bit: bool::default(),
