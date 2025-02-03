@@ -458,3 +458,31 @@ impl Register for Nr14 {
         self.0 = value;
     }
 }
+
+/// Channel 2 length timer & duty cycle.
+///
+/// See more details [here][nr11].
+///
+/// [nr11]: https://gbdev.io/pandocs/Audio_Registers.html#ff11--nr11-channel-1-length-timer--duty-cycle
+pub type Nr21 = Nr11;
+
+/// Channel 2 volume & envelope
+///
+/// See more details [here][nr12].
+///
+/// [nr12]: https://gbdev.io/pandocs/Audio_Registers.html#ff12--nr12-channel-1-volume--envelope
+pub type Nr22 = Nr12;
+
+/// Channel 2 period low.
+///
+/// See more details [here][nr13].
+///
+/// [nr13]: https://gbdev.io/pandocs/Audio_Registers.html#ff13--nr13-channel-1-period-low-write-only
+pub type Nr23 = Nr13;
+
+/// Channel 2 period high & control.
+///
+/// See more details [here][nr14].
+///
+/// [nr14]: https://gbdev.io/pandocs/Audio_Registers.html#ff14--nr14-channel-1-period-high--control
+pub type Nr24 = Nr14;

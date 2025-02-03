@@ -136,6 +136,8 @@ pub struct Apu {
     pub mem: Bank,
     /// Channel 1.
     pub ch1: ch1::Channel,
+    /// Channel 2.
+    pub ch2: ch2::Channel,
     /// Audio sequencer.
     pub seq: Sequencer,
     /// Audio internals.
@@ -172,6 +174,7 @@ impl Block for Apu {
                 if self.seq.clk & 0b001 == 0b000 {
                     // Tick length timers
                     self.ch1.length();
+                    self.ch2.length();
                 }
                 // Envelope: 64 Hz
                 //
@@ -179,6 +182,7 @@ impl Block for Apu {
                 if self.seq.clk & 0b111 == 0b111 {
                     // Tick volume envelope
                     self.ch1.volume();
+                    self.ch2.volume();
                 }
                 // CH1 Freq: 128 Hz
                 //
@@ -195,6 +199,10 @@ impl Block for Apu {
             if self.ch1.ready() && self.etc.div % 4 == 0 {
                 self.ch1.cycle();
             }
+            // Channel 2: 1 MiHz
+            if self.ch2.ready() && self.etc.div % 4 == 0 {
+                self.ch2.cycle();
+            }
         } else {
             // When disabled, all registers are reset and in read-only mode. We
             // can emulate this by constantly resetting these components.
@@ -210,6 +218,7 @@ impl Block for Apu {
         // Update channel status
         let mut nr52 = self.reg.nr52.borrow_mut();
         nr52.set_ch1_on(self.ch1.ready());
+        nr52.set_ch2_on(self.ch2.ready());
 
         // Cycle internal clock divider
         self.etc.div = self.etc.div.wrapping_add(1);
@@ -217,6 +226,7 @@ impl Block for Apu {
 
     fn reset(&mut self) {
         self.ch1.reset();
+        self.ch2.reset();
         self.reg.reset();
     }
 }
@@ -340,13 +350,13 @@ pub struct Control {
     /// CH1 period high & control.
     pub nr14: Shared<Nr14>,
     /// CH2 length timer & duty cycle.
-    pub nr21: Shared<Byte>,
+    pub nr21: Shared<Nr21>,
     /// CH2 volume & envelope.
-    pub nr22: Shared<Byte>,
+    pub nr22: Shared<Nr22>,
     /// CH2 period low.
-    pub nr23: Shared<Byte>,
+    pub nr23: Shared<Nr23>,
     /// CH2 period high & control.
-    pub nr24: Shared<Byte>,
+    pub nr24: Shared<Nr24>,
     /// CH3 DAC enable.
     pub nr30: Shared<Byte>,
     /// CH3 length timer.
