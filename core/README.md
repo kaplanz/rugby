@@ -10,7 +10,8 @@ support for the Game Boy Color (CGB) is planned.
 ## Progress
 
 - [x] Implementation
-  - [ ] Audio (APU)
+  - [x] Audio (APU)
+    - [ ] Implementation accuracy
   - [x] Cartridge
     - [x] Save RAM to disk
     - [ ] Supported kinds
