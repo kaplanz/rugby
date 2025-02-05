@@ -140,6 +140,8 @@ pub struct Apu {
     pub ch2: ch2::Channel,
     /// Channel 3.
     pub ch3: ch3::Channel,
+    /// Channel 4.
+    pub ch4: ch4::Channel,
     /// Audio sequencer.
     pub seq: Sequencer,
     /// Audio internals.
@@ -178,6 +180,7 @@ impl Block for Apu {
                     self.ch1.length();
                     self.ch2.length();
                     self.ch3.length();
+                    self.ch4.length();
                 }
                 // Envelope: 64 Hz
                 //
@@ -186,6 +189,7 @@ impl Block for Apu {
                     // Tick volume envelope
                     self.ch1.volume();
                     self.ch2.volume();
+                    self.ch4.volume();
                 }
                 // CH1 Freq: 128 Hz
                 //
@@ -210,6 +214,10 @@ impl Block for Apu {
             if self.ch3.ready() && self.etc.div % 2 == 0 {
                 self.ch3.cycle();
             }
+            // Channel 4: 1 MiHz
+            if self.ch4.ready() && self.etc.div % 4 == 0 {
+                self.ch4.cycle();
+            }
         } else {
             // When disabled, all registers are reset and in read-only mode. We
             // can emulate this by constantly resetting these components.
@@ -227,6 +235,7 @@ impl Block for Apu {
         nr52.set_ch1_on(self.ch1.ready());
         nr52.set_ch2_on(self.ch2.ready());
         nr52.set_ch3_on(self.ch3.ready());
+        nr52.set_ch4_on(self.ch4.ready());
 
         // Cycle internal clock divider
         self.etc.div = self.etc.div.wrapping_add(1);
@@ -236,6 +245,7 @@ impl Block for Apu {
         self.ch1.reset();
         self.ch2.reset();
         self.ch3.reset();
+        self.ch4.reset();
         self.reg.reset();
     }
 }
@@ -377,13 +387,13 @@ pub struct Control {
     /// CH3 period high & control.
     pub nr34: Shared<Nr34>,
     /// CH4 length timer.
-    pub nr41: Shared<Byte>,
+    pub nr41: Shared<Nr41>,
     /// CH4 volume & envelope.
-    pub nr42: Shared<Byte>,
+    pub nr42: Shared<Nr42>,
     /// CH4 frequency & randomness.
-    pub nr43: Shared<Byte>,
+    pub nr43: Shared<Nr43>,
     /// CH4 control.
-    pub nr44: Shared<Byte>,
+    pub nr44: Shared<Nr44>,
 }
 
 impl Block for Control {
