@@ -310,7 +310,7 @@ impl Processor for Cpu {
 /// |:---------------:|--------|------|---------------|
 /// | `$C000..=$DFFF` |  8 KiB | WRAM | Work RAM      |
 /// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Bank {
     /// Work RAM.
     pub wram: Shared<Wram>,
