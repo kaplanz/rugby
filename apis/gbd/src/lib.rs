@@ -221,8 +221,8 @@ impl Debugger {
     ///
     /// Cannot panic.
     #[rustfmt::skip]
-    #[allow(clippy::enum_glob_use)]
     pub fn exec(&mut self, emu: &mut GameBoy, cmd: Command) -> Result<()> {
+        #[allow(clippy::enum_glob_use)]
         use Command::*;
 
         // Perform the command
@@ -415,7 +415,7 @@ pub trait Filter: Debug {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by a debugger command.
-#[allow(clippy::large_enum_variant)]
+#[expect(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum Error {
     /// Requested breakpoint could not be found.

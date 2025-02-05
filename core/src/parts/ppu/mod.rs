@@ -25,7 +25,6 @@ pub use self::meta::Color;
 ///
 /// Video frame refresh occurs every 70,224 clock cycles. When running at the
 /// full 4 MiHz, this equates to a frequency of ~59.7275 Hz.
-#[allow(clippy::doc_markdown)]
 pub const RATE: u32 = 70224;
 
 /// Display resolution.

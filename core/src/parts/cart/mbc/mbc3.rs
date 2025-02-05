@@ -16,7 +16,7 @@ pub struct Mbc3 {
     ctl: Control,
     rom: Shared<Rom>,
     ram: Shared<Ram>,
-    #[allow(unused)]
+    #[expect(unused)]
     rtc: Rtc,
 }
 

@@ -128,7 +128,7 @@ impl Channel {
 
         // A envelope iteration only happens when the envelope timer reaches
         // zero, otherwise, the volume is not modified.
-        #[allow(clippy::redundant_else)]
+        #[expect(clippy::redundant_else)]
         if let Some(len @ 1..) = self.etc.env.len.checked_sub(1) {
             // While still non-zero, simply decrement the sweep timer without
             // re-calculating or updating the frequency.

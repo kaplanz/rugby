@@ -152,7 +152,7 @@ mod tests {
     fn from_range_full_works() {
         let range = Wrange::from(..);
         let found = range.into_iter().collect::<Vec<i8>>();
-        #[allow(clippy::cast_possible_truncation)]
+        #[expect(clippy::cast_possible_truncation)]
         let truth: [_; 256] = std::array::from_fn(|i| (i as i8).wrapping_add(-128));
         assert_eq!(found, truth);
     }
