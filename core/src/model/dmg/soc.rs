@@ -48,11 +48,11 @@ impl Chip {
 
         // Audio processing unit
         let apu = {
+            let mem = apu::Bank {
+                wave: mem.wave.clone(),
+            };
             let reg = apu::Control::default();
             apu::Apu {
-                mem: apu::Bank {
-                    wave: mem.wave.clone(),
-                },
                 ch1: apu::ch1::Channel {
                     out: f32::default(),
                     reg: apu::ch1::Control::with(&reg),
@@ -63,7 +63,14 @@ impl Chip {
                     reg: apu::ch2::Control::with(&reg),
                     etc: apu::ch2::Internal::default(),
                 },
+                ch3: apu::ch3::Channel {
+                    out: f32::default(),
+                    reg: apu::ch3::Control::with(&reg),
+                    mem: mem.clone(),
+                    etc: apu::ch3::Internal::default(),
+                },
                 reg,
+                mem,
                 seq: apu::Sequencer {
                     bit: bool::default(),
                     clk: u8::default(),
