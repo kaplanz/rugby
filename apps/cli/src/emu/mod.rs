@@ -212,7 +212,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             #[expect(irrefutable_let_patterns)]
             if let audio = emu.inside().audio() {
                 // Fetch next sample
-                apu.push(audio.sample());
+                apu.push(audio.sample().mix());
                 // Filter to lower sample rate
                 if apu.len() >= freq / SAMPLE {
                     // Filter collected samples
