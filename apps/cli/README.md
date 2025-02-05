@@ -94,7 +94,7 @@ To list and get help with GBD, use the `help` command at the prompt or see its
 ## Progress
 
 - [x] Emulator
-  - [ ] Audio
+  - [x] Audio
   - [x] Joypad
     - [x] Keyboard inputs
     - [ ] Custom bindings
