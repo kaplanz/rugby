@@ -87,7 +87,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-#[allow(clippy::verbose_bit_mask)]
+#[expect(clippy::verbose_bit_mask)]
 fn execute(code: Byte, cpu: &mut Cpu, op1: Byte) -> Return {
     // Execute INC
     let res = op1.wrapping_add(1);
