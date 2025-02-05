@@ -6,7 +6,7 @@ use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Byte, Shared};
 
 use super::timer;
-use crate::api::part::audio::Audio as Api;
+use crate::api::part::audio::{Audio as Api, Sample};
 
 mod reg;
 
@@ -158,7 +158,40 @@ pub struct Internal {
     div: u8,
 }
 
-impl Api for Apu {}
+impl Api for Apu {
+    fn sample(&self) -> Sample {
+        // Extract control values
+        let nr50 = *self.reg.nr50.borrow();
+        let nr51 = *self.reg.nr51.borrow();
+
+        // Mix each channel's sample
+        let ch1 = Sample {
+            lt: nr51.ch1_l().then_some(self.ch1.out).unwrap_or_default(),
+            rt: nr51.ch1_r().then_some(self.ch1.out).unwrap_or_default(),
+        };
+        let ch2 = Sample {
+            lt: nr51.ch2_l().then_some(self.ch2.out).unwrap_or_default(),
+            rt: nr51.ch2_r().then_some(self.ch2.out).unwrap_or_default(),
+        };
+        let ch3 = Sample {
+            lt: nr51.ch3_l().then_some(self.ch3.out).unwrap_or_default(),
+            rt: nr51.ch3_r().then_some(self.ch3.out).unwrap_or_default(),
+        };
+        let ch4 = Sample {
+            lt: nr51.ch4_l().then_some(self.ch4.out).unwrap_or_default(),
+            rt: nr51.ch4_r().then_some(self.ch4.out).unwrap_or_default(),
+        };
+
+        // Combine mixed channels
+        let mix = [ch1, ch2, ch3, ch4].into_iter().sum::<Sample>() / 4.;
+
+        // Scale channel volumes
+        Sample {
+            lt: mix.lt * (f32::from(nr50.vol_l()) / 7.),
+            rt: mix.rt * (f32::from(nr50.vol_r()) / 7.),
+        }
+    }
+}
 
 impl Block for Apu {
     fn cycle(&mut self) {
