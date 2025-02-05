@@ -138,6 +138,8 @@ pub struct Apu {
     pub ch1: ch1::Channel,
     /// Channel 2.
     pub ch2: ch2::Channel,
+    /// Channel 3.
+    pub ch3: ch3::Channel,
     /// Audio sequencer.
     pub seq: Sequencer,
     /// Audio internals.
@@ -175,6 +177,7 @@ impl Block for Apu {
                     // Tick length timers
                     self.ch1.length();
                     self.ch2.length();
+                    self.ch3.length();
                 }
                 // Envelope: 64 Hz
                 //
@@ -203,6 +206,10 @@ impl Block for Apu {
             if self.ch2.ready() && self.etc.div % 4 == 0 {
                 self.ch2.cycle();
             }
+            // Channel 3: 2 MiHz
+            if self.ch3.ready() && self.etc.div % 2 == 0 {
+                self.ch3.cycle();
+            }
         } else {
             // When disabled, all registers are reset and in read-only mode. We
             // can emulate this by constantly resetting these components.
@@ -219,6 +226,7 @@ impl Block for Apu {
         let mut nr52 = self.reg.nr52.borrow_mut();
         nr52.set_ch1_on(self.ch1.ready());
         nr52.set_ch2_on(self.ch2.ready());
+        nr52.set_ch3_on(self.ch3.ready());
 
         // Cycle internal clock divider
         self.etc.div = self.etc.div.wrapping_add(1);
@@ -227,6 +235,7 @@ impl Block for Apu {
     fn reset(&mut self) {
         self.ch1.reset();
         self.ch2.reset();
+        self.ch3.reset();
         self.reg.reset();
     }
 }
@@ -298,7 +307,7 @@ impl Port<Byte> for Apu {
 /// |     Address     | Size | Name | Description |
 /// |:---------------:|------|------|-------------|
 /// | `$FF30..=$FF3F` | 16 B | WAVE | Wave RAM    |
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct Bank {
     /// Wave RAM.
     pub wave: Shared<Wave>,
@@ -358,15 +367,15 @@ pub struct Control {
     /// CH2 period high & control.
     pub nr24: Shared<Nr24>,
     /// CH3 DAC enable.
-    pub nr30: Shared<Byte>,
+    pub nr30: Shared<Nr30>,
     /// CH3 length timer.
-    pub nr31: Shared<Byte>,
+    pub nr31: Shared<Nr31>,
     /// CH3 output level.
-    pub nr32: Shared<Byte>,
+    pub nr32: Shared<Nr32>,
     /// CH3 period low.
-    pub nr33: Shared<Byte>,
+    pub nr33: Shared<Nr33>,
     /// CH3 period high & control.
-    pub nr34: Shared<Byte>,
+    pub nr34: Shared<Nr34>,
     /// CH4 length timer.
     pub nr41: Shared<Byte>,
     /// CH4 volume & envelope.
