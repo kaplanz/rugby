@@ -80,7 +80,7 @@ impl Mul<f32> for Sample {
 impl Div<f32> for Sample {
     type Output = Self;
 
-    #[allow(clippy::suspicious_arithmetic_impl)]
+    #[expect(clippy::suspicious_arithmetic_impl)]
     fn div(self, rhs: f32) -> Self::Output {
         self * rhs.recip()
     }

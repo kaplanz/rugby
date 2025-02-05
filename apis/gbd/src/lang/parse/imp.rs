@@ -13,8 +13,8 @@ use wrange::Wrange;
 
 use super::{Command, Keyword, Result, Rule, Select, Serial, Tick, Value};
 
-#[allow(clippy::cast_sign_loss)]
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::cast_sign_loss)]
+#[expect(clippy::too_many_lines)]
 pub fn command(input: Pair<Rule>) -> Result<Command> {
     // Extract keyword and args
     let rule = input.as_rule();
@@ -339,7 +339,7 @@ where
 }
 
 #[rustfmt::skip]
-#[allow(clippy::needless_pass_by_value)]
+#[expect(clippy::needless_pass_by_value)]
 pub fn keyword(pair: Pair<Rule>) -> Result<Keyword> {
     // Extract the keyword rule
     Ok(match pair.as_rule() {

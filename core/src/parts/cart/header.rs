@@ -58,7 +58,7 @@ pub fn gchk(rom: &[Byte]) -> Word {
 /// Information about the ROM and the cartridge containing it. Stored in the
 /// address range `[$0100, $0150)`.
 #[derive(Debug, Eq, PartialEq)]
-#[allow(clippy::struct_excessive_bools)]
+#[expect(clippy::struct_excessive_bools)]
 pub struct Header {
     /// `[$0104..=$0133]`: Nintendo logo.
     ///
@@ -566,7 +566,7 @@ impl Display for Info {
 impl TryFrom<Byte> for Info {
     type Error = Error;
 
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     #[rustfmt::skip]
     fn try_from(value: Byte) -> Result<Self, Self::Error> {
         match value {

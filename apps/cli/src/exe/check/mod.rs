@@ -15,7 +15,7 @@ pub use self::cli::Cli;
 pub const NAME: &str = concat!(crate::NAME, "-check");
 
 /// [`Check`](crate::cli::Command::Check) entrypoint.
-#[allow(clippy::needless_pass_by_value)]
+#[expect(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
     // Initialize logger
     crate::log::init(None).context("logger initialization failed")?;

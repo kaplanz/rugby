@@ -196,7 +196,7 @@ pub mod reg {
 
     impl Div {
         /// Gets the internal clock (lower 8-bits).
-        #[allow(unused)]
+        #[expect(unused)]
         #[must_use]
         pub(super) fn clk(&self) -> Byte {
             self.0.load().to_le_bytes()[0]
@@ -374,7 +374,7 @@ pub mod reg {
     }
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 #[cfg(test)]
 mod tests {
     use super::*;
