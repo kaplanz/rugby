@@ -104,7 +104,7 @@ impl Register for Control {
     }
 }
 /// Boot memory bank.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Bank {
     /// Boot ROM.
     pub boot: Boot,

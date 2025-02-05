@@ -281,7 +281,7 @@ impl Port<Byte> for Ppu {
 /// |:---------------:|--------|------|---------------|
 /// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
 /// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Bank {
     /// Video RAM.
     pub vram: Shared<Vram>,
