@@ -69,6 +69,11 @@ impl Chip {
                     mem: mem.clone(),
                     etc: apu::ch3::Internal::default(),
                 },
+                ch4: apu::ch4::Channel {
+                    out: f32::default(),
+                    reg: apu::ch4::Control::with(&reg),
+                    etc: apu::ch4::Internal::default(),
+                },
                 reg,
                 mem,
                 seq: apu::Sequencer {
