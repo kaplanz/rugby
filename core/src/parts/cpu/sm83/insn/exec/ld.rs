@@ -7,7 +7,7 @@ pub const fn default() -> Operation {
     Operation::Ld(Ld::Fetch)
 }
 
-#[allow(unused)]
+#[expect(unused)]
 #[derive(Clone, Debug, Default)]
 pub enum Ld {
     #[default]

@@ -30,7 +30,7 @@ impl Index<usize> for Palette {
     }
 }
 
-#[allow(clippy::unreadable_literal)]
+#[expect(clippy::unreadable_literal)]
 mod decl {
     use super::{Color, Palette};
 

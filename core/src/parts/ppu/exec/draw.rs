@@ -72,7 +72,7 @@ impl Ppu {
             Palette::Obp1 => self.reg.obp1.load(),
         };
         // Assign colors using palette
-        #[allow(clippy::identity_op)]
+        #[expect(clippy::identity_op)]
         let col = Color::from(match pixel.col {
             Color::C0 => (0b0000_0011 & pal) >> 0,
             Color::C1 => (0b0000_1100 & pal) >> 2,

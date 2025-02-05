@@ -19,7 +19,6 @@ pub struct Cli {
     pub feat: Features,
 
     /// Configuration options.
-    #[allow(private_interfaces)]
     #[clap(flatten)]
     pub cfg: Settings,
 
