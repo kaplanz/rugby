@@ -350,7 +350,7 @@ impl Port<Byte> for Apu {
 /// |     Address     | Size | Name | Description |
 /// |:---------------:|------|------|-------------|
 /// | `$FF30..=$FF3F` | 16 B | WAVE | Wave RAM    |
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct Bank {
     /// Wave RAM.
     pub wave: Shared<Wave>,
