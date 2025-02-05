@@ -231,7 +231,7 @@ pub fn loads(emu: &GameBoy, locs: Vec<Select>) -> Result<()> {
     locs.into_iter().try_for_each(|loc| load(emu, loc))
 }
 
-#[allow(clippy::needless_pass_by_value)]
+#[expect(clippy::needless_pass_by_value)]
 pub fn load(emu: &GameBoy, loc: Select) -> Result<()> {
     // Perform the load
     match loc {
@@ -356,13 +356,13 @@ pub fn step(gbd: &mut Debugger, many: Option<usize>) -> Result<()> {
     Ok(())
 }
 
-#[allow(clippy::needless_pass_by_value)]
+#[expect(clippy::needless_pass_by_value)]
 pub fn stores(emu: &mut GameBoy, locs: Vec<Select>, value: Value) -> Result<()> {
     locs.into_iter()
         .try_for_each(|loc| store(emu, loc, value.clone()))
 }
 
-#[allow(clippy::needless_pass_by_value)]
+#[expect(clippy::needless_pass_by_value)]
 pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
     let soc = &mut emu.main.soc;
     match loc {

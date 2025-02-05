@@ -17,7 +17,7 @@ pub struct Program(VecDeque<Command>);
 
 impl Program {
     /// Constructs a new `Program`.
-    #[allow(unused)]
+    #[expect(unused)]
     pub fn new(prog: impl Iterator<Item = Command>) -> Self {
         Self(prog.collect())
     }

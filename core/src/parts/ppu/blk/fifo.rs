@@ -6,7 +6,7 @@ use super::meta::{Meta, Pixel, Row};
 #[derive(Clone, Debug, Default)]
 pub struct Fifo(VecDeque<Pixel>);
 
-#[allow(unused)]
+#[expect(unused)]
 impl Fifo {
     /// Constructs a new `Fifo`.
     pub fn new() -> Self {
@@ -19,7 +19,7 @@ impl Fifo {
     }
 
     /// Pushes a row of pixels into the FIFO.
-    #[allow(clippy::needless_pass_by_value)]
+    #[expect(clippy::needless_pass_by_value)]
     pub fn push(&mut self, row: Row, meta: Meta) {
         let iter = std::mem::take(&mut self.0)
             .into_iter()
