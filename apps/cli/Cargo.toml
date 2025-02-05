@@ -26,6 +26,7 @@ derive_more = { version = "1.0.0", features = ["display"] }
 either = { workspace = true }
 log = { workspace = true }
 minifb = "0.27.0"
+ringbuf = "0.4.7"
 rugby = { workspace = true }
 rugby-cfg = { workspace = true, features = ["clap", "serde", "toml"] }
 rugby-gbd = { workspace = true, optional = true }
@@ -35,6 +36,7 @@ supports-color = "3.0.2"
 sysexits = "0.8.5"
 tempfile = "3.15.0"
 thiserror = { workspace = true }
+tinyaudio = "1.1.0"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 xdir = { workspace = true }
 
