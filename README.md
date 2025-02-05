@@ -146,6 +146,10 @@ project below.
   - Used extensively for the initial PPU and timer implementations.
 - [Nitty Gritty Gameboy Cycle Timing][nitty]: Down and dirty timing of the Game
   Boy's video hardware.
+- [GhostSonic's Sound Emulation Comment][gsonic]: Detailed comment discussing
+  implementing and emulating the APU.
+- [Game Boy Sound Emulation][ns256]: A short article on the Game Boy sound
+  hardware with the perspective of emulating it.
 
 ### Hardware
 
@@ -215,7 +219,9 @@ chosen license.
 [gbdev]:     https://gbdev.io
 [gbedg]:     https://hacktix.github.io/GBEDG/
 [gekkio]:    https://gekkio.fi
+[gsonic]:    https://www.reddit.com/r/EmuDev/comments/5gkwi5/comment/dat3zni
 [nitty]:     http://blog.kevtris.org/blogfiles/Nitty%20Gritty%20Gameboy%20VRAM%20Timing.txt
+[ns256]:     https://nightshade256.github.io/2021/03/27/gb-sound-emulation.html
 [pandocs]:   https://gbdev.io/pandocs/
 
 <!-- Attribution -->
