@@ -40,10 +40,10 @@ impl FromStr for Program {
 }
 
 #[rustfmt::skip]
-#[allow(clippy::enum_glob_use)]
-#[allow(clippy::match_same_arms)]
+#[expect(clippy::match_same_arms)]
 impl Display for Rule {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        #[allow(clippy::enum_glob_use)]
         use Rule::*;
 
         match self {
@@ -81,7 +81,7 @@ impl Display for Rule {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by parsing debugger commands.
-#[allow(clippy::large_enum_variant)]
+#[expect(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum Error {
     /// Internal parsing error.

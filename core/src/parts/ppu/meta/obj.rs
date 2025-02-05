@@ -52,7 +52,7 @@ impl From<[Byte; 4]> for Sprite {
 /// - `X` is the x-flip flag.
 /// - `Y` is the y-flip flag.
 /// - `Z` is the priority flag.
-#[allow(clippy::struct_excessive_bools)]
+#[expect(clippy::struct_excessive_bools)]
 #[derive(Clone, Debug)]
 pub struct Attributes {
     /// Priority flag.
