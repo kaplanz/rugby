@@ -68,7 +68,7 @@ impl Debug {
     }
 
     /// Renders tile data as pixels.
-    #[allow(clippy::unnecessary_box_returns)]
+    #[expect(clippy::unnecessary_box_returns)]
     fn render<const N: usize>(
         tdat: &[Tile],
         ppu: &Ppu,

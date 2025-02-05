@@ -44,7 +44,7 @@ mod select {
     }
 
     /// Blend background and sprite pixels.
-    #[allow(clippy::if_same_then_else)]
+    #[expect(clippy::if_same_then_else)]
     #[must_use]
     pub fn blend(bgw: Pixel, obj: Pixel) -> Pixel {
         // Pixels are blended as follows:

@@ -41,7 +41,7 @@ pub const DIVIDER: u32 = 0x100;
 pub const SAMPLE: usize = 96_000;
 
 // Emulator main.
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> {
     // Instantiate emulator
     let mut emu = init::emu(&args.cfg.data).context("startup sequence failed")?;
@@ -209,7 +209,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             // Cycle emulator
             emu.cycle();
             // Sample audio output
-            #[allow(irrefutable_let_patterns)]
+            #[expect(irrefutable_let_patterns)]
             if let audio = emu.inside().audio() {
                 // Fetch next sample
                 apu.push(audio.sample());
@@ -219,7 +219,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
                     let len = apu.len();
                     // Average using mean
                     let sum = apu.drain(..).sum::<Sample>();
-                    #[allow(clippy::cast_precision_loss)]
+                    #[expect(clippy::cast_precision_loss)]
                     let avg = sum / len as f32;
                     // Send sample to device
                     wave.lock().unwrap().push_overwrite(avg);
