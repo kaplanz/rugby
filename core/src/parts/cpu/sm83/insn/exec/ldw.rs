@@ -7,7 +7,7 @@ pub const fn default() -> Operation {
     Operation::Ldw(Ldw::Fetch)
 }
 
-#[allow(unused)]
+#[expect(unused)]
 #[derive(Clone, Debug, Default)]
 pub enum Ldw {
     #[default]
@@ -47,7 +47,7 @@ impl From<Ldw> for Operation {
 
 fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     // Check opcode
-    #[allow(clippy::match_same_arms)]
+    #[expect(clippy::match_same_arms)]
     match code {
         // LD r16, n16
         0x01 | 0x11 | 0x21 | 0x31 => {

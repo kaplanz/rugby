@@ -12,7 +12,7 @@ use crate::Word;
 #[derive(Debug, Default)]
 pub(super) struct Map(BTreeMap<Word, IndexSet<Entry>>);
 
-#[allow(unused)]
+#[expect(unused)]
 impl Map {
     /// Constructs a new `Map`.
     pub fn new() -> Self {
@@ -85,7 +85,7 @@ impl Entry {
         *self.range.end() - *self.range.start()
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
+    #[expect(clippy::trivially_copy_pass_by_ref)]
     fn contains(&self, addr: &Word) -> bool {
         self.range.contains(addr)
     }
