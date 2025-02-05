@@ -103,8 +103,8 @@ impl Clock {
     }
 
     /// Converts a period into a frequency.
-    #[allow(clippy::cast_possible_truncation)]
-    #[allow(clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_sign_loss)]
     fn to_freq(period: Duration) -> u32 {
         period.as_secs_f64().recip().round() as u32
     }

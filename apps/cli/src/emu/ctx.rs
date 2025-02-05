@@ -75,7 +75,7 @@ pub struct Counter {
     pub delta: u32,
 }
 
-#[allow(unused)]
+#[expect(unused)]
 impl Counter {
     /// Constructs a new `Counter`.
     pub fn new() -> Self {
@@ -84,7 +84,7 @@ impl Counter {
 
     /// Gets the absolute cycle number.
     pub fn cycle(&self) -> u32 {
-        #[allow(clippy::cast_possible_truncation)]
+        #[expect(clippy::cast_possible_truncation)]
         (self.cycle as u32).wrapping_add(self.delta)
     }
 
@@ -128,7 +128,7 @@ pub struct Stats {
     rate: f64,
 }
 
-#[allow(unused)]
+#[expect(unused)]
 impl Stats {
     /// Gets the emulated clock frequency.
     pub fn freq(&self) -> f64 {

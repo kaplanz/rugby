@@ -35,7 +35,7 @@ pub use crate::parts::{apu, boot, cart, dma, joypad, pic, ppu, serial, timer};
 /// Clock frequency.
 ///
 /// Crystal oscillator frequency of 4 KiHz.
-#[allow(clippy::doc_markdown)]
+#[expect(clippy::doc_markdown)]
 pub const FREQ: u32 = 4_194_304;
 
 pub use self::ppu::LCD;
@@ -89,7 +89,7 @@ impl GameBoy {
         let cpu = &mut self.main.soc.cpu;
 
         // Initialize registers
-        #[allow(clippy::items_after_statements)]
+        #[expect(clippy::items_after_statements)]
         type Select = <Cpu as Port<Word>>::Select;
         cpu.store(Select::AF, 0x01b0_u16);
         cpu.store(Select::BC, 0x0013_u16);

@@ -8,7 +8,7 @@ use crate::gui::Frontend;
 
 impl Frontend {
     /// Render debug windows.
-    #[allow(clippy::needless_pass_by_value)]
+    #[expect(clippy::needless_pass_by_value)]
     pub fn vram(&mut self, data: ppu::dbg::Debug) -> Result<()> {
         // Extract GUI
         let Some(gui) = self.win.as_mut() else {
@@ -53,7 +53,7 @@ pub struct Vram {
     pub map2: Option<Window<Map2>>,
 }
 
-#[allow(unused)]
+#[expect(unused)]
 impl Vram {
     /// Constructs a new `Debug`.
     pub fn new() -> Result<Self> {

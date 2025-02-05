@@ -14,7 +14,7 @@ pub use self::cli::Cli;
 pub const NAME: &str = concat!(crate::NAME, "-gen");
 
 /// [`Gen`](crate::cli::Command::Gen) entrypoint.
-#[allow(clippy::needless_pass_by_value)]
+#[expect(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
     // Initialize logger
     crate::log::init(None).context("logger initialization failed")?;
@@ -74,7 +74,7 @@ pub mod cmp {
     }
 
     /// Generate shell completions.
-    #[allow(clippy::unnecessary_wraps)]
+    #[expect(clippy::unnecessary_wraps)]
     pub fn gen(shell: Shell, mut cmd: Command, mut buf: impl Write) -> Result<()> {
         clap_complete::generate(shell, &mut cmd, NAME, &mut buf);
         Ok(()) // unconditionally succeed
