@@ -1,18 +1,24 @@
 //! Emulator thread.
 
 use std::mem;
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use anyhow::{Context as _, Result};
 use log::{debug, trace};
+use ringbuf::traits::{Consumer, RingBuffer};
+use ringbuf::LocalRb as Ring;
 use rugby::arch::Block;
 #[cfg(feature = "win")]
 use rugby::core::dmg;
 #[cfg(feature = "log")]
 use rugby::core::dmg::cpu;
+use rugby::core::dmg::FREQ;
+use rugby::emu::part::audio::{Audio, Sample};
 use rugby::emu::part::joypad::Joypad;
 use rugby::emu::part::video::Video;
 use rugby::prelude::Core;
+use rugby_cfg::opt::app::Speed;
 
 use self::ctx::Context;
 use self::msg::{Data, Sync};
@@ -30,6 +36,9 @@ pub use self::msg::Message;
 /// As an optimization for more efficient synchronization, divide the target
 /// frequency by this number, but clock this number as many cycles each time.
 pub const DIVIDER: u32 = 0x100;
+
+/// Audio sample rate.
+pub const SAMPLE: usize = 96_000;
 
 // Emulator main.
 #[allow(clippy::too_many_lines)]
@@ -54,10 +63,50 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
         .transpose()
         .context("tracelog initialization failed")?;
 
+    // Audio loop
+    let (mut audio, wave) = {
+        // Define output device parameters
+        let params = tinyaudio::OutputDeviceParameters {
+            channels_count: 2,
+            sample_rate: SAMPLE,
+            channel_sample_count: SAMPLE / 10,
+        };
+
+        // Define audio wave source and sink
+        let wave = Arc::new(Mutex::new(Ring::new(0x8000)));
+        let sink = wave.clone();
+
+        // Run output device loop
+        let audio = tinyaudio::run_output_device(params, move |data| {
+            for samples in data.chunks_mut(params.channels_count) {
+                // Recieve audio sample
+                let sample: Sample = sink.lock().unwrap().try_pop().unwrap_or_default();
+                // Update channel values
+                let [lt, rt] = samples else {
+                    panic!("incorrect number of audio channels")
+                };
+                *lt = sample.lt;
+                *rt = sample.rt;
+            }
+        })
+        .unwrap();
+
+        (audio, wave)
+    };
+
     // Emulator loop
     let mut res = (|| -> Result<()> {
         // Initialize context
         let mut ctx = Context::new(&args.cfg.data);
+        let mut apu = Vec::<Sample>::new();
+        let freq = args
+            .cfg
+            .data
+            .app
+            .spd
+            .as_ref()
+            .and_then(Speed::freq)
+            .unwrap_or(FREQ) as usize;
         // Await initial start
         ctx.pause();
 
@@ -159,6 +208,23 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             }
             // Cycle emulator
             emu.cycle();
+            // Sample audio output
+            #[allow(irrefutable_let_patterns)]
+            if let audio = emu.inside().audio() {
+                // Fetch next sample
+                apu.push(audio.sample());
+                // Filter to lower sample rate
+                if apu.len() >= freq / SAMPLE {
+                    // Filter collected samples
+                    let len = apu.len();
+                    // Average using mean
+                    let sum = apu.drain(..).sum::<Sample>();
+                    #[allow(clippy::cast_precision_loss)]
+                    let avg = sum / len as f32;
+                    // Send sample to device
+                    wave.lock().unwrap().push_overwrite(avg);
+                }
+            }
             // Send video frame
             let video = emu.inside().video();
             if video.vsync() && {
@@ -206,6 +272,9 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             }
         }
     })(); // NOTE: This weird syntax is in lieu of using unstable try blocks.
+
+    // Close audio device
+    audio.close();
 
     // Destroy emulator
     drop::emu(emu, &args.cfg.data).context("shutdown sequence failed")?;
