@@ -93,6 +93,10 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
 
         (audio, wave)
     };
+    // Disable audio when headless
+    if args.feat.headless {
+        audio.close();
+    }
 
     // Emulator loop
     let mut res = (|| -> Result<()> {
