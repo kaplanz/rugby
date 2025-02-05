@@ -727,3 +727,148 @@ impl Register for Nr34 {
         self.0 = value;
     }
 }
+
+/// Channel 4 length timer.
+///
+/// See more details [here][nr41].
+///
+/// [nr41]: https://gbdev.io/pandocs/Audio_Registers.html#ff20--nr41-channel-4-length-timer-write-only
+#[bitfield(u8, order = msb)]
+pub struct Nr41 {
+    /// `NR11[7:6]`: Padding.
+    #[bits(2)]
+    __: u8,
+    /// `NR11[5:0]`: Initial length timer. (Write-only)
+    #[bits(6)]
+    pub step: u8,
+}
+
+impl Nr41 {
+    /// Readable bit mask.
+    const READABLE: Byte = 0b00_000000;
+
+    /// Writable bit mask.
+    const WRITABLE: Byte = 0b00_111111;
+}
+
+impl Memory for Nr41 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr41 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0 | !Self::READABLE
+    }
+
+    fn store(&mut self, mut value: Self::Value) {
+        value &= Self::WRITABLE;
+        self.0 = value;
+    }
+}
+
+/// Channel 4 volume & envelope
+///
+/// See more details [here][nr42].
+///
+/// [nr42]: https://gbdev.io/pandocs/Audio_Registers.html#ff21--nr42-channel-4-volume--envelope
+pub type Nr42 = Nr12;
+
+/// Channel 4 frequency & randomness.
+///
+/// See more details [here][nr43].
+///
+/// [nr43]: https://gbdev.io/pandocs/Audio_Registers.html#ff22--nr43-channel-4-frequency--randomness
+#[bitfield(u8, order = msb)]
+pub struct Nr43 {
+    /// `NR43[7:4]`: Clock shift.
+    #[bits(4)]
+    pub shift: u8,
+    /// `NR43[3]`: LFSR width.
+    #[bits(1)]
+    pub width: bool,
+    /// `NR43[2:0]`: Clock divider.
+    #[bits(3)]
+    pub divide: u8,
+}
+
+impl Memory for Nr43 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr43 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0
+    }
+
+    fn store(&mut self, value: Self::Value) {
+        self.0 = value;
+    }
+}
+
+/// Channel 4 control.
+///
+/// See more details [here][nr44].
+///
+/// [nr44]: https://gbdev.io/pandocs/Audio_Registers.html#ff23--nr44-channel-4-control
+#[bitfield(u8, order = msb)]
+pub struct Nr44 {
+    /// `NR44[7]`: Channel trigger. (Write-only)
+    #[bits(1)]
+    pub trigger: bool,
+    /// `NR44[6]`: Length enable.
+    #[bits(1)]
+    pub length: bool,
+    /// `NR44[5:0]`: Padding.
+    #[bits(6)]
+    __: u8,
+}
+
+impl Nr44 {
+    /// Readable bit mask.
+    const READABLE: Byte = 0b0_1_000000;
+
+    /// Writable bit mask.
+    const WRITABLE: Byte = 0b1_1_000000;
+}
+
+impl Memory for Nr44 {
+    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        self.store(data);
+        Ok(())
+    }
+}
+
+impl Register for Nr44 {
+    type Value = Byte;
+
+    fn load(&self) -> Self::Value {
+        self.0 | !Self::READABLE
+    }
+
+    fn store(&mut self, mut value: Self::Value) {
+        value &= Self::WRITABLE;
+        self.0 = value;
+    }
+}
