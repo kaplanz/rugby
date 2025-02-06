@@ -10,7 +10,5 @@ license = { workspace = true }
 
 [dependencies]
 indexmap = "2.7.0"
-log = { workspace = true }
-num = { workspace = true }
 rand = "0.8.5"
 thiserror = { workspace = true }

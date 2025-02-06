@@ -1679,8 +1679,6 @@ name = "rugby-arch"
 version = "0.1.0"
 dependencies = [
  "indexmap 2.7.0",
- "log",
- "num",
  "rand",
  "thiserror 2.0.11",
 ]
@@ -1717,7 +1715,6 @@ dependencies = [
  "rugby-cfg",
  "rugby-gbd",
  "rustyline",
- "serde",
  "supports-color",
  "sysexits",
  "tempfile",
@@ -1778,7 +1775,6 @@ dependencies = [
  "console_log",
  "getrandom",
  "js-sys",
- "log",
  "rugby",
  "wasm-bindgen",
  "wasm-bindgen-test",
