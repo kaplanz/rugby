@@ -46,8 +46,8 @@ advise = "0.1.0"
 anyhow = "1.0.95"
 bfmt = { version = "0.1.0", path = "crates/bfmt" }
 chex = { version = "0.1.0", path = "crates/chex" }
-clap = { version = "4.5.26", features = ["derive"] }
-constcat = "0.5.1"
+clap = { version = "4.5.28", features = ["derive"] }
+constcat = "0.6.0"
 either = "1.13.0"
 hexd = { version = "0.1.0", path = "crates/hexd" }
 itertools = "0.14.0"
@@ -61,6 +61,6 @@ rugby-core = { version = "0.1.0", path = "core" }
 rugby-gbd = { version = "0.1.0", path = "apis/gbd" }
 serde = { version = "1.0.217", features = ["derive"] }
 thiserror = "2.0.11"
-toml = "0.8.19"
+toml = "0.8.20"
 wrange = { version = "0.1.0", path = "crates/wrange" }
 xdir = "0.1.0"
