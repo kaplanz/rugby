@@ -17,7 +17,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 console_log = "1.0.0"
-getrandom = { version = "0.2.15", features = ["js"] }
+getrandom = { version = "0.3.1", features = ["wasm_js"] }
 js-sys = "0.3.77"
 rugby = { workspace = true }
 wasm-bindgen = "0.2.100"
