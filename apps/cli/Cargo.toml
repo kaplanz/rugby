@@ -31,7 +31,6 @@ rugby = { workspace = true }
 rugby-cfg = { workspace = true, features = ["clap", "serde", "toml"] }
 rugby-gbd = { workspace = true, optional = true }
 rustyline = { version = "15.0.0", optional = true }
-serde = { workspace = true }
 supports-color = "3.0.2"
 sysexits = "0.8.5"
 tempfile = "3.15.0"
