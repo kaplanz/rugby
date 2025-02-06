@@ -14,7 +14,7 @@ bfmt = { workspace = true }
 bytecount = { version = "0.6.8" }
 displaydoc = { version = "0.2.5" }
 hexd = { workspace = true }
-indexmap = { version = "2.7.0" }
+indexmap = { version = "2.7.1" }
 itertools = { workspace = true }
 log = { workspace = true }
 num = { workspace = true }
