@@ -1,6 +1,9 @@
 import { GameBoy } from "rugby-web";
 
 import type { Screen } from "./rugby/screen";
+import type { Stereo } from "./rugby/stereo";
+
+import { SAMPLE } from "./rugby/stereo";
 
 /**
  * Clock frequency.
@@ -8,7 +11,7 @@ import type { Screen } from "./rugby/screen";
  * @remarks
  * Frequency of the on-board quartz crystal used for timekeeping.
  */
-const FRQ = 4194304;
+export const FRQ = 4194304;
 
 /**
  * Clock divider.
@@ -47,6 +50,8 @@ export class Application {
    * Graphical state.
    */
   gui = {
+    /** Speaker model. */
+    apu: undefined as Stereo | undefined,
     /** Display model. */
     lcd: undefined as Screen | undefined,
   };
@@ -88,6 +93,13 @@ export class Application {
     for (let tick = 0; tick < (this.cfg.spd * FRQ) / DIV; tick++) {
       // Emulate a single cycle
       this.emu.cycle();
+      // Sample audio output
+      if (tick % Math.floor((this.cfg.spd * FRQ) / SAMPLE) === 0) {
+        // Fetch current sample
+        const sample = this.emu.sample();
+        // Play sample
+        this.gui.apu?.play(sample);
+      }
       // Redraw on vertical sync
       if (this.gui.lcd && this.emu.vsync()) {
         // Get next frame
