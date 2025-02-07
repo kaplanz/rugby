@@ -234,7 +234,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             if video.vsync() && {
                 // To prevent overwhelming the frontend, we disable the video
                 // before we send a frame. It will be re-enabled after receipt
-                // if acknowledged.
+                // is acknowledged.
                 mem::take(&mut ctx.video)
             } {
                 // Collect and send completed frame
