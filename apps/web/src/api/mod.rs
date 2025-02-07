@@ -4,6 +4,7 @@ use rugby::arch::Block;
 use rugby::core::dmg;
 use wasm_bindgen::prelude::*;
 
+pub mod audio;
 pub mod cart;
 pub mod joypad;
 pub mod video;
