@@ -18,9 +18,9 @@ import "@shoelace-style/shoelace/dist/components/tab-group/tab-group";
 import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel";
 import "@shoelace-style/shoelace/dist/components/tab/tab";
 
-import shoelaceLight from "@shoelace-style/shoelace/dist/themes/light.css?raw";
-import shoelaceDark from "@shoelace-style/shoelace/dist/themes/dark.css?raw";
 import fontAwesome from "@fortawesome/fontawesome-free/css/all.min.css?raw";
+import shoelaceDark from "@shoelace-style/shoelace/dist/themes/dark.css?raw";
+import shoelaceLight from "@shoelace-style/shoelace/dist/themes/light.css?raw";
 
 /**
  * Library database name.
