@@ -16,6 +16,9 @@ export class Screen extends LitElement {
     this.redraw(new Uint8Array());
   }
 
+  /**
+   * Redraws the screen using the frame.
+   */
   redraw(frame: Uint8Array) {
     // Create an image to draw to the canvas
     const image = this.ctx.createImageData(160, 144);
