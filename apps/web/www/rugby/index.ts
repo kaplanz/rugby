@@ -6,6 +6,7 @@ import { Cartridge, demo } from "rugby-web";
 import { Application } from "../app";
 import type { Dialog } from "./dialog";
 import type { Screen } from "./screen";
+import type { Stereo } from "./stereo";
 
 import "./dialog";
 import "./joypad";
@@ -22,11 +23,15 @@ export class GameBoy extends LitElement {
   @state()
   private app = new Application();
 
+  /** Audio speaker output. */
+  @query("gb-stereo")
+  private apu!: Stereo;
+
   /** Graphical display model. */
   @query("gb-screen")
   private lcd!: Screen;
 
-  /** Graphical display model. */
+  /** Configuration interface. */
   @query("gb-dialog")
   private cfg!: Dialog;
 
@@ -50,6 +55,7 @@ export class GameBoy extends LitElement {
     // Trigger a re-render to initialize
     this.requestUpdate();
     // Connect components to application
+    this.app.gui.apu = this.apu;
     this.app.gui.lcd = this.lcd;
   }
 
