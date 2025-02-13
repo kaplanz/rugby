@@ -46,6 +46,7 @@ struct GameItem: View {
             Text(game.name)
                 .multilineTextAlignment(.center)
         }
+        .frame(width: 160)
         .onTapGesture {
             emu.play(game)
         }
