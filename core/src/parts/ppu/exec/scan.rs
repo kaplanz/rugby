@@ -1,7 +1,7 @@
 use log::{debug, trace};
+use rugby_arch::Word;
 use rugby_arch::mem::Memory;
 use rugby_arch::reg::Register;
-use rugby_arch::Word;
 
 use super::hblank::HBlank;
 use super::ppu::meta::Sprite;

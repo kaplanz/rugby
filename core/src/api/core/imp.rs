@@ -1,4 +1,4 @@
-use super::{has, Core, Inside, InsideMut};
+use super::{Core, Inside, InsideMut, has};
 
 impl<'a, C: Core + has::Audio> Inside<'a, C> {
     /// Borrow the core's audio.
