@@ -8,7 +8,7 @@ use std::ops::Not;
 use std::path::Path;
 use std::sync::mpsc;
 
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
 use log::{debug, info, trace, warn};
 use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
 use rugby::pal::Palette;
@@ -24,7 +24,7 @@ use crate::dbg::gbd::Console;
 use crate::dbg::log::Tracer;
 #[cfg(feature = "log")]
 use crate::exe::run::cli::trace::Trace;
-use crate::exe::run::{self, cli, Cli};
+use crate::exe::run::{self, Cli, cli};
 use crate::gui::{self, Cable};
 use crate::util;
 

@@ -116,8 +116,8 @@ impl Memory for Bus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::mem::Ram;
     use crate::Shared;
+    use crate::mem::Ram;
 
     fn setup() -> Bus {
         Bus::from([
@@ -148,15 +148,21 @@ mod tests {
     #[test]
     fn map_works() {
         let bus = setup();
-        assert!((0x000..=0x0ff)
-            .map(|idx| bus.read(idx))
-            .all(|value| value == Ok(0)));
-        assert!((0x100..=0x1ff)
-            .map(|idx| bus.read(idx))
-            .all(|value| value == Ok(1)));
-        assert!((0x200..=0x2ff)
-            .map(|idx| bus.read(idx))
-            .all(|value| value == Ok(2)));
+        assert!(
+            (0x000..=0x0ff)
+                .map(|idx| bus.read(idx))
+                .all(|value| value == Ok(0))
+        );
+        assert!(
+            (0x100..=0x1ff)
+                .map(|idx| bus.read(idx))
+                .all(|value| value == Ok(1))
+        );
+        assert!(
+            (0x200..=0x2ff)
+                .map(|idx| bus.read(idx))
+                .all(|value| value == Ok(2))
+        );
     }
 
     #[test]
@@ -265,23 +271,35 @@ mod tests {
         bus.map(A5..=A5 + N5 - 1, d5);
 
         // Check if it is accessed properly...
-        assert!((A0..A0 + N0)
-            .map(|index| bus.read(index))
-            .all(|byte| byte == Ok(0xaa)));
-        assert!((A1..A1 + N1)
-            .map(|index| bus.read(index))
-            .all(|byte| byte == Ok(0xbb)));
-        assert!((A2..A2 + N2)
-            .map(|index| bus.read(index))
-            .all(|byte| byte == Ok(0xcc)));
-        assert!((A3..A3 + N3)
-            .map(|index| bus.read(index))
-            .all(|byte| byte == Ok(0xdd)));
-        assert!((A4..A4 + N4)
-            .map(|index| bus.read(index))
-            .all(|byte| byte == Ok(0xee)));
-        assert!((A3 + N3..A5 + N5)
-            .map(|index| bus.read(index))
-            .all(|byte| byte == Ok(0xff)));
+        assert!(
+            (A0..A0 + N0)
+                .map(|index| bus.read(index))
+                .all(|byte| byte == Ok(0xaa))
+        );
+        assert!(
+            (A1..A1 + N1)
+                .map(|index| bus.read(index))
+                .all(|byte| byte == Ok(0xbb))
+        );
+        assert!(
+            (A2..A2 + N2)
+                .map(|index| bus.read(index))
+                .all(|byte| byte == Ok(0xcc))
+        );
+        assert!(
+            (A3..A3 + N3)
+                .map(|index| bus.read(index))
+                .all(|byte| byte == Ok(0xdd))
+        );
+        assert!(
+            (A4..A4 + N4)
+                .map(|index| bus.read(index))
+                .all(|byte| byte == Ok(0xee))
+        );
+        assert!(
+            (A3 + N3..A5 + N5)
+                .map(|index| bus.read(index))
+                .all(|byte| byte == Ok(0xff))
+        );
     }
 }

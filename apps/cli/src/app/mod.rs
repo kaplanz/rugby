@@ -151,17 +151,20 @@ pub fn main(args: &Cli, mut talk: Channel<Message, emu::Message>) -> Result<()> 
     })(); // NOTE: This weird syntax is in lieu of using unstable try blocks.
 
     // Inspect error
-    if let Some(err) = res
+    match res
         .as_ref()
         .err()
         .and_then(|err| err.downcast_ref::<talk::Error>())
     {
-        // Ignore disconnect
-        debug!("{err}");
-        res = Ok(());
-    } else {
-        // Exit emulator
-        talk.send(emu::Message::Exit)?;
+        Some(err) => {
+            // Ignore disconnect
+            debug!("{err}");
+            res = Ok(());
+        }
+        _ => {
+            // Exit emulator
+            talk.send(emu::Message::Exit)?;
+        }
     }
     // Propagate errors
     res.context("frontend error occurred")

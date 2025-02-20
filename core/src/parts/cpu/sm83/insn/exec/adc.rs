@@ -1,7 +1,7 @@
-use rugby_arch::reg::Register;
 use rugby_arch::Byte;
+use rugby_arch::reg::Register;
 
-use super::{help, Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Adc(Adc::Fetch)

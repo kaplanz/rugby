@@ -1,10 +1,10 @@
 //! Introspective tracing.
 
-use rugby_arch::reg::Register;
 use rugby_arch::Block;
+use rugby_arch::reg::Register;
 
-use super::cpu::Flag;
 use super::GameBoy;
+use super::cpu::Flag;
 
 /// Collect a trace with formatting matching [binjgb].
 ///

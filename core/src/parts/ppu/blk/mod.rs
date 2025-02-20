@@ -1,4 +1,4 @@
-use super::{meta, Lcdc, Ppu};
+use super::{Lcdc, Ppu, meta};
 
 pub mod fetch;
 pub mod fifo;

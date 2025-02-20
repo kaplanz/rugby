@@ -235,10 +235,10 @@ impl Rom {
             } else {
                 usize::from(self.ctl.ram.load())
             };
-            hi << 5 | lo
+            (hi << 5) | lo
         };
         let addr = usize::from(addr);
-        (bank << 14 | addr & 0x3fff) % self.mem.len().max(0x8000)
+        ((bank << 14) | addr & 0x3fff) % self.mem.len().max(0x8000)
     }
 
     /// Adjusts addresses by internal bank number.
@@ -249,10 +249,10 @@ impl Rom {
                 x => x,
             };
             let hi = usize::from(self.ctl.ram.load());
-            hi << 5 | lo
+            (hi << 5) | lo
         };
         let addr = usize::from(addr);
-        (bank << 14 | addr & 0x3fff) % self.mem.len().max(0x8000)
+        ((bank << 14) | addr & 0x3fff) % self.mem.len().max(0x8000)
     }
 }
 
@@ -323,7 +323,7 @@ impl Ram {
             }
         };
         let addr = usize::from(addr);
-        (bank << 13 | addr & 0x1fff) % self.mem.len().max(0x2000)
+        ((bank << 13) | addr & 0x1fff) % self.mem.len().max(0x2000)
     }
 }
 

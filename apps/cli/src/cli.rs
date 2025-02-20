@@ -6,7 +6,7 @@ use clap::{Args, Parser, ValueHint};
 use clap_verbosity_flag::Verbosity;
 
 use crate::cfg::Config;
-use crate::{exe, NAME};
+use crate::{NAME, exe};
 
 /// Emulate the Nintendo Game Boy.
 ///
@@ -39,7 +39,7 @@ pub enum Command {
     #[clap(visible_alias = "r")]
     Run(Box<exe::run::Cli>),
     /// Generate static files.
-    Gen(Box<exe::gen::Cli>),
+    Gen(Box<exe::r#gen::Cli>),
     /// Show help information.
     #[clap(alias = "man")]
     Help(Box<exe::help::Cli>),

@@ -1,5 +1,5 @@
-use rugby_arch::reg::Register;
 use rugby_arch::Byte;
+use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
 

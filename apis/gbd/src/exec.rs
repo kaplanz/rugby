@@ -6,8 +6,8 @@ use std::ops::Not;
 use std::path::Path;
 
 use itertools::Itertools;
-use rugby::arch::reg::Port;
 use rugby::arch::Block;
+use rugby::arch::reg::Port;
 use rugby::core::dmg::LCD;
 use rugby::prelude::*;
 use wrange::Wrange;

@@ -105,8 +105,8 @@ impl From<Interrupt> for Instruction {
 
 /// Helper functions.
 mod help {
-    use rugby_arch::reg::Register;
     use rugby_arch::Byte;
+    use rugby_arch::reg::Register;
 
     use super::Cpu;
 

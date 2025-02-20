@@ -6,14 +6,14 @@ use std::time::Instant;
 
 use anyhow::{Context as _, Result};
 use log::{debug, trace};
-use ringbuf::traits::{Consumer, RingBuffer};
 use ringbuf::LocalRb as Ring;
+use ringbuf::traits::{Consumer, RingBuffer};
 use rugby::arch::Block;
 #[cfg(feature = "win")]
 use rugby::core::dmg;
+use rugby::core::dmg::FREQ;
 #[cfg(feature = "log")]
 use rugby::core::dmg::cpu;
-use rugby::core::dmg::FREQ;
 use rugby::emu::part::audio::{Audio, Sample};
 use rugby::emu::part::joypad::Joypad;
 use rugby::emu::part::video::Video;

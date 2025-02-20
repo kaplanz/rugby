@@ -1,7 +1,7 @@
-use rugby_arch::reg::Register;
 use rugby_arch::Byte;
+use rugby_arch::reg::Register;
 
-use super::{help, Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Rr(Rr::Fetch)
@@ -56,7 +56,7 @@ fn execute(code: Byte, cpu: &mut Cpu, op1: Byte) -> Return {
     let flags = &mut cpu.reg.f.load();
     let cin = Flag::C.get(flags);
     let carry = op1 & 0x01 != 0;
-    let res = ((cin as Byte) << 7) | op1 >> 1;
+    let res = ((cin as Byte) << 7) | (op1 >> 1);
 
     // Set flags
     Flag::Z.set(flags, res == 0);
