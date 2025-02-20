@@ -1,6 +1,6 @@
 use rugby_arch::Byte;
 
-use super::{help, Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Set(Set::Fetch)
