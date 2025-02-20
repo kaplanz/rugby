@@ -274,7 +274,7 @@ pub mod reg {
             *self = match self {
                 Reload::Wait(0) => Reload::Now,
                 // Decrement cycles until reload
-                Reload::Wait(mut count) => {
+                &mut Reload::Wait(mut count) => {
                     // Decrement cycles until reload
                     count -= 1;
                     // Update the reload counter

@@ -3,7 +3,7 @@
 use clap::Parser;
 
 use super::NAME;
-pub use crate::exe::gen::cli::Command;
+pub use crate::exe::r#gen::cli::Command;
 
 /// Show help information.
 #[derive(Debug, Parser)]

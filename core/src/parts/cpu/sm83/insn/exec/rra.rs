@@ -1,5 +1,5 @@
-use rugby_arch::reg::Register;
 use rugby_arch::Byte;
+use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
 
@@ -39,7 +39,7 @@ fn execute(code: Byte, cpu: &mut Cpu) -> Return {
     let acc = cpu.reg.a.load();
     let cin = Flag::C.get(flags);
     let carry = acc & 0x01 != 0;
-    let res = ((cin as Byte) << 7) | acc >> 1;
+    let res = ((cin as Byte) << 7) | (acc >> 1);
     cpu.reg.a.store(res);
 
     // Set flags

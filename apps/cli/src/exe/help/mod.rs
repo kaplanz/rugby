@@ -8,7 +8,7 @@ use constcat::concat;
 use log::{debug, trace};
 
 use crate::err::Result;
-use crate::exe::gen::man;
+use crate::exe::r#gen::man;
 
 pub mod cli;
 
@@ -30,14 +30,14 @@ pub fn main(args: Cli) -> Result<()> {
         None => crate::Cli::command(),
         Some(cli::Command::Check) => crate::exe::check::Cli::command(),
         Some(cli::Command::Run) => crate::exe::run::Cli::command(),
-        Some(cli::Command::Gen) => crate::exe::gen::Cli::command(),
+        Some(cli::Command::Gen) => crate::exe::r#gen::Cli::command(),
     }
     .flatten_help(true);
     cmd.build();
 
     // Generate manpage to tempfile
     let mut tmp = tempfile::NamedTempFile::new().context("could not open temporary file")?;
-    man::gen(cmd, tmp.as_file_mut())?;
+    man::r#gen(cmd, tmp.as_file_mut())?;
     debug!("wrote temporary manpage: {}", tmp.path().display());
 
     // Spawn manual documentation process

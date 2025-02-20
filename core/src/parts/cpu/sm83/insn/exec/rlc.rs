@@ -1,7 +1,7 @@
-use rugby_arch::reg::Register;
 use rugby_arch::Byte;
+use rugby_arch::reg::Register;
 
-use super::{help, Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Rlc(Rlc::Fetch)
@@ -54,7 +54,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
 fn execute(code: Byte, cpu: &mut Cpu, op1: Byte) -> Return {
     // Execute RLC
     let carry = op1 & 0x80 != 0;
-    let res = op1 << 1 | (carry as Byte);
+    let res = (op1 << 1) | (carry as Byte);
 
     // Set flags
     let flags = &mut cpu.reg.f.load();
