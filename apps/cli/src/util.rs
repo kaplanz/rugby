@@ -21,8 +21,8 @@ pub mod rom {
 
     use anyhow::{Context, Result};
     use log::{debug, error};
-    use rugby::core::dmg::cart::mbc::Mbc;
     use rugby::core::dmg::Cartridge;
+    use rugby::core::dmg::cart::mbc::Mbc;
     use rugby_cfg::opt;
     use rugby_cfg::opt::emu::When;
 

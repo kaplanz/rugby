@@ -43,7 +43,7 @@ fn main() -> Exit {
         }
         Command::Gen(cli) => {
             // rugby gen
-            exe::gen::main(*cli)
+            exe::r#gen::main(*cli)
         }
         Command::Help(cli) => {
             // rugby help

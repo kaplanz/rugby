@@ -2,7 +2,7 @@ use log::debug;
 use rugby_arch::reg::Register;
 
 use super::hblank::HBlank;
-use super::{Mode, Ppu, LCD};
+use super::{LCD, Mode, Ppu};
 
 /// Mode 1: Vertical blank.
 #[derive(Clone, Debug, Default)]

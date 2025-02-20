@@ -121,7 +121,7 @@ impl Block for Serial {
         // Extract bitmask
         let bit = self.reg.sc.borrow().bit;
         // Determine receiving bit
-        let rx = self.etc.rx.front().map_or(true, |rx| rx & bit != 0);
+        let rx = self.etc.rx.front().is_none_or(|rx| rx & bit != 0);
 
         // Perform transfer-exchange
         let tx = self.tex(rx);
@@ -235,7 +235,7 @@ pub mod reg {
         type Value = Byte;
 
         fn load(&self) -> Self::Value {
-            Byte::from(self.ena) << 7 | 0x7e | Byte::from(self.clk)
+            (Byte::from(self.ena) << 7) | 0x7e | Byte::from(self.clk)
         }
 
         fn store(&mut self, value: Self::Value) {

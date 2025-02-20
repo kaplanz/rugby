@@ -6,7 +6,7 @@ use clap_verbosity_flag::Verbosity;
 use rugby_gbd::Filter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{fmt, reload, EnvFilter, Layer, Registry};
+use tracing_subscriber::{EnvFilter, Layer, Registry, fmt, reload};
 
 type Reload = reload::Handle<EnvFilter, Registry>;
 

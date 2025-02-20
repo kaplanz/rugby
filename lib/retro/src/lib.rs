@@ -300,7 +300,7 @@ const AV_INFO: retro_system_av_info = retro_system_av_info {
 /// # See
 ///
 /// - [`RETRO_ENVIRONMENT`](mod@env)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_environment(cb: *const retro_environment_t) {
     let cb = if cb.is_null() {
         return;
@@ -326,7 +326,7 @@ pub extern "C" fn retro_set_environment(cb: *const retro_environment_t) {
 ///
 /// Guaranteed to have been called before the first call to [`retro_run`] is
 /// made.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_video_refresh(cb: *const retro_video_refresh_t) {
     let cb = if cb.is_null() {
         return;
@@ -352,7 +352,7 @@ pub extern "C" fn retro_set_video_refresh(cb: *const retro_video_refresh_t) {
 ///
 /// Guaranteed to have been called before the first call to [`retro_run`] is
 /// made.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_audio_sample(cb: *const retro_audio_sample_t) {
     let cb = if cb.is_null() {
         return;
@@ -379,7 +379,7 @@ pub extern "C" fn retro_set_audio_sample(cb: *const retro_audio_sample_t) {
 ///
 /// Guaranteed to have been called before the first call to [`retro_run`] is
 /// made.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_audio_sample_batch(cb: *const retro_audio_sample_batch_t) {
     let cb = if cb.is_null() {
         return;
@@ -405,7 +405,7 @@ pub extern "C" fn retro_set_audio_sample_batch(cb: *const retro_audio_sample_bat
 ///
 /// Guaranteed to have been called before the first call to [`retro_run`] is
 /// made.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_input_poll(cb: *const retro_input_poll_t) {
     let cb = if cb.is_null() {
         return;
@@ -431,7 +431,7 @@ pub extern "C" fn retro_set_input_poll(cb: *const retro_input_poll_t) {
 ///
 /// Guaranteed to have been called before the first call to [`retro_run`] is
 /// made.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_input_state(cb: *const retro_input_state_t) {
     let cb = if cb.is_null() {
         return;
@@ -468,7 +468,7 @@ pub extern "C" fn retro_set_input_state(cb: *const retro_input_state_t) {
 /// # See
 ///
 /// - [`retro_deinit`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_init() {
     // Construct emulator
     EMULATOR.lock().get_or_insert_with(Emulator::new);
@@ -511,7 +511,7 @@ pub extern "C" fn retro_init() {
 /// # See
 ///
 /// - [`retro_init`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_deinit() {
     // Destroy emulator
     EMULATOR.lock().take();
@@ -530,7 +530,7 @@ pub extern "C" fn retro_deinit() {
 /// # See
 ///
 /// - [`RETRO_API_VERSION`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_api_version() -> unsigned {
     RETRO_API_VERSION
 }
@@ -545,7 +545,7 @@ pub extern "C" fn retro_api_version() -> unsigned {
 ///
 /// - `info`: A pointer to a [`retro_system_info`] where the info is to be loaded
 ///   into. This must be statically allocated.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_get_system_info(info: *mut retro_system_info) {
     if !info.is_null() {
         // SAFETY: pointer is guaranteed non-null
@@ -573,7 +573,7 @@ pub extern "C" fn retro_get_system_info(info: *mut retro_system_info) {
 ///   information should be loaded into.
 ///
 /// - [`retro_system_av_info`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_get_system_av_info(info: *mut retro_system_av_info) {
     if !info.is_null() {
         // SAFETY: pointer is guaranteed non-null
@@ -622,7 +622,7 @@ pub extern "C" fn retro_get_system_av_info(info: *mut retro_system_av_info) {
 /// - [`RETRO_DEVICE_POINTER`]
 /// - [`RETRO_ENVIRONMENT_SET_CONTROLLER_INFO`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_set_controller_port_device(port: unsigned, device: unsigned) {
     todo!()
 }
@@ -631,7 +631,7 @@ pub extern "C" fn retro_set_controller_port_device(port: unsigned, device: unsig
 ///
 /// Cores should treat this as a soft reset (i.e. an emulated reset button) if
 /// possible, but hard resets are acceptable.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_reset() {
     // Acquire emulator instance
     let mut guard = EMULATOR.lock();
@@ -656,7 +656,7 @@ pub extern "C" fn retro_reset() {
 /// # See
 ///
 /// - [`retro_input_poll_t`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_run() {
     // Acquire emulator instance
     let mut guard = EMULATOR.lock();
@@ -733,7 +733,7 @@ pub extern "C" fn retro_run() {
 /// # See
 ///
 /// - [`retro_serialize`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_serialize_size() -> usize {
     todo!()
 }
@@ -755,7 +755,7 @@ pub extern "C" fn retro_serialize_size() -> usize {
 /// - [`retro_serialize_size`]
 /// - [`retro_unserialize`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_serialize(data: *mut void, size: usize) -> bool {
     todo!()
 }
@@ -770,7 +770,7 @@ pub extern "C" fn retro_serialize(data: *mut void, size: usize) -> bool {
 ///
 /// - [`retro_serialize`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_unserialize(data: *const void, size: usize) -> bool {
     todo!()
 }
@@ -781,7 +781,7 @@ pub extern "C" fn retro_unserialize(data: *const void, size: usize) -> bool {
 ///
 /// - [`retro_cheat_set`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_cheat_reset() {
     todo!()
 }
@@ -798,7 +798,7 @@ pub extern "C" fn retro_cheat_reset() {
 ///
 /// - [`retro_cheat_reset`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_cheat_set(index: unsigned, enabled: bool, code: *const char) {
     todo!()
 }
@@ -877,7 +877,7 @@ impl retro_game_info {
 ///
 /// - [`retro_game_info`]
 /// - [`RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_load_game(game: *const retro_game_info) -> bool {
     // Access game info
     let game: &retro_game_info = if game.is_null() {
@@ -945,7 +945,7 @@ pub extern "C" fn retro_load_game(game: *const retro_game_info) -> bool {
 /// - [`retro_load_game`]
 /// - [`retro_subsystem_info`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_load_game_special(
     game_type: unsigned,
     info: *const retro_game_info,
@@ -964,7 +964,7 @@ pub extern "C" fn retro_load_game_special(
 ///
 /// - [`retro_load_game`]
 /// - [`retro_deinit`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_unload_game() {
     // Acquire emulator instance
     let mut guard = EMULATOR.lock();
@@ -993,7 +993,7 @@ pub extern "C" fn retro_unload_game() {
 ///
 /// - [`RETRO_REGION_NTSC`]
 /// - [`RETRO_REGION_PAL`]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_get_region() -> unsigned {
     todo!()
 }
@@ -1017,7 +1017,7 @@ pub extern "C" fn retro_get_region() -> unsigned {
 /// - [`RETRO_MEMORY_SYSTEM_RAM`]
 /// - [`RETRO_MEMORY_VIDEO_RAM`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_get_memory_data(id: unsigned) -> *mut void {
     ptr::null_mut() // TODO
 }
@@ -1041,7 +1041,7 @@ pub extern "C" fn retro_get_memory_data(id: unsigned) -> *mut void {
 /// - [`RETRO_MEMORY_SYSTEM_RAM`]
 /// - [`RETRO_MEMORY_VIDEO_RAM`]
 #[allow(unused_variables)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn retro_get_memory_size(id: unsigned) -> usize {
     0 // TODO
 }
