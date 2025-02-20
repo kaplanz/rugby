@@ -7,9 +7,9 @@ use std::path::PathBuf;
 use anyhow::Context;
 use log::{debug, error, trace};
 use rugby_gbd::prompt::{Error, Prompt};
+use rustyline::DefaultEditor as Editor;
 use rustyline::error::ReadlineError::{Eof, Interrupted as Int};
 use rustyline::history::History;
-use rustyline::DefaultEditor as Editor;
 
 use crate::dir;
 

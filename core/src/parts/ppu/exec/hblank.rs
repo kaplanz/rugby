@@ -2,7 +2,7 @@ use log::debug;
 use rugby_arch::reg::Register;
 
 use super::draw::Draw;
-use super::{Interrupt, Mode, Ppu, LCD};
+use super::{Interrupt, LCD, Mode, Ppu};
 
 /// Mode 0: Horizontal blank.
 #[derive(Clone, Debug, Default)]

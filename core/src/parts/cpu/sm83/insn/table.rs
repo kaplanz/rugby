@@ -1,4 +1,4 @@
-use super::{exec, Instruction};
+use super::{Instruction, exec};
 
 /// Instruction lookup table.
 #[rustfmt::skip]

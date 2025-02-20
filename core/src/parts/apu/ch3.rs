@@ -6,8 +6,8 @@ use log::{debug, trace};
 use rugby_arch::mem::Memory;
 use rugby_arch::{Block, Shared};
 
-pub use super::reg::{Nr30, Nr31, Nr32, Nr33, Nr34};
 use super::Bank;
+pub use super::reg::{Nr30, Nr31, Nr32, Nr33, Nr34};
 
 /// Sound Channel 3 - Wave output.
 #[derive(Debug)]

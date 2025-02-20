@@ -52,33 +52,41 @@ mod tests {
     #[test]
     fn new_works() {
         let null = Null::new();
-        assert!((0..0x100)
-            .map(|addr| null.read(addr))
-            .all(|data| data == Ok(0)));
+        assert!(
+            (0..0x100)
+                .map(|addr| null.read(addr))
+                .all(|data| data == Ok(0))
+        );
     }
 
     #[test]
     fn with_works() {
         let null = Null::with(0xaa);
-        assert!((0..0x100)
-            .map(|addr| null.read(addr))
-            .all(|data| data == Ok(0xaa)));
+        assert!(
+            (0..0x100)
+                .map(|addr| null.read(addr))
+                .all(|data| data == Ok(0xaa))
+        );
     }
 
     #[test]
     fn memory_read_works() {
         let null = Null::with(0xaa);
-        assert!((0..0x100)
-            .map(|addr| null.read(addr))
-            .all(|data| data == Ok(null.0)));
+        assert!(
+            (0..0x100)
+                .map(|addr| null.read(addr))
+                .all(|data| data == Ok(null.0))
+        );
     }
 
     #[test]
     fn memory_write_works() {
         let mut null = Null::new();
         (0..0x100).for_each(|addr| null.write(addr, 0xaa).unwrap());
-        assert!((0..0x100)
-            .map(|addr| null.read(addr))
-            .all(|data| data == Ok(0)));
+        assert!(
+            (0..0x100)
+                .map(|addr| null.read(addr))
+                .all(|data| data == Ok(0))
+        );
     }
 }

@@ -1,6 +1,6 @@
-use ppu::{Lcdc, Ppu, LCD};
-use rugby_arch::reg::Register;
+use ppu::{LCD, Lcdc, Ppu};
 use rugby_arch::Byte;
+use rugby_arch::reg::Register;
 
 use self::draw::Draw;
 use self::hblank::HBlank;
@@ -54,7 +54,7 @@ impl Mode {
         let stat = {
             let mut stat = ppu.reg.stat.load();
             stat ^= (0x03 & stat) ^ self.value();
-            stat ^= (0x04 & stat) ^ Byte::from(ly == lyc) << 2;
+            stat ^= (0x04 & stat) ^ (Byte::from(ly == lyc) << 2);
             stat
         };
         ppu.reg.stat.store(stat);
