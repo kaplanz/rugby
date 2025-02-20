@@ -8,9 +8,9 @@ use std::fmt::{Debug, Display, Write};
 
 use indexmap::IndexMap;
 use log::debug;
-use rugby::arch::reg::Port;
 use rugby::arch::Block;
-use rugby::core::dmg::{cpu, ppu, GameBoy};
+use rugby::arch::reg::Port;
+use rugby::core::dmg::{GameBoy, cpu, ppu};
 use thiserror::Error;
 
 use self::lang::Program;
@@ -326,7 +326,7 @@ struct Breakpoint {
 }
 
 impl Breakpoint {
-    fn display(&self, point: usize, addr: u16) -> impl Display {
+    fn display(&self, point: usize, addr: u16) -> impl Display + use<> {
         let &Self { disable, ignore } = self;
 
         // Prepare format string

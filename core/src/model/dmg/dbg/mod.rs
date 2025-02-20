@@ -2,7 +2,7 @@
 
 pub mod trace;
 
-use super::{cpu, ppu, GameBoy};
+use super::{GameBoy, cpu, ppu};
 
 /// Collect debug information from the PPU.
 #[must_use]
