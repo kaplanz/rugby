@@ -17,7 +17,7 @@
 
 use rugby_arch::Byte;
 
-use super::{help, Cpu, Error, Execute, Flag, Ime, Result, Status};
+use super::{Cpu, Error, Execute, Flag, Ime, Result, Status, help};
 
 type Return = Result<Option<Operation>>;
 

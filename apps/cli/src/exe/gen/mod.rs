@@ -42,11 +42,11 @@ pub mod cfg {
         // Declare buffer
         let buf = std::io::stdout();
         // Generate output
-        gen(buf)
+        r#gen(buf)
     }
 
     /// Generate configuration file.
-    pub fn gen(mut buf: impl Write) -> Result<()> {
+    pub fn r#gen(mut buf: impl Write) -> Result<()> {
         buf.write_all(include_str!("../../../rugby.toml").as_bytes())
             .context("could not generate config file")
             .map_err(Into::into)
@@ -60,7 +60,7 @@ pub mod cmp {
     use clap::{Command, CommandFactory};
     use clap_complete::Shell;
 
-    use crate::{Result, NAME};
+    use crate::{NAME, Result};
 
     /// [`Cmp`](super::cli::Document::Cmp) entrypoint.
     pub fn exec(shell: Shell) -> Result<()> {
@@ -70,12 +70,12 @@ pub mod cmp {
         // Declare buffer
         let buf = std::io::stdout();
         // Generate output
-        gen(shell, cmd, buf)
+        r#gen(shell, cmd, buf)
     }
 
     /// Generate shell completions.
     #[expect(clippy::unnecessary_wraps)]
-    pub fn gen(shell: Shell, mut cmd: Command, mut buf: impl Write) -> Result<()> {
+    pub fn r#gen(shell: Shell, mut cmd: Command, mut buf: impl Write) -> Result<()> {
         clap_complete::generate(shell, &mut cmd, NAME, &mut buf);
         Ok(()) // unconditionally succeed
     }
@@ -90,7 +90,7 @@ pub mod man {
     use clap_mangen::Man;
 
     use super::cli::Command as Subcommand;
-    use crate::{Result, NAME};
+    use crate::{NAME, Result};
 
     /// Manual section.
     ///
@@ -113,18 +113,18 @@ pub mod man {
             None => crate::Cli::command(),
             Some(Subcommand::Check) => crate::exe::check::Cli::command(),
             Some(Subcommand::Run) => crate::exe::run::Cli::command(),
-            Some(Subcommand::Gen) => crate::exe::gen::Cli::command(),
+            Some(Subcommand::Gen) => crate::exe::r#gen::Cli::command(),
         }
         .flatten_help(true);
         cmd.build();
         // Declare buffer
         let mut buf = std::io::stdout();
         // Generate output
-        gen(cmd, &mut buf)
+        r#gen(cmd, &mut buf)
     }
 
     /// Generate manual page.
-    pub fn gen(cmd: Command, mut buf: impl Write) -> Result<()> {
+    pub fn r#gen(cmd: Command, mut buf: impl Write) -> Result<()> {
         Man::new(cmd)
             .title(NAME)
             .section(MANSECT)

@@ -2,8 +2,8 @@
 
 use std::path::Path;
 
-pub use crate::val::{Palette, Speed};
 use crate::Join;
+pub use crate::val::{Palette, Speed};
 
 /// Frontend options.
 #[derive(Debug, Default)]

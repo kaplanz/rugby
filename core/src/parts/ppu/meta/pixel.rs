@@ -36,11 +36,7 @@ mod select {
     /// Select the first opaque pixel.
     #[must_use]
     pub fn color(a: Pixel, b: Pixel) -> Pixel {
-        if a.col == Color::C0 {
-            b
-        } else {
-            a
-        }
+        if a.col == Color::C0 { b } else { a }
     }
 
     /// Blend background and sprite pixels.

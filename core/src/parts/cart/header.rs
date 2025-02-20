@@ -366,7 +366,7 @@ mod parse {
     use log::warn;
     use rugby_arch::{Byte, Word};
 
-    use super::{Error, Info, Region, Result, LOGO};
+    use super::{Error, Info, LOGO, Region, Result};
 
     /// Parse the `logo` field from the header.
     pub fn logo(head: &[Byte; 0x50]) -> bool {

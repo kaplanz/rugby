@@ -1,11 +1,11 @@
 use log::{debug, trace};
 use rugby_arch::reg::Register;
 
+use super::ppu::Color;
 use super::ppu::blk::pipe::Pipeline;
 use super::ppu::meta::{Layer, Palette, Pixel, Sprite};
-use super::ppu::Color;
 use super::scan::Scan;
-use super::{Mode, Ppu, LCD};
+use super::{LCD, Mode, Ppu};
 
 /// Mode 3: Draw pixels.
 #[derive(Clone, Debug, Default)]

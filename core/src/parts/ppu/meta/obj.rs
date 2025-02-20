@@ -1,7 +1,7 @@
 use rugby_arch::Byte;
 
-use super::pixel::Meta;
 use super::Palette;
+use super::pixel::Meta;
 
 /// Sprite metadata.
 #[derive(Clone, Debug)]

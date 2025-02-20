@@ -3,8 +3,8 @@
 use anyhow::{Context, Result};
 use rugby::core::dmg::ppu;
 
-use crate::gui::win::{Attributes, Extent, Window};
 use crate::gui::Frontend;
+use crate::gui::win::{Attributes, Extent, Window};
 
 impl Frontend {
     /// Render debug windows.

@@ -2,8 +2,8 @@
 
 use std::path::{Path, PathBuf};
 
-pub use crate::val::When;
 use crate::Join;
+pub use crate::val::When;
 
 /// Emulator options.
 #[derive(Debug, Default)]

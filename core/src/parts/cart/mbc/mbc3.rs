@@ -219,7 +219,7 @@ impl Rom {
     fn adjust(&self, addr: Word) -> usize {
         let bank = usize::from(self.ctl.ram.load());
         let addr = usize::from(addr);
-        (bank << 14 | addr & 0x3fff) % self.mem.len().max(0x8000)
+        ((bank << 14) | addr & 0x3fff) % self.mem.len().max(0x8000)
     }
 }
 
@@ -280,7 +280,7 @@ impl Ram {
     fn adjust(&self, addr: Word) -> usize {
         let bank = usize::from(self.ctl.ram.load());
         let addr = usize::from(addr);
-        (bank << 13 | addr & 0x1fff) % self.mem.len().max(0x2000)
+        ((bank << 13) | addr & 0x1fff) % self.mem.len().max(0x2000)
     }
 }
 

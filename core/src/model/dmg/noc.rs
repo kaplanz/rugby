@@ -1,7 +1,7 @@
 //! Network-on-chip.
 
-use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::Shared;
+use rugby_arch::mio::{Bus, Mmio};
 
 use super::pcb::Motherboard;
 
