@@ -34,6 +34,7 @@ pub struct Chiptune {
 
 impl Chiptune {
     /// Mixes all channels together to produce a single audio sample.
+    #[must_use]
     pub fn mix(self) -> Sample {
         [self.ch1, self.ch2, self.ch3, self.ch4]
             .into_iter()

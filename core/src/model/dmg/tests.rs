@@ -1,5 +1,5 @@
-use rugby_arch::mem::Memory;
 use rugby_arch::Byte;
+use rugby_arch::mem::Memory;
 
 use self::cart::mbc::Mbc;
 use self::pic::Pic;

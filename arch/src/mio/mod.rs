@@ -3,8 +3,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::mem::Memory;
 use crate::Shared;
+use crate::mem::Memory;
 
 mod bus;
 
