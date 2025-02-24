@@ -40,6 +40,9 @@ pub const DIVIDER: u32 = 0x100;
 /// Audio sample rate.
 pub const SAMPLE: usize = 96_000;
 
+/// Audio buffer length.
+pub const BUFLEN: usize = 0x1000;
+
 // Emulator main.
 #[expect(clippy::too_many_lines)]
 pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> {
@@ -69,11 +72,11 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
         let params = tinyaudio::OutputDeviceParameters {
             channels_count: 2,
             sample_rate: SAMPLE,
-            channel_sample_count: SAMPLE / 10,
+            channel_sample_count: BUFLEN,
         };
 
         // Define audio wave source and sink
-        let wave = Arc::new(Mutex::new(Ring::new(0x8000)));
+        let wave = Arc::new(Mutex::new(Ring::new(BUFLEN)));
         let sink = wave.clone();
 
         // Run output device loop
