@@ -1782,6 +1782,7 @@ name = "rugby-ios"
 version = "0.1.0"
 dependencies = [
  "bfmt",
+ "log",
  "rugby",
  "thiserror 2.0.11",
  "uniffi",
