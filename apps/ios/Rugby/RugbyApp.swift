@@ -13,6 +13,26 @@ import SwiftUI
 /// Global logger.
 let log = Logger()
 
+/// Define core logger.
+@_cdecl("log")
+func rugby_log(level: UInt64, target: UnsafePointer<CChar>, message: UnsafePointer<CChar>) {
+    // Decode log level
+    let level: OSLogType = [
+        // error
+        .error,
+        // warn
+        .error,
+        // info
+        .info,
+        // debug
+        .debug,
+        // trace
+        .debug
+    ][Int(level)]
+    // Write with global logger
+    log.log(level: level, "[\(String(cString: target))]: \(String(cString: message))")
+}
+
 struct Build {
     /// Application name.
     static let NAME = Bundle.main.infoDictionary?["CFBundleName"] as! String
@@ -30,6 +50,9 @@ struct RugbyApp: App {
     @State private var lib = Library()
 
     init() {
+        // Initialize core
+        RugbyKit.initialize()
+        // Initialize game
         initGameController()
     }
 
