@@ -81,15 +81,26 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
 
         // Run output device loop
         let audio = tinyaudio::run_output_device(params, move |data| {
+            // Store previous (stale) sample
+            let mut last = Sample::default();
+
+            // Play received samples
             for samples in data.chunks_mut(params.channels_count) {
-                // Recieve audio sample
-                let sample: Sample = sink.lock().unwrap().try_pop().unwrap_or_default();
-                // Update channel values
+                // Receive next sample from the audio buffer
+                let sample: Sample = sink.lock().unwrap().try_pop().unwrap_or(last);
+                // Update the sample value for each output channel
                 let [lt, rt] = samples else {
                     panic!("incorrect number of audio channels")
                 };
                 *lt = sample.lt;
                 *rt = sample.rt;
+                // Slowly decay stale sample
+                //
+                // This will prevent pops as the volume is adjusted while
+                // paused, as samples which would otherwise be reused could have
+                // a DC offset. By tending them towards zero, that offset is no
+                // longer multiplied as volume is adjusted.
+                last = sample * 0.99;
             }
         })
         .unwrap();
