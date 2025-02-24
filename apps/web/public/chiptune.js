@@ -6,7 +6,12 @@ class ChiptuneWorklet extends AudioWorkletProcessor {
 
     // Listen for incoming messages from the main thread.
     this.port.onmessage = (event) => {
+      // Push incoming audio sample
       this.buf.push(event.data);
+      // Limit buffer size (reduces audio latency)
+      if (this.buf.length > 0x1000) {
+        this.buf.shift();
+      }
     };
 
     // Use a buffer to store samples.
