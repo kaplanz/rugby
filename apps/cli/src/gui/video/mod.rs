@@ -1,4 +1,4 @@
-//! Window graphics.
+//! Video frontend.
 
 use anyhow::Result;
 use rugby::core::dmg;
@@ -7,9 +7,9 @@ mod imp;
 
 pub use self::imp::{Attributes, Extent, Window};
 
-/// Graphics window groups.
+/// Video windows.
 #[derive(Debug)]
-pub struct Graphics {
+pub struct Video {
     /// Main window.
     pub lcd: Window<Main>,
     /// VRAM window group.
@@ -17,7 +17,7 @@ pub struct Graphics {
     pub dbg: crate::dbg::win::Vram,
 }
 
-impl Graphics {
+impl Video {
     /// Constructs a new `Graphics`.
     pub fn new() -> Result<Self> {
         Ok(Self {

@@ -72,6 +72,7 @@ pub fn app(args: &Cli) -> Result<App> {
             cfg: gui::Options {
                 pal: args.cfg.data.app.pal.clone().unwrap_or_default().into(),
             },
+            aux: None,
             win: gui,
             lnk,
         },
@@ -199,9 +200,9 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
 }
 
 /// Builds a graphics instance.
-pub fn gui(args: &run::Cli) -> Result<gui::Graphics> {
+pub fn gui(args: &run::Cli) -> Result<gui::Video> {
     // Construct GUI
-    let mut gui = gui::Graphics::new().context("could not open main window")?;
+    let mut gui = gui::Video::new().context("could not open main window")?;
     // Set initial title
     gui.lcd.title(util::title(&args.cfg.data.emu.cart));
     // Open debug windows
