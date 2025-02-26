@@ -4,19 +4,20 @@ use std::io::{self, Read, Write};
 
 use log::{debug, trace};
 use minifb::Key;
-use rugby::app::audio::Audio;
-use rugby::app::joypad::Joypad;
-use rugby::app::serial::Serial;
-use rugby::app::video::Video;
+use rugby::app;
 use rugby::core::dmg::{self, Button};
+use rugby::emu::part::audio::Sample;
 use rugby::emu::part::joypad::Event;
 use rugby::emu::part::video::Frame;
 use rugby::pal::Palette;
 
-pub mod win;
+pub mod audio;
+pub mod video;
 
-pub use self::win::Graphics;
+pub use self::audio::Audio;
+pub use self::video::Video;
 
+/// Game link cable.
 pub type Cable = std::net::UdpSocket;
 
 /// Frontend options.
@@ -31,19 +32,26 @@ pub struct Options {
 pub struct Frontend {
     /// Frontend options.
     pub cfg: Options,
-    /// Link cable.
+    /// Audio speaker.
+    #[allow(unused)]
+    pub aux: Option<Audio>,
+    /// Game link cable.
     pub lnk: Option<Cable>,
-    /// Window graphics.
-    pub win: Option<Graphics>,
+    /// Video windows.
+    pub win: Option<Video>,
 }
 
-impl Audio for Frontend {}
+impl app::audio::Audio for Frontend {
+    fn play(&mut self, _: Sample) {
+        todo!()
+    }
+}
 
-impl Joypad for Frontend {
+impl app::joypad::Joypad for Frontend {
     type Button = Button;
 
     #[rustfmt::skip]
-    fn input(&mut self) -> Vec<Event<Self::Button>> {
+    fn events(&mut self) -> Vec<Event<Self::Button>> {
         self.win
             .as_ref()
             // Fetch keys
@@ -52,7 +60,7 @@ impl Joypad for Frontend {
             // Remove nested optional
             .flatten()
             // Perform key mapping
-            .filter_map(|Event { input: key, state }| match key {
+            .filter_map(|Event { input, state }| match input {
                 Key::X     => Some(Event { input: Button::A,      state }),
                 Key::Z     => Some(Event { input: Button::B,      state }),
                 Key::Space => Some(Event { input: Button::Select, state }),
@@ -66,7 +74,7 @@ impl Joypad for Frontend {
     }
 }
 
-impl Serial for Frontend {
+impl app::serial::Serial for Frontend {
     fn recv(&mut self, mut tx: impl Read) -> io::Result<usize> {
         // Extract remote link
         let Some(link) = self.lnk.as_mut() else {
@@ -117,7 +125,7 @@ impl Serial for Frontend {
     }
 }
 
-impl Video for Frontend {
+impl app::video::Video for Frontend {
     type Pixel = dmg::ppu::Color;
 
     fn draw(&mut self, frame: Frame<Self::Pixel>) {
