@@ -38,8 +38,8 @@ palette = "mono"
 # Simulated clock speed.
 #
 # Value must be a named preset or customized as follows:
-# speed   = { fps = 90 }      # runs at 1.50x
-# speed   = { hz  = 3145728 } # runs at 0.75x
+# speed = { fps = 90 }      # runs at 1.50x
+# speed = { hz  = 3145728 } # runs at 0.75x
 speed = "actual"
 
 
