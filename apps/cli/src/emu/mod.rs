@@ -243,24 +243,25 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
                     wave.lock().unwrap().push_overwrite(avg);
                 }
             }
-            // Send video frame
-            let video = emu.inside().video();
-            if video.vsync() && {
-                // To prevent overwhelming the frontend, we disable the video
-                // before we send a frame. It will be re-enabled after receipt
-                // is acknowledged.
-                mem::take(&mut ctx.video)
-            } {
-                // Collect and send completed frame
-                let frame = video.frame().to_owned().into_boxed_slice();
-                talk.send(app::Message::Video(frame))?;
-            }
-            // Send VRAM debug info
-            #[cfg(feature = "win")]
-            if args.dbg.win && video.vsync() {
-                // Collect debug info
-                let info = dmg::dbg::ppu(&emu);
-                talk.send(app::Message::Debug(app::msg::Debug::Vram(info)))?;
+            // Fetch video frame
+            #[expect(irrefutable_let_patterns)]
+            if let video = emu.inside().video() {
+                if video.vsync() && {
+                    // To prevent overwhelming the frontend, we disable the
+                    // video before we send a frame. It will be re-enabled after
+                    // receipt is acknowledged.
+                    mem::take(&mut ctx.video)
+                } {
+                    // Collect completed frame
+                    let frame = video.frame().to_owned().into_boxed_slice();
+                    talk.send(app::Message::Video(frame))?;
+                    // Collect VRAM debug info
+                    #[cfg(feature = "win")]
+                    if args.dbg.win {
+                        let info = dmg::dbg::ppu(&emu);
+                        talk.send(app::Message::Debug(app::msg::Debug::Vram(info)))?;
+                    }
+                }
             }
             // Write trace entries.
             #[cfg(feature = "log")]
