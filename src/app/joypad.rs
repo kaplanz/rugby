@@ -6,9 +6,9 @@ use crate::emu::part::joypad::{Event, Input};
 pub trait Joypad {
     type Button: Input;
 
-    /// Polls joypad input for the emulator.
+    /// Polls for joypad events.
     ///
-    /// The produced vector contains an ordered list of all input events that
-    /// occurred since input was last polled.
-    fn input(&mut self) -> Vec<Event<Self::Button>>;
+    /// Produces an ordered list of all joypad events since input was last
+    /// polled.
+    fn events(&mut self) -> Vec<Event<Self::Button>>;
 }

@@ -114,8 +114,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
 
     // Emulator loop
     let mut res = (|| -> Result<()> {
-        // Initialize context
-        let mut ctx = Context::new(&args.cfg.data);
+        // Initialize audio
         let mut apu = Vec::<Sample>::new();
         let freq = args
             .cfg
@@ -125,6 +124,8 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
             .as_ref()
             .and_then(Speed::freq)
             .unwrap_or(FREQ) as usize;
+        // Initialize context
+        let mut ctx = Context::new(&args.cfg.data);
         // Await initial start
         ctx.pause();
 

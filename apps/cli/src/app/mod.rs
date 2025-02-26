@@ -82,7 +82,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, emu::Message>) -> Result<()> 
             }
 
             // Poll key events
-            let keys = app.gui.input();
+            let keys = app.gui.events();
             if !keys.is_empty() {
                 debug!("keys: {keys:?}");
                 talk.send(emu::Message::Data(emu::msg::Data::Joypad(keys)))?;
