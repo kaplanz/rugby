@@ -6,9 +6,6 @@ use crate::emu::part::video::{Frame, Pixel};
 pub trait Video {
     type Pixel: Pixel;
 
-    /// Draws the current video frame.
-    ///
-    /// The video output is updated using the framebuffer provided by the
-    /// emulator.
+    /// Draws a video frame.
     fn draw(&mut self, frame: Frame<Self::Pixel>);
 }
