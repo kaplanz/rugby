@@ -54,11 +54,11 @@ pub struct Settings {
     /// with the following precedence: cli > env > file.
     #[clap(long = "conf", env = rugby_cfg::env::CFG)]
     #[clap(value_name = "PATH")]
+    #[clap(value_hint = ValueHint::FilePath)]
     #[clap(default_value_os_t = crate::cfg::path())]
     #[clap(help_heading = None)]
     #[clap(hide_default_value = std::env::var(rugby_cfg::env::CFG).is_ok())]
     #[clap(hide_env_values    = std::env::var(rugby_cfg::env::CFG).is_err())]
-    #[clap(value_hint = ValueHint::FilePath)]
     pub path: PathBuf,
 
     /// Configuration data.
