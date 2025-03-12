@@ -47,10 +47,10 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 /// An error caused by [loading](load) the configuration.
 #[derive(Debug, Error)]
 pub enum Error {
-    /// Read error.
-    #[error("error reading config")]
+    /// Reading error.
+    #[error("reading configuration failed")]
     Read(#[from] io::Error),
-    /// Parse error.
-    #[error("error parsing config")]
+    /// Parsing error.
+    #[error("parsing configuration failed")]
     Parse(#[from] de::Error),
 }
