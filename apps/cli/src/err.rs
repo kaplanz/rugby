@@ -17,41 +17,44 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 #[derive(Debug, Error)]
 #[non_exhaustive]
 pub enum Error {
-    /// Configuration errors.
+    /// Application error.
     #[error(transparent)]
-    Config(#[from] cfg::Error),
-    /// Catchall error variant.
+    App(#[from] anyhow::Error),
+    /// Configuration error.
     #[error(transparent)]
-    Other(#[from] anyhow::Error),
+    Cfg(#[from] cfg::Error),
 }
 
 impl Error {
     /// Advises the user about an error.
     fn advise(&self) {
-        advise::error!("{self}");
+        // Report top-level error
+        advise::error!("{}", format!("{self}").trim_end());
         let Some(mut err) = self.source() else {
             return;
         };
+        // Report intermediate errors
         while let Some(src) = err.source() {
-            advise::advise!(Cause::Stem, "{err}");
+            advise::advise!(Cause::Stem, "{}", format!("{err}").trim_end());
             err = src;
         }
-        advise::advise!(Cause::Root, "{err}");
+        // Report bottom-level error
+        advise::advise!(Cause::Root, "{}", format!("{err}").trim_end());
     }
 }
 
 impl From<Error> for ExitCode {
     fn from(err: Error) -> Self {
         match err {
-            Error::Config(_) => sysexits::ExitCode::Config.into(),
-            _ => ExitCode::FAILURE,
+            Error::App(_) => ExitCode::FAILURE,
+            Error::Cfg(_) => sysexits::ExitCode::Config.into(),
         }
     }
 }
 
-/// Application exit conditions.
+/// Application exit condition.
 ///
-/// In the `Termination` implementation for `Exit`, we print any errors that
+/// In the [`Termination`] implementation for `Exit`, we print any errors that
 /// occur for the user.
 #[derive(Debug)]
 pub enum Exit {
@@ -92,7 +95,7 @@ impl Termination for Exit {
 enum Cause {
     /// Intermediate error source.
     Stem,
-    /// Underlying error cause.
+    /// Bottom-level error cause.
     Root,
 }
 
