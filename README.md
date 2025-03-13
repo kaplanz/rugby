@@ -53,7 +53,8 @@ crates are used with the structure as follows:
 ├── ...
 ├── apis/            # app interfaces
 │  ├── cfg/          # app configuration
-│  └── gbd/          # game boy debugger
+│  ├── gbd/          # game boy debugger
+│  └── pal/          # palette presets
 ├── apps/            # frontend apps
 │  ├── cli/          # command-line app
 │  └── web/          # web assembly app
@@ -93,6 +94,7 @@ Main components of `rugby` are outlined below.
 
 - [`rugby-cfg`](./apis/cfg): definition of application configuration options.
 - [`rugby-gbd`](./apis/gbd): provides an interactive prompt debugging interface.
+- [`rugby-pal`](./apis/pal): a collection of DMG palette presets.
 
 #### Frontends
 
