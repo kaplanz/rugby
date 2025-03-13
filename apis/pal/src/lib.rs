@@ -1,17 +1,23 @@
-//! Preset color palettes.
+//! Color palettes.
+
+#![warn(clippy::pedantic)]
 
 use std::fmt::Debug;
 use std::ops::Index;
 
 pub use chex::Color;
-use serde::{Deserialize, Serialize};
 
 pub use self::decl::*;
 
 /// 2-bit color palette.
 ///
 /// Used by the DMG model; the 2-bit palette depth supports a total of 4 colors.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Serialize, serde::Deserialize),
+    serde(default, deny_unknown_fields)
+)]
 pub struct Palette([Color; 4]);
 
 impl Palette {
