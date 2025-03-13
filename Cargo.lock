@@ -1772,7 +1772,8 @@ dependencies = [
  "pest",
  "pest_derive",
  "png",
- "rugby",
+ "rugby-arch",
+ "rugby-core",
  "thiserror 2.0.11",
  "wrange",
 ]
