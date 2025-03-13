@@ -12,7 +12,7 @@ pub use self::decl::*;
 /// 2-bit color palette.
 ///
 /// Used by the DMG model; the 2-bit palette depth supports a total of 4 colors.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(
     feature = "serde",
     derive(serde::Serialize, serde::Deserialize),
