@@ -64,6 +64,7 @@ crates are used with the structure as follows:
 │  ├── hexd/         # hex dump printer
 │  └── wrange/       # wrapping ranges
 ├── docs/            # documentation
+├── examples/        # example frontends
 ├── lib/             # library frontends
 │  └── retro/        # libretro port
 ├── roms/            # open-source ROMs
