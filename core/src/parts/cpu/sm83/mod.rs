@@ -22,11 +22,7 @@ pub type Wram = Sram;
 
 /// High RAM.
 ///
-/// 127 byte RAM only accessible by the [CPU], used to prevent memory corruption
-/// during [DMA].
-///
-/// [cpu]: super::cpu
-/// [dma]: super::dma
+/// 127 byte RAM only accessible by the CPU.
 pub type Hram = Ram<[Byte; 0x007f]>;
 
 /// Processor byte select.
