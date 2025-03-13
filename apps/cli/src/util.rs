@@ -62,7 +62,8 @@ pub mod ram {
             .with_context(|| format!("failed to open: `{}`", path.display()))?
             .take(0x0002_0000); // cartridge ROM has a maximum of 128 KiB
         // Load into cartridge
-        let nbytes = cart.body_mut()
+        let nbytes = cart
+            .body_mut()
             .flash(&mut file)
             .with_context(|| format!("failed to read: `{}", path.display()))?;
         debug!(
@@ -112,7 +113,8 @@ pub mod ram {
         let mut file =
             File::create(&path).with_context(|| format!("failed to open: `{}`", path.display()))?;
         // Save from cartridge
-        let nbytes = cart.body()
+        let nbytes = cart
+            .body()
             .dump(&mut file)
             .with_context(|| format!("failed to write: `{}", path.display()))?;
         debug!(
