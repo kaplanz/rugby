@@ -27,6 +27,6 @@ static INIT: Once = Once::new();
 pub fn init() {
     INIT.call_once(|| {
         // Initialize logging
-        log::init()
+        log::init();
     });
 }
