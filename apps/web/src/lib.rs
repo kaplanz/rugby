@@ -2,6 +2,8 @@
 //!
 //! Exported as a JS package called `rugby-web`.
 
+#![warn(clippy::pedantic)]
+
 use wasm_bindgen::prelude::*;
 
 mod api;
