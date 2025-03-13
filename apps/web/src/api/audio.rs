@@ -8,6 +8,7 @@ use super::GameBoy;
 
 #[wasm_bindgen]
 impl GameBoy {
+    #[must_use]
     pub fn sample(&self) -> Chiptune {
         self.0.inside().audio().sample().into()
     }

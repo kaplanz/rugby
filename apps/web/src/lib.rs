@@ -17,6 +17,7 @@ fn start() {
 
 /// Demo ROM.
 #[wasm_bindgen]
+#[must_use]
 pub fn demo() -> Box<[u8]> {
     Box::from(
         include_bytes!(concat!(
