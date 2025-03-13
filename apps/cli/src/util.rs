@@ -3,7 +3,7 @@
 use std::ffi::OsStr;
 use std::path::Path;
 
-use rugby_cfg::opt;
+use rugby::extra::cfg::opt;
 
 /// Resolves the application title.
 pub fn title(args: &opt::emu::Cart) -> &str {
@@ -23,8 +23,8 @@ pub mod ram {
     use log::{debug, error};
     use rugby::core::dmg::Cartridge;
     use rugby::core::dmg::cart::mbc::Mbc;
-    use rugby_cfg::opt;
-    use rugby_cfg::opt::emu::When;
+    use rugby::extra::cfg::opt;
+    use rugby::extra::cfg::opt::emu::When;
 
     /// Loads the cartridge RAM from a save file.
     pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {

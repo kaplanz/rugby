@@ -17,8 +17,8 @@ use rugby::core::dmg::cpu;
 use rugby::emu::part::audio::{Audio, Sample};
 use rugby::emu::part::joypad::Joypad;
 use rugby::emu::part::video::Video;
+use rugby::extra::cfg::opt::app::Speed;
 use rugby::prelude::Core;
-use rugby_cfg::opt::app::Speed;
 
 use self::ctx::Context;
 use self::msg::{Data, Sync};
@@ -211,7 +211,7 @@ pub fn main(args: &Cli, mut talk: Channel<Message, app::Message>) -> Result<()> 
                     // Play emulator
                     ctx.resume();
                     // Quit if requested
-                    if let Err(rugby_gbd::Error::Quit) = res {
+                    if let Err(rugby::extra::gbd::Error::Quit) = res {
                         // Exit frontend
                         talk.send(app::Message::Exit(app::Exit::Debugger))?;
                         // Exit emulator
