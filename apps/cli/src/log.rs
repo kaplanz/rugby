@@ -3,7 +3,7 @@ use std::sync::OnceLock;
 use anyhow::{Context, Result};
 use clap_verbosity_flag::Verbosity;
 #[cfg(feature = "gbd")]
-use rugby_gbd::Filter;
+use rugby::extra::gbd::Filter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer, Registry, fmt, reload};
