@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
 
 use displaydoc::Display;
-use rugby::core::dmg::{apu, cpu, pic, ppu, serial, timer};
+use rugby_core::dmg::{apu, cpu, pic, ppu, serial, timer};
 use wrange::Wrange;
 
 use super::Tick;
