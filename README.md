@@ -57,7 +57,8 @@ crates are used with the structure as follows:
 │  └── pal/          # palette presets
 ├── apps/            # frontend apps
 │  ├── cli/          # command-line app
-│  └── web/          # web assembly app
+│  ├── ios/          # SwiftUI iOS app
+│  └── web/          # WebAssembly app
 ├── arch/            # arch primitives
 ├── core/            # emulation core
 ├── crates/          # support crates
@@ -99,14 +100,9 @@ Main components of `rugby` are outlined below.
 #### Frontends
 
 - [`rugby-cli`](./apps/cli): a command-line interface application with rich
-  configuration support and comprehensive debugging options.
-- [`rugby-web`](./apps/web): an online web application powered by [Wasm].
-
-Several additional frontends are planned for the future:
-
+  configuration and comprehensive debugging.
 - [`rugby-ios`](./apps/ios): a native iOS application built with [SwiftUI].
-- ~`rugby-sdl`: a cross-platform application based upon the [SDL] framework.~
-  - No longer planned, use `rugby-cli` or `libretro` instead.
+- [`rugby-web`](./apps/web): an online web application powered by [Wasm].
 
 #### Libraries
 
@@ -211,7 +207,6 @@ chosen license.
 [web.badge]: https://img.shields.io/badge/frontend-web-orange
 
 <!-- Organization -->
-[sdl]:     https://www.libsdl.org
 [swiftui]: https://developer.apple.com/xcode/swiftui/
 [wasm]:    https://webassembly.org
 
