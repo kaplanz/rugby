@@ -8,9 +8,9 @@ use std::fmt::{Debug, Display, Write};
 
 use indexmap::IndexMap;
 use log::debug;
-use rugby::arch::Block;
-use rugby::arch::reg::Port;
-use rugby::core::dmg::{GameBoy, cpu, ppu};
+use rugby_arch::Block;
+use rugby_arch::reg::Port;
+use rugby_core::dmg::{GameBoy, cpu, ppu};
 use thiserror::Error;
 
 use self::lang::Program;
