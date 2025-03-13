@@ -1,7 +1,7 @@
 //! Command-line interface.
 
 use clap::Parser;
-use rugby_cfg::opt::emu::Cart;
+use rugby::extra::cfg::opt::emu::Cart;
 
 use super::NAME;
 

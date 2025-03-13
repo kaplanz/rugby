@@ -37,8 +37,19 @@ pub mod app;
 pub use rugby_arch as arch;
 #[doc(inline)]
 pub use rugby_core as core;
-#[doc(inline)]
-pub use rugby_pal as pal;
+
+/// Extra features.
+pub mod extra {
+    #[cfg(feature = "cfg")]
+    #[doc(inline)]
+    pub use rugby_cfg as cfg;
+    #[cfg(feature = "gbd")]
+    #[doc(inline)]
+    pub use rugby_gbd as gbd;
+    #[cfg(feature = "pal")]
+    #[doc(inline)]
+    pub use rugby_pal as pal;
+}
 
 pub use crate::core::api as emu;
 

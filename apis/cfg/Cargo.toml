@@ -16,6 +16,11 @@ serde = { workspace = true, optional = true }
 toml = { workspace = true, optional = true }
 
 [features]
+default = [
+  "clap",
+  "serde",
+  "toml",
+]
 clap = ["dep:clap"]
 serde = [
   "rugby-pal/serde",
