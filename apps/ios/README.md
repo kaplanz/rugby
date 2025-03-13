@@ -4,12 +4,12 @@
 
 ## Progress
 
-- [ ] Emulator
+- [x] Emulator
   - [ ] Audio
-  - [ ] Joypad
-    - [ ] On-screen touch buttons
-    - [ ] Game Controller API
-  - [ ] Video
+  - [x] Joypad
+    - [x] On-screen touch buttons
+    - [x] Game Controller API
+  - [x] Video
     - [ ] Custom palettes
 - [ ] Frontend
   - [x] Game library
