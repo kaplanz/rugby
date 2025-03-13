@@ -104,6 +104,7 @@ pub enum Unit {
 
 impl Unit {
     #[rustfmt::skip]
+    #[must_use]
     pub const fn value(&self) -> u64 {
         match self {
             Unit::Byte => B,
@@ -318,7 +319,7 @@ impl FromStr for Size {
     type Err = Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        let (base, unit) = s.trim().split_once(" ").ok_or(Error::Size)?;
+        let (base, unit) = s.trim().split_once(' ').ok_or(Error::Size)?;
         let unit: Unit = unit.parse()?;
         let value: f64 = base.parse()?;
         let bytes = (value * (unit.value() as f64)).round() as u64;

@@ -11,6 +11,7 @@ impl GameBoy {
     ///
     /// Assuming the PPU is enabled (by the cartridge), this should be true
     /// exactly once every 70,224 cycles.
+    #[must_use]
     pub fn vsync(&self) -> bool {
         self.0.inside().video().vsync()
     }
@@ -30,6 +31,7 @@ impl GameBoy {
     /// example, to get the 20th pixel of the 16th line, you would access the
     /// `(20 * 160) + 16  = 3216`th element of the frame (zero indexed) as
     /// `frame[3215]`.
+    #[must_use]
     pub fn frame(&self) -> js_sys::Uint8Array {
         js_sys::Uint8Array::from(
             self.0
