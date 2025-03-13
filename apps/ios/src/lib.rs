@@ -2,6 +2,11 @@
 //!
 //! Exported as a Swift package called `RugbyKit`.
 
+#![warn(clippy::pedantic)]
+// Allowed lints: clippy
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_panics_doc)]
+
 uniffi::setup_scaffolding!();
 
 mod api;
