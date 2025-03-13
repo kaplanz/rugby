@@ -7,7 +7,7 @@ use log::trace;
 use num::traits::{WrappingAdd, WrappingSub};
 use num::{Bounded, Integer};
 use pest::iterators::Pair;
-use rugby::core::dmg::{apu, cpu, pic, ppu, serial, timer};
+use rugby_core::dmg::{apu, cpu, pic, ppu, serial, timer};
 use thiserror::Error;
 use wrange::Wrange;
 
