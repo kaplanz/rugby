@@ -10,13 +10,17 @@ license = { workspace = true }
 
 [dependencies]
 clap = { workspace = true, optional = true, features = ["env"] }
-rugby = { workspace = true }
+rugby-core = { workspace = true }
+rugby-pal = { workspace = true }
 serde = { workspace = true, optional = true }
 toml = { workspace = true, optional = true }
 
 [features]
 clap = ["dep:clap"]
-serde = ["dep:serde"]
+serde = [
+  "rugby-pal/serde",
+  "dep:serde",
+]
 toml = [
   "serde",
   "dep:toml",
