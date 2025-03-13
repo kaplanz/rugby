@@ -88,7 +88,7 @@ pub fn emu(cfg: &Config) -> Result<GameBoy> {
         .inspect(|cart| info!("cartridge header:\n{}", cart.header()));
     // Load cart RAM
     if let Some(cart) = cart.as_mut() {
-        util::rom::flash(&cfg.emu.cart, cart).context("error flashing save RAM")?;
+        util::ram::load(&cfg.emu.cart, cart).context("error flashing save RAM")?;
     }
     // Load boot ROM
     let boot = self::boot(&cfg.emu.boot).context("invalid boot ROM")?;
