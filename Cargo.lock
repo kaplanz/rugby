@@ -1706,7 +1706,8 @@ name = "rugby-cfg"
 version = "0.1.0"
 dependencies = [
  "clap",
- "rugby",
+ "rugby-core",
+ "rugby-pal",
  "serde",
  "toml 0.8.20",
 ]
