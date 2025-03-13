@@ -6,7 +6,7 @@ use std::thread;
 use anyhow::Context as _;
 use constcat::concat;
 use log::trace;
-use rugby_cfg::Join;
+use rugby::extra::cfg::Join;
 
 use crate::err::Result;
 use crate::{app, cfg, emu, talk};

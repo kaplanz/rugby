@@ -9,7 +9,7 @@ use rugby::core::dmg::{self, Button};
 use rugby::emu::part::audio::Sample;
 use rugby::emu::part::joypad::Event;
 use rugby::emu::part::video::Frame;
-use rugby::pal::Palette;
+use rugby::extra::pal::Palette;
 
 pub mod audio;
 pub mod video;

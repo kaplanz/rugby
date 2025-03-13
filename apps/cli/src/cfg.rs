@@ -4,8 +4,8 @@ use std::io::ErrorKind::NotFound;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
-pub use rugby_cfg::Config;
-use rugby_cfg::de;
+pub use rugby::extra::cfg::Config;
+use rugby::extra::cfg::de;
 use thiserror::Error;
 
 use crate::dir;

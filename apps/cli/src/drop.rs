@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use rugby::core::dmg::GameBoy;
-use rugby_cfg::Config;
+use rugby::extra::cfg::Config;
 
 use crate::util;
 
