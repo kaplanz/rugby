@@ -23,6 +23,7 @@ impl GameBoy {
     ///
     /// Use [`Self::reset`] for a soft reset.
     #[wasm_bindgen(constructor)]
+    #[must_use]
     pub fn new() -> Self {
         Self(dmg::GameBoy::new())
     }
@@ -37,6 +38,7 @@ impl GameBoy {
     /// further emulation is required.
     ///
     /// This should generally be checked before calling [`Self::cycle`].
+    #[must_use]
     pub fn ready(&self) -> bool {
         self.0.ready()
     }
