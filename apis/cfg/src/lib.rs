@@ -1,5 +1,7 @@
 //! Emulator configuration.
 
+#![warn(clippy::pedantic)]
+
 use std::path::Path;
 
 use crate::opt::{Emulator, Frontend};
