@@ -134,6 +134,7 @@ pub enum Speed {
 impl Speed {
     /// Converts the `Speed` to its corresponding frequency.
     #[rustfmt::skip]
+    #[must_use]
     pub fn freq(&self) -> Option<u32> {
         match self {
             Speed::Half       => Some(FREQ / 2),

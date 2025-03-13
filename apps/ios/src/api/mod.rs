@@ -29,6 +29,7 @@ impl GameBoy {
     ///
     /// Use [`Self::reset`] for a soft reset.
     #[uniffi::constructor]
+    #[must_use]
     pub fn new() -> Self {
         Self {
             emu: dmg::GameBoy::new().into(),

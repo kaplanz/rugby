@@ -139,6 +139,7 @@ impl Cart {
     /// Cartridge RAM save file.
     ///
     /// The cartridge's RAM be initialized from the data specified in this file.
+    #[must_use]
     pub fn ram(&self) -> Option<PathBuf> {
         self.rom.as_ref().map(|path| path.with_extension("sav"))
     }
