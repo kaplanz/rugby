@@ -1,7 +1,7 @@
 //! Configurable values.
 
-use rugby::core::dmg::FREQ;
-use rugby::pal;
+use rugby_core::dmg::FREQ;
+use rugby_pal as pal;
 
 /// When to enable.
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
