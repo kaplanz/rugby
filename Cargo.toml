@@ -14,10 +14,9 @@ categories = ["emulators"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chex = { workspace = true }
 rugby-arch = { workspace = true }
 rugby-core = { workspace = true }
-serde = { workspace = true }
+rugby-pal = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
@@ -64,6 +63,7 @@ rugby-arch = { version = "0.1.0", path = "arch" }
 rugby-cfg = { version = "0.1.0", path = "apis/cfg" }
 rugby-core = { version = "0.1.0", path = "core" }
 rugby-gbd = { version = "0.1.0", path = "apis/gbd" }
+rugby-pal = { version = "0.1.0", path = "apis/pal" }
 serde = { version = "1.0.217", features = ["derive"] }
 thiserror = "2.0.11"
 toml = "0.8.20"
