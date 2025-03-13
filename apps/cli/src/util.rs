@@ -14,8 +14,8 @@ pub fn title(args: &opt::emu::Cart) -> &str {
         .unwrap_or(crate::NAME)
 }
 
-/// Cartridge utilities.
-pub mod rom {
+/// Cartridge RAM.
+pub mod ram {
     use std::fs::File;
     use std::io::Read;
 
@@ -26,19 +26,31 @@ pub mod rom {
     use rugby_cfg::opt;
     use rugby_cfg::opt::emu::When;
 
-    /// Flashes the cartridge RAM from a save file.
-    pub fn flash(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
+    /// Loads the cartridge RAM from a save file.
+    pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
         let Some(path) = args.ram() else {
             return Ok(());
         };
-        if let Some(When::Never) = args.save {
-            return Ok(());
-        }
-        if matches!(args.save, Some(When::Auto)) && !cart.header().info.has_battery() {
-            return Ok(());
+        match args.save.unwrap_or_default() {
+            When::Never => {
+                debug!("load RAM disabled by user");
+                return Ok(());
+            }
+            When::Auto => {
+                let info = &cart.header().info;
+                if info.has_ram() && info.has_battery() {
+                    debug!("load RAM automatically enabled");
+                } else {
+                    debug!("load RAM automatically disabled");
+                    return Ok(());
+                }
+            }
+            When::Always => {
+                debug!("load RAM enabled by user");
+            }
         }
         if !cart.header().info.has_ram() {
-            error!("cannot flash: cartridge does not support RAM");
+            error!("cannot load: cartridge does not support RAM");
             return Ok(());
         }
         if !path.exists() {
@@ -49,12 +61,15 @@ pub mod rom {
         let mut file = File::open(&path)
             .with_context(|| format!("failed to open: `{}`", path.display()))?
             .take(0x0002_0000); // cartridge ROM has a maximum of 128 KiB
-        debug!("reading RAM image: `{}`", path.display());
-
         // Load into cartridge
-        cart.body_mut()
+        let nbytes = cart.body_mut()
             .flash(&mut file)
             .with_context(|| format!("failed to read: `{}", path.display()))?;
+        debug!(
+            "read {size}: `{path}`",
+            size = bfmt::Size::from(nbytes),
+            path = path.display(),
+        );
 
         Ok(())
     }
@@ -64,6 +79,24 @@ pub mod rom {
         let Some(path) = args.ram() else {
             return Ok(());
         };
+        match args.save.unwrap_or_default() {
+            When::Never => {
+                debug!("dump RAM disabled by user");
+                return Ok(());
+            }
+            When::Auto => {
+                let info = &cart.header().info;
+                if info.has_ram() && info.has_battery() {
+                    debug!("dump RAM automatically enabled");
+                } else {
+                    debug!("dump RAM automatically disabled");
+                    return Ok(());
+                }
+            }
+            When::Always => {
+                debug!("dump RAM enabled by user");
+            }
+        }
         if let Some(When::Never) = args.save {
             return Ok(());
         }
@@ -78,12 +111,15 @@ pub mod rom {
         // Open RAM file
         let mut file =
             File::create(&path).with_context(|| format!("failed to open: `{}`", path.display()))?;
-        debug!("writing RAM image: `{}`", path.display());
-
         // Save from cartridge
-        cart.body()
+        let nbytes = cart.body()
             .dump(&mut file)
             .with_context(|| format!("failed to write: `{}", path.display()))?;
+        debug!(
+            "read {size}: `{path}`",
+            size = bfmt::Size::from(nbytes),
+            path = path.display(),
+        );
 
         Ok(())
     }
