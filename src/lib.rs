@@ -32,12 +32,13 @@
 #![warn(clippy::pedantic)]
 
 pub mod app;
-pub mod pal;
 
 #[doc(inline)]
 pub use rugby_arch as arch;
 #[doc(inline)]
 pub use rugby_core as core;
+#[doc(inline)]
+pub use rugby_pal as pal;
 
 pub use crate::core::api as emu;
 
