@@ -704,7 +704,7 @@ pub extern "C" fn retro_run() {
     // Apply palette to frame
     let frame: Box<[u32]> = frame
         .iter()
-        .map(|&pix| rugby::pal::MONO[pix as usize].into())
+        .map(|&pix| rugby::extra::pal::MONO[pix as usize].into())
         .collect();
 
     // Draw completed frame

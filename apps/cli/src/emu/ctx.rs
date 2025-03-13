@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 
 use rugby::arch::Clock;
 use rugby::core::dmg::{self, ppu};
-use rugby_cfg::Config;
+use rugby::extra::cfg::Config;
 
 use super::DIVIDER;
 

@@ -1687,7 +1687,9 @@ dependencies = [
  "png",
  "rugby",
  "rugby-arch",
+ "rugby-cfg",
  "rugby-core",
+ "rugby-gbd",
  "rugby-pal",
  "thiserror 2.0.11",
 ]
@@ -1731,8 +1733,6 @@ dependencies = [
  "minifb",
  "ringbuf",
  "rugby",
- "rugby-cfg",
- "rugby-gbd",
  "rustyline",
  "supports-color",
  "sysexits",

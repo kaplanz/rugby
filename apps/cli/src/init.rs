@@ -11,10 +11,10 @@ use std::sync::mpsc;
 use anyhow::{Context, Result, ensure};
 use log::{debug, info, trace, warn};
 use rugby::core::dmg::{Boot, Cartridge, GameBoy, LCD};
-use rugby::pal::Palette;
-use rugby_cfg::opt;
+use rugby::extra::cfg::opt;
 #[cfg(feature = "gbd")]
-use rugby_gbd::Debugger;
+use rugby::extra::gbd::Debugger;
+use rugby::extra::pal::Palette;
 
 use crate::app::{self, App};
 use crate::cfg::Config;
