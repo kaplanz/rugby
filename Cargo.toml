@@ -16,7 +16,9 @@ categories = ["emulators"]
 [dependencies]
 rugby-arch = { workspace = true }
 rugby-core = { workspace = true }
-rugby-pal = { workspace = true }
+rugby-cfg = { workspace = true, optional = true }
+rugby-gbd = { workspace = true, optional = true }
+rugby-pal = { workspace = true, optional = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
@@ -25,7 +27,17 @@ rugby = { workspace = true, features = ["debug"] }
 
 [features]
 default = []
-debug = ["rugby-core/debug"]
+debug = [
+  "rugby-core/debug",
+]
+extra = [
+  "cfg",
+  "gbd",
+  "pal",
+]
+cfg = ["dep:rugby-cfg"]
+gbd = ["dep:rugby-gbd"]
+pal = ["dep:rugby-pal"]
 
 [profile.dev]
 opt-level = 3

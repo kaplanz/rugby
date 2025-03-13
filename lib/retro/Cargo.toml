@@ -16,4 +16,4 @@ crate-type = ["cdylib"]
 constcat = { workspace = true }
 log = { workspace = true }
 parking_lot = "0.12.3"
-rugby = { workspace = true }
+rugby = { workspace = true, features = ["pal"] }
