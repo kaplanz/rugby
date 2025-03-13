@@ -24,7 +24,13 @@
 //! # }
 //! ```
 
+#![warn(clippy::pedantic)]
+// Allowed lints: rustc
 #![allow(non_upper_case_globals)]
+// Allowed lints: clippy
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::cast_sign_loss)]
 
 use std::fmt::{self, Debug, Display, Formatter};
 use std::num;
