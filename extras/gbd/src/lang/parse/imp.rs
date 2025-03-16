@@ -6,10 +6,10 @@ use std::path::PathBuf;
 use log::trace;
 use num::traits::{WrappingAdd, WrappingSub};
 use num::{Bounded, Integer};
+use orng::Orange;
 use pest::iterators::Pair;
 use rugby_core::dmg::{apu, cpu, pic, ppu, serial, timer};
 use thiserror::Error;
-use wrange::Wrange;
 
 use super::{Command, Keyword, Result, Rule, Select, Serial, Tick, Value};
 
@@ -246,7 +246,7 @@ where
     .map_err(super::Error::ParseInt)
 }
 
-pub fn range<I>(pair: Pair<Rule>) -> Result<Wrange<I>>
+pub fn range<I>(pair: Pair<Rule>) -> Result<Orange<I>>
 where
     I: Bounded
         + Clone
@@ -272,7 +272,7 @@ where
                 rule => return Err(Error::from(ErrorKind::Invalid(rule)).into()),
             };
             // Define
-            let range = Wrange::from(stx..end);
+            let range = Orange::from(stx..end);
             Ok(range)
         }
         Rule::RangeFrom => {
@@ -282,12 +282,12 @@ where
             // Parse
             let stx = self::integer(stx)?;
             // Define
-            let range = Wrange::from(stx..);
+            let range = Orange::from(stx..);
             Ok(range)
         }
         Rule::RangeFull => {
             // Define
-            let range = Wrange::from(..);
+            let range = Orange::from(..);
             Ok(range)
         }
         Rule::RangeInc => {
@@ -303,7 +303,7 @@ where
                 rule => return Err(Error::from(ErrorKind::Invalid(rule)).into()),
             };
             // Define
-            let range = Wrange::from(stx..=end);
+            let range = Orange::from(stx..=end);
             Ok(range)
         }
         Rule::RangeTo => {
@@ -317,7 +317,7 @@ where
                 rule => return Err(Error::from(ErrorKind::Invalid(rule)).into()),
             };
             // Define
-            let range = Wrange::from(..end);
+            let range = Orange::from(..end);
             Ok(range)
         }
         Rule::RangeToInc => {
@@ -331,7 +331,7 @@ where
                 rule => return Err(Error::from(ErrorKind::Invalid(rule)).into()),
             };
             // Define
-            let range = Wrange::from(..=end);
+            let range = Orange::from(..=end);
             Ok(range)
         }
         rule => rule.exception(),

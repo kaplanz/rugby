@@ -79,5 +79,5 @@ rugby-pal = { version = "0.1.0", path = "extras/pal" }
 serde = { version = "1.0.217", features = ["derive"] }
 thiserror = "2.0.11"
 toml = "0.8.20"
-wrange = { version = "0.1.0", path = "crates/wrange" }
+orng = { version = "0.1.0", path = "crates/orng" }
 xdir = "0.1.0"
