@@ -61,7 +61,7 @@ crates are used with the structure as follows:
 │  ├── bfmt/         # bytes formatter
 │  ├── chex/         # color hex parser
 │  ├── hexd/         # hex dump printer
-│  └── wrange/       # wrapping ranges
+│  └── orng/         # wrapping ranges
 ├── docs/            # documentation
 ├── examples/        # example frontends
 ├── extras/          # extra emulator APIs
