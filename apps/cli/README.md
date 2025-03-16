@@ -123,8 +123,8 @@ To list and get help with GBD, use the `help` command at the prompt or see its
 For information regarding licensure, please see the project's [README][license].
 
 <!-- Reference-style links -->
-[cfg.doc]: /apis/cfg/README.md
-[gbd.doc]: /apis/gbd/README.md
+[cfg.doc]: /extras/cfg/README.md
+[gbd.doc]: /extras/gbd/README.md
 [license]: /README.md#license
 
 <!-- Badges -->
