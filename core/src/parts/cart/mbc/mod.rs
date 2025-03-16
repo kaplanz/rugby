@@ -78,12 +78,12 @@ impl Body {
     /// header.
     pub fn new(head: &Header, rom: &[Byte]) -> Result<Self> {
         // Initialize ROM
-        let rom = make::rom(head, rom);
+        let rom = init::rom(head, rom);
         if !rom.is_empty() {
             trace!("ROM:\n{rom}", rom = hexd::Printer::<Byte>::new(0, &rom));
         }
         // Initialize RAM
-        let ram = make::ram(head);
+        let ram = init::ram(head);
         if !ram.is_empty() {
             trace!("RAM:\n{ram}", ram = hexd::Printer::<Byte>::new(0, &ram));
         }
@@ -98,7 +98,7 @@ impl Body {
     }
 }
 
-mod make {
+mod init {
     use std::cmp::Ordering;
     use std::iter;
 
