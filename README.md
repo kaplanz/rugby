@@ -32,7 +32,7 @@ different accuracy/performance margins.
 ## Organization
 
 In accordance with the preference for modularity outlined above, the project is
-partitioned into the [core](./core), the [debugger](./apis/gbd), and various
+partitioned into the [core](./core), the [debugger](./extras/gbd), and various
 emulator [frontends](./apps). Useful supporting [crates](./crates) are
 independently available as well. Also packaged in this repository are several
 open-source [ROMs](./roms). These are used internally for testing and to demo
@@ -51,10 +51,6 @@ crates are used with the structure as follows:
 ├── Justfile         # useful dev commands
 ├── README.md        # this document
 ├── ...
-├── apis/            # app interfaces
-│  ├── cfg/          # app configuration
-│  ├── gbd/          # game boy debugger
-│  └── pal/          # palette presets
 ├── apps/            # frontend apps
 │  ├── cli/          # command-line app
 │  ├── ios/          # SwiftUI iOS app
@@ -67,6 +63,10 @@ crates are used with the structure as follows:
 │  └── wrange/       # wrapping ranges
 ├── docs/            # documentation
 ├── examples/        # example frontends
+├── extras/          # extra emulator APIs
+│  ├── cfg/          # app configuration
+│  ├── gbd/          # game boy debugger
+│  └── pal/          # palette presets
 ├── lib/             # library frontends
 │  └── retro/        # libretro port
 ├── roms/            # open-source ROMs
@@ -93,9 +93,9 @@ Main components of `rugby` are outlined below.
 
 #### Interfaces
 
-- [`rugby-cfg`](./apis/cfg): definition of application configuration options.
-- [`rugby-gbd`](./apis/gbd): provides an interactive prompt debugging interface.
-- [`rugby-pal`](./apis/pal): a collection of DMG palette presets.
+- [`rugby-cfg`](./extras/cfg): definition of app configuration options.
+- [`rugby-gbd`](./extras/gbd): provides an interactive prompt debugger.
+- [`rugby-pal`](./extras/pal): a collection of DMG palette presets.
 
 #### Frontends
 
