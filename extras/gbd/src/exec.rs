@@ -6,13 +6,13 @@ use std::ops::Not;
 use std::path::Path;
 
 use itertools::Itertools;
+use orng::Orange;
 use rugby_arch::Block;
 use rugby_arch::reg::Port;
 use rugby_core::api::part::proc::Processor as _;
 use rugby_core::api::part::serial::Serial as _;
 use rugby_core::api::part::video::Video as _;
 use rugby_core::dmg::LCD;
-use wrange::Wrange;
 
 use super::lang::{Keyword, Select, Serial, Value};
 use super::{Debugger, Error, GameBoy, Result, Tick};
@@ -282,9 +282,9 @@ pub fn read(emu: &mut GameBoy, addr: u16) -> Result<()> {
     Ok(())
 }
 
-pub fn read_range(emu: &mut GameBoy, range: Wrange<u16>) -> Result<()> {
+pub fn read_range(emu: &mut GameBoy, range: Orange<u16>) -> Result<()> {
     // Create iterator from range
-    let Wrange { start, .. } = range.clone();
+    let Orange { start, .. } = range.clone();
     let iter = range.into_iter();
     // Load all reads
     let data: Vec<_> = iter.map(|addr| emu.main.soc.cpu.read(addr)).collect();
@@ -445,10 +445,10 @@ pub fn write(emu: &mut GameBoy, addr: u16, byte: u8) -> Result<()> {
     Ok(())
 }
 
-pub fn write_range(emu: &mut GameBoy, range: Wrange<u16>, byte: u8) -> Result<()> {
+pub fn write_range(emu: &mut GameBoy, range: Orange<u16>, byte: u8) -> Result<()> {
     let cpu = &mut emu.main.soc.cpu;
     // Create iterator from range
-    let Wrange { start, end } = range.clone();
+    let Orange { start, end } = range.clone();
     let iter = range.into_iter();
     // Store all writes
     let data: Vec<_> = iter
