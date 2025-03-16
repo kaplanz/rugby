@@ -44,11 +44,11 @@ opt-level = 3
 
 [workspace]
 members = [
-  "apis/*",
   "apps/*",
   "arch",
   "core",
   "crates/*",
+  "extras/*",
   "lib/*",
 ]
 
@@ -72,10 +72,10 @@ num = "0.4.3"
 png = "0.17.16"
 rugby = { version = "0.1.0", path = "." }
 rugby-arch = { version = "0.1.0", path = "arch" }
-rugby-cfg = { version = "0.1.0", path = "apis/cfg" }
+rugby-cfg = { version = "0.1.0", path = "extras/cfg" }
 rugby-core = { version = "0.1.0", path = "core" }
-rugby-gbd = { version = "0.1.0", path = "apis/gbd" }
-rugby-pal = { version = "0.1.0", path = "apis/pal" }
+rugby-gbd = { version = "0.1.0", path = "extras/gbd" }
+rugby-pal = { version = "0.1.0", path = "extras/pal" }
 serde = { version = "1.0.217", features = ["derive"] }
 thiserror = "2.0.11"
 toml = "0.8.20"
