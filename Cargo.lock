@@ -1304,6 +1304,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "orng"
+version = "0.1.0"
+dependencies = [
+ "num",
+]
+
+[[package]]
 name = "overload"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1769,13 +1776,13 @@ dependencies = [
  "itertools 0.14.0",
  "log",
  "num",
+ "orng",
  "pest",
  "pest_derive",
  "png",
  "rugby-arch",
  "rugby-core",
  "thiserror 2.0.11",
- "wrange",
 ]
 
 [[package]]
@@ -2851,13 +2858,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3268f3d866458b787f390cf61f4bbb563b922d091359f9608842999eaee3943c"
 dependencies = [
  "bitflags 2.8.0",
-]
-
-[[package]]
-name = "wrange"
-version = "0.1.0"
-dependencies = [
- "num",
 ]
 
 [[package]]
