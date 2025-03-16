@@ -58,6 +58,7 @@ crates are used with the structure as follows:
 ├── arch/            # arch primitives
 ├── core/            # emulation core
 ├── crates/          # support crates
+│  ├── bfmt/         # bytes formatter
 │  ├── chex/         # color hex parser
 │  ├── hexd/         # hex dump printer
 │  └── wrange/       # wrapping ranges
