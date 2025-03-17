@@ -1,9 +1,13 @@
-use std::time::Instant;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
+use std::time::{Duration, Instant};
 
 use rugby::arch::Block;
 use rugby::core::dmg::{Cartridge, FREQ, GameBoy};
 
 const GAME: &[u8; 0x10000] = include_bytes!("../roms/games/porklike/porklike.gb");
+
+static EXIT: AtomicBool = AtomicBool::new(false);
 
 fn main() {
     // Instantiate a cartridge
@@ -13,8 +17,15 @@ fn main() {
     // Load the cartridge
     emu.insert(cart);
 
-    // Loop forever
-    loop {
+    // Start exit timer
+    thread::spawn(|| {
+        thread::sleep(Duration::from_secs(5));
+        // Exit after timer
+        EXIT.store(true, Ordering::Relaxed);
+    });
+
+    // Loop until exit
+    while !EXIT.load(Ordering::Relaxed) {
         // Timestamp iteration start
         let instant = Instant::now();
         for _ in 0..FREQ {
