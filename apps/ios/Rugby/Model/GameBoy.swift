@@ -287,9 +287,9 @@ class GameBoy {
 ///
 /// Calculates the running frame rate of an emulator task,
 private struct Profiler {
-    /// Cycle counter.
+    /// Elapsed cycle count.
     private var count: UInt32 = 0
-    /// Statistics timer.
+    /// Statistics timestamp.
     private var timer = ContinuousClock.now
 
     mutating func reset() {
@@ -299,14 +299,14 @@ private struct Profiler {
     mutating func tick(by update: UInt32 = 1) -> Double? {
         // Increment counter
         count += update
-        // Calculate elapsed time
+        // Read elapsed time
         let delta = timer.duration(to: .now)
         // Report every second
         var rate: Double? = nil
         if delta > .seconds(1) {
             // Update profiled rate
             rate = (Double(count) / 70_244.0) * (.seconds(1) / delta)
-            // Reset properties
+            // Reset profiler
             count = 0
             timer = .now
         }
