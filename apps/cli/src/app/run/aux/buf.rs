@@ -9,14 +9,7 @@ use rubato::{
     SincInterpolationType,
     WindowFunction,
 };
-use rugby::core::dmg;
 use rugby::emu::part::audio::Sample;
-
-/// Audio input rate.
-const IRATE: usize = dmg::FREQ as usize;
-
-/// Audio output rate.
-const ORATE: usize = super::SAMPLES;
 
 /// Audio latency maximum (in milliseconds).
 const DELAY: usize = super::LATENCY;
@@ -26,6 +19,11 @@ const NCHAN: usize = super::CHANNELS;
 
 /// Audio resampling stream.
 pub struct Stream {
+    /// Sample rate input.
+    #[expect(unused)]
+    ifrq: u32,
+    /// Sample rate output.
+    ofrq: u32,
     /// Sample buffer input.
     ibuf: Ring<Sample>,
     /// Sample buffer output.
@@ -42,18 +40,12 @@ pub struct Stream {
     need: usize,
 }
 
-impl Default for Stream {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Stream {
     /// Constructs a new `Stream`.
-    pub fn new() -> Self {
+    pub fn new(ifrq: u32, ofrq: u32) -> Self {
         // Calculate buffer sizes based on rates and duration
-        let ilen = IRATE * DELAY / 1000;
-        let olen = ORATE * DELAY / 1000;
+        let ilen = ifrq as usize * DELAY / 1000;
+        let olen = ofrq as usize * DELAY / 1000;
 
         // Create interface buffers
         let ibuf = Ring::new(ilen);
@@ -69,10 +61,14 @@ impl Stream {
         };
 
         // Create the resampler with appropriate parameters
-        #[expect(clippy::cast_precision_loss)]
-        let sinc =
-            SincFixedIn::<f32>::new(ORATE as f64 / IRATE as f64, 1.0, params, ilen / 4, NCHAN)
-                .unwrap();
+        let sinc = SincFixedIn::<f32>::new(
+            f64::from(ofrq) / f64::from(ifrq),
+            1.0,
+            params,
+            ilen / 4,
+            NCHAN,
+        )
+        .unwrap();
 
         // Get initial frame counts
         let need = sinc.input_frames_next();
@@ -83,6 +79,8 @@ impl Stream {
         let owrk = vec![vec![0.0; omax]; NCHAN];
 
         Self {
+            ifrq,
+            ofrq,
             ibuf,
             obuf,
             sinc,
@@ -116,7 +114,9 @@ impl Stream {
     /// An audio sample if available, or `None` if the buffer is empty.
     pub fn pull(&mut self) -> Option<Sample> {
         // Process more samples if output buffer is getting low
-        if self.obuf.occupied_len() < ORATE / 100 && self.ibuf.occupied_len() >= self.need {
+        if self.obuf.occupied_len() < self.ofrq as usize / 100
+            && self.ibuf.occupied_len() >= self.need
+        {
             self.process();
         }
 
