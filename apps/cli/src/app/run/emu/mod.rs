@@ -101,7 +101,9 @@ pub fn main(args: &Cli) -> Result<()> {
             emu.cycle();
 
             // Sample audio
-            app::data::audio::push(emu.inside().audio().sample().mix());
+            if !args.feat.mute {
+                app::data::audio::push(emu.inside().audio().sample().mix());
+            }
             // Sample video
             if !args.feat.headless && emu.inside().video().vsync() {
                 // Video frame.
