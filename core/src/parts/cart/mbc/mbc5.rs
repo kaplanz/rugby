@@ -1,5 +1,3 @@
-use std::io;
-
 use log::{debug, trace};
 use rugby_arch::mem::{Error, Memory, Result};
 use rugby_arch::mio::Device;
@@ -14,8 +12,8 @@ use super::{Data, Mbc};
 #[derive(Debug)]
 pub struct Mbc5 {
     ctl: Control,
-    rom: Shared<Rom>,
-    ram: Shared<Ram>,
+    pub(super) rom: Shared<Rom>,
+    pub(super) ram: Shared<Ram>,
 }
 
 impl Mbc5 {
@@ -44,14 +42,6 @@ impl Mbc for Mbc5 {
 
     fn ram(&self) -> Device {
         self.ram.clone().into()
-    }
-
-    fn flash(&mut self, buf: &mut impl io::Read) -> io::Result<usize> {
-        buf.read(&mut self.ram.borrow_mut().mem)
-    }
-
-    fn dump(&self, buf: &mut impl io::Write) -> io::Result<usize> {
-        buf.write(&self.ram.borrow().mem)
     }
 }
 
@@ -197,9 +187,9 @@ impl Register for RamBank {
 
 /// MBC5 ROM.
 #[derive(Debug)]
-struct Rom {
+pub(super) struct Rom {
     ctl: Control,
-    mem: Data,
+    pub(super) mem: Data,
 }
 
 impl Rom {
@@ -261,9 +251,9 @@ impl Memory for Rom {
 
 /// MBC5 RAM.
 #[derive(Debug)]
-struct Ram {
+pub(super) struct Ram {
     ctl: Control,
-    mem: Data,
+    pub(super) mem: Data,
 }
 
 impl Ram {
