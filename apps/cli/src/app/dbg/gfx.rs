@@ -1,38 +1,34 @@
-//! Debug windows.
+//! Graphics debug windows.
 
 use anyhow::{Context, Result};
 use rugby::core::dmg::ppu;
 
-use crate::gui::Frontend;
-use crate::gui::video::{Attributes, Extent, Window};
+use crate::app::gui::Frontend;
+use crate::app::gui::win::{Attributes, Extent, Window};
 
 impl Frontend {
     /// Render debug windows.
     #[expect(clippy::needless_pass_by_value)]
-    pub fn vram(&mut self, data: ppu::dbg::Debug) -> Result<()> {
-        // Extract GUI
-        let Some(gui) = self.win.as_mut() else {
-            return Ok(());
-        };
+    pub fn gfx(&mut self, data: ppu::dbg::Debug) -> Result<()> {
         // Extract PPU state
-        let recolor = |col: ppu::Color| self.cfg.pal[col as usize].into();
+        let recolor = |col: ppu::Color| self.pal[col as usize].into();
         let tdat = data.tdat.into_iter().map(recolor).collect::<Box<_>>();
         let map1 = data.map1.into_iter().map(recolor).collect::<Box<_>>();
         let map2 = data.map2.into_iter().map(recolor).collect::<Box<_>>();
         // Display PPU state
-        gui.dbg
+        self.dbg
             .tile
             .as_mut()
             .map(|win| win.redraw(&tdat))
             .transpose()
             .context("error drawing tile data")?;
-        gui.dbg
+        self.dbg
             .map1
             .as_mut()
             .map(|win| win.redraw(&map1))
             .transpose()
             .context("error drawing tile map 1")?;
-        gui.dbg
+        self.dbg
             .map2
             .as_mut()
             .map(|win| win.redraw(&map2))
@@ -42,9 +38,9 @@ impl Frontend {
     }
 }
 
-/// VRAM windows.
+/// Graphics windows.
 #[derive(Debug, Default)]
-pub struct Vram {
+pub struct Gfx {
     /// Tile data.
     pub tile: Option<Window<Tile>>,
     /// Tile map 1.
@@ -54,7 +50,7 @@ pub struct Vram {
 }
 
 #[expect(unused)]
-impl Vram {
+impl Gfx {
     /// Constructs a new `Debug`.
     pub fn new() -> Result<Self> {
         let mut this = Self::default();
