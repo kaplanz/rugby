@@ -14,6 +14,19 @@ pub use crate::val::{Palette, Speed};
     serde(default, deny_unknown_fields)
 )]
 pub struct Frontend {
+    /// Audio sample rate.
+    ///
+    /// Defines the sample rate to use for audio output. On most systems, this
+    /// should be in the range of 8 Khz to 96 KHz. Unless you have a specific
+    /// use case, there is no reason to change the default value.
+    #[cfg_attr(
+        feature = "clap",
+        clap(short, long = "audio", value_name = "RATE", default_value_t = 48_000)
+    )]
+    #[cfg_attr(feature = "serde", serde(rename = "audio"))]
+    #[expect(clippy::doc_markdown)]
+    pub aux: u32,
+
     /// Logging filter.
     ///
     /// A comma-separated list of logging directives.
