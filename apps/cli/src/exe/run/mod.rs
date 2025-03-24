@@ -1,7 +1,6 @@
 //! Emulate provided ROM.
 
 use std::path::Path;
-use std::thread;
 
 use anyhow::Context as _;
 use constcat::concat;
@@ -9,7 +8,7 @@ use log::trace;
 use rugby::extra::cfg::Join;
 
 use crate::err::Result;
-use crate::{app, cfg, emu, talk};
+use crate::{app, cfg};
 
 pub mod cli;
 
@@ -35,19 +34,5 @@ pub fn main(mut args: Cli) -> Result<()> {
     trace!("{args:#?}");
 
     // Run application
-    let res = thread::scope(|s| {
-        // Initialize channels
-        let channel = talk::pair::<emu::Message, app::Message>();
-
-        // Run emulator on another thread
-        let emu = s.spawn(|| emu::main(&args, channel.0));
-        // Run frontend on main thread
-        let app = app::main(&args, channel.1);
-
-        // Forward result
-        emu.join().expect("emulator thread panicked").and(app)
-    });
-
-    // Return runtime errors
-    res.map_err(Into::into)
+    app::run(&args).map_err(Into::into)
 }

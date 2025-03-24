@@ -10,11 +10,11 @@ use tracing_subscriber::{EnvFilter, Layer, Registry, fmt, reload};
 
 type Reload = reload::Handle<EnvFilter, Registry>;
 
+/// Global logger verbosity.
+pub static VLEVEL: OnceLock<Verbosity> = OnceLock::new();
+
 /// Global logger reload handle.
 pub static RELOAD: OnceLock<Handle> = OnceLock::new();
-
-/// Global logger verbosity.
-pub static VERBOSE: OnceLock<Verbosity> = OnceLock::new();
 
 /// Initializes the global logger.
 ///
@@ -24,12 +24,12 @@ pub static VERBOSE: OnceLock<Verbosity> = OnceLock::new();
 /// [`RELOAD`].
 pub fn init(filter: Option<&str>) -> Result<()> {
     // Extract verbosity flag
-    let verbose = VERBOSE.get().context("missing logging filter")?;
+    let vlevel = VLEVEL.get().context("missing verbosity level")?;
     // Build and configure an environment filter
     let filter = EnvFilter::builder()
-        .with_default_directive(verbose.tracing_level_filter().into())
+        .with_default_directive(vlevel.tracing_level_filter().into())
         .parse({
-            if verbose.is_present() {
+            if vlevel.is_present() {
                 ""
             } else {
                 filter.unwrap_or_default()
