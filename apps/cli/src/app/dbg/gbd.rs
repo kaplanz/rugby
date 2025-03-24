@@ -30,6 +30,7 @@ pub struct Console {
 
 impl Console {
     /// Constructs a new `Console`.
+    #[expect(unused)]
     pub fn new() -> anyhow::Result<Self> {
         Self {
             edit: Editor::new()?,
