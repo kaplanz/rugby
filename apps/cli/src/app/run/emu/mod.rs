@@ -4,7 +4,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context as _, Result};
-use log::{debug, trace};
+use log::{debug, info, trace};
 use rugby::arch::Block;
 use rugby::core::dmg::{self, ppu};
 use rugby::emu::part::audio::Audio;
@@ -28,6 +28,8 @@ pub struct Context {
     pub awake: Option<Instant>,
     /// Cycle counter.
     pub count: Profiler,
+    /// Total counter.
+    pub total: Profiler,
     /// Pause emulator.
     pub pause: bool,
 }
@@ -140,23 +142,39 @@ pub fn main(args: &Cli) -> Result<()> {
             None
         };
 
-        // Synchronize profiler
+        // Synchronize profilers
+        ctx.total.tick_by(count);
         ctx.count.tick_by(count);
         if let Some(freq) = ctx.count.report_delay() {
             // Log performance
-            debug!(
-                "frequency: {freq:>7.4} MHz, speedup: {pace:>4.2}x, frames: {rate:>6.2} FPS",
-                freq = freq / 1e6,
-                pace = freq / f64::from(dmg::FREQ),
-                rate = freq / f64::from(ppu::RATE)
-            );
+            self::report(freq);
             // Set performance
             app::data::bench::update(freq);
         }
     }
 
+    // Report benchmark
+    let tick = ctx.total.cycle;
+    let time = ctx.total.timer.elapsed();
+    let mean = ctx.total.report();
+    info!(
+        "benchmark: {tick:>7.4} MCy, elapsed: {time:>4.2?}",
+        tick = f64::from(tick) / 1e6,
+    );
+    self::report(mean);
+
     // Destroy emulator
     drop::emu(emu, &args.cfg.data).context("shutdown sequence failed")?;
 
     Ok(())
+}
+
+/// Logs a performance report.
+fn report(freq: f64) {
+    debug!(
+        "frequency: {freq:>7.4} MHz, speedup: {pace:>4.2}x, frames: {rate:>6.2} FPS",
+        freq = freq / 1e6,
+        pace = freq / f64::from(dmg::FREQ),
+        rate = freq / f64::from(ppu::RATE)
+    );
 }
