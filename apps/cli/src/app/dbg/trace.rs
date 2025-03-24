@@ -1,11 +1,27 @@
 //! Introspective tracing.
 
 use std::fmt::Debug;
+use std::fs::File;
 use std::io::{BufWriter, Write};
+use std::path::Path;
 
+use anyhow::{Context, Result};
 use rugby::core::dmg::{self, GameBoy};
 
-use crate::exe::run::cli::trace::Format;
+use crate::exe::run::cli::trace::{Format, Trace};
+
+/// Builds a tracing instance.
+pub fn init(Trace { fmt, log }: &Trace) -> Result<Tracer> {
+    let log = match log.as_deref() {
+        // Create a logfile from the path
+        Some(path) if path != Path::new("-") => either::Either::Left({
+            File::create(path).with_context(|| format!("failed to open: `{}`", path.display()))?
+        }),
+        // Use `stdout` missing path or as alias of "-"
+        _ => either::Either::Right(std::io::stdout()),
+    };
+    Ok(Tracer::new(*fmt, log))
+}
 
 /// Tracing output.
 ///

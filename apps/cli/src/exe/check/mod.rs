@@ -4,8 +4,8 @@ use anyhow::Context;
 use constcat::concat;
 use log::trace;
 
+use crate::app::{init, save};
 use crate::err::Result;
-use crate::{init, util};
 
 pub mod cli;
 
@@ -25,7 +25,8 @@ pub fn main(args: Cli) -> Result<()> {
     // Load cart ROM
     let mut cart = init::cart(&args.cart)?.context("try again with a valid ROM")?;
     // Load cart RAM
-    util::ram::load(&args.cart, &mut cart).context("error flashing save RAM")?;
+    save::ram::load(&args.cart, &mut cart).context("error flashing save RAM")?;
+
     // Print header
     println!("{}", cart.header());
 
