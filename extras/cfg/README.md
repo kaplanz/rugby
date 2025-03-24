@@ -11,6 +11,7 @@ Configurable fields are arranged hierarchically as such:
 ```
 .
 ├── app: object
+│  ├── aux: uint
 │  ├── log: string
 │  ├── pal: enum
 │  └── spd: enum
@@ -33,6 +34,7 @@ The following is a table of supported configurable fields:
 
 | Field            | Description                   | Flag           | Type     | Clap  | Serde | Notes  |
 |------------------|-------------------------------|----------------|----------|:-----:|:-----:|--------|
+| `app.aux`        | Audio sample rate.            | `--audio`      | `uint`   |   ✓   |   ✓   | [^aux] |
 | `app.log`        | Logging filter.               | `-l/--log`     | `string` |   ✓   |   ✓   | [^log] |
 | `app.pal`        | 2-bit color palette.          | `-p/--palette` | `enum`   |   ✓   |   ✓   | [^pal] |
 | `app.spd`        | Simulated clock speed.        | `-s/--speed`   | `enum`   |   ✓   |   ✓   |        |
@@ -43,6 +45,8 @@ The following is a table of supported configurable fields:
 | `emu.cart.force` | Force cartridge construction. | `-f/--force`   | `bool`   |   ✓   |   ✓   |        |
 | `emu.cart.save`  | Cartridge RAM persistence.    | `-S/--save`    | `enum`   |   ✓   |   ✓   | [^sav] |
 
+[^pal]: Unless you have a specific use case, there is no reason to change the
+    default value of 48 Khz.
 [^log]: Must be a valid log filter as parsed by the frontend. See filter
     directives using [`tracing`][filter] as an example.
 [^pal]: Only applicable on the DMG model. On CGB, the palette will be ignored.
