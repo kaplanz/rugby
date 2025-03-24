@@ -76,29 +76,29 @@ pub struct Link {
 /// Debugging options.
 #[derive(Args, Debug)]
 pub struct Debugger {
-    /// Enable interactive debugging.
+    /// Interactive debugging.
     ///
-    /// Starts with Game Boy Debugger (GBD) enabled, presenting the prompt after
-    /// loading.
+    /// Enables the Game Boy Debugger (GBD), an interactive command-line
+    /// debugger which accepts commands at a prompt to control the emulator.
     #[cfg(feature = "gbd")]
     #[clap(short = 'i', long)]
     pub gbd: bool,
 
+    /// Graphics debug windows.
+    ///
+    /// Enables debug windows for visually rendering contents of VRAM.
+    #[cfg(feature = "gfx")]
+    #[clap(long)]
+    pub gfx: bool,
+
     /// Introspective tracing.
-    #[cfg(feature = "log")]
+    #[cfg(feature = "trace")]
     #[clap(flatten)]
     pub trace: Option<trace::Trace>,
-
-    /// Enable VRAM debug windows.
-    ///
-    /// Starts with debug windows opened, visually rendering VRAM contents.
-    #[cfg(feature = "win")]
-    #[clap(long)]
-    pub win: bool,
 }
 
 /// Introspective tracing.
-#[cfg(feature = "log")]
+#[cfg(feature = "trace")]
 pub mod trace {
     use std::path::PathBuf;
 
@@ -108,19 +108,21 @@ pub mod trace {
     #[derive(Args, Debug)]
     #[group(requires = "trace")]
     pub struct Trace {
-        /// Enable introspective tracing.
+        /// Tracing enable format.
         ///
-        /// Produces tracing logs of the emulator's state in the requested
-        /// format.
+        /// Enables tracing of emulated cycles using the specified format. For
+        /// more details on these formats please see their corresponding
+        /// projects.
         #[clap(name = "trace")]
         #[clap(long)]
         #[clap(required = false)]
         #[clap(value_name = "FORMAT")]
         pub fmt: Format,
 
-        /// Output tracing logfile.
+        /// Tracing output logfile.
         ///
-        /// Defines the path where tracing output will be logged.
+        /// An optional file for logging tracing output. If unspecified or "-",
+        /// the standard output stream is used.
         #[clap(name = "tracelog")]
         #[clap(long)]
         #[clap(requires = "trace")]
