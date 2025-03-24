@@ -74,7 +74,6 @@ pub mod cmp {
     }
 
     /// Generate shell completions.
-    #[expect(clippy::unnecessary_wraps)]
     pub fn r#gen(shell: Shell, mut cmd: Command, mut buf: impl Write) -> Result<()> {
         clap_complete::generate(shell, &mut cmd, NAME, &mut buf);
         Ok(()) // unconditionally succeed
