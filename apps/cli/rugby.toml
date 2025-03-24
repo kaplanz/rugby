@@ -24,6 +24,11 @@
 #
 [app]
 
+# Audio sample rate.
+#
+# Sample rate to use for audio output.
+audio = 48000
+
 # Logging level.
 #
 # A comma-separated list of logging directives.
