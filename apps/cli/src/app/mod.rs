@@ -28,28 +28,37 @@ pub mod save {
 pub mod data {
     /// Audio state.
     pub mod audio {
-        use std::sync::LazyLock;
+        use std::sync::OnceLock;
 
+        use log::debug;
         use parking_lot::Mutex;
         use rugby::emu::part::audio::Sample;
 
         use crate::app::run::aux::Stream;
 
-        /// Thread-safe shared audio stream.
-        static STREAM: LazyLock<Mutex<Stream>> = LazyLock::new(|| Mutex::new(Stream::new()));
+        /// Audio system stream.
+        static STREAM: OnceLock<Mutex<Stream>> = OnceLock::new();
+
+        /// Initializes the audio system.
+        pub fn init(ifrq: u32, ofrq: u32) {
+            debug!("audio sample rate: (input: {ifrq}, output: {ofrq})");
+            STREAM.get_or_init(|| Mutex::new(Stream::new(ifrq, ofrq)));
+        }
 
         /// Push a sample to the audio system.
         ///
         /// This function blocks if the mutex is held by another thread.
         pub fn push(sample: Sample) {
-            STREAM.lock().push(sample);
+            if let Some(stream) = STREAM.get() {
+                stream.lock().push(sample);
+            };
         }
 
         /// Pull a sample from the audio system.
         ///
         /// This function blocks if the mutex is held by another thread.
         pub fn pull() -> Option<Sample> {
-            STREAM.lock().pull()
+            STREAM.get()?.lock().pull()
         }
     }
 

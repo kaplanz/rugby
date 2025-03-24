@@ -5,6 +5,7 @@ use std::time::Duration;
 
 use anyhow::{Result, anyhow};
 use log::debug;
+use rugby::core::dmg;
 use rugby::emu::part::audio::Sample;
 
 use crate::app;
@@ -17,9 +18,6 @@ pub use self::buf::Stream;
 /// Audio channel count.
 pub const CHANNELS: usize = 2;
 
-/// Audio sampling rate.
-pub const SAMPLES: usize = 48_000;
-
 /// Audio latency maximum (in milliseconds).
 pub const LATENCY: usize = 100;
 
@@ -31,11 +29,26 @@ pub fn main(args: &Cli) -> Result<()> {
         return Ok(());
     }
 
+    // Define sample rates
+    let ifrq = args
+        .cfg
+        .data
+        .app
+        .spd
+        .clone()
+        .unwrap_or_default()
+        .freq()
+        .unwrap_or(dmg::FREQ);
+    let ofrq = args.cfg.data.app.aux;
+
+    // Initialize audio system
+    app::data::audio::init(ifrq, ofrq);
+
     // Define output device parameters
     let params = tinyaudio::OutputDeviceParameters {
         channels_count: CHANNELS,
-        sample_rate: SAMPLES,
-        channel_sample_count: SAMPLES * LATENCY / 1000,
+        sample_rate: ofrq as usize,
+        channel_sample_count: ofrq as usize * LATENCY / 1000,
     };
 
     // Run output device loop with proper error handling
