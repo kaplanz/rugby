@@ -4,6 +4,7 @@ use std::thread;
 use std::time::Duration;
 
 use anyhow::{Result, anyhow};
+use log::debug;
 use rugby::emu::part::audio::Sample;
 
 use crate::app;
@@ -23,8 +24,13 @@ pub const SAMPLES: usize = 48_000;
 pub const LATENCY: usize = 100;
 
 /// Audio main.
-#[expect(unused)]
 pub fn main(args: &Cli) -> Result<()> {
+    // No-op if muted
+    if args.feat.mute {
+        debug!("playback muted");
+        return Ok(());
+    }
+
     // Define output device parameters
     let params = tinyaudio::OutputDeviceParameters {
         channels_count: CHANNELS,

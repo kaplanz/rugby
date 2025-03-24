@@ -46,6 +46,12 @@ pub struct Features {
     #[clap(short = 'H', long)]
     pub headless: bool,
 
+    /// Run without audio.
+    ///
+    /// Starts with the audio subsystem disabled.
+    #[clap(short = 'M', long)]
+    pub mute: bool,
+
     /// Serial connection.
     #[clap(flatten)]
     pub link: Option<Link>,
