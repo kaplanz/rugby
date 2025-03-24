@@ -26,7 +26,10 @@ derive_more = { version = "2.0.1", features = ["display"] }
 either = { workspace = true }
 log = { workspace = true }
 minifb = "0.28.0"
+num_enum = "0.7.3"
+parking_lot = "0.12.3"
 ringbuf = "0.4.7"
+rubato = "0.16.1"
 rugby = { workspace = true, features = ["cfg", "pal"] }
 rustyline = { version = "15.0.0", optional = true }
 supports-color = "3.0.2"
@@ -40,8 +43,8 @@ xdir = { workspace = true }
 [features]
 default = [
   "gbd",
-  "log",
-  "win",
+  "gfx",
+  "trace",
 ]
 debug = ["rugby/debug"]
 gbd = [
@@ -49,5 +52,5 @@ gbd = [
   "rugby/gbd",
   "dep:rustyline",
 ]
-log = ["debug"]
-win = ["debug"]
+gfx = ["debug"]
+trace = ["debug"]
