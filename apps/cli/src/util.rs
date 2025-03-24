@@ -22,7 +22,6 @@ pub mod ram {
     use anyhow::{Context, Result};
     use log::{debug, error};
     use rugby::core::dmg::Cartridge;
-    use rugby::core::dmg::cart::mbc::Mbc;
     use rugby::extra::cfg::opt;
     use rugby::extra::cfg::opt::emu::When;
 
