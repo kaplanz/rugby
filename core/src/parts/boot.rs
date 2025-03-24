@@ -24,10 +24,7 @@ impl Chip {
     /// Constructs a new `Rom`.
     #[must_use]
     pub fn new(rom: Boot) -> Self {
-        trace!(
-            "BOOT:\n{rom}",
-            rom = hexd::Printer::<Byte>::new(0, rom.inner())
-        );
+        trace!("boot ROM:\n{}", hexd::Printer::<Byte>::new(0, rom.inner()));
         let reg = Shared::new(Control::new());
         Self {
             mem: Shared::new(Bank::new(reg.clone(), rom)),
