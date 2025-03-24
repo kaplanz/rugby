@@ -7,7 +7,7 @@
 use std::fmt::Debug;
 use std::io;
 
-use log::{info, trace};
+use log::{debug, trace};
 use rugby_arch::mio::{Bus, Device, Mmio};
 use rugby_arch::{Block, Byte};
 
@@ -15,6 +15,7 @@ use super::header::Header;
 use super::{Error, Info, Result};
 
 mod bare;
+mod init;
 mod mbc1;
 mod mbc3;
 mod mbc5;
@@ -34,23 +35,6 @@ pub trait Mbc {
 
     /// Gets the contents of the cartridge's RAM.
     fn ram(&self) -> Device;
-
-    /// Flashes the provided data onto the cartridge's RAM.
-    ///
-    /// # Errors
-    ///
-    /// May generate an I/O error indicating that the operation could not be
-    /// completed. If an error is returned then it must be guaranteed that no
-    /// bytes were read.
-    fn flash(&mut self, buf: &mut impl io::Read) -> io::Result<usize>;
-
-    /// Dumps the contents of the cartridge's RAM.
-    ///
-    /// # Errors
-    ///
-    /// May generate an I/O error indicating that the operation could not be
-    /// completed. If an error is returned then no bytes were written.
-    fn dump(&self, buf: &mut impl io::Write) -> io::Result<usize>;
 }
 
 /// Cartridge body.
@@ -92,60 +76,6 @@ impl Body {
             &Info::Mbc5 { .. } => Ok(Body::Mbc5(Mbc5::new(rom, ram))),
             kind => Err(Error::Unsupported(kind.clone())),
         }
-    }
-}
-
-mod init {
-    use std::cmp::Ordering;
-    use std::iter;
-
-    use log::{info, warn};
-    use rugby_arch::Byte;
-
-    use super::{Data, Header};
-
-    /// Constructs a new ROM.
-    pub fn rom(head: &Header, rom: &[Byte]) -> Data {
-        let read = rom.len();
-        match read.cmp(&head.romsz) {
-            Ordering::Less => {
-                warn!(
-                    "loaded {init}; remaining {diff} uninitialized",
-                    init = bfmt::Size::from(read),
-                    diff = bfmt::Size::from(head.romsz - read),
-                );
-            }
-            Ordering::Equal => info!("loaded {read}", read = bfmt::Size::from(read)),
-            Ordering::Greater => {
-                warn!(
-                    "loaded {init}; remaining {diff} truncated",
-                    init = bfmt::Size::from(head.romsz),
-                    diff = bfmt::Size::from(read - head.romsz),
-                );
-            }
-        }
-        rom.iter()
-            .copied()
-            // pad missing values with open bus value
-            .chain(iter::repeat(0xff))
-            // truncate based on recorded cartridge size
-            .take(head.romsz)
-            // collect as a heap-allocated slice
-            .collect::<Box<_>>()
-    }
-
-    /// Constructs a new RAM.
-    pub fn ram(head: &Header) -> Data {
-        if head.info.has_ram() && head.ramsz == 0 {
-            warn!("cartridge supports RAM, but specified size is zero");
-        }
-        if !head.info.has_ram() && head.ramsz > 0 {
-            warn!(
-                "cartridge does not support RAM, but specified size is non-zero (found: {})",
-                head.ramsz
-            );
-        }
-        vec![0; head.ramsz].into_boxed_slice()
     }
 }
 
@@ -196,28 +126,6 @@ impl Mbc for Body {
             Body::Mbc5(mbc) => mbc.ram(),
         }
     }
-
-    /// Flashes the provided data onto the cartridge's RAM.
-    fn flash(&mut self, buf: &mut impl io::Read) -> io::Result<usize> {
-        match self {
-            Body::Bare(mbc) => mbc.flash(buf),
-            Body::Mbc1(mbc) => mbc.flash(buf),
-            Body::Mbc3(mbc) => mbc.flash(buf),
-            Body::Mbc5(mbc) => mbc.flash(buf),
-        }
-        .inspect(|&nbytes| info!("flashed {size}", size = bfmt::Size::from(nbytes)))
-    }
-
-    /// Dumps the contents of the cartridge's RAM.
-    fn dump(&self, buf: &mut impl io::Write) -> io::Result<usize> {
-        match self {
-            Body::Bare(mbc) => mbc.dump(buf),
-            Body::Mbc1(mbc) => mbc.dump(buf),
-            Body::Mbc3(mbc) => mbc.dump(buf),
-            Body::Mbc5(mbc) => mbc.dump(buf),
-        }
-        .inspect(|&nbytes| info!("dumped {size}", size = bfmt::Size::from(nbytes)))
-    }
 }
 
 impl Mmio for Body {
@@ -229,5 +137,49 @@ impl Mmio for Body {
     fn detach(&self, bus: &mut Bus) {
         assert!(bus.unmap(&self.rom()));
         assert!(bus.unmap(&self.ram()));
+    }
+}
+
+impl Body {
+    /// Flashes data onto the cartridge's RAM.
+    ///
+    /// # Errors
+    ///
+    /// May generate an I/O error indicating that the operation could not be
+    /// completed. If an error is returned then no bytes were read.
+    pub fn flash(&mut self, buf: &mut impl io::Read) -> io::Result<usize> {
+        let mut flash = |ram: &mut [u8]| {
+            buf.read(ram).inspect(|&nbytes| {
+                debug!("loaded {size}", size = bfmt::Size::from(nbytes));
+                trace!("cart RAM:\n{}", hexd::Printer::<Byte>::new(0, ram));
+            })
+        };
+        match self {
+            Body::Bare(mbc) => flash(mbc.ram.borrow_mut().inner_mut()),
+            Body::Mbc1(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+            Body::Mbc3(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+            Body::Mbc5(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+        }
+    }
+
+    /// Dumps contents of the cartridge's RAM.
+    ///
+    /// # Errors
+    ///
+    /// May generate an I/O error indicating that the operation could not be
+    /// completed. If an error is returned then no bytes were written.
+    pub fn dump(&self, buf: &mut impl io::Write) -> io::Result<usize> {
+        let mut dump = |ram: &[u8]| {
+            buf.write(ram).inspect(|&nbytes| {
+                debug!("dumped {size}", size = bfmt::Size::from(nbytes));
+                trace!("cart RAM:\n{}", hexd::Printer::<Byte>::new(0, ram));
+            })
+        };
+        match self {
+            Body::Bare(mbc) => dump(mbc.ram.borrow_mut().inner_mut()),
+            Body::Mbc1(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+            Body::Mbc3(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+            Body::Mbc5(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+        }
     }
 }
