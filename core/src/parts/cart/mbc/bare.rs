@@ -1,5 +1,3 @@
-use std::io;
-
 use rugby_arch::mio::Device;
 use rugby_arch::{Block, Shared};
 
@@ -13,8 +11,8 @@ type Ram = rugby_arch::mem::Ram<Data>;
 /// Bare ROM + RAM.
 #[derive(Debug)]
 pub struct Bare {
-    rom: Shared<Rom>,
-    ram: Shared<Ram>,
+    pub(super) rom: Shared<Rom>,
+    pub(super) ram: Shared<Ram>,
 }
 
 impl Bare {
@@ -37,13 +35,5 @@ impl Mbc for Bare {
 
     fn ram(&self) -> Device {
         self.ram.clone().into()
-    }
-
-    fn flash(&mut self, buf: &mut impl io::Read) -> io::Result<usize> {
-        buf.read(self.ram.borrow_mut().inner_mut())
-    }
-
-    fn dump(&self, buf: &mut impl io::Write) -> io::Result<usize> {
-        buf.write(self.ram.borrow().inner())
     }
 }
