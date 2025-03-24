@@ -136,12 +136,12 @@ impl Speed {
     #[rustfmt::skip]
     #[must_use]
     pub fn freq(&self) -> Option<u32> {
-        match self {
+        match *self {
             Speed::Half       => Some(FREQ / 2),
             Speed::Actual     => Some(FREQ),
             Speed::Double     => Some(FREQ * 2),
-            Speed::Rate(rate) => Some((FREQ / 60).saturating_mul((*rate).into())),
-            Speed::Freq(freq) => Some(*freq),
+            Speed::Rate(rate) => Some(FREQ * u32::from(rate) / 60),
+            Speed::Freq(freq) => Some(freq),
             Speed::Max        => None,
         }
     }
