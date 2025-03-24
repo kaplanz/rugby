@@ -9,7 +9,7 @@ use super::*;
 /// Sample boot ROM.
 const BOOT: &[Byte; 0x0100] = include_bytes!("../../../../roms/boot/sameboy/dmg_boot.bin");
 
-/// Sample ROM header.
+/// Sample cart ROM.
 const GAME: &[Byte; 0x8000] = include_bytes!("../../../../roms/games/2048/2048.gb");
 
 fn setup() -> GameBoy {

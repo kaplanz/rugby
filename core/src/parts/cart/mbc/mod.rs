@@ -80,13 +80,10 @@ impl Body {
         // Initialize ROM
         let rom = init::rom(head, rom);
         if !rom.is_empty() {
-            trace!("ROM:\n{rom}", rom = hexd::Printer::<Byte>::new(0, &rom));
+            trace!("cart ROM:\n{}", hexd::Printer::<Byte>::new(0, &rom));
         }
         // Initialize RAM
         let ram = init::ram(head);
-        if !ram.is_empty() {
-            trace!("RAM:\n{ram}", ram = hexd::Printer::<Byte>::new(0, &ram));
-        }
         // Construct body
         match &head.info {
             &Info::Bare { .. } => Ok(Body::Bare(Bare::new(rom, ram))),
