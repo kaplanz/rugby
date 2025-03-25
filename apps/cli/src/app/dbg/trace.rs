@@ -81,10 +81,10 @@ pub enum Error {
     #[error(transparent)]
     Ioput(#[from] std::io::Error),
     /// Source log mismatch.
-    #[error(transparent)]
+    #[error("tracelog entries did not match")]
     Mismatch(#[from] cmp::Mismatch),
     /// Source log finished.
-    #[error("finished comparison")]
+    #[error("tracelog comparison has finished")]
     Finished,
 }
 
@@ -92,10 +92,7 @@ pub enum Error {
 mod cmp {
     use std::fmt::Display;
     use std::io::{BufRead, BufReader, Read};
-    use std::ops::Range;
 
-    use annotate_snippets::{Level, Renderer, Snippet};
-    use dissimilar::Chunk;
     use rugby::core::dmg;
 
     use super::{Error, Format, GameBoy};
@@ -121,88 +118,43 @@ mod cmp {
             let expect = buf.trim_end();
             // Increment line number
             self.idx += 1;
+
             // Emit trace entry
             let actual = match self.fmt {
                 Format::Binjgb => dmg::dbg::trace::binjgb,
                 Format::Doctor => dmg::dbg::trace::doctor,
             }(emu);
+            let actual = actual.as_str();
+
             // Handle finished case
             if expect.is_empty() {
                 return Err(Error::Finished);
             }
-            // Compare trace entries
-            self::diff(expect, &actual, self.idx).map_err(Into::into)
+
+            // Perform equality check
+            if expect == actual {
+                // Success is when entries are equal
+                Ok(())
+            } else {
+                // Compute rendered diff when unequal
+                Err(Error::Mismatch(Mismatch {
+                    line: self.idx,
+                    diff: prettydiff::diff_chars(expect, actual).to_string(),
+                }))
+            }
         }
     }
 
-    /// Compares tracelog entries.
-    fn diff(expect: &str, actual: &str, lineno: usize) -> Result<(), Mismatch> {
-        // Quick identity check
-        if expect == actual {
-            return Ok(());
-        }
-
-        // Use itertools to find the first differing characters
-        let mut count = 0;
-        let chunks = dissimilar::diff(expect, actual)
-            .iter()
-            .filter_map(|change| match change {
-                Chunk::Delete(s) => {
-                    let index = count;
-                    count += s.len();
-                    Some(index..count)
-                }
-                Chunk::Insert(_) => None,
-                Chunk::Equal(s) => {
-                    count += s.len();
-                    None
-                }
-            })
-            .collect();
-
-        // Create error with detailed information
-        Err(Mismatch {
-            lineno,
-            expect: expect.to_string(),
-            actual: actual.to_string(),
-            chunks,
-        })
-    }
-    /// Detailed tracelog mismatch report.
+    /// Tracelog mismatch report.
     #[derive(Debug)]
     pub struct Mismatch {
-        lineno: usize,
-        expect: String,
-        actual: String,
-        chunks: Vec<Range<usize>>,
+        line: usize,
+        diff: String,
     }
 
     impl Display for Mismatch {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let notes = self
-                .chunks
-                .iter()
-                .map(|diff| {
-                    format!(
-                        "expected `{}`, found `{}`",
-                        &self.expect[diff.clone()],
-                        &self.actual[diff.clone()],
-                    )
-                })
-                .collect::<Vec<_>>();
-            write!(
-                f,
-                "mismatch with tracelog entries\n\n{}",
-                Renderer::styled().render(
-                    Level::Note.title("see the following difference").snippet(
-                        Snippet::source(&self.expect)
-                            .line_start(self.lineno)
-                            .annotations(self.chunks.iter().zip(notes.iter()).map(
-                                |(diff, note)| { Level::Error.span(diff.clone()).label(note) }
-                            ))
-                    )
-                )
-            )
+            write!(f, "mismatch on line {}: `{}`", self.line, self.diff)
         }
     }
 
