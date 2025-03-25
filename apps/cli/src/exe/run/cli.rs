@@ -125,13 +125,23 @@ pub mod trace {
         #[clap(value_name = "FORMAT")]
         pub fmt: Format,
 
+        /// Tracing input compare.
+        ///
+        /// Instead of emitting trace logs, perform line-by-line comparison
+        /// using the supplied tracelog file.
+        #[clap(name = "tracecmp")]
+        #[clap(long)]
+        #[clap(conflicts_with = "tracelog")]
+        #[clap(value_name = "PATH")]
+        pub cmp: Option<PathBuf>,
+
         /// Tracing output logfile.
         ///
         /// An optional file for logging tracing output. If unspecified or "-",
         /// the standard output stream is used.
         #[clap(name = "tracelog")]
         #[clap(long)]
-        #[clap(requires = "trace")]
+        #[clap(conflicts_with = "tracecmp")]
         #[clap(value_name = "PATH")]
         pub log: Option<PathBuf>,
     }
