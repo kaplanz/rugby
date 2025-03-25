@@ -14,6 +14,8 @@ use rugby::prelude::Core;
 
 use self::perf::Profiler;
 use crate::app;
+#[cfg(feature = "trace")]
+use crate::app::dbg::trace;
 use crate::exe::run::Cli;
 
 pub mod drop;
@@ -125,7 +127,15 @@ pub fn main(args: &Cli) -> Result<()> {
                     dmg::cpu::Stage::Fetch | dmg::cpu::Stage::Done
                 ) && ctx.count.cycle % 4 == 0
                 {
-                    trace.log(&emu).context("could not write trace entry")?;
+                    match trace.emit(&emu) {
+                        // Exit on completion
+                        Err(trace::Error::Finished) => {
+                            info!("trace comparison successful");
+                            app::exit(app::Exit::Tracecmp);
+                            break;
+                        }
+                        res => res?,
+                    }
                 }
             }
         }

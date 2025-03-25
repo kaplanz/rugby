@@ -14,6 +14,7 @@ path = "src/main.rs"
 
 [dependencies]
 advise = { workspace = true }
+annotate-snippets = { version = "0.11.5", optional = true }
 anyhow = { workspace = true }
 bfmt = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
@@ -23,6 +24,7 @@ clap_mangen = "0.2.26"
 constcat = { workspace = true }
 ctrlc = "3.4.5"
 derive_more = { version = "2.0.1", features = ["display"] }
+dissimilar = { version = "1.0.10", optional = true }
 either = { workspace = true }
 log = { workspace = true }
 minifb = "0.28.0"
@@ -53,4 +55,8 @@ gbd = [
   "dep:rustyline",
 ]
 gfx = ["debug"]
-trace = ["debug"]
+trace = [
+  "debug",
+  "dep:annotate-snippets",
+  "dep:dissimilar",
+]
