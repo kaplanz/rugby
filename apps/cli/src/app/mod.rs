@@ -192,6 +192,9 @@ mod ctrl {
         /// Interrupt signal.
         #[error("interrupt by user")]
         Interrupt,
+        /// Tracecmp finished.
+        #[error("tracecmp finished")]
+        Tracecmp,
     }
 
     /// Application exit flag.
