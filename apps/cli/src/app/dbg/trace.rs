@@ -15,12 +15,12 @@ use thiserror::Error;
 use crate::exe::run::cli::trace::{Format, Trace};
 
 /// Builds a tracing instance.
-pub fn init(Trace { fmt, cmp, log }: &Trace) -> anyhow::Result<Tracer> {
-    Ok(match (cmp, log) {
-        (Some(cmp), None) => {
+pub fn init(Trace { fmt, log, cmp }: &Trace) -> anyhow::Result<Tracer> {
+    Ok(match (log, cmp) {
+        (None, Some(cmp)) => {
             Tracer::Cmp(Tracecmp {
                 fmt: *fmt,
-                src: BufReader::new(Box::new(if cmp == Path::new("-") {
+                log: BufReader::new(Box::new(if cmp == Path::new("-") {
                     // Use `stdin` for missing path or as alias of "-"
                     Either::Right(std::io::stdin())
                 } else {
@@ -33,10 +33,10 @@ pub fn init(Trace { fmt, cmp, log }: &Trace) -> anyhow::Result<Tracer> {
                 idx: usize::default(),
             })
         }
-        (None, log) => {
+        (log, None) => {
             Tracer::Log(Tracelog {
                 fmt: *fmt,
-                dst: BufWriter::new(Box::new(match log.as_deref() {
+                log: BufWriter::new(Box::new(match log.as_deref() {
                     // Make logfile at path
                     Some(path) if path != Path::new("-") => Either::Left({
                         File::create(path)
@@ -53,9 +53,9 @@ pub fn init(Trace { fmt, cmp, log }: &Trace) -> anyhow::Result<Tracer> {
 
 /// Tracer instance.
 pub enum Tracer {
-    /// Tracing compare.
+    /// Compare tracer.
     Cmp(Tracecmp),
-    /// Tracing logger.
+    /// Logging tracer.
     Log(Tracelog),
 }
 
@@ -97,14 +97,14 @@ mod cmp {
 
     use super::{Error, Format, GameBoy};
 
-    /// Comparing tracer.
+    /// Compare tracer.
     ///
-    /// Compare against a file when tracing entries are emitted.
+    /// Compares against a file as tracing entries are emitted.
     pub struct Tracer {
         /// Tracing format.
         pub(super) fmt: Format,
-        /// Trace compare file.
-        pub(super) src: BufReader<Box<dyn Read>>,
+        /// Tracelog input file.
+        pub(super) log: BufReader<Box<dyn Read>>,
         /// Trace line number.
         pub(super) idx: usize,
     }
@@ -118,7 +118,7 @@ mod cmp {
             let expect = {
                 // Read next line from the file
                 let mut buf = String::with_capacity(len);
-                let read = self.src.by_ref().take(256).read_line(&mut buf)?;
+                let read = self.log.by_ref().take(256).read_line(&mut buf)?;
                 // Ensure line isn't too long...
                 if read == len && !buf.ends_with('\n') {
                     return Err(io::Error::new(
@@ -189,8 +189,8 @@ mod log {
     pub struct Tracer {
         /// Tracing format.
         pub(super) fmt: Format,
-        /// Trace logging file.
-        pub(super) dst: BufWriter<Box<dyn Write>>,
+        /// Tracelog output file.
+        pub(super) log: BufWriter<Box<dyn Write>>,
     }
 
     impl Tracer {
@@ -202,17 +202,7 @@ mod log {
                 Format::Doctor => dmg::dbg::trace::doctor,
             }(emu);
             // Write to logfile
-            writeln!(self.dst, "{entry}").map_err(Into::into)
-        }
-    }
-
-    impl Write for Tracer {
-        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-            self.dst.write(buf)
-        }
-
-        fn flush(&mut self) -> std::io::Result<()> {
-            self.dst.flush()
+            writeln!(self.log, "{entry}").map_err(Into::into)
         }
     }
 }
