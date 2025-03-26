@@ -84,10 +84,14 @@ pub fn main(args: &Cli) -> Result<()> {
                 // Not yet ready for work... sleep until ready.
                 thread::sleep(awake - watch);
             } else {
+                // There's a delay, which means the emulator has stalled.
+                trace!(
+                    "emulator thread stalled: {delay:>4.2?} behind",
+                    delay = watch - awake
+                );
                 // When lagging behind, unset the wake-up time. This has the
                 // effect of resetting synchronization against the current time,
                 // rather than against the previous pace.
-                trace!("emulator thread stalled");
                 ctx.awake = None;
             }
             // At this point, emulator is ready to perform work...
