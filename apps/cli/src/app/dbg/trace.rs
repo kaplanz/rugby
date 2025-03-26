@@ -91,7 +91,7 @@ pub enum Error {
 /// Trace comparisons.
 mod cmp {
     use std::fmt::Display;
-    use std::io::{BufRead, BufReader, Read};
+    use std::io::{self, BufRead, BufReader, Read};
 
     use rugby::core::dmg;
 
@@ -112,10 +112,24 @@ mod cmp {
     impl Tracer {
         /// Compare a trace entry against the provided tracelog file.
         pub fn emit(&mut self, emu: &GameBoy) -> super::Result<()> {
+            let len = 256;
+
             // Read trace entry
-            let mut buf = String::new();
-            self.src.read_line(&mut buf)?;
-            let expect = buf.trim_end();
+            let expect = {
+                // Read next line from the file
+                let mut buf = String::with_capacity(len);
+                let read = self.src.by_ref().take(256).read_line(&mut buf)?;
+                // Ensure line isn't too long...
+                if read == len && !buf.ends_with('\n') {
+                    return Err(io::Error::new(
+                        io::ErrorKind::FileTooLarge,
+                        format!("line exceeded {len} byte limit"),
+                    )
+                    .into());
+                }
+                buf
+            };
+            let expect = expect.trim_end();
             // Increment line number
             self.idx += 1;
 
