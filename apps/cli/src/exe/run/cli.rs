@@ -129,7 +129,7 @@ pub mod trace {
         ///
         /// An optional file for logging tracing output. If unspecified or "-",
         /// the standard output stream is used.
-        #[clap(name = "tracelog")]
+        #[clap(name = "logfile")]
         #[clap(long)]
         #[clap(conflicts_with = "compare")]
         #[clap(value_name = "PATH")]
@@ -138,12 +138,12 @@ pub mod trace {
         /// Compare against existing logfile.
         ///
         /// Instead of emitting trace logs, perform line-by-line comparison
-        /// using the supplied tracelog file. This will continue until the
+        /// using the supplied tracing logfile. This will continue until the
         /// emulator either diverges from or reaches the end of the provided
-        /// tracelog file.
+        /// logfile.
         #[clap(name = "compare")]
         #[clap(long)]
-        #[clap(conflicts_with = "tracelog")]
+        #[clap(conflicts_with = "logfile")]
         #[clap(value_name = "PATH")]
         pub cmp: Option<PathBuf>,
     }
