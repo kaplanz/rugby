@@ -134,7 +134,7 @@ pub fn main(args: &Cli) -> Result<()> {
                             app::exit(app::Exit::Tracecmp);
                             break;
                         }
-                        res => res?,
+                        res => res.context("failed to emit trace entry")?,
                     }
                 }
             }
