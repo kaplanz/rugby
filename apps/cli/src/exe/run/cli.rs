@@ -114,7 +114,7 @@ pub mod trace {
     #[derive(Args, Debug)]
     #[group(requires = "trace")]
     pub struct Trace {
-        /// Tracing enable format.
+        /// Enable tracing with format.
         ///
         /// Enables tracing of emulated cycles using the specified format. For
         /// more details on these formats please see their corresponding
@@ -125,25 +125,27 @@ pub mod trace {
         #[clap(value_name = "FORMAT")]
         pub fmt: Format,
 
-        /// Tracing input compare.
-        ///
-        /// Instead of emitting trace logs, perform line-by-line comparison
-        /// using the supplied tracelog file.
-        #[clap(name = "tracecmp")]
-        #[clap(long)]
-        #[clap(conflicts_with = "tracelog")]
-        #[clap(value_name = "PATH")]
-        pub cmp: Option<PathBuf>,
-
-        /// Tracing output logfile.
+        /// Path to output generated logfile.
         ///
         /// An optional file for logging tracing output. If unspecified or "-",
         /// the standard output stream is used.
         #[clap(name = "tracelog")]
         #[clap(long)]
-        #[clap(conflicts_with = "tracecmp")]
+        #[clap(conflicts_with = "compare")]
         #[clap(value_name = "PATH")]
         pub log: Option<PathBuf>,
+
+        /// Compare against existing logfile.
+        ///
+        /// Instead of emitting trace logs, perform line-by-line comparison
+        /// using the supplied tracelog file. This will continue until the
+        /// emulator either diverges from or reaches the end of the provided
+        /// tracelog file.
+        #[clap(name = "compare")]
+        #[clap(long)]
+        #[clap(conflicts_with = "tracelog")]
+        #[clap(value_name = "PATH")]
+        pub cmp: Option<PathBuf>,
     }
 
     /// Tracing output format.
