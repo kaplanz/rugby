@@ -55,7 +55,8 @@ pub struct Frontend {
     /// Custom values can be defined in the configuration file.
     #[cfg_attr(
         feature = "clap",
-        clap(short, long = "speed", value_name = "FREQ", value_enum)
+        clap(short, long = "speed", value_name = "SPEED"),
+        clap(value_parser = crate::val::SpeedValueParser)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "speed"))]
     pub spd: Option<Speed>,
