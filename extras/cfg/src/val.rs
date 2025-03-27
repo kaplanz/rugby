@@ -1,7 +1,11 @@
 //! Configurable values.
 
+use std::num::{ParseFloatError, ParseIntError};
+use std::str::FromStr;
+
 use rugby_core::dmg::FREQ;
 use rugby_pal as pal;
+use thiserror::Error;
 
 /// When to enable.
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -93,42 +97,38 @@ impl From<Palette> for pal::Palette {
 
 /// Simulated clock frequency.
 #[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(rename_all = "kebab-case")
 )]
 pub enum Speed {
-    /// Half speed mode.
-    ///
-    /// Convenience preset resulting in emulation at half speed.
-    Half,
     /// Actual hardware speed.
     ///
-    /// Mimics the actual hardware clock frequency. Equal to 4 MiHz (60 FPS).
+    /// The real clock frequency used by the actual hardware. Equal to 4 MiHz
+    /// (approx. 59.7 FPS).
     #[default]
     Actual,
-    /// Double speed mode.
-    ///
-    /// Convenience preset resulting in emulation at double speed.
-    Double,
-    /// Maximum possible.
+    /// Maximum possible speed.
     ///
     /// Unconstrained, limited only by the host system's capabilities.
     Max,
-    /// Frame rate.
-    ///
-    /// Frequency that targets supplied frame rate (FPS).
-    #[cfg_attr(feature = "clap", clap(skip))]
-    #[cfg_attr(feature = "serde", serde(rename = "fps"))]
-    Rate(u8),
     /// Clock frequency.
     ///
-    /// Precise frequency (Hz) to clock the emulator.
-    #[cfg_attr(feature = "clap", clap(skip))]
+    /// Precise frequency (Hz) to clock the emulator. Must be an integer.
     #[cfg_attr(feature = "serde", serde(rename = "hz"))]
-    Freq(u32),
+    Clock(u32),
+    /// Speedup ratio.
+    ///
+    /// Multiple of the actual hardware speed. May be a floating point.
+    #[cfg_attr(feature = "serde", serde(rename = "x"))]
+    Ratio(f32),
+    /// Frame rate.
+    ///
+    /// Frequency that targets the supplied frame rate (FPS). Must be an
+    /// integer.
+    #[cfg_attr(feature = "serde", serde(rename = "fps"))]
+    Frame(u8),
 }
 
 impl Speed {
@@ -137,12 +137,116 @@ impl Speed {
     #[must_use]
     pub fn freq(&self) -> Option<u32> {
         match *self {
-            Speed::Half       => Some(FREQ / 2),
-            Speed::Actual     => Some(FREQ),
-            Speed::Double     => Some(FREQ * 2),
-            Speed::Rate(rate) => Some(FREQ * u32::from(rate) / 60),
-            Speed::Freq(freq) => Some(freq),
-            Speed::Max        => None,
+            Speed::Actual      => Some(FREQ),
+            Speed::Clock(freq) => Some(freq),
+            #[expect(clippy::cast_possible_truncation)]
+            #[expect(clippy::cast_precision_loss)]
+            #[expect(clippy::cast_sign_loss)]
+            Speed::Ratio(mult) => Some((FREQ as f32 * mult) as u32),
+            Speed::Frame(rate) => Some(FREQ * u32::from(rate) / 60),
+            Speed::Max         => None,
+        }
+    }
+}
+
+impl FromStr for Speed {
+    type Err = ParseSpeedError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "" => Err(Self::Err::Empty),
+            "actual" => Ok(Speed::Actual),
+            "max" => Ok(Speed::Max),
+            s if s.ends_with("hz") => {
+                let num = s[..s.len() - 2].parse()?;
+                Ok(Speed::Clock(num))
+            }
+            s if s.ends_with('x') => {
+                let num = s[..s.len() - 1].parse()?;
+                Ok(Speed::Ratio(num))
+            }
+            s if s.ends_with("fps") => {
+                let num = s[..s.len() - 3].parse()?;
+                Ok(Speed::Frame(num))
+            }
+            _ => Err(Self::Err::Unknown),
+        }
+    }
+}
+
+/// A type specifying categories of [`Color`] error.
+#[derive(Clone, Debug, Error)]
+pub enum ParseSpeedError {
+    /// Parse string was empty.
+    #[error("empty string")]
+    Empty,
+    /// Failure parsing an integer.
+    #[error("invalid integer: {0}")]
+    ParseInt(#[from] ParseIntError),
+    /// Failure parsing a floating point.
+    #[error("invalid float: {0}")]
+    ParseFloat(#[from] ParseFloatError),
+    /// Unknown parse format.
+    #[error("unknown format")]
+    Unknown,
+}
+
+#[cfg(feature = "clap")]
+pub use imp::SpeedValueParser;
+
+#[cfg(feature = "clap")]
+mod imp {
+    use std::ffi::OsStr;
+
+    use clap::Error;
+    use clap::builder::{PossibleValue, TypedValueParser};
+    use clap::error::{ContextKind, ContextValue};
+
+    use super::Speed;
+
+    #[derive(Clone)]
+    pub struct SpeedValueParser;
+
+    impl TypedValueParser for SpeedValueParser {
+        type Value = Speed;
+
+        fn parse_ref(
+            &self,
+            cmd: &clap::Command,
+            arg: Option<&clap::Arg>,
+            val: &OsStr,
+        ) -> Result<Self::Value, Error> {
+            let val = val.to_str().ok_or_else(|| {
+                clap::Error::new(clap::error::ErrorKind::InvalidUtf8).with_cmd(cmd)
+            })?;
+            val.parse::<Speed>().map_err(|_| {
+                let mut err =
+                    clap::Error::new(clap::error::ErrorKind::ValueValidation).with_cmd(cmd);
+                arg.map(|arg| {
+                    err.insert(
+                        ContextKind::InvalidArg,
+                        ContextValue::String(arg.to_string()),
+                    )
+                });
+                err.insert(
+                    ContextKind::InvalidValue,
+                    ContextValue::String(val.to_string()),
+                );
+                err
+            })
+        }
+
+        fn possible_values(&self) -> Option<Box<dyn Iterator<Item = PossibleValue>>> {
+            Some(Box::new(
+                vec![
+                    PossibleValue::new("actual").help("Actual hardware speed"),
+                    PossibleValue::new("max").help("Maximum possible speed"),
+                    PossibleValue::new("<freq>hz").help("Clock frequency (e.g. 6291456hz)"),
+                    PossibleValue::new("<mult>x").help("Speedup ratio (e.g. 1.5x)"),
+                    PossibleValue::new("<rate>fps").help("Frame rate (e.g. 90fps)"),
+                ]
+                .into_iter(),
+            ))
         }
     }
 }
