@@ -13,6 +13,7 @@ clap = { workspace = true, optional = true, features = ["env"] }
 rugby-core = { workspace = true }
 rugby-pal = { workspace = true }
 serde = { workspace = true, optional = true }
+thiserror = { workspace = true }
 toml = { workspace = true, optional = true }
 
 [features]
