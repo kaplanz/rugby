@@ -109,7 +109,7 @@ impl Register for Control {
             Mode::Off => {
                 // Request a new transfer
                 self.mode = Mode::Req(value);
-                debug!("request: 0xfe00 <- {:#04x}00", value);
+                debug!("request: 0xfe00 <- {value:#04x}00");
             }
             Mode::Req(_) | Mode::On { .. } => {
                 warn!("ignored request; already in progress");
