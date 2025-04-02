@@ -47,4 +47,6 @@ pub enum Command {
     Run,
     /// Generate static files.
     Gen,
+    /// Show help information.
+    Help,
 }

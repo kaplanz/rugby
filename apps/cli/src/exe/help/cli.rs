@@ -9,7 +9,7 @@ pub use crate::exe::r#gen::cli::Command;
 #[derive(Debug, Parser)]
 #[clap(name = NAME)]
 #[clap(flatten_help = true)]
-#[group(id = "Gen")]
+#[group(id = "Help")]
 pub struct Cli {
     /// Rugby subcommand.
     #[clap(value_name = "COMMAND")]
