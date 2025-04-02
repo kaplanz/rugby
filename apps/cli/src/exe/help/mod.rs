@@ -31,6 +31,7 @@ pub fn main(args: Cli) -> Result<()> {
         Some(cli::Command::Check) => crate::exe::check::Cli::command(),
         Some(cli::Command::Run) => crate::exe::run::Cli::command(),
         Some(cli::Command::Gen) => crate::exe::r#gen::Cli::command(),
+        Some(cli::Command::Help) => crate::exe::help::Cli::command(),
     }
     .flatten_help(true);
     cmd.build();
