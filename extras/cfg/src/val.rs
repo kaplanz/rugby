@@ -109,26 +109,26 @@ pub enum Speed {
     /// (approx. 59.7 FPS).
     #[default]
     Actual,
-    /// Maximum possible speed.
-    ///
-    /// Unconstrained, limited only by the host system's capabilities.
-    Max,
-    /// Clock frequency.
-    ///
-    /// Precise frequency (Hz) to clock the emulator. Must be an integer.
-    #[cfg_attr(feature = "serde", serde(rename = "hz"))]
-    Clock(u32),
     /// Speedup ratio.
     ///
     /// Multiple of the actual hardware speed. May be a floating point.
     #[cfg_attr(feature = "serde", serde(rename = "x"))]
     Ratio(f32),
+    /// Clock frequency.
+    ///
+    /// Precise frequency (Hz) to clock the emulator. Must be an integer.
+    #[cfg_attr(feature = "serde", serde(rename = "hz"))]
+    Clock(u32),
     /// Frame rate.
     ///
     /// Frequency that targets the supplied frame rate (FPS). Must be an
     /// integer.
     #[cfg_attr(feature = "serde", serde(rename = "fps"))]
     Frame(u8),
+    /// Maximum possible speed.
+    ///
+    /// Unconstrained, limited only by the host system's capabilities.
+    Turbo,
 }
 
 impl Speed {
@@ -144,7 +144,7 @@ impl Speed {
             #[expect(clippy::cast_sign_loss)]
             Speed::Ratio(mult) => Some((FREQ as f32 * mult) as u32),
             Speed::Frame(rate) => Some(FREQ * u32::from(rate) / 60),
-            Speed::Max         => None,
+            Speed::Turbo       => None,
         }
     }
 }
@@ -153,23 +153,37 @@ impl FromStr for Speed {
     type Err = ParseSpeedError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "" => Err(Self::Err::Empty),
-            "actual" => Ok(Speed::Actual),
-            "max" => Ok(Speed::Max),
-            s if s.ends_with("hz") => {
-                let num = s[..s.len() - 2].parse()?;
-                Ok(Speed::Clock(num))
-            }
-            s if s.ends_with('x') => {
-                let num = s[..s.len() - 1].parse()?;
-                Ok(Speed::Ratio(num))
-            }
-            s if s.ends_with("fps") => {
-                let num = s[..s.len() - 3].parse()?;
-                Ok(Speed::Frame(num))
-            }
-            _ => Err(Self::Err::Unknown),
+        // Ensure string is non-empty
+        if s.is_empty() {
+            Err(Self::Err::Empty)
+        }
+        // Match on unit variants
+        //
+        // Actual speed
+        else if s == "actual" {
+            Ok(Speed::Actual)
+        }
+        // Maximum speed
+        else if s == "turbo" {
+            Ok(Speed::Turbo)
+        }
+        // Try parsing with suffix
+        //
+        // Speedup ratio
+        else if let Some(mult) = s.strip_suffix('x') {
+            mult.parse().map(Speed::Ratio).map_err(Into::into)
+        }
+        // Clock frequency
+        else if let Some(freq) = s.strip_suffix("hz") {
+            freq.parse().map(Speed::Clock).map_err(Into::into)
+        }
+        // Frame rate
+        else if let Some(rate) = s.strip_suffix("fps") {
+            rate.parse().map(Speed::Frame).map_err(Into::into)
+        }
+        // Otherwise, unknown format
+        else {
+            Err(Self::Err::Unknown)
         }
     }
 }
@@ -240,10 +254,10 @@ mod imp {
             Some(Box::new(
                 vec![
                     PossibleValue::new("actual").help("Actual hardware speed"),
-                    PossibleValue::new("max").help("Maximum possible speed"),
                     PossibleValue::new("<freq>hz").help("Clock frequency (e.g. 6291456hz)"),
                     PossibleValue::new("<mult>x").help("Speedup ratio (e.g. 1.5x)"),
                     PossibleValue::new("<rate>fps").help("Frame rate (e.g. 90fps)"),
+                    PossibleValue::new("turbo").help("Maximum possible speed"),
                 ]
                 .into_iter(),
             ))
