@@ -75,7 +75,12 @@ All enumerated types are described below:
 - `palette`: color palette selection, see [variants][src.pal]; can be customized
   as an array of 4 colors (parsed in hex).
 - `speed`: simulated clock frequency, see [variants][src.spd]; can be specified
-  either as a frame rate (`fps`) or frequency (`hz`).
+  as:
+  - `actual`: actual hardware speed
+  - `<mult>x`: speedup ratio; e.g. `x = 1.5`
+  - `<freq>hz`: clock frequency; e.g. `hz = 6291456`
+  - `<rate>fps`: frame rate; e.g. `fps = 90`
+  - `turbo`: maximum possible speed
 - `when`: choice of when to enable an option, [variants][src.when] are: `never`,
   `auto`, and `always`.
 
