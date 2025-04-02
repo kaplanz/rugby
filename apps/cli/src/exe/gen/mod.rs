@@ -113,6 +113,7 @@ pub mod man {
             Some(Subcommand::Check) => crate::exe::check::Cli::command(),
             Some(Subcommand::Run) => crate::exe::run::Cli::command(),
             Some(Subcommand::Gen) => crate::exe::r#gen::Cli::command(),
+            Some(Subcommand::Help) => crate::exe::help::Cli::command(),
         }
         .flatten_help(true);
         cmd.build();
