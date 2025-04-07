@@ -51,7 +51,7 @@ pub mod data {
         pub fn push(sample: Sample) {
             if let Some(stream) = STREAM.get() {
                 stream.lock().push(sample);
-            };
+            }
         }
 
         /// Pull a sample from the audio system.
