@@ -9,10 +9,10 @@ use super::pcb::Motherboard;
 ///
 /// The Game Boy's memory architecture is divided across three distinct buses:
 /// - [Internal](Self::ibus): Embedded within the Sharp LR35902. Usable only by
-///                           the [CPU](super::cpu).
+///   the [CPU](super::cpu).
 /// - [External](Self::ebus): Accessible to on-board components.
-/// - [Video](Self::vbus):    Connected only to VRAM, controlled by the
-///                           [PPU](super::ppu).
+/// - [Graphics](Self::vbus): Connected only to VRAM, controlled by the
+///   [PPU](super::ppu).
 ///
 /// # Memory Map
 ///
@@ -120,7 +120,7 @@ impl Motherboard {
         ebus.map(0xe000..=0xffff, self.mem.wram.clone().into()); // ECHO
     }
 
-    /// Connect video bus.
+    /// Connect graphics bus.
     fn vbus(&self) {
         let mut vbus = self.noc.vbus.borrow_mut();
         // Memory map

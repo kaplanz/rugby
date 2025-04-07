@@ -91,8 +91,8 @@ pub(crate) static AUDIO_SAMPLE: OnceLock<retro_audio_sample_t> = OnceLock::new()
 ///
 /// - `data`: A pointer to the audio sample data pairs to render.
 /// - `frames`: The number of frames that are represented in the data. One
-///    frame is defined as a sample of left and right channels, interleaved.
-///    For example: `int16_t buf[4] = { l, r, l, r };` would be 2 frames.
+///   frame is defined as a sample of left and right channels, interleaved.
+///   For example: `int16_t buf[4] = { l, r, l, r };` would be 2 frames.
 ///
 /// # Returns
 ///
