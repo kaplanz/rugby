@@ -21,7 +21,7 @@ pub fn gui(args: &Cli) -> Result<Frontend> {
     #[cfg(feature = "gfx")]
     if args.dbg.gfx {
         gui.dbg.open().context("could not open debug windows")?;
-    };
+    }
 
     Ok(gui)
 }

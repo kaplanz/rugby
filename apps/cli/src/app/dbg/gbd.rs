@@ -126,7 +126,7 @@ impl Prompt for Console {
             match self.edit.readline(msg) {
                 Ok(line) => break line,
                 Err(err) => match err {
-                    Int => continue,
+                    Int => (),
                     Eof => return Err(Error::Quit),
                     _ => return Err(Error::Internal(Box::new(err))),
                 },
