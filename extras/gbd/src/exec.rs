@@ -265,7 +265,7 @@ pub fn load(emu: &GameBoy, loc: Select) -> Result<()> {
             let byte: u8 = emu.main.soc.tma.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
-    };
+    }
 
     Ok(())
 }

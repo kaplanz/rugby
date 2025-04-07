@@ -101,6 +101,7 @@ pub enum Command {
 }
 
 /// Debugger keywords.
+#[expect(clippy::doc_overindented_list_items)]
 #[derive(Clone, Debug, Display)]
 pub enum Keyword {
     /**

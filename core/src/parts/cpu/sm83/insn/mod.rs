@@ -137,7 +137,7 @@ mod help {
             0x6 => cpu.writebyte(value),
             0x7 => cpu.reg.a.store(value),
             _ => panic!("Illegal register."),
-        };
+        }
     }
 }
 
