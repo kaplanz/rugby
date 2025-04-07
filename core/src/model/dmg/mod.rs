@@ -118,7 +118,7 @@ impl GameBoy {
         // Disconnect previous cartridge
         if let Some(cart) = self.eject() {
             warn!("ejected previous cartridge: {}", cart.header());
-        };
+        }
         // Insert supplied cartridge
         let ebus = &mut *self.main.noc.ebus.borrow_mut();
         cart.attach(ebus);
