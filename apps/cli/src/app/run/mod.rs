@@ -76,17 +76,25 @@ pub fn main(args: &Cli) -> Result<()> {
         // thread, the frontend entrypoint is run directly on this thread.
         let gui = watch(|| gui::main(args))();
 
-        // Join threads after exit
-        let aux = aux.join().expect("playback thread panicked");
-        let emu = emu.join().expect("emulator thread panicked");
-        let tui = tui.join().expect("terminal thread panicked");
+        // Join thread handles, collecting any errors
+        let res = [
+            aux.join().expect("playback thread panicked"),
+            emu.join().expect("emulator thread panicked"),
+            tui.join().expect("terminal thread panicked"),
+            gui,
+        ];
+
         // Log exit reason
         debug!(
             "exit reason: {}",
             app::reason().expect("missing exit reason")
         );
+
         // Propagate errors
-        aux.and(emu).and(tui).and(gui)
+        //
+        // Iterate through each thread's result, short-circuit returning
+        // immediately if it indicates an error.
+        res.into_iter().collect()
     })
 }
 
