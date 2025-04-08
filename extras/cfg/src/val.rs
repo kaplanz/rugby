@@ -3,7 +3,7 @@
 use std::num::{ParseFloatError, ParseIntError};
 use std::str::FromStr;
 
-use rugby_core::dmg::FREQ;
+use rugby_core::dmg::{FREQ, ppu};
 use rugby_pal as pal;
 use thiserror::Error;
 
@@ -143,7 +143,7 @@ impl Speed {
             #[expect(clippy::cast_precision_loss)]
             #[expect(clippy::cast_sign_loss)]
             Speed::Ratio(mult) => Some((FREQ as f32 * mult) as u32),
-            Speed::Frame(rate) => Some(FREQ * u32::from(rate) / 60),
+            Speed::Frame(rate) => Some(u32::from(rate) * ppu::RATE),
             Speed::Turbo       => None,
         }
     }
