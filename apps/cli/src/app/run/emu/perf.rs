@@ -7,17 +7,17 @@ use std::time::Instant;
 /// Calculates the running frame rate of an emulator task,
 #[derive(Clone, Debug)]
 pub struct Profiler {
-    /// Elapsed cycles count.
-    pub cycle: u32,
-    /// Statistics timestamp.
-    pub timer: Instant,
+    /// Clock instant
+    pub clk: Instant,
+    /// Clock counter.
+    pub idx: u32,
 }
 
 impl Default for Profiler {
     fn default() -> Self {
         Self {
-            cycle: u32::default(),
-            timer: Instant::now(),
+            idx: u32::default(),
+            clk: Instant::now(),
         }
     }
 }
@@ -39,16 +39,16 @@ impl Profiler {
     /// # Returns
     ///
     /// Every second, the profiler will return the wall-clock cycle count.
-    #[expect(unused)]
     pub fn tick(&mut self) {
         // Increment counter
-        self.cycle += 1;
+        self.idx += 1;
     }
 
     /// Ticks the profiler by the specified amount.
+    #[allow(unused)]
     pub fn tick_by(&mut self, count: u32) {
         // Increment counter
-        self.cycle += count;
+        self.idx += count;
     }
 
     /// Reports the profiled frequency.
@@ -58,11 +58,7 @@ impl Profiler {
     /// Extrapolates the average frequency over the recorded time period.
     pub fn report(&mut self) -> f64 {
         // Compute rate
-        let rate = self
-            .timer
-            .elapsed()
-            .checked_div(self.cycle)
-            .map_or(f64::NAN, |iter| iter.as_secs_f64().recip());
+        let rate = f64::from(self.idx) / self.clk.elapsed().as_secs_f64();
         // Reset profiler
         self.reset();
         // Return rate
@@ -76,7 +72,7 @@ impl Profiler {
     /// Every second, the profiler will return the period-adjusted cycle count.
     pub fn report_delay(&mut self) -> Option<f64> {
         // Report after delay
-        if self.timer.elapsed().as_secs() >= 1 {
+        if self.clk.elapsed().as_secs() >= 1 {
             Some(self.report())
         } else {
             None
