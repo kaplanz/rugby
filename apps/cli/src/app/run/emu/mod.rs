@@ -4,7 +4,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context as _, Result};
-use log::{debug, info, trace};
+use log::{debug, info};
 use rugby::arch::Block;
 use rugby::core::dmg::{self, ppu};
 use rugby::emu::part::audio::Audio;
@@ -12,7 +12,6 @@ use rugby::emu::part::joypad::Joypad;
 use rugby::emu::part::video::Video;
 use rugby::prelude::Core;
 
-use self::perf::Profiler;
 use crate::app;
 #[cfg(feature = "trace")]
 use crate::app::dbg::trace;
@@ -22,18 +21,36 @@ pub mod drop;
 pub mod init;
 pub mod perf;
 pub mod save;
+pub mod sync;
+
+use self::perf::Profiler;
+use self::sync::Clocking;
 
 /// Emulator context.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Context {
-    /// Sync timestamp.
-    pub awake: Option<Instant>,
-    /// Cycle counter.
-    pub count: Profiler,
-    /// Total counter.
-    pub total: Profiler,
-    /// Pause emulator.
+    /// Pause signal.
     pub pause: bool,
+    /// Clock timings.
+    pub clock: Clocking,
+    /// Batch counter.
+    pub batch: Profiler,
+    /// Start instant.
+    pub start: Instant,
+    /// Total counter.
+    pub total: u64,
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            pause: false,
+            clock: Clocking::default(),
+            batch: Profiler::default(),
+            start: Instant::now(),
+            total: u64::default(),
+        }
+    }
 }
 
 /// Emulator main.
@@ -42,6 +59,8 @@ pub fn main(args: &Cli) -> Result<()> {
     let mut emu = init::emu(&args.cfg.data)?;
     // Instantiate context
     let mut ctx = Context::default();
+    // Prepare clocking
+    ctx.clock.frq = args.cfg.data.app.spd.clone().unwrap_or_default().freq();
     // Initialize tracing
     #[cfg(feature = "trace")]
     let mut trace = args
@@ -67,115 +86,106 @@ pub fn main(args: &Cli) -> Result<()> {
         if ctx.pause {
             // Use delay that is negligible in human time
             thread::sleep(Duration::from_millis(10));
-            // Once woken, restart loop to determine state
+            // Once woken, restart loop to re-synchronize
             continue;
         }
-        // Record emulation time
+
+        // Synchronize thread
         //
-        // This will be used for frequency synchronization, to ensure that
-        let watch = Instant::now();
-        // Synchronize frequency
-        //
-        // To ensure the emulator is clocked at the target frequency, if it is
-        // running ahead of schedule, sleep until around when we expect the next
-        // cycles to run.
-        if let Some(awake) = ctx.awake {
-            if awake > watch {
-                // Not yet ready for work... sleep until ready.
-                thread::sleep(awake - watch);
-            } else {
-                // There's a delay, which means the emulator has stalled.
-                trace!(
-                    "emulator thread stalled: {delay:>4.2?} behind",
-                    delay = watch - awake
-                );
-                // When lagging behind, unset the wake-up time. This has the
-                // effect of resetting synchronization against the current time,
-                // rather than against the previous pace.
-                ctx.awake = None;
-            }
-            // At this point, emulator is ready to perform work...
+        // Ensures the thread doesn't exceed nominal frequency as configured.
+        if ctx.clock.sync() {
+            continue;
         }
 
-        // Forward joypad input
-        let keys = app::data::input::take();
-        if !keys.is_empty() {
-            emu.inside_mut().joypad().recv(keys);
+        // Cycle emulator
+        //
+        // Advances the emulator by a single virtual clock cycle.
+        emu.cycle();
+
+        // Sample audio
+        //
+        // Audio is sampled each cycle in order to ensure the audio system
+        // remain busy, otherwise, audible "pops" will sound.
+        if !args.feat.mute {
+            app::data::audio::push(emu.inside().audio().sample().mix());
         }
-        // Perform emulation work
-        let count = ppu::RATE;
-        for _ in 0..count {
-            // Cycle emulator
-            emu.cycle();
 
-            // Sample audio
-            if !args.feat.mute {
-                app::data::audio::push(emu.inside().audio().sample().mix());
+        // Sample video
+        //
+        // Video is sampled only once per vsync, then the emulator indicates it
+        // has completed drawing the frame.
+        if !args.feat.headless && emu.inside().video().vsync() {
+            // Render video frame
+            app::data::video::draw(emu.inside().video().frame().into());
+            // Render debug frame
+            //
+            // This contains a graphical representation of the contents of VRAM.
+            #[cfg(feature = "gfx")]
+            if args.dbg.gfx {
+                app::data::debug::gfx::draw(dmg::dbg::ppu(&emu));
             }
-            // Sample video
-            if !args.feat.headless && emu.inside().video().vsync() {
-                // Video frame.
-                app::data::video::draw(emu.inside().video().frame().into());
-                // Debug frame.
-                #[cfg(feature = "gfx")]
-                if args.dbg.gfx {
-                    app::data::debug::gfx::draw(dmg::dbg::ppu(&emu));
-                }
-            }
+        }
 
-            // Trace execution
-            #[cfg(feature = "trace")]
-            if let Some(trace) = trace.as_mut() {
-                if matches!(
-                    emu.main.soc.cpu.stage(),
-                    dmg::cpu::Stage::Fetch | dmg::cpu::Stage::Done
-                ) && ctx.count.cycle % 4 == 0
-                {
-                    match trace.emit(&emu) {
-                        // Exit on completion
-                        Err(trace::Error::Finished) => {
-                            info!("trace comparison successful");
-                            app::exit(app::Exit::Tracecmp);
-                            break;
-                        }
-                        res => res.context("failed to emit trace entry")?,
+        // Sample trace
+        //
+        // Processor tracing only occurs on the the first T-cycle of the CPU's
+        // fetch/done stage.
+        #[cfg(feature = "trace")]
+        if let Some(trace) = trace.as_mut() {
+            if matches!(
+                emu.main.soc.cpu.stage(),
+                dmg::cpu::Stage::Fetch | dmg::cpu::Stage::Done
+            ) && ctx.total % 4 == 0
+            {
+                match trace.emit(&emu) {
+                    // Exit on completion
+                    Err(trace::Error::Finished) => {
+                        info!("trace comparison successful");
+                        app::exit(app::Exit::Tracecmp);
+                        break;
                     }
+                    res => res.context("failed to emit trace entry")?,
                 }
             }
         }
 
-        // Update synchronization delay
-        ctx.awake = if let Some(freq) = args.cfg.data.app.spd.clone().unwrap_or_default().freq() {
-            // Calculate sync delay for executed cycles
-            let delay = Duration::from_secs(1) * count / freq;
-            // Subtract emulation time from delay
-            Some(ctx.awake.unwrap_or(watch) + delay)
-        } else {
-            // When running without a target frequency (i.e. at maximum speed),
-            // no synchronization delay is needed.
-            None
-        };
+        // Perform lower-frequency actions
+        if ctx.total % u64::from(ctx.clock.frq.unwrap_or(dmg::FREQ) / 64) == 0 {
+            // Sample input
+            //
+            // Joypad input is sampled to the emulator ~64 times per second, as
+            // doing so more often impacts performance and shouldn't be
+            // noticeable to users. This improves overall emulation efficiency.
+            let keys = app::data::input::take();
+            if !keys.is_empty() {
+                emu.inside_mut().joypad().recv(keys);
+            }
 
-        // Synchronize profilers
-        ctx.total.tick_by(count);
-        ctx.count.tick_by(count);
-        if let Some(freq) = ctx.count.report_delay() {
-            // Log performance
-            self::report(freq);
-            // Set performance
-            app::data::bench::update(freq);
+            // Report performance
+            //
+            // Approximately once per second, we should generate a performance
+            // report. This will be logged and updated in the window's title.
+            if let Some(freq) = ctx.batch.report_delay() {
+                // Log performance
+                debug!("{}", self::frequency(freq));
+                // Set performance
+                app::data::bench::update(freq);
+            }
         }
+
+        // Register clocked cycle
+        ctx.clock.tick();
+        ctx.batch.tick();
+        ctx.total += 1;
     }
 
     // Report benchmark
-    let tick = ctx.total.cycle;
-    let time = ctx.total.timer.elapsed();
-    let mean = ctx.total.report();
-    info!(
-        "benchmark: {tick:>7.4} MCy, elapsed: {time:>4.2?}",
-        tick = f64::from(tick) / 1e6,
-    );
-    self::report(mean);
+    let tick = ctx.total;
+    let time = ctx.start.elapsed();
+    info!("{}", self::benchmark(tick, time));
+    // Report frequency
+    let mean = ctx.clock.perf().report();
+    info!("{}", self::frequency(mean));
 
     // Destroy emulator
     drop::emu(emu, &args.cfg.data).context("shutdown sequence failed")?;
@@ -183,12 +193,21 @@ pub fn main(args: &Cli) -> Result<()> {
     Ok(())
 }
 
-/// Logs a performance report.
-fn report(freq: f64) {
-    debug!(
-        "frequency: {freq:>7.4} MHz, speedup: {pace:>4.2}x, frames: {rate:>6.2} FPS",
+/// Generates a benchmark report.
+fn benchmark(tick: u64, time: Duration) -> String {
+    format!(
+        "benchmark: {div:>3}.{rem:06} MCy, elapsed: {time:>4.2?}",
+        div = tick / 1_000_000,
+        rem = tick % 1_000_000,
+    )
+}
+
+/// Generates a frequency report.
+fn frequency(freq: f64) -> String {
+    format!(
+        "frequency: {freq:>10.6} MHz, speedup: {pace:>4.2}x, frames: {rate:>6.2} FPS",
         freq = freq / 1e6,
         pace = freq / f64::from(dmg::FREQ),
         rate = freq / f64::from(ppu::RATE)
-    );
+    )
 }
