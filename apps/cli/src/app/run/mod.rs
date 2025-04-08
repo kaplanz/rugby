@@ -11,7 +11,6 @@ use crate::exe::run::Cli;
 pub mod aux;
 pub mod emu;
 pub mod gui;
-pub mod tui;
 
 /// Run application.
 ///
@@ -68,8 +67,6 @@ pub fn main(args: &Cli) -> Result<()> {
         let aux = s.spawn(watch(|| aux::main(args)));
         // Run emulator thread
         let emu = s.spawn(watch(|| emu::main(args)));
-        // Run terminal thread
-        let tui = s.spawn(watch(|| tui::main(args)));
         // Run frontend thread
         //
         // Since on Cocoa-based systems, windows must be managed on the main
@@ -80,7 +77,6 @@ pub fn main(args: &Cli) -> Result<()> {
         let res = [
             aux.join().expect("playback thread panicked"),
             emu.join().expect("emulator thread panicked"),
-            tui.join().expect("terminal thread panicked"),
             gui,
         ];
 
