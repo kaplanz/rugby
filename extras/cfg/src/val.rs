@@ -67,7 +67,7 @@ pub enum Palette {
     /// Deep and passionate purples.
     VelvetCherry,
     /// Whatever colors you want!
-    #[cfg_attr(feature = "clap", clap(skip))]
+    #[cfg_attr(feature = "clap", value(skip))]
     Custom(pal::Palette),
 }
 
