@@ -9,23 +9,23 @@ use crate::cli::Settings;
 
 /// Emulate provided ROM.
 #[derive(Debug, Parser)]
-#[clap(name = NAME)]
-#[clap(arg_required_else_help = true)]
+#[command(name = NAME)]
+#[command(arg_required_else_help = true)]
 #[group(id = "Run")]
 pub struct Cli {
     /// Runtime features.
-    #[clap(flatten)]
-    #[clap(next_help_heading = "Features")]
+    #[command(flatten)]
+    #[command(next_help_heading = "Features")]
     pub feat: Features,
 
     /// Configuration options.
-    #[clap(flatten)]
+    #[command(flatten)]
     pub cfg: Settings,
 
     /// Debugging options.
     #[cfg(feature = "debug")]
-    #[clap(flatten)]
-    #[clap(next_help_heading = "Debug")]
+    #[command(flatten)]
+    #[command(next_help_heading = "Debug")]
     pub dbg: Debugger,
 }
 
@@ -36,24 +36,24 @@ pub struct Features {
     ///
     /// Instead of entering the main emulation loop, exit immediately after
     /// emulator instantiation is complete.
-    #[clap(short = 'x', long)]
+    #[arg(short = 'x', long)]
     pub exit: bool,
 
     /// Run in headless mode (command-line only).
     ///
     /// Starts without initializing or opening the UI. This is often useful when
     /// debugging to prevent the GUI from taking focus in your OS.
-    #[clap(short = 'H', long)]
+    #[arg(short = 'H', long)]
     pub headless: bool,
 
     /// Run without audio.
     ///
     /// Starts with the audio subsystem disabled.
-    #[clap(short = 'M', long)]
+    #[arg(short = 'M', long)]
     pub mute: bool,
 
     /// Serial connection.
-    #[clap(flatten)]
+    #[command(flatten)]
     pub link: Option<Link>,
 }
 
@@ -65,17 +65,17 @@ pub struct Link {
     ///
     /// Binds a local UDP socket to the specified address for serial
     /// communications.
-    #[clap(long)]
-    #[clap(value_name = "ADDR")]
-    #[clap(required = false)]
+    #[arg(long)]
+    #[arg(value_name = "ADDR")]
+    #[arg(required = false)]
     pub host: SocketAddr,
 
     /// Link cable peer address.
     ///
     /// Opens a UDP socket at the specified address for serial communications.
-    #[clap(long)]
-    #[clap(value_name = "ADDR")]
-    #[clap(required = false)]
+    #[arg(long)]
+    #[arg(value_name = "ADDR")]
+    #[arg(required = false)]
     pub peer: SocketAddr,
 }
 
@@ -87,19 +87,19 @@ pub struct Debugger {
     /// Enables the Game Boy Debugger (GBD), an interactive command-line
     /// debugger which accepts commands at a prompt to control the emulator.
     #[cfg(feature = "gbd")]
-    #[clap(short = 'i', long)]
+    #[arg(short = 'i', long)]
     pub gbd: bool,
 
     /// Graphics debug windows.
     ///
     /// Enables debug windows for visually rendering contents of VRAM.
     #[cfg(feature = "gfx")]
-    #[clap(long)]
+    #[arg(long)]
     pub gfx: bool,
 
     /// Introspective tracing.
     #[cfg(feature = "trace")]
-    #[clap(flatten)]
+    #[command(flatten)]
     pub trace: Option<trace::Trace>,
 }
 
@@ -119,20 +119,20 @@ pub mod trace {
         /// Enables tracing of emulated cycles using the specified format. For
         /// more details on these formats please see their corresponding
         /// projects.
-        #[clap(name = "trace")]
-        #[clap(long)]
-        #[clap(required = false)]
-        #[clap(value_name = "FORMAT")]
+        #[arg(name = "trace")]
+        #[arg(long)]
+        #[arg(required = false)]
+        #[arg(value_name = "FORMAT")]
         pub fmt: Format,
 
         /// Path to output generated logfile.
         ///
         /// An optional file for logging tracing output. If unspecified or "-",
         /// the standard output stream is used.
-        #[clap(name = "logfile")]
-        #[clap(long)]
-        #[clap(conflicts_with = "compare")]
-        #[clap(value_name = "PATH")]
+        #[arg(name = "logfile")]
+        #[arg(long)]
+        #[arg(conflicts_with = "compare")]
+        #[arg(value_name = "PATH")]
         pub log: Option<PathBuf>,
 
         /// Compare against existing logfile.
@@ -141,10 +141,10 @@ pub mod trace {
         /// using the supplied tracing logfile. This will continue until the
         /// emulator either diverges from or reaches the end of the provided
         /// logfile.
-        #[clap(name = "compare")]
-        #[clap(long)]
-        #[clap(conflicts_with = "logfile")]
-        #[clap(value_name = "PATH")]
+        #[arg(name = "compare")]
+        #[arg(long)]
+        #[arg(conflicts_with = "logfile")]
+        #[arg(value_name = "PATH")]
         pub cmp: Option<PathBuf>,
     }
 
