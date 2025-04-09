@@ -21,7 +21,7 @@ pub struct Frontend {
     /// use case, there is no reason to change the default value.
     #[cfg_attr(
         feature = "clap",
-        clap(short, long = "audio", value_name = "RATE", default_value_t = 48_000)
+        arg(short, long = "audio", value_name = "RATE", default_value_t = 48_000)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "audio"))]
     #[expect(clippy::doc_markdown)]
@@ -30,7 +30,7 @@ pub struct Frontend {
     /// Logging filter.
     ///
     /// A comma-separated list of logging directives.
-    #[cfg_attr(feature = "clap", clap(
+    #[cfg_attr(feature = "clap", arg(
         short, long,
         env = crate::env::LOG,
         value_name = "FILTER",
@@ -44,7 +44,7 @@ pub struct Frontend {
     /// Custom values can be defined in the configuration file.
     #[cfg_attr(
         feature = "clap",
-        clap(short, long = "palette", value_name = "COLOR", value_enum)
+        arg(short, long = "palette", value_name = "COLOR", value_enum)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "palette"))]
     pub pal: Option<Palette>,
@@ -55,8 +55,8 @@ pub struct Frontend {
     /// Custom values can be defined in the configuration file.
     #[cfg_attr(
         feature = "clap",
-        clap(short, long = "speed", value_name = "SPEED"),
-        clap(value_parser = crate::val::SpeedValueParser)
+        arg(short, long = "speed", value_name = "SPEED"),
+        arg(value_parser = crate::val::SpeedValueParser)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "speed"))]
     pub spd: Option<Speed>,
