@@ -38,11 +38,11 @@ pub trait Join {
 )]
 pub struct Config {
     /// Frontend options.
-    #[cfg_attr(feature = "clap", clap(flatten))]
+    #[cfg_attr(feature = "clap", command(flatten))]
     pub app: Frontend,
 
     /// Emulator options.
-    #[cfg_attr(feature = "clap", clap(flatten))]
+    #[cfg_attr(feature = "clap", command(flatten))]
     pub emu: Emulator,
 }
 
