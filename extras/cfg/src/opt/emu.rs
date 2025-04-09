@@ -15,11 +15,11 @@ pub use crate::val::When;
 )]
 pub struct Emulator {
     /// Booting options.
-    #[cfg_attr(feature = "clap", clap(flatten))]
+    #[cfg_attr(feature = "clap", command(flatten))]
     pub boot: Boot,
 
     /// Cartridge options.
-    #[cfg_attr(feature = "clap", clap(flatten))]
+    #[cfg_attr(feature = "clap", command(flatten))]
     pub cart: Cart,
 }
 
@@ -51,7 +51,7 @@ pub struct Boot {
     /// Otherwise, the path to the image file must be provided.
     ///
     /// May be negated with `--no-boot`.
-    #[cfg_attr(feature = "clap", clap(
+    #[cfg_attr(feature = "clap", arg(
         name = "boot",
         short, long,
         num_args(0..=1),
@@ -65,7 +65,7 @@ pub struct Boot {
     /// Negates `-b/--boot`.
     #[cfg_attr(
         feature = "clap",
-        clap(
+        arg(
             hide = true,
             long = "no-boot",
             overrides_with = "boot",
@@ -101,7 +101,7 @@ pub struct Cart {
     /// A cartridge will be constructed from the data specified in this file.
     /// The cartridge header specifies precisely what hardware will be
     /// instantiated.
-    #[cfg_attr(feature = "clap", clap(
+    #[cfg_attr(feature = "clap", arg(
         required_unless_present("force"),
         value_hint = clap::ValueHint::FilePath,
         help_heading = None,
@@ -113,14 +113,14 @@ pub struct Cart {
     ///
     /// Verifies that both the header and global checksums match the data within
     /// the ROM.
-    #[cfg_attr(feature = "clap", clap(short, long, conflicts_with("force")))]
+    #[cfg_attr(feature = "clap", arg(short, long, conflicts_with("force")))]
     pub check: bool,
 
     /// Force cartridge construction.
     ///
     /// Causes the cartridge generation to always succeed, even if the ROM does
     /// not contain valid data.
-    #[cfg_attr(feature = "clap", clap(short, long))]
+    #[cfg_attr(feature = "clap", arg(short, long))]
     pub force: bool,
 
     /// Cartridge RAM persistence.
@@ -130,7 +130,7 @@ pub struct Cart {
     /// with the same path and name as the ROM, but using the ".sav" extension.
     #[cfg_attr(
         feature = "clap",
-        clap(short = 'S', long, value_name = "WHEN", value_enum)
+        arg(short = 'S', long, value_name = "WHEN", value_enum)
     )]
     pub save: Option<When>,
 }
