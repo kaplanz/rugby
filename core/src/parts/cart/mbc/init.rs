@@ -2,12 +2,11 @@ use std::cmp::Ordering;
 use std::iter;
 
 use log::{debug, warn};
-use rugby_arch::Byte;
 
 use super::{Data, Header};
 
 /// Constructs a new ROM.
-pub fn rom(head: &Header, rom: &[Byte]) -> Data {
+pub fn rom(head: &Header, rom: &[u8]) -> Data {
     let read = rom.len();
     match read.cmp(&head.romsz) {
         Ordering::Less => {

@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
@@ -15,7 +14,7 @@ pub enum Cpl {
 
 impl Execute for Cpl {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Execute => execute(code, cpu),
         }
@@ -28,7 +27,7 @@ impl From<Cpl> for Operation {
     }
 }
 
-fn execute(code: Byte, cpu: &mut Cpu) -> Return {
+fn execute(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     if code != 0x2f {
         return Err(Error::Opcode(code));

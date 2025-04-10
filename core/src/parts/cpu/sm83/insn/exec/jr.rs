@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
@@ -11,13 +10,13 @@ pub const fn default() -> Operation {
 pub enum Jr {
     #[default]
     Fetch,
-    Check(Byte),
-    Jump(Byte),
+    Check(u8),
+    Jump(u8),
 }
 
 impl Execute for Jr {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch     => fetch(code, cpu),
             Self::Check(e8) => check(code, cpu, e8),
@@ -32,7 +31,7 @@ impl From<Jr> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0x18 | 0x20 | 0x28 | 0x30 | 0x38 => {
@@ -45,7 +44,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn check(code: Byte, cpu: &mut Cpu, e8: Byte) -> Return {
+fn check(code: u8, cpu: &mut Cpu, e8: u8) -> Return {
     // Evaluate condition
     let flags = &cpu.reg.f.load();
     #[rustfmt::skip]
@@ -68,7 +67,7 @@ fn check(code: Byte, cpu: &mut Cpu, e8: Byte) -> Return {
     }
 }
 
-fn jump(_: Byte, cpu: &mut Cpu, e8: Byte) -> Return {
+fn jump(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
     // Perform jump
     let e8 = e8 as i8 as i16;
     let pc = cpu.reg.pc.load() as i16;

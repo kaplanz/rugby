@@ -4,12 +4,11 @@ use std::ops::RangeInclusive;
 use self::imp::Map;
 use super::Device;
 use crate::mem::{Error, Memory, Result};
-use crate::{Byte, Word};
 
 mod imp;
 
 /// Mappable address range.
-type Range = RangeInclusive<Word>;
+type Range = RangeInclusive<u16>;
 
 /// Databus.
 ///
@@ -74,7 +73,7 @@ impl<const N: usize> From<[(Range, Device); N]> for Bus {
 }
 
 impl Memory for Bus {
-    fn read(&self, addr: Word) -> Result<Byte> {
+    fn read(&self, addr: u16) -> Result<u8> {
         // No-op if locked
         if self.lock {
             return Err(Error::Busy);
@@ -92,7 +91,7 @@ impl Memory for Bus {
             .ok_or(Error::Range)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         // No-op if locked
         if self.lock {
             return Err(Error::Busy);

@@ -7,7 +7,7 @@ use log::{debug, trace};
 use rugby_arch::mem::Memory;
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::Register;
-use rugby_arch::{Block, Byte, Shared, Word};
+use rugby_arch::{Block, Shared};
 
 use super::pic::{self, Interrupt};
 use crate::api::part::joypad::{Event, Input, Joypad as Api, State};
@@ -35,12 +35,12 @@ pub enum Button {
 }
 
 impl Button {
-    fn mode(self) -> Byte {
-        Mode::MASK & self as Byte
+    fn mode(self) -> u8 {
+        Mode::MASK & self as u8
     }
 
-    fn key(self) -> Byte {
-        Mode::KEYS & self as Byte
+    fn key(self) -> u8 {
+        Mode::KEYS & self as u8
     }
 }
 
@@ -61,11 +61,11 @@ pub enum Mode {
 }
 
 impl Mode {
-    const KEYS: Byte = 0b0000_1111;
-    const MASK: Byte = 0b0011_0000;
+    const KEYS: u8 = 0b0000_1111;
+    const MASK: u8 = 0b0011_0000;
 
-    fn mode(self) -> Byte {
-        Self::MASK & self as Byte
+    fn mode(self) -> u8 {
+        Self::MASK & self as u8
     }
 
     fn select(self, btn: Button) -> bool {
@@ -73,8 +73,8 @@ impl Mode {
     }
 }
 
-impl From<Byte> for Mode {
-    fn from(value: Byte) -> Self {
+impl From<u8> for Mode {
+    fn from(value: u8) -> Self {
         match value & Self::MASK {
             0b0000_0000 => Mode::None,
             0b0001_0000 => Mode::DPad,
@@ -154,18 +154,18 @@ impl Block for Control {
 }
 
 impl Memory for Control {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Control {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.keys

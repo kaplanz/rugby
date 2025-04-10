@@ -3,7 +3,7 @@
 use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Block, Byte, Shared};
+use rugby_arch::{Block, Shared};
 
 use super::timer;
 use crate::api::part::audio::{Audio as Api, Chiptune, Sample};
@@ -22,7 +22,7 @@ pub use self::reg::*;
 /// 16 byte RAM used to store audio samples. See more details [here][wave].
 ///
 /// [wave]: https://gbdev.io/pandocs/Audio_Registers.html#ff30ff3f--wave-pattern-ram
-pub type Wave = Ram<[Byte; 0x0010]>;
+pub type Wave = Ram<[u8; 0x0010]>;
 
 /// Audio sequencer.
 ///
@@ -287,10 +287,10 @@ impl Mmio for Apu {
     }
 }
 
-impl Port<Byte> for Apu {
+impl Port<u8> for Apu {
     type Select = Select;
 
-    fn load(&self, reg: Self::Select) -> Byte {
+    fn load(&self, reg: Self::Select) -> u8 {
         match reg {
             Select::Nr52 => self.reg.nr52.load(),
             Select::Nr51 => self.reg.nr51.load(),
@@ -316,7 +316,7 @@ impl Port<Byte> for Apu {
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Byte) {
+    fn store(&mut self, reg: Self::Select, value: u8) {
         match reg {
             Select::Nr52 => self.reg.nr52.store(value),
             Select::Nr51 => self.reg.nr51.store(value),

@@ -10,8 +10,8 @@
 //! [header]: https://gbdev.io/pandocs/The_Cartridge_Header.html
 //! [mbcs]:   https://gbdev.io/pandocs/MBCs.html
 
+use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Mmio};
-use rugby_arch::{Block, Byte};
 use thiserror::Error;
 
 use self::header::{Header, Info};
@@ -39,7 +39,7 @@ impl Cartridge {
     ///
     /// Returns an error when the cartridge could not be constructed. This will
     /// either be due to invalid header bytes or an unsupported cartridge type.
-    pub fn new(rom: &[Byte]) -> Result<Self> {
+    pub fn new(rom: &[u8]) -> Result<Self> {
         let head = Header::new(rom)?;
         Ok(Self {
             body: Body::new(&head, rom)?,
@@ -53,7 +53,7 @@ impl Cartridge {
     ///
     /// Returns an error when the cartridge could not be constructed. This will
     /// either be due to invalid header bytes or an unsupported cartridge type.
-    pub fn checked(rom: &[Byte]) -> Result<Self> {
+    pub fn checked(rom: &[u8]) -> Result<Self> {
         let head = Header::checked(rom)?;
         Ok(Self {
             body: Body::new(&head, rom)?,
@@ -67,7 +67,7 @@ impl Cartridge {
     ///
     /// Returns an error when the cartridge could not be constructed. This will
     /// either be due to missing header bytes or an unsupported cartridge type.
-    pub fn unchecked(rom: &[Byte]) -> Result<Self> {
+    pub fn unchecked(rom: &[u8]) -> Result<Self> {
         let head = Header::unchecked(rom)?;
         Ok(Self {
             body: Body::new(&head, rom)?,

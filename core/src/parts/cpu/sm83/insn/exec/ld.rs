@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Operation, Return, help};
@@ -13,17 +12,17 @@ pub enum Ld {
     #[default]
     Fetch,
     Update,
-    Write(Byte),
-    Byte(Byte),
+    Write(u8),
+    Byte(u8),
     Fetch0,
-    Fetch1(Byte),
+    Fetch1(u8),
     Word(u16),
     Done,
 }
 
 impl Execute for Ld {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch       => fetch(code, cpu),
             Self::Update      => update(code, cpu),
@@ -43,7 +42,7 @@ impl From<Ld> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         // LD [r16], A
@@ -133,7 +132,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn update(code: Byte, cpu: &mut Cpu) -> Return {
+fn update(code: u8, cpu: &mut Cpu) -> Return {
     // Load HL
     let mut hl = cpu.reg.hl_mut();
     let r16 = hl.load();
@@ -152,7 +151,7 @@ fn update(code: Byte, cpu: &mut Cpu) -> Return {
     done(code, cpu)
 }
 
-fn write(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn write(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Check opcode
     if code != 0x36 {
         return Err(Error::Opcode(code));
@@ -165,7 +164,7 @@ fn write(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
     Ok(Some(Ld::Done.into()))
 }
 
-fn byte(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn byte(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Store r8 <- {r8, n8, [HL]}
     let op1 = match code {
         0x06 | 0x40..=0x47 => &mut cpu.reg.b,
@@ -186,14 +185,14 @@ fn byte(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
     }
 }
 
-fn fetch0(_: Byte, cpu: &mut Cpu) -> Return {
+fn fetch0(_: u8, cpu: &mut Cpu) -> Return {
     // Fetch LSB
     let lsb = cpu.fetchbyte();
     // Proceed
     Ok(Some(Ld::Fetch1(lsb).into()))
 }
 
-fn fetch1(_: Byte, cpu: &mut Cpu, lsb: Byte) -> Return {
+fn fetch1(_: u8, cpu: &mut Cpu, lsb: u8) -> Return {
     // Fetch LSB
     let msb = cpu.fetchbyte();
     // Combine bytes
@@ -203,7 +202,7 @@ fn fetch1(_: Byte, cpu: &mut Cpu, lsb: Byte) -> Return {
     Ok(Some(Ld::Word(a16).into()))
 }
 
-fn word(code: Byte, cpu: &mut Cpu, word: u16) -> Return {
+fn word(code: u8, cpu: &mut Cpu, word: u16) -> Return {
     match code {
         0xea => {
             // Execute LD [a16], A
@@ -222,7 +221,7 @@ fn word(code: Byte, cpu: &mut Cpu, word: u16) -> Return {
     Ok(Some(Ld::Done.into()))
 }
 
-fn done(_: Byte, _: &mut Cpu) -> Return {
+fn done(_: u8, _: &mut Cpu) -> Return {
     // Finish
     Ok(None)
 }
