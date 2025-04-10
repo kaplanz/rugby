@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
@@ -15,7 +14,7 @@ pub enum Rlca {
 
 impl Execute for Rlca {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Execute => execute(code, cpu),
         }
@@ -28,7 +27,7 @@ impl From<Rlca> for Operation {
     }
 }
 
-fn execute(code: Byte, cpu: &mut Cpu) -> Return {
+fn execute(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     if code != 0x07 {
         return Err(Error::Opcode(code));
@@ -37,7 +36,7 @@ fn execute(code: Byte, cpu: &mut Cpu) -> Return {
     // Execute RLCA
     let acc = cpu.reg.a.load();
     let carry = acc & 0x80 != 0;
-    let res = (acc << 1) | (carry as Byte);
+    let res = (acc << 1) | (carry as u8);
     cpu.reg.a.store(res);
 
     // Set flags

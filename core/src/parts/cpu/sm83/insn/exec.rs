@@ -15,8 +15,6 @@
 
 #![allow(clippy::unnecessary_wraps)]
 
-use rugby_arch::Byte;
-
 use super::{Cpu, Error, Execute, Flag, Ime, Result, Status, help};
 
 type Return = Result<Option<Operation>>;
@@ -79,7 +77,7 @@ pub enum Operation {
 
 impl Execute for Operation {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Result<Option<Operation>> {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>> {
         match self {
             Operation::Adc(inner)    => inner.exec(code, cpu),
             Operation::Add(inner)    => inner.exec(code, cpu),

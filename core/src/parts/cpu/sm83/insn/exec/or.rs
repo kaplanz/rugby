@@ -1,6 +1,5 @@
 use std::ops::BitOr;
 
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
@@ -13,12 +12,12 @@ pub const fn default() -> Operation {
 pub enum Or {
     #[default]
     Fetch,
-    Execute(Byte),
+    Execute(u8),
 }
 
 impl Execute for Or {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op2) => execute(code, cpu, op2),
@@ -32,7 +31,7 @@ impl From<Or> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0xb6 => {
@@ -57,7 +56,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(_: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Execute OR
     let acc = cpu.reg.a.load();
     let res = acc.bitor(op2);

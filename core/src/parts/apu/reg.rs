@@ -3,7 +3,6 @@
 use bitfield_struct::bitfield;
 use rugby_arch::mem::Memory;
 use rugby_arch::reg::Register;
-use rugby_arch::{Byte, Word};
 
 /// Audio master control.
 ///
@@ -54,25 +53,25 @@ pub struct Nr52 {
 
 impl Nr52 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b1_000_1111;
+    const READABLE: u8 = 0b1_000_1111;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b1_000_0000;
+    const WRITABLE: u8 = 0b1_000_0000;
 }
 
 impl Memory for Nr52 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr52 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -130,18 +129,18 @@ pub struct Nr51 {
 }
 
 impl Memory for Nr51 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr51 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0
@@ -196,18 +195,18 @@ pub struct Nr50 {
 }
 
 impl Memory for Nr50 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr50 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0
@@ -244,22 +243,22 @@ pub struct Nr10 {
 
 impl Nr10 {
     /// Unusable bit mask.
-    const UNUSABLE: Byte = 0b1_000_0_000;
+    const UNUSABLE: u8 = 0b1_000_0_000;
 }
 
 impl Memory for Nr10 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr10 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | Self::UNUSABLE
@@ -288,25 +287,25 @@ pub struct Nr11 {
 
 impl Nr11 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b11_000000;
+    const READABLE: u8 = 0b11_000000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b11_111111;
+    const WRITABLE: u8 = 0b11_111111;
 }
 
 impl Memory for Nr11 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr11 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -340,18 +339,18 @@ pub struct Nr12 {
 }
 
 impl Memory for Nr12 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr12 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0
@@ -376,25 +375,25 @@ pub struct Nr13 {
 
 impl Nr13 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b00000000;
+    const READABLE: u8 = 0b00000000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b11111111;
+    const WRITABLE: u8 = 0b11111111;
 }
 
 impl Memory for Nr13 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr13 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -429,25 +428,25 @@ pub struct Nr14 {
 
 impl Nr14 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b0_1_000_000;
+    const READABLE: u8 = 0b0_1_000_000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b1_1_000_111;
+    const WRITABLE: u8 = 0b1_1_000_111;
 }
 
 impl Memory for Nr14 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr14 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -504,22 +503,22 @@ pub struct Nr30 {
 
 impl Nr30 {
     /// Unusable bit mask.
-    const UNUSABLE: Byte = 0b0_1111111;
+    const UNUSABLE: u8 = 0b0_1111111;
 }
 
 impl Memory for Nr30 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr30 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | Self::UNUSABLE
@@ -545,25 +544,25 @@ pub struct Nr31 {
 
 impl Nr31 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b00000000;
+    const READABLE: u8 = 0b00000000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b11111111;
+    const WRITABLE: u8 = 0b11111111;
 }
 
 impl Memory for Nr31 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr31 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -604,22 +603,22 @@ pub struct Nr32 {
 
 impl Nr32 {
     /// Unusable bit mask.
-    const UNUSABLE: Byte = 0b1_00_11111;
+    const UNUSABLE: u8 = 0b1_00_11111;
 }
 
 impl Memory for Nr32 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr32 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | Self::UNUSABLE
@@ -645,25 +644,25 @@ pub struct Nr33 {
 
 impl Nr33 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b00000000;
+    const READABLE: u8 = 0b00000000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b11111111;
+    const WRITABLE: u8 = 0b11111111;
 }
 
 impl Memory for Nr33 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr33 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -698,25 +697,25 @@ pub struct Nr34 {
 
 impl Nr34 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b0_1_000_000;
+    const READABLE: u8 = 0b0_1_000_000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b1_1_000_111;
+    const WRITABLE: u8 = 0b1_1_000_111;
 }
 
 impl Memory for Nr34 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr34 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -745,25 +744,25 @@ pub struct Nr41 {
 
 impl Nr41 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b00_000000;
+    const READABLE: u8 = 0b00_000000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b00_111111;
+    const WRITABLE: u8 = 0b00_111111;
 }
 
 impl Memory for Nr41 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr41 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE
@@ -801,18 +800,18 @@ pub struct Nr43 {
 }
 
 impl Memory for Nr43 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr43 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0
@@ -843,25 +842,25 @@ pub struct Nr44 {
 
 impl Nr44 {
     /// Readable bit mask.
-    const READABLE: Byte = 0b0_1_000000;
+    const READABLE: u8 = 0b0_1_000000;
 
     /// Writable bit mask.
-    const WRITABLE: Byte = 0b1_1_000000;
+    const WRITABLE: u8 = 0b1_1_000000;
 }
 
 impl Memory for Nr44 {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Nr44 {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 | !Self::READABLE

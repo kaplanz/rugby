@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
@@ -14,7 +12,7 @@ pub enum Prefix {
 
 impl Execute for Prefix {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch => fetch(code, cpu),
         }
@@ -27,7 +25,7 @@ impl From<Prefix> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     if code != 0xcb {
         return Err(Error::Opcode(code));

@@ -1,5 +1,4 @@
 use log::{debug, trace};
-use rugby_arch::Word;
 use rugby_arch::mem::Memory;
 use rugby_arch::reg::Register;
 
@@ -12,7 +11,7 @@ use super::{Lcdc, Mode, Ppu};
 #[derive(Clone, Debug, Default)]
 pub struct Scan {
     /// OAM entry index.
-    pub(super) addr: Word,
+    pub(super) addr: u16,
     /// Scanned sprites.
     pub(super) objs: Vec<Sprite>,
 }

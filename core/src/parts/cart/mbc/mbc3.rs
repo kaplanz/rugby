@@ -2,7 +2,7 @@ use log::{debug, error, trace};
 use rugby_arch::mem::{Error, Memory, Result};
 use rugby_arch::mio::Device;
 use rugby_arch::reg::Register;
-use rugby_arch::{Block, Byte, Shared, Word};
+use rugby_arch::{Block, Shared};
 
 use super::{Data, Mbc};
 
@@ -83,21 +83,21 @@ impl Block for Control {
 struct Enable(bool);
 
 impl Memory for Enable {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Err(Error::Misuse)
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Enable {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
-        Byte::from(self.0)
+        u8::from(self.0)
     }
 
     fn store(&mut self, value: Self::Value) {
@@ -108,21 +108,21 @@ impl Register for Enable {
 
 /// ROM Bank Number.
 #[derive(Debug, Default)]
-struct RomBank(Byte);
+struct RomBank(u8);
 
 impl Memory for RomBank {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Err(Error::Misuse)
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for RomBank {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 & 0x7f
@@ -136,21 +136,21 @@ impl Register for RomBank {
 
 /// RAM Bank Number.
 #[derive(Debug, Default)]
-struct RamBank(Byte);
+struct RamBank(u8);
 
 impl Memory for RamBank {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Err(Error::Misuse)
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for RamBank {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0 & 0x03
@@ -167,21 +167,21 @@ impl Register for RamBank {
 struct Latch(bool);
 
 impl Memory for Latch {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Err(Error::Misuse)
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Latch {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
-        Byte::from(self.0)
+        u8::from(self.0)
     }
 
     fn store(&mut self, value: Self::Value) {
@@ -206,7 +206,7 @@ impl Rom {
     }
 
     /// Adjusts addresses by internal bank number.
-    fn adjust(&self, addr: Word) -> usize {
+    fn adjust(&self, addr: u16) -> usize {
         let bank = usize::from(self.ctl.ram.load());
         let addr = usize::from(addr);
         ((bank << 14) | addr & 0x3fff) % self.mem.len().max(0x8000)
@@ -214,7 +214,7 @@ impl Rom {
 }
 
 impl Memory for Rom {
-    fn read(&self, addr: Word) -> Result<Byte> {
+    fn read(&self, addr: u16) -> Result<u8> {
         let index = match addr {
             0x0000..=0x3fff => usize::from(addr),
             0x4000..=0x7fff => self.adjust(addr),
@@ -223,7 +223,7 @@ impl Memory for Rom {
         self.mem.get(index).ok_or(Error::Range).copied()
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         trace!("Mbc3::write(${addr:04x}, {data:#04x})");
         match addr {
             // RAM Enable
@@ -267,7 +267,7 @@ impl Ram {
     }
 
     /// Adjusts addresses by internal bank number.
-    fn adjust(&self, addr: Word) -> usize {
+    fn adjust(&self, addr: u16) -> usize {
         let bank = usize::from(self.ctl.ram.load());
         let addr = usize::from(addr);
         ((bank << 13) | addr & 0x1fff) % self.mem.len().max(0x2000)
@@ -275,7 +275,7 @@ impl Ram {
 }
 
 impl Memory for Ram {
-    fn read(&self, addr: Word) -> Result<Byte> {
+    fn read(&self, addr: u16) -> Result<u8> {
         // Error when disabled
         if self.ctl.ena.load() == 0 {
             return Err(Error::Disabled);
@@ -285,7 +285,7 @@ impl Memory for Ram {
         self.mem.get(index).ok_or(Error::Range).copied()
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         // Error when disabled
         if self.ctl.ena.load() == 0 {
             return Err(Error::Disabled);

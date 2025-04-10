@@ -1,5 +1,4 @@
 use super::{Error, Memory, Result};
-use crate::{Byte, Word};
 
 /// Read-only memory.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
@@ -24,11 +23,11 @@ impl<M: Memory> From<M> for Rom<M> {
 }
 
 impl<M: Memory> Memory for Rom<M> {
-    fn read(&self, addr: Word) -> Result<Byte> {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.0.read(addr)
     }
 
-    fn write(&mut self, addr: Word, _: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, _: u8) -> Result<()> {
         Err(if self.0.read(addr).is_ok() {
             Error::Misuse
         } else {

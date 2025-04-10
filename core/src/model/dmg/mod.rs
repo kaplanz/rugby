@@ -3,9 +3,9 @@
 //! [Game Boy]: https://en.wikipedia.org/wiki/Game_Boy
 
 use log::warn;
+use rugby_arch::Block;
 use rugby_arch::mio::Mmio;
 use rugby_arch::reg::Port;
-use rugby_arch::{Block, Word};
 
 use self::apu::Apu;
 use self::cpu::Cpu;
@@ -90,7 +90,7 @@ impl GameBoy {
 
         // Initialize registers
         #[expect(clippy::items_after_statements)]
-        type Select = <Cpu as Port<Word>>::Select;
+        type Select = <Cpu as Port<u16>>::Select;
         cpu.store(Select::AF, 0x01b0_u16);
         cpu.store(Select::BC, 0x0013_u16);
         cpu.store(Select::DE, 0x00d8_u16);

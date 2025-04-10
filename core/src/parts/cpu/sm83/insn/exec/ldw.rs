@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
@@ -13,18 +12,18 @@ pub enum Ldw {
     #[default]
     Fetch,
     ReadLsb,
-    ReadMsb(Byte),
+    ReadMsb(u8),
     Execute(u16),
     Load(u16),
     WriteLsb(u16, u16),
     WriteMsb(u16, u16),
-    Add(Byte),
+    Add(u8),
     Delay,
 }
 
 impl Execute for Ldw {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch             => fetch(code, cpu),
             Self::ReadLsb           => read_lsb(code, cpu),
@@ -45,7 +44,7 @@ impl From<Ldw> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     #[expect(clippy::match_same_arms)]
     match code {
@@ -77,14 +76,14 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn read_lsb(_: Byte, cpu: &mut Cpu) -> Return {
+fn read_lsb(_: u8, cpu: &mut Cpu) -> Return {
     // Fetch LSB <- [PC++]
     let lsb = cpu.fetchbyte();
     // Proceed
     Ok(Some(Ldw::ReadMsb(lsb).into()))
 }
 
-fn read_msb(_: Byte, cpu: &mut Cpu, lsb: Byte) -> Return {
+fn read_msb(_: u8, cpu: &mut Cpu, lsb: u8) -> Return {
     // Fetch MSB <- [PC++]
     let msb = cpu.fetchbyte();
     // Combine bytes
@@ -94,7 +93,7 @@ fn read_msb(_: Byte, cpu: &mut Cpu, lsb: Byte) -> Return {
     Ok(Some(Ldw::Execute(n16).into()))
 }
 
-fn execute(code: Byte, cpu: &mut Cpu, op2: u16) -> Return {
+fn execute(code: u8, cpu: &mut Cpu, op2: u16) -> Return {
     // Execute LDW
     match code {
         0x01 => cpu.reg.bc_mut().store(op2),
@@ -109,7 +108,7 @@ fn execute(code: Byte, cpu: &mut Cpu, op2: u16) -> Return {
     Ok(None)
 }
 
-fn load(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
+fn load(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
     // Load SP
     let sp = cpu.reg.sp.load();
 
@@ -117,7 +116,7 @@ fn load(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
     Ok(Some(Ldw::WriteLsb(a16, sp).into()))
 }
 
-fn write_lsb(_: Byte, cpu: &mut Cpu, a16: u16, sp: u16) -> Return {
+fn write_lsb(_: u8, cpu: &mut Cpu, a16: u16, sp: u16) -> Return {
     // Write a16 <- lower(SP)
     cpu.write(a16, sp.to_le_bytes()[0]);
 
@@ -125,7 +124,7 @@ fn write_lsb(_: Byte, cpu: &mut Cpu, a16: u16, sp: u16) -> Return {
     Ok(Some(Ldw::WriteMsb(a16, sp).into()))
 }
 
-fn write_msb(_: Byte, cpu: &mut Cpu, mut a16: u16, sp: u16) -> Return {
+fn write_msb(_: u8, cpu: &mut Cpu, mut a16: u16, sp: u16) -> Return {
     // Write a16 + 1 <- upper(SP)
     a16 = a16.wrapping_add(1);
     cpu.write(a16, sp.to_le_bytes()[1]);
@@ -134,7 +133,7 @@ fn write_msb(_: Byte, cpu: &mut Cpu, mut a16: u16, sp: u16) -> Return {
     Ok(None)
 }
 
-fn add(_: Byte, cpu: &mut Cpu, e8: Byte) -> Return {
+fn add(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
     // LD HL, SP + e8
     let sp = cpu.reg.sp.load();
     let e16 = e8 as i8 as u16;
@@ -153,7 +152,7 @@ fn add(_: Byte, cpu: &mut Cpu, e8: Byte) -> Return {
     Ok(Some(Ldw::Delay.into()))
 }
 
-fn delay(_: Byte, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish

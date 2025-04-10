@@ -3,7 +3,7 @@
 use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Block, Byte, Shared};
+use rugby_arch::{Block, Shared};
 
 use self::exec::hblank::HBlank;
 use self::exec::vblank::VBlank;
@@ -46,7 +46,7 @@ pub type Vram = Sram;
 /// 160 byte RAM used to store sprites data. See more details [here][oam].
 ///
 /// [oam]: https://gbdev.io/pandocs/OAM.html
-pub type Oam = Ram<[Byte; 0x00a0]>;
+pub type Oam = Ram<[u8; 0x00a0]>;
 
 /// Graphics register select.
 #[derive(Clone, Copy, Debug)]
@@ -145,7 +145,7 @@ pub struct Internal {
     /// Cycle count.
     dot: u16,
     /// Window line.
-    ywin: Byte,
+    ywin: u8,
     /// Graphics mode.
     mode: Mode,
 }
@@ -161,7 +161,7 @@ impl Default for Internal {
         Self {
             buf: vec![Color::default(); LCD.depth()].into_boxed_slice(),
             dot: u16::default(),
-            ywin: Byte::default(),
+            ywin: u8::default(),
             mode: Mode::default(),
         }
     }
@@ -236,10 +236,10 @@ impl Mmio for Ppu {
 }
 
 #[rustfmt::skip]
-impl Port<Byte> for Ppu {
+impl Port<u8> for Ppu {
     type Select = Select;
 
-    fn load(&self, reg: Self::Select) -> Byte {
+    fn load(&self, reg: Self::Select) -> u8 {
         match reg {
             Select::Lcdc => self.reg.lcdc.load(),
             Select::Stat => self.reg.stat.load(),
@@ -256,7 +256,7 @@ impl Port<Byte> for Ppu {
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Byte) {
+    fn store(&mut self, reg: Self::Select, value: u8) {
         match reg {
             Select::Lcdc => self.reg.lcdc.store(value),
             Select::Stat => self.reg.stat.store(value),
@@ -308,29 +308,29 @@ pub struct Bank {
 #[derive(Debug, Default)]
 pub struct Control {
     /// LCD control
-    pub lcdc: Shared<Byte>,
+    pub lcdc: Shared<u8>,
     /// LCD status
-    pub stat: Shared<Byte>,
+    pub stat: Shared<u8>,
     /// Viewport Y position
-    pub scy:  Shared<Byte>,
+    pub scy:  Shared<u8>,
     /// Viewport X position
-    pub scx:  Shared<Byte>,
+    pub scx:  Shared<u8>,
     /// LCD Y coordinate
-    pub ly:   Shared<Byte>,
+    pub ly:   Shared<u8>,
     /// LY compare
-    pub lyc:  Shared<Byte>,
+    pub lyc:  Shared<u8>,
     /// OAM DMA source address
     pub dma:  Shared<dma::Control>,
     /// BG palette data
-    pub bgp:  Shared<Byte>,
+    pub bgp:  Shared<u8>,
     /// OBJ palette 0 data
-    pub obp0: Shared<Byte>,
+    pub obp0: Shared<u8>,
     /// OBJ palette 1 data
-    pub obp1: Shared<Byte>,
+    pub obp1: Shared<u8>,
     /// Window Y position
-    pub wy:   Shared<Byte>,
+    pub wy:   Shared<u8>,
     /// Window X position
-    pub wx:   Shared<Byte>,
+    pub wx:   Shared<u8>,
 }
 
 impl Block for Control {
@@ -421,7 +421,7 @@ pub enum Lcdc {
 impl Lcdc {
     /// Gets the value of the corresponding bit to the flag.
     #[must_use]
-    fn get(self, value: Byte) -> bool {
-        value & self as Byte != 0
+    fn get(self, value: u8) -> bool {
+        value & self as u8 != 0
     }
 }
