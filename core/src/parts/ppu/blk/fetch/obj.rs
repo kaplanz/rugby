@@ -1,4 +1,4 @@
-use rugby_arch::{Block, Byte};
+use rugby_arch::Block;
 
 use super::meta::{Layer, Row, Sprite};
 use super::{Fifo, Lcdc, Ppu, Step};
@@ -50,7 +50,7 @@ pub(super) mod exec {
     use log::trace;
     use rugby_arch::reg::Register;
 
-    use super::{Byte, Fetcher, Lcdc, Ppu, Row, Sprite, Step};
+    use super::{Fetcher, Lcdc, Ppu, Row, Sprite, Step};
 
     /// Executes fetch tile step.
     pub fn fetch(ppu: &Ppu, obj: &Sprite) -> Step {
@@ -89,7 +89,7 @@ pub(super) mod exec {
     pub use super::super::bgw::exec::{read0, read1};
 
     /// Executes push to FIFO.
-    pub fn push(fetch: &mut Fetcher, data: [Byte; 2], obj: &Sprite) -> Step {
+    pub fn push(fetch: &mut Fetcher, data: [u8; 2], obj: &Sprite) -> Step {
         // Decode pixel row from bytes
         let mut row = Row::from(data);
         // Perform horizontal flip

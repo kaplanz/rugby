@@ -17,11 +17,6 @@ use std::rc::Rc;
 pub use crate::blk::Block;
 pub use crate::clk::Clock;
 
-/// Native architecture byte.
-pub type Byte = u8;
-/// Native architecture word.
-pub type Word = u16;
-
 /// Interface for accessing values according to a bitmask.
 pub trait Bitmask<M>
 where

@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Operation, Return};
@@ -17,7 +16,7 @@ pub enum Pop {
 
 impl Execute for Pop {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Pop1  => pop1(code, cpu),
             Self::Pop0  => pop0(code, cpu),
@@ -32,7 +31,7 @@ impl From<Pop> for Operation {
     }
 }
 
-fn pop1(code: Byte, cpu: &mut Cpu) -> Return {
+fn pop1(code: u8, cpu: &mut Cpu) -> Return {
     // Pop LSB <- [SP++]
     let mut lsb = cpu.popbyte();
     if code == 0xf1 {
@@ -53,7 +52,7 @@ fn pop1(code: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Pop::Pop0.into()))
 }
 
-fn pop0(code: Byte, cpu: &mut Cpu) -> Return {
+fn pop0(code: u8, cpu: &mut Cpu) -> Return {
     // Pop MSB <- [SP++]
     let msb = cpu.popbyte();
 
@@ -71,7 +70,7 @@ fn pop0(code: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Pop::Delay.into()))
 }
 
-fn delay(_: Byte, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish

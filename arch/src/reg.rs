@@ -1,6 +1,6 @@
 //! Register models.
 
-use crate::{Byte, Shared, Word};
+use crate::Shared;
 
 /// An access point within a register file.
 pub trait Port<R: Register> {
@@ -26,26 +26,26 @@ pub trait Register {
     fn store(&mut self, value: Self::Value);
 }
 
-impl Register for Byte {
+impl Register for u8 {
     type Value = Self;
 
-    fn load(&self) -> Byte {
+    fn load(&self) -> u8 {
         *self
     }
 
-    fn store(&mut self, value: Byte) {
+    fn store(&mut self, value: u8) {
         *self = value;
     }
 }
 
-impl Register for Word {
+impl Register for u16 {
     type Value = Self;
 
-    fn load(&self) -> Word {
+    fn load(&self) -> u16 {
         *self
     }
 
-    fn store(&mut self, value: Word) {
+    fn store(&mut self, value: u16) {
         *self = value;
     }
 }

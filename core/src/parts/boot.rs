@@ -6,10 +6,10 @@ use log::{debug, trace};
 use rugby_arch::mem::{Error, Memory, Result};
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::Register;
-use rugby_arch::{Block, Byte, Shared, Word};
+use rugby_arch::{Block, Shared};
 
 /// Boot ROM.
-pub type Boot = rugby_arch::mem::Rom<[Byte; 0x100]>;
+pub type Boot = rugby_arch::mem::Rom<[u8; 0x100]>;
 
 /// Boot mapper chip.
 #[derive(Clone, Debug)]
@@ -24,7 +24,7 @@ impl Chip {
     /// Constructs a new `Rom`.
     #[must_use]
     pub fn new(rom: Boot) -> Self {
-        trace!("boot ROM:\n{}", hexd::Printer::<Byte>::new(0, rom.inner()));
+        trace!("boot ROM:\n{}", hexd::Printer::<u8>::new(0, rom.inner()));
         let reg = Shared::new(Control::new());
         Self {
             mem: Shared::new(Bank::new(reg.clone(), rom)),
@@ -69,21 +69,21 @@ impl Block for Control {
 }
 
 impl Memory for Control {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, value: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, value: u8) -> Result<()> {
         self.store(value);
         Ok(())
     }
 }
 
 impl Register for Control {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
-        0xfe | Byte::from(self.0)
+        0xfe | u8::from(self.0)
     }
 
     #[rustfmt::skip]
@@ -123,7 +123,7 @@ impl Block for Bank {
 }
 
 impl Memory for Bank {
-    fn read(&self, addr: Word) -> Result<Byte> {
+    fn read(&self, addr: u16) -> Result<u8> {
         if self.ready() {
             self.boot.read(addr)
         } else {
@@ -131,7 +131,7 @@ impl Memory for Bank {
         }
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         if self.ready() {
             self.boot.write(addr, data)
         } else {

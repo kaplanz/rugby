@@ -1,6 +1,5 @@
 use std::ops::BitAnd;
 
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
@@ -13,12 +12,12 @@ pub const fn default() -> Operation {
 pub enum And {
     #[default]
     Fetch,
-    Execute(Byte),
+    Execute(u8),
 }
 
 impl Execute for And {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op2) => execute(code, cpu, op2),
@@ -32,7 +31,7 @@ impl From<And> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0xa6 => {
@@ -57,7 +56,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(_: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Execute AND
     let acc = cpu.reg.a.load();
     let res = acc.bitand(op2);

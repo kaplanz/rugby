@@ -1,5 +1,4 @@
 use rugby_arch::reg::Register;
-use rugby_arch::{Byte, Word};
 
 use super::fifo::Fifo;
 use super::meta::{self, Layer};
@@ -18,17 +17,17 @@ pub enum Step {
     #[default]
     Fetch,
     /// Read tile data (low).
-    Read0 { tdat: Word },
+    Read0 { tdat: u16 },
     /// Read tile data (high).
-    Read1 { tdat: Word, data: Byte },
+    Read1 { tdat: u16, data: u8 },
     /// Push pixels to FIFO.
-    Push { data: [Byte; 2] },
+    Push { data: [u8; 2] },
 }
 
 impl Ppu {
     /// Gets the tile address base for the configured addressing mode.
     #[inline]
-    pub(crate) fn base(&self, layer: Layer) -> Word {
+    pub(crate) fn base(&self, layer: Layer) -> u16 {
         match layer {
             Layer::Background | Layer::Window => {
                 if self.lcdc(Lcdc::BgWinData) {
@@ -43,25 +42,25 @@ impl Ppu {
 
     /// Calculates a tile index for the configured addressing mode.
     #[inline]
-    pub(crate) fn tidx(&self, layer: Layer, tnum: Byte) -> Word {
+    pub(crate) fn tidx(&self, layer: Layer, tnum: u8) -> u16 {
         let base = self.base(layer);
         let tnum = match layer {
             Layer::Background | Layer::Window => {
                 if self.lcdc(Lcdc::BgWinData) {
-                    Word::from(tnum)
+                    u16::from(tnum)
                 } else {
-                    tnum as i8 as Word
+                    tnum as i8 as u16
                 }
             }
-            Layer::Sprite => Word::from(tnum),
+            Layer::Sprite => u16::from(tnum),
         };
         base.wrapping_add(tnum << 4)
     }
 
     /// Calculates the tile offset for a given layer.
     #[inline]
-    pub(crate) fn toff(&self, layer: Layer, yoff: Byte) -> Word {
-        Word::from(match layer {
+    pub(crate) fn toff(&self, layer: Layer, yoff: u8) -> u16 {
+        u16::from(match layer {
             Layer::Background => self.reg.ly.load().wrapping_add(yoff),
             Layer::Window => self.etc.ywin,
             Layer::Sprite => self.reg.ly.load().wrapping_sub(yoff),
@@ -71,7 +70,7 @@ impl Ppu {
     /// Calculates the tile data address from a tile number using the configured
     /// addressing mode.
     #[inline]
-    pub(crate) fn tdat(&self, layer: Layer, tnum: Byte, yoff: Byte) -> Word {
+    pub(crate) fn tdat(&self, layer: Layer, tnum: u8, yoff: u8) -> u16 {
         let tidx = self.tidx(layer, tnum);
         let toff = self.toff(layer, yoff) * 2;
         tidx | toff

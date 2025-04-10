@@ -6,7 +6,7 @@ use log::{debug, error, trace, warn};
 use rugby_arch::mem::{Memory, Ram};
 use rugby_arch::mio::Bus;
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Block, Byte, Shared, Word};
+use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
 use crate::api::part::proc::Processor;
@@ -23,7 +23,7 @@ pub type Wram = Sram;
 /// High RAM.
 ///
 /// 127 byte RAM only accessible by the CPU.
-pub type Hram = Ram<[Byte; 0x007f]>;
+pub type Hram = Ram<[u8; 0x007f]>;
 
 /// Processor byte select.
 ///
@@ -118,7 +118,7 @@ impl Cpu {
 
     /// Read the byte at the given address.
     #[must_use]
-    pub fn read(&self, addr: Word) -> Byte {
+    pub fn read(&self, addr: u16) -> u8 {
         self.bus
             .read(addr)
             .inspect_err(|err| warn!("failed to read [${addr:04x}] (default: `0xff`): {err}"))
@@ -126,7 +126,7 @@ impl Cpu {
     }
 
     /// Write to the byte at the given address.
-    pub fn write(&mut self, addr: Word, data: Byte) {
+    pub fn write(&mut self, addr: u16, data: u8) {
         let _ = self
             .bus
             .write(addr, data)
@@ -134,7 +134,7 @@ impl Cpu {
     }
 
     /// Fetch the next byte after PC.
-    fn fetchbyte(&mut self) -> Byte {
+    fn fetchbyte(&mut self) -> u8 {
         // Load PC
         let mut pc = self.reg.pc.load();
         // Read at PC
@@ -147,7 +147,7 @@ impl Cpu {
     }
 
     /// Read the byte at HL.
-    fn readbyte(&mut self) -> Byte {
+    fn readbyte(&mut self) -> u8 {
         // Load value of HL
         let hl = self.reg.hl().load();
         // Read at HL
@@ -155,7 +155,7 @@ impl Cpu {
     }
 
     /// Write to the byte at HL
-    fn writebyte(&mut self, byte: Byte) {
+    fn writebyte(&mut self, byte: u8) {
         // Load value of HL
         let hl = self.reg.hl().load();
         // Write to HL
@@ -163,7 +163,7 @@ impl Cpu {
     }
 
     /// Pop the byte at SP.
-    fn popbyte(&mut self) -> Byte {
+    fn popbyte(&mut self) -> u8 {
         // Load SP
         let mut sp = self.reg.sp.load();
         // Read at SP
@@ -176,7 +176,7 @@ impl Cpu {
     }
 
     /// Push to the byte at SP.
-    fn pushbyte(&mut self, byte: Byte) {
+    fn pushbyte(&mut self, byte: u8) {
         // Increment SP
         let mut sp = self.reg.sp.load();
         sp = sp.wrapping_sub(1);
@@ -201,10 +201,10 @@ impl Block for Cpu {
     }
 }
 
-impl Port<Byte> for Cpu {
+impl Port<u8> for Cpu {
     type Select = Select8;
 
-    fn load(&self, reg: Self::Select) -> Byte {
+    fn load(&self, reg: Self::Select) -> u8 {
         match reg {
             Select8::A => self.reg.a.load(),
             Select8::F => self.reg.f.load(),
@@ -217,7 +217,7 @@ impl Port<Byte> for Cpu {
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Byte) {
+    fn store(&mut self, reg: Self::Select, value: u8) {
         match reg {
             Select8::A => self.reg.a.store(value),
             Select8::F => self.reg.f.store(value),
@@ -231,10 +231,10 @@ impl Port<Byte> for Cpu {
     }
 }
 
-impl Port<Word> for Cpu {
+impl Port<u16> for Cpu {
     type Select = Select16;
 
-    fn load(&self, reg: Self::Select) -> Word {
+    fn load(&self, reg: Self::Select) -> u16 {
         match reg {
             Select16::AF => self.reg.af().load(),
             Select16::BC => self.reg.bc().load(),
@@ -245,7 +245,7 @@ impl Port<Word> for Cpu {
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Word) {
+    fn store(&mut self, reg: Self::Select, value: u16) {
         match reg {
             Select16::AF => self.reg.af_mut().store(value),
             Select16::BC => self.reg.bc_mut().store(value),
@@ -272,11 +272,11 @@ impl Processor for Cpu {
         }
     }
 
-    fn goto(&mut self, addr: Word) {
+    fn goto(&mut self, addr: u16) {
         self.reg.pc.store(addr);
     }
 
-    fn exec(&mut self, code: Byte) {
+    fn exec(&mut self, code: u8) {
         // Create a new instruction...
         let mut insn = Ok(Some(Instruction::decode(code)));
         // ... then execute it until completion
@@ -289,7 +289,7 @@ impl Processor for Cpu {
         }
     }
 
-    fn run(&mut self, prog: &[Byte]) {
+    fn run(&mut self, prog: &[u8]) {
         for &code in prog {
             self.exec(code);
         }
@@ -331,25 +331,25 @@ pub struct Bank {
 #[derive(Debug, Default)]
 pub struct Control {
     /// Accumulator register.
-    pub a: Byte,
+    pub a: u8,
     /// Flags register.
-    pub f: Byte,
+    pub f: u8,
     /// General register B.
-    pub b: Byte,
+    pub b: u8,
     /// General register C.
-    pub c: Byte,
+    pub c: u8,
     /// General register D.
-    pub d: Byte,
+    pub d: u8,
     /// General register E.
-    pub e: Byte,
+    pub e: u8,
     /// Address (HI) byte.
-    pub h: Byte,
+    pub h: u8,
     /// Address (LO) byte.
-    pub l: Byte,
+    pub l: u8,
     /// Stack pointer.
-    pub sp: Word,
+    pub sp: u16,
     /// Program counter.
-    pub pc: Word,
+    pub pc: u16,
 }
 
 impl Control {
@@ -465,14 +465,14 @@ impl Display for Control {
 /// Aliased register.
 #[derive(Clone, Copy)]
 pub(crate) struct Alias<'a> {
-    pub lo: &'a Byte,
-    pub hi: &'a Byte,
+    pub lo: &'a u8,
+    pub hi: &'a u8,
 }
 
 impl Alias<'_> {
-    pub fn load(&self) -> Word {
+    pub fn load(&self) -> u16 {
         let value = [*self.lo, *self.hi];
-        Word::from_le_bytes(value)
+        u16::from_le_bytes(value)
     }
 }
 
@@ -490,16 +490,16 @@ impl Display for Alias<'_> {
 
 /// Aliased register.
 pub(crate) struct AliasMut<'a> {
-    pub lo: &'a mut Byte,
-    pub hi: &'a mut Byte,
+    pub lo: &'a mut u8,
+    pub hi: &'a mut u8,
 }
 
 impl Register for AliasMut<'_> {
-    type Value = Word;
+    type Value = u16;
 
     fn load(&self) -> Self::Value {
         let value = [*self.lo, *self.hi];
-        Word::from_le_bytes(value)
+        u16::from_le_bytes(value)
     }
 
     fn store(&mut self, value: Self::Value) {
@@ -548,13 +548,13 @@ pub enum Flag {
 impl Flag {
     /// Gets the value of the corresponding bit to the flag.
     #[must_use]
-    pub fn get(self, value: &Byte) -> bool {
-        value & self as Byte != 0
+    pub fn get(self, value: &u8) -> bool {
+        value & self as u8 != 0
     }
 
     /// Sets the value of the corresponding bit from the flag.
-    pub fn set(self, value: &mut Byte, enable: bool) {
-        *value ^= (*value & self as Byte) ^ (!Byte::from(enable).wrapping_sub(1) & self as Byte);
+    pub fn set(self, value: &mut u8, enable: bool) {
+        *value ^= (*value & self as u8) ^ (!u8::from(enable).wrapping_sub(1) & self as u8);
     }
 }
 

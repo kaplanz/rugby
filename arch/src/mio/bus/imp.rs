@@ -7,10 +7,9 @@ use std::rc::Rc;
 use indexmap::IndexSet;
 
 use super::{Device, Range};
-use crate::Word;
 
 #[derive(Debug, Default)]
-pub(super) struct Map(BTreeMap<Word, IndexSet<Entry>>);
+pub(super) struct Map(BTreeMap<u16, IndexSet<Entry>>);
 
 #[expect(unused)]
 impl Map {
@@ -44,7 +43,7 @@ impl Map {
     }
 
     /// Select all devices for a given address.
-    pub fn select(&self, addr: Word) -> impl Iterator<Item = &Entry> {
+    pub fn select(&self, addr: u16) -> impl Iterator<Item = &Entry> {
         self.0
             .range(..=addr)
             .rev()
@@ -77,16 +76,16 @@ impl Entry {
         Self { range, entry }
     }
 
-    pub fn base(&self) -> Word {
+    pub fn base(&self) -> u16 {
         *self.range.start()
     }
 
-    fn span(&self) -> Word {
+    fn span(&self) -> u16 {
         *self.range.end() - *self.range.start()
     }
 
     #[expect(clippy::trivially_copy_pass_by_ref)]
-    fn contains(&self, addr: &Word) -> bool {
+    fn contains(&self, addr: &u16) -> bool {
         self.range.contains(addr)
     }
 }

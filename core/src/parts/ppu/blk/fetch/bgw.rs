@@ -1,4 +1,4 @@
-use rugby_arch::{Block, Byte, Word};
+use rugby_arch::Block;
 
 use super::meta::{Layer, Meta, Row};
 use super::{Fifo, Lcdc, Ppu, Step};
@@ -11,7 +11,7 @@ pub struct Fetcher {
     /// Fetcher step.
     pub step: Step,
     /// X position counter.
-    pub xpos: Byte,
+    pub xpos: u8,
     /// Graphics layer.
     pub layer: Layer,
 }
@@ -21,7 +21,7 @@ impl Default for Fetcher {
         Self {
             fifo: Fifo::default(),
             step: Step::Fetch,
-            xpos: Byte::default(),
+            xpos: u8::default(),
             layer: Layer::Background,
         }
     }
@@ -53,7 +53,7 @@ pub(super) mod exec {
     use rugby_arch::mem::Memory;
     use rugby_arch::reg::Register;
 
-    use super::{Byte, Fetcher, Layer, Lcdc, Meta, Ppu, Row, Step, Word};
+    use super::{Fetcher, Layer, Lcdc, Meta, Ppu, Row, Step};
 
     /// Executes fetch tile step.
     pub fn fetch(ppu: &Ppu, fetch: &mut Fetcher) -> Step {
@@ -65,8 +65,8 @@ pub(super) mod exec {
         }))];
         // Calculate the offset from the pixel coordinates
         let toff = {
-            let row: Byte;
-            let col: Byte;
+            let row: u8;
+            let col: u8;
             match fetch.layer {
                 Layer::Background => {
                     row = ppu.reg.ly.load().wrapping_add(ppu.reg.scy.load()) / 8;
@@ -78,7 +78,7 @@ pub(super) mod exec {
                 }
                 Layer::Sprite => unreachable!(),
             }
-            (32 * (Word::from(row)) + Word::from(col)) & 0x03ff
+            (32 * (u16::from(row)) + u16::from(col)) & 0x03ff
         };
         // Read the tile number from the tile map
         let addr = tmap + toff;
@@ -92,7 +92,7 @@ pub(super) mod exec {
     }
 
     /// Executes read tile data low.
-    pub fn read0(ppu: &Ppu, tdat: Word) -> Step {
+    pub fn read0(ppu: &Ppu, tdat: u16) -> Step {
         // Fetch the low byte of the tile
         let data = ppu.mem.vram.read(tdat).unwrap();
         trace!("read lower byte: VRAM[${tdat:04x}] -> {data:#04x}");
@@ -103,7 +103,7 @@ pub(super) mod exec {
     }
 
     /// Executes read tile data high.
-    pub fn read1(ppu: &Ppu, tdat: Word, data0: Byte) -> Step {
+    pub fn read1(ppu: &Ppu, tdat: u16, data0: u8) -> Step {
         // Fetch the high byte of the tile
         let data1 = ppu.mem.vram.read(tdat).unwrap();
         trace!("read upper byte: VRAM[${tdat:04x}] -> {data1:#04x}");
@@ -115,7 +115,7 @@ pub(super) mod exec {
     }
 
     /// Executes push to FIFO.
-    pub fn push(fetch: &mut Fetcher, data: [Byte; 2]) -> Step {
+    pub fn push(fetch: &mut Fetcher, data: [u8; 2]) -> Step {
         // Decode pixel row from bytes
         let row = Row::from(data);
         let meta = Meta::Bgw;

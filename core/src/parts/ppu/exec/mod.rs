@@ -1,5 +1,4 @@
 use ppu::{LCD, Lcdc, Ppu};
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use self::draw::Draw;
@@ -37,7 +36,7 @@ impl Mode {
     /// Returns the internal mode value.
     #[must_use]
     #[rustfmt::skip]
-    pub fn value(&self) -> Byte {
+    pub fn value(&self) -> u8 {
         match self {
             Mode::Scan(_)   => 0b10,
             Mode::Draw(_)   => 0b11,
@@ -54,7 +53,7 @@ impl Mode {
         let stat = {
             let mut stat = ppu.reg.stat.load();
             stat ^= (0x03 & stat) ^ self.value();
-            stat ^= (0x04 & stat) ^ (Byte::from(ly == lyc) << 2);
+            stat ^= (0x04 & stat) ^ (u8::from(ly == lyc) << 2);
             stat
         };
         ppu.reg.stat.store(stat);
@@ -63,13 +62,13 @@ impl Mode {
         if ppu.etc.dot == 0 {
             let mut int = 0;
             // LYC=LY
-            int |= Byte::from(lyc == ly) << 6;
+            int |= u8::from(lyc == ly) << 6;
             // Mode 2
-            int |= Byte::from(matches!(self, Mode::Scan(_))) << 5;
+            int |= u8::from(matches!(self, Mode::Scan(_))) << 5;
             // Mode 1
-            int |= Byte::from(matches!(self, Mode::VBlank(_))) << 4;
+            int |= u8::from(matches!(self, Mode::VBlank(_))) << 4;
             // Mode 0
-            int |= Byte::from(matches!(self, Mode::HBlank(_))) << 3;
+            int |= u8::from(matches!(self, Mode::HBlank(_))) << 3;
             // Check for interrupts
             if int & (stat & 0x78) != 0 {
                 // Request an interrupt

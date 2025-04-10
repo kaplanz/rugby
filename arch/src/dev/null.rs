@@ -1,5 +1,4 @@
 use crate::mem::{Memory, Result};
-use crate::{Byte, Word};
 
 /// Null device.
 ///
@@ -13,7 +12,7 @@ use crate::{Byte, Word};
 /// be changed either by constructing with [`Null::with`], or through the
 /// [`Null::value`] method at runtime.
 #[derive(Debug, Default)]
-pub struct Null(Byte);
+pub struct Null(u8);
 
 impl Null {
     /// Constructs a new `Null` device.
@@ -25,22 +24,22 @@ impl Null {
     /// Construct an instance of [`Null`] that yields the specified value when
     /// performing a read.
     #[must_use]
-    pub fn with(value: Byte) -> Self {
+    pub fn with(value: u8) -> Self {
         Self(value)
     }
 
     /// Set the value to be used when performing a read.
-    pub fn value(&mut self, value: Byte) {
+    pub fn value(&mut self, value: u8) {
         self.0 = value;
     }
 }
 
 impl Memory for Null {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Ok(self.0)
     }
 
-    fn write(&mut self, _: Word, _: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, _: u8) -> Result<()> {
         Ok(())
     }
 }

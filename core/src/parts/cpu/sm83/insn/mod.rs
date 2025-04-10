@@ -3,7 +3,6 @@
 use std::fmt::{Debug, Display};
 
 use log::trace;
-use rugby_arch::Byte;
 use thiserror::Error;
 
 use self::exec::Operation;
@@ -15,7 +14,7 @@ mod table;
 
 /// Instruction operation execution interface.
 trait Execute {
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Result<Option<Operation>>;
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>>;
 }
 
 /// Processor instruction.
@@ -24,7 +23,7 @@ trait Execute {
 /// started and resumed.
 #[derive(Clone)]
 pub struct Instruction {
-    code: Byte,
+    code: u8,
     oper: Operation,
     repr: &'static str,
 }
@@ -32,13 +31,13 @@ pub struct Instruction {
 impl Instruction {
     /// Constructs a new `Instruction` with the given opcode.
     #[must_use]
-    pub fn decode(code: Byte) -> Self {
+    pub fn decode(code: u8) -> Self {
         table::DECODE[code as usize].clone()
     }
 
     /// Constructs a new prefix `Instruction` with the given opcode.
     #[must_use]
-    pub fn prefix(code: Byte) -> Self {
+    pub fn prefix(code: u8) -> Self {
         table::PREFIX[code as usize].clone()
     }
 
@@ -46,7 +45,7 @@ impl Instruction {
     #[must_use]
     pub fn int(int: Interrupt) -> Self {
         Self {
-            code: int as Byte,
+            code: int as u8,
             oper: Operation::Int(exec::int::Int::default()),
             repr: int.repr(),
         }
@@ -54,7 +53,7 @@ impl Instruction {
 
     /// Gets the instruction's opcode.
     #[must_use]
-    pub fn opcode(&self) -> Byte {
+    pub fn opcode(&self) -> u8 {
         self.code
     }
 
@@ -96,7 +95,7 @@ impl Display for Instruction {
 impl From<Interrupt> for Instruction {
     fn from(value: Interrupt) -> Self {
         Self {
-            code: value as Byte,
+            code: value as u8,
             oper: Operation::Int(exec::int::Int::default()),
             repr: value.repr(),
         }
@@ -105,13 +104,12 @@ impl From<Interrupt> for Instruction {
 
 /// Helper functions.
 mod help {
-    use rugby_arch::Byte;
     use rugby_arch::reg::Register;
 
     use super::Cpu;
 
     /// Get an 8-bit register operand.
-    pub fn get_op8(cpu: &mut Cpu, idx: Byte) -> Byte {
+    pub fn get_op8(cpu: &mut Cpu, idx: u8) -> u8 {
         match idx {
             0x0 => cpu.reg.b.load(),
             0x1 => cpu.reg.c.load(),
@@ -126,7 +124,7 @@ mod help {
     }
 
     /// Set an 8-bit register operand.
-    pub fn set_op8(cpu: &mut Cpu, idx: Byte, value: Byte) {
+    pub fn set_op8(cpu: &mut Cpu, idx: u8, value: u8) {
         match idx {
             0x0 => cpu.reg.b.store(value),
             0x1 => cpu.reg.c.store(value),
@@ -149,13 +147,13 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     /// Illegal instruction.
     #[error("illegal instruction: {0:#04X}")]
-    Illegal(Byte),
+    Illegal(u8),
     /// Unexpected opcode.
     #[error("unexpected opcode: {0:#04X}")]
-    Opcode(Byte),
+    Opcode(u8),
     /// Unimplemented instruction.
     #[error("unimplemented: {0:#04X}")]
-    Unimplemented(Byte),
+    Unimplemented(u8),
 }
 
 #[cfg(test)]

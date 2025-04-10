@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use super::{Cpu, Error, Execute, Operation, Return, Status};
 
 pub const fn default() -> Operation {
@@ -14,7 +12,7 @@ pub enum Halt {
 
 impl Execute for Halt {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Execute => execute(code, cpu),
         }
@@ -27,7 +25,7 @@ impl From<Halt> for Operation {
     }
 }
 
-fn execute(code: Byte, cpu: &mut Cpu) -> Return {
+fn execute(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     if code != 0x76 {
         return Err(Error::Opcode(code));
