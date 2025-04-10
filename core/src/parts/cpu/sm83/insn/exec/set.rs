@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use super::{Cpu, Error, Execute, Operation, Return, help};
 
 pub const fn default() -> Operation {
@@ -10,13 +8,13 @@ pub const fn default() -> Operation {
 pub enum Set {
     #[default]
     Fetch,
-    Execute(Byte),
+    Execute(u8),
     Delay,
 }
 
 impl Execute for Set {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op2) => execute(code, cpu, op2),
@@ -31,7 +29,7 @@ impl From<Set> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0xc6 | 0xce | 0xd6 | 0xde | 0xe6 | 0xee | 0xf6 | 0xfe => {
@@ -50,7 +48,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Execute SET
     let op1 = (code & 0x38) >> 3;
     let mask = !(0b1 << op1);
@@ -74,7 +72,7 @@ fn execute(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
     }
 }
 
-fn delay(_: Byte, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish

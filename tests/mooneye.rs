@@ -2,8 +2,8 @@
 
 use std::fmt::{Debug, Display};
 
+use rugby::arch::Block;
 use rugby::arch::reg::Port;
-use rugby::arch::{Block, Word};
 use rugby::core::dmg::cpu::Cpu;
 use rugby::core::dmg::{Cartridge, GameBoy};
 use thiserror::Error;
@@ -38,7 +38,7 @@ fn emulate(rom: &[u8]) -> Result<()> {
 
 /// Check for test results.
 fn check(emu: &GameBoy) -> Result<()> {
-    type Select = <Cpu as Port<Word>>::Select;
+    type Select = <Cpu as Port<u16>>::Select;
     // Extract register values
     let cpu = &emu.main.soc.cpu;
     let bc: u16 = cpu.load(Select::BC);

@@ -3,7 +3,7 @@
 use log::{debug, trace};
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Block, Byte, Shared};
+use rugby_arch::{Block, Shared};
 
 use super::pic::{self, Interrupt};
 
@@ -123,10 +123,10 @@ impl Mmio for Timer {
     }
 }
 
-impl Port<Byte> for Timer {
+impl Port<u8> for Timer {
     type Select = Select;
 
-    fn load(&self, reg: Self::Select) -> Byte {
+    fn load(&self, reg: Self::Select) -> u8 {
         match reg {
             Select::Div => self.reg.div.load(),
             Select::Tima => self.reg.tima.load(),
@@ -135,7 +135,7 @@ impl Port<Byte> for Timer {
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Byte) {
+    fn store(&mut self, reg: Self::Select, value: u8) {
         match reg {
             Select::Div => self.reg.div.store(value),
             Select::Tima => self.reg.tima.store(value),
@@ -188,23 +188,22 @@ pub mod reg {
     use log::debug;
     use rugby_arch::mem::Memory;
     use rugby_arch::reg::Register;
-    use rugby_arch::{Byte, Word};
 
     /// Divider register.
     #[derive(Debug, Default)]
-    pub struct Div(Word);
+    pub struct Div(u16);
 
     impl Div {
         /// Gets the internal clock (lower 8-bits).
         #[expect(unused)]
         #[must_use]
-        pub(super) fn clk(&self) -> Byte {
+        pub(super) fn clk(&self) -> u8 {
             self.0.load().to_le_bytes()[0]
         }
 
         /// Gets the full internal register value.
         #[must_use]
-        pub(super) fn div(&self) -> Word {
+        pub(super) fn div(&self) -> u16 {
             self.0.load()
         }
 
@@ -216,18 +215,18 @@ pub mod reg {
     }
 
     impl Memory for Div {
-        fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
             Ok(self.load())
         }
 
-        fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
             self.store(data);
             Ok(())
         }
     }
 
     impl Register for Div {
-        type Value = Byte;
+        type Value = u8;
 
         /// Loads the value of DIV (upper 8-bits).
         fn load(&self) -> Self::Value {
@@ -243,7 +242,7 @@ pub mod reg {
     /// Timer counter.
     #[derive(Debug, Default)]
     pub struct Tima {
-        pub(super) reg: Byte,
+        pub(super) reg: u8,
         pub(super) rel: Reload,
     }
 
@@ -297,18 +296,18 @@ pub mod reg {
     }
 
     impl Memory for Tima {
-        fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
             Ok(self.load())
         }
 
-        fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
             self.store(data);
             Ok(())
         }
     }
 
     impl Register for Tima {
-        type Value = Byte;
+        type Value = u8;
 
         fn load(&self) -> Self::Value {
             self.reg.load()
@@ -324,11 +323,11 @@ pub mod reg {
     }
 
     /// Timer modulo.
-    pub type Tma = Byte;
+    pub type Tma = u8;
 
     /// Timer control.
     #[derive(Debug, Default)]
-    pub struct Tac(Byte);
+    pub struct Tac(u8);
 
     impl Tac {
         /// Gets the enable bit.
@@ -339,7 +338,7 @@ pub mod reg {
 
         /// Gets the clock select rate.
         #[must_use]
-        pub fn select(&self) -> Word {
+        pub fn select(&self) -> u16 {
             match self.0.load() & 0b011 {
                 0b01 => 1 << 3,
                 0b10 => 1 << 5,
@@ -351,18 +350,18 @@ pub mod reg {
     }
 
     impl Memory for Tac {
-        fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
             Ok(self.load())
         }
 
-        fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
             self.store(data);
             Ok(())
         }
     }
 
     impl Register for Tac {
-        type Value = Byte;
+        type Value = u8;
 
         fn load(&self) -> Self::Value {
             0b1111_1000 | self.0.load()

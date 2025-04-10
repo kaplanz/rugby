@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use super::{Color, Palette};
 
 /// Pre-rendered pixel.
@@ -98,7 +96,7 @@ pub enum Meta {
         /// Background priority.
         prty: bool,
         /// X-coordinate.
-        xpos: Byte,
+        xpos: u8,
     },
 }
 

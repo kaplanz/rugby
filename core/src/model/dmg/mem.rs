@@ -1,14 +1,14 @@
 //! Embedded memory.
 
+use rugby_arch::Shared;
 use rugby_arch::mem::Ram;
-use rugby_arch::{Byte, Shared};
 
 pub use super::apu::Wave;
 pub use super::cpu::{Hram, Wram};
 pub use super::ppu::{Oam, Vram};
 
 /// Sharp LH5164N (64K SRAM).
-pub type Sram = Ram<[Byte; 0x2000]>;
+pub type Sram = Ram<[u8; 0x2000]>;
 
 /// Memory bank.
 ///
@@ -37,11 +37,11 @@ pub struct Bank {
 impl Default for Bank {
     fn default() -> Self {
         Self {
-            vram: Shared::new(Vram::from([Byte::default(); 0x2000])),
-            wram: Shared::new(Wram::from([Byte::default(); 0x2000])),
-            oam:  Shared::new( Oam::from([Byte::default(); 0x00a0])),
-            wave: Shared::new(Wave::from([Byte::default(); 0x0010])),
-            hram: Shared::new(Hram::from([Byte::default(); 0x007f])),
+            vram: Shared::new(Vram::from([u8::default(); 0x2000])),
+            wram: Shared::new(Wram::from([u8::default(); 0x2000])),
+            oam:  Shared::new( Oam::from([u8::default(); 0x00a0])),
+            wave: Shared::new(Wave::from([u8::default(); 0x0010])),
+            hram: Shared::new(Hram::from([u8::default(); 0x007f])),
         }
     }
 }

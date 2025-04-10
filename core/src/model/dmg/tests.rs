@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::mem::Memory;
 
 use self::cart::mbc::Mbc;
@@ -7,10 +6,10 @@ use self::timer::Timer;
 use super::*;
 
 /// Sample boot ROM.
-const BOOT: &[Byte; 0x0100] = include_bytes!("../../../../roms/boot/sameboy/dmg_boot.bin");
+const BOOT: &[u8; 0x0100] = include_bytes!("../../../../roms/boot/sameboy/dmg_boot.bin");
 
 /// Sample cart ROM.
-const GAME: &[Byte; 0x8000] = include_bytes!("../../../../roms/games/2048/2048.gb");
+const GAME: &[u8; 0x8000] = include_bytes!("../../../../roms/games/2048/2048.gb");
 
 fn setup() -> GameBoy {
     // Instantiate a `Boot`
@@ -68,7 +67,7 @@ fn bus_all_works() {
     // Video RAM
     (0x8000..=0x9fff).for_each(|addr| bus.write(addr, 0x03));
     (0x0000..=0x1fff)
-        .map(|addr: Word| emu.main.mem.vram.read(addr).unwrap())
+        .map(|addr: u16| emu.main.mem.vram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x03));
     // External RAM
     if let Some(cart) = &emu.cart {
@@ -88,7 +87,7 @@ fn bus_all_works() {
     // Object memory
     (0xfe00..=0xfe9f).for_each(|addr| bus.write(addr, 0x05));
     (0x0000..=0x009f)
-        .map(|addr: Word| emu.main.mem.oam.read(addr).unwrap())
+        .map(|addr: u16| emu.main.mem.oam.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x05));
     // Joypad
     (0xff00..=0xff00).for_each(|addr| bus.write(addr, 0x60));
@@ -104,10 +103,10 @@ fn bus_all_works() {
     (0xff04..=0xff07).for_each(|addr| bus.write(addr, 0x08));
     (0x0000..=0x0003)
         .zip([
-            <Timer as Port<Byte>>::Select::Div,
-            <Timer as Port<Byte>>::Select::Tima,
-            <Timer as Port<Byte>>::Select::Tma,
-            <Timer as Port<Byte>>::Select::Tac,
+            <Timer as Port<u8>>::Select::Div,
+            <Timer as Port<u8>>::Select::Tima,
+            <Timer as Port<u8>>::Select::Tma,
+            <Timer as Port<u8>>::Select::Tac,
         ])
         .map(|(_, reg)| emu.main.soc.tma.load(reg))
         .zip([0x00, 0x08, 0x08, 0xf8])
@@ -115,7 +114,7 @@ fn bus_all_works() {
     // Interrupt flag
     (0xff0f..=0xff0f).for_each(|addr| bus.write(addr, 0x09));
     (0x0000..=0x0000)
-        .map(|_| emu.main.soc.pic.load(<Pic as Port<Byte>>::Select::If))
+        .map(|_| emu.main.soc.pic.load(<Pic as Port<u8>>::Select::If))
         .for_each(|byte| assert_eq!(byte, 0xe9));
     // Audio
     (0xff10..=0xff27).for_each(|addr| bus.write(addr, 0x0a));
@@ -131,18 +130,18 @@ fn bus_all_works() {
     (0xff40..=0xff4b).for_each(|addr| bus.write(addr, 0x0c));
     (0x0000..=0x000b)
         .zip([
-            <Ppu as Port<Byte>>::Select::Lcdc,
-            <Ppu as Port<Byte>>::Select::Stat,
-            <Ppu as Port<Byte>>::Select::Scy,
-            <Ppu as Port<Byte>>::Select::Scx,
-            <Ppu as Port<Byte>>::Select::Ly,
-            <Ppu as Port<Byte>>::Select::Lyc,
-            <Ppu as Port<Byte>>::Select::Dma,
-            <Ppu as Port<Byte>>::Select::Bgp,
-            <Ppu as Port<Byte>>::Select::Obp0,
-            <Ppu as Port<Byte>>::Select::Obp1,
-            <Ppu as Port<Byte>>::Select::Wy,
-            <Ppu as Port<Byte>>::Select::Wx,
+            <Ppu as Port<u8>>::Select::Lcdc,
+            <Ppu as Port<u8>>::Select::Stat,
+            <Ppu as Port<u8>>::Select::Scy,
+            <Ppu as Port<u8>>::Select::Scx,
+            <Ppu as Port<u8>>::Select::Ly,
+            <Ppu as Port<u8>>::Select::Lyc,
+            <Ppu as Port<u8>>::Select::Dma,
+            <Ppu as Port<u8>>::Select::Bgp,
+            <Ppu as Port<u8>>::Select::Obp0,
+            <Ppu as Port<u8>>::Select::Obp1,
+            <Ppu as Port<u8>>::Select::Wy,
+            <Ppu as Port<u8>>::Select::Wx,
         ])
         .map(|(_, reg)| emu.main.soc.ppu.load(reg))
         .for_each(|byte| assert_eq!(byte, 0x0c));
@@ -156,12 +155,12 @@ fn bus_all_works() {
     // High RAM
     (0xff80..=0xfffe).for_each(|addr| bus.write(addr, 0x0e));
     (0x0000..=0x007e)
-        .map(|addr: Word| emu.main.mem.hram.read(addr).unwrap())
+        .map(|addr: u16| emu.main.mem.hram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x0e));
     // Interrupt enable
     (0xffff..=0xffff).for_each(|addr| bus.write(addr, 0x0f));
     (0x0000..=0x0000)
-        .map(|_| emu.main.soc.pic.load(<Pic as Port<Byte>>::Select::Ie))
+        .map(|_| emu.main.soc.pic.load(<Pic as Port<u8>>::Select::Ie))
         .for_each(|byte| assert_eq!(byte, 0xef));
 }
 

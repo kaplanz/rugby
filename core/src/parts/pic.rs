@@ -6,7 +6,7 @@ use log::trace;
 use rugby_arch::mem::Memory;
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register as _};
-use rugby_arch::{Block, Byte, Shared, Word};
+use rugby_arch::{Block, Shared};
 use thiserror::Error;
 
 /// Interrupt source.
@@ -68,7 +68,7 @@ impl Interrupt {
     /// Returns the address of the interrupt handler.
     #[must_use]
     #[rustfmt::skip]
-    pub fn handler(self) -> Byte {
+    pub fn handler(self) -> u8 {
         match self {
             Self::VBlank  => 0x40,
             Self::LcdStat => 0x48,
@@ -80,8 +80,8 @@ impl Interrupt {
 
     /// Returns the interrupt as a vector value.
     #[must_use]
-    pub fn vector(self) -> Byte {
-        self as Byte
+    pub fn vector(self) -> u8 {
+        self as u8
     }
 
     /// Returns a string representation of the interrupt instruction.
@@ -104,10 +104,10 @@ impl Display for Interrupt {
     }
 }
 
-impl TryFrom<Byte> for Interrupt {
+impl TryFrom<u8> for Interrupt {
     type Error = Error;
 
-    fn try_from(value: Byte) -> Result<Self, Self::Error> {
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
         Ok(match value.trailing_zeros() {
             0 => Self::VBlank,
             1 => Self::LcdStat,
@@ -119,7 +119,7 @@ impl TryFrom<Byte> for Interrupt {
     }
 }
 
-impl From<Interrupt> for Byte {
+impl From<Interrupt> for u8 {
     fn from(value: Interrupt) -> Self {
         value.vector()
     }
@@ -173,17 +173,17 @@ impl Mmio for Pic {
     }
 }
 
-impl Port<Byte> for Pic {
+impl Port<u8> for Pic {
     type Select = Select;
 
-    fn load(&self, reg: Self::Select) -> Byte {
+    fn load(&self, reg: Self::Select) -> u8 {
         match reg {
             Select::If => self.reg.flg.load(),
             Select::Ie => self.reg.ena.load(),
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Byte) {
+    fn store(&mut self, reg: Self::Select, value: u8) {
         match reg {
             Select::If => self.reg.flg.store(value),
             Select::Ie => self.reg.ena.store(value),
@@ -232,25 +232,25 @@ impl Mmio for Control {
 /// |  3  | Serial   |
 /// |  4  | Joypad   |
 #[derive(Debug, Default)]
-pub struct Register(Byte);
+pub struct Register(u8);
 
 impl Register {
     const MASK: u8 = 0b0001_1111;
 }
 
 impl Memory for Register {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl rugby_arch::reg::Register for Register {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.0.load() | !Self::MASK
@@ -300,14 +300,14 @@ impl Line {
 
     /// Raises an interrupt.
     pub fn raise(&mut self, int: Interrupt) {
-        let flg = self.flg.load() | (int as Byte);
+        let flg = self.flg.load() | (int as u8);
         self.flg.store(flg);
         trace!("interrupt requested: {int:?}");
     }
 
     /// Clears an interrupt.
     pub fn clear(&mut self, int: Interrupt) {
-        let flg = self.flg.load() & !(int as Byte);
+        let flg = self.flg.load() & !(int as u8);
         self.flg.store(flg);
         trace!("interrupt acknowledged: {int:?}");
     }
@@ -331,11 +331,11 @@ mod tests {
     #[rustfmt::skip]
     #[test]
     fn byte_from_interrupt_works() {
-        assert_eq!(Byte::from(Interrupt::VBlank),  0b0000_0001);
-        assert_eq!(Byte::from(Interrupt::LcdStat), 0b0000_0010);
-        assert_eq!(Byte::from(Interrupt::Timer),   0b0000_0100);
-        assert_eq!(Byte::from(Interrupt::Serial),  0b0000_1000);
-        assert_eq!(Byte::from(Interrupt::Joypad),  0b0001_0000);
+        assert_eq!(u8::from(Interrupt::VBlank),  0b0000_0001);
+        assert_eq!(u8::from(Interrupt::LcdStat), 0b0000_0010);
+        assert_eq!(u8::from(Interrupt::Timer),   0b0000_0100);
+        assert_eq!(u8::from(Interrupt::Serial),  0b0000_1000);
+        assert_eq!(u8::from(Interrupt::Joypad),  0b0001_0000);
     }
 
     #[rustfmt::skip]

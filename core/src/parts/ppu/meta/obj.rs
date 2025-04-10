@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use super::Palette;
 use super::pixel::Meta;
 
@@ -7,11 +5,11 @@ use super::pixel::Meta;
 #[derive(Clone, Debug)]
 pub struct Sprite {
     /// Byte 0: Y Position.
-    pub ypos: Byte,
+    pub ypos: u8,
     /// Byte 1: X Position.
-    pub xpos: Byte,
+    pub xpos: u8,
     /// Byte 2: Tile Index.
-    pub tnum: Byte,
+    pub tnum: u8,
     /// Byte 3: Attributes.
     pub attr: Attributes,
 }
@@ -19,7 +17,7 @@ pub struct Sprite {
 impl Sprite {
     /// Constructs a new `Sprite`.
     #[must_use]
-    pub fn new(data: [Byte; 4]) -> Self {
+    pub fn new(data: [u8; 4]) -> Self {
         Self::from(data)
     }
 
@@ -34,8 +32,8 @@ impl Sprite {
     }
 }
 
-impl From<[Byte; 4]> for Sprite {
-    fn from(data: [Byte; 4]) -> Self {
+impl From<[u8; 4]> for Sprite {
+    fn from(data: [u8; 4]) -> Self {
         Self {
             ypos: data[0],
             xpos: data[1],
@@ -77,14 +75,14 @@ pub struct Attributes {
 impl Attributes {
     /// Constructs a new `Attributes`.
     #[must_use]
-    pub fn new(byte: Byte) -> Self {
+    pub fn new(byte: u8) -> Self {
         Self::from(byte)
     }
 }
 
-impl From<Byte> for Attributes {
+impl From<u8> for Attributes {
     #[rustfmt::skip]
-    fn from(byte: Byte) -> Self {
+    fn from(byte: u8) -> Self {
         Self {
             prty:  byte & (1 << 7) != 0,
             yflip: byte & (1 << 6) != 0,
