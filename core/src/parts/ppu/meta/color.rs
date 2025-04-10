@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use crate::api::part::video::Pixel;
 
 /// Color values.
@@ -16,8 +14,8 @@ pub enum Color {
     C3 = 0b11,
 }
 
-impl From<Byte> for Color {
-    fn from(value: Byte) -> Self {
+impl From<u8> for Color {
+    fn from(value: u8) -> Self {
         match value & 0b11 {
             0b00 => Self::C0,
             0b01 => Self::C1,

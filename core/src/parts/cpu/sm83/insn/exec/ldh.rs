@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Operation, Return};
@@ -11,14 +10,14 @@ pub const fn default() -> Operation {
 pub enum Ldh {
     #[default]
     Fetch,
-    Read(Byte),
-    Write(Byte),
+    Read(u8),
+    Write(u8),
     Delay,
 }
 
 impl Execute for Ldh {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch     => fetch(code, cpu),
             Self::Read(a8)  => read(code, cpu, a8),
@@ -34,7 +33,7 @@ impl From<Ldh> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0xe0 => {
@@ -65,7 +64,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn read(_: Byte, cpu: &mut Cpu, a8: Byte) -> Return {
+fn read(_: u8, cpu: &mut Cpu, a8: u8) -> Return {
     // Calculate absolute address
     let addr = u16::from_be_bytes([0xff, a8]);
 
@@ -77,7 +76,7 @@ fn read(_: Byte, cpu: &mut Cpu, a8: Byte) -> Return {
     Ok(Some(Ldh::Delay.into()))
 }
 
-fn write(_: Byte, cpu: &mut Cpu, a8: Byte) -> Return {
+fn write(_: u8, cpu: &mut Cpu, a8: u8) -> Return {
     // Calculate absolute address
     let addr = u16::from_be_bytes([0xff, a8]);
 
@@ -89,7 +88,7 @@ fn write(_: Byte, cpu: &mut Cpu, a8: Byte) -> Return {
     Ok(Some(Ldh::Delay.into()))
 }
 
-fn delay(_: Byte, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish

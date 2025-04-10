@@ -1,7 +1,5 @@
 use std::ops::{Index, IndexMut};
 
-use rugby_arch::Byte;
-
 use super::Color;
 
 /// 8x8 pixel tile.
@@ -26,8 +24,8 @@ impl From<[Row; 8]> for Tile {
     }
 }
 
-impl From<[Byte; 16]> for Tile {
-    fn from(bytes: [Byte; 16]) -> Self {
+impl From<[u8; 16]> for Tile {
+    fn from(bytes: [u8; 16]) -> Self {
         Self(
             bytes
                 .chunks_exact(2)
@@ -77,11 +75,11 @@ impl Row {
     }
 }
 
-impl From<[Byte; 2]> for Row {
-    fn from(data: [Byte; 2]) -> Self {
+impl From<[u8; 2]> for Row {
+    fn from(data: [u8; 2]) -> Self {
         // this will necessarily succeed
         Self(
-            (0..Byte::BITS)
+            (0..u8::BITS)
                 // combine upper and lower bytes into colors for each bit
                 .map(|bit| {
                     // Extract color bits
@@ -89,7 +87,7 @@ impl From<[Byte; 2]> for Row {
                     let bit0 = data[0] & mask != 0;
                     let bit1 = data[1] & mask != 0;
                     // Combine into color value
-                    (Byte::from(bit1) << 1) | Byte::from(bit0)
+                    (u8::from(bit1) << 1) | u8::from(bit0)
                 })
                 // reverse the bits, since bit 7 represents the leftmost pixel,
                 // and bit 0 the rightmost

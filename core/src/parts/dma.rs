@@ -4,7 +4,7 @@ use log::{debug, trace, warn};
 use rugby_arch::mem::Memory;
 use rugby_arch::mio::Bus;
 use rugby_arch::reg::Register;
-use rugby_arch::{Block, Byte, Shared, Word};
+use rugby_arch::{Block, Shared};
 
 pub use super::ppu::Oam;
 use crate::dmg::Mmap;
@@ -45,7 +45,7 @@ impl Block for Dma {
                 // Transfer single byte
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
-                self.mem.write(lo as Word, data).unwrap();
+                self.mem.write(lo as u16, data).unwrap();
                 trace!("copied: $fe{lo:02x} <- ${addr:04x}, data: {data:#04x}");
                 // Increment transfer index
                 let lo = lo.saturating_add(1);
@@ -77,7 +77,7 @@ pub struct Control {
     /// DMA progress.
     mode: Mode,
     /// DMA source page.
-    page: Byte,
+    page: u8,
 }
 
 impl Block for Control {
@@ -87,18 +87,18 @@ impl Block for Control {
 }
 
 impl Memory for Control {
-    fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
 impl Register for Control {
-    type Value = Byte;
+    type Value = u8;
 
     fn load(&self) -> Self::Value {
         self.page.load()
@@ -127,7 +127,7 @@ enum Mode {
     #[default]
     Off,
     /// Requested.
-    Req(Byte),
+    Req(u8),
     /// In-progress.
-    On { hi: Byte, lo: Byte },
+    On { hi: u8, lo: u8 },
 }

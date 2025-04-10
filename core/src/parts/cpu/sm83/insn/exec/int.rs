@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Ime, Operation, Return};
@@ -16,7 +15,7 @@ pub enum Int {
 
 impl Execute for Int {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch => fetch(code, cpu),
             Self::Nop   => nop(code, cpu),
@@ -33,7 +32,7 @@ impl From<Int> for Operation {
     }
 }
 
-fn fetch(_: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(_: u8, cpu: &mut Cpu) -> Return {
     // Disable interrupts
     cpu.etc.ime = Ime::Disabled;
 
@@ -41,14 +40,14 @@ fn fetch(_: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Int::Nop.into()))
 }
 
-fn nop(_: Byte, _: &mut Cpu) -> Return {
+fn nop(_: u8, _: &mut Cpu) -> Return {
     // Execute NOP
 
     // Proceed
     Ok(Some(Int::Push0.into()))
 }
 
-fn push0(_: Byte, cpu: &mut Cpu) -> Return {
+fn push0(_: u8, cpu: &mut Cpu) -> Return {
     // Load MSB
     let msb = cpu.reg.pc.load().to_le_bytes()[1];
 
@@ -59,7 +58,7 @@ fn push0(_: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Int::Push1.into()))
 }
 
-fn push1(_: Byte, cpu: &mut Cpu) -> Return {
+fn push1(_: u8, cpu: &mut Cpu) -> Return {
     // Load LSB
     let lsb = cpu.reg.pc.load().to_le_bytes()[0];
 
@@ -70,7 +69,7 @@ fn push1(_: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Int::Jump.into()))
 }
 
-fn jump(code: Byte, cpu: &mut Cpu) -> Return {
+fn jump(code: u8, cpu: &mut Cpu) -> Return {
     // Perform jump
     let int = Interrupt::try_from(code).map_err(|_| Error::Opcode(code))?;
     cpu.reg.pc.store(int.handler() as u16);

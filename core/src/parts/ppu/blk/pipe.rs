@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
 use log::trace;
+use rugby_arch::Block;
 use rugby_arch::reg::Register;
-use rugby_arch::{Block, Byte};
 
 use super::fetch::{self, Step};
 use super::meta::{Color, Layer, Pixel, Sprite};
@@ -16,7 +16,7 @@ pub struct Pipeline {
     /// Background scroll offset.
     pub scx: u8,
     /// LCD X-coordinate.
-    pub lx: Byte,
+    pub lx: u8,
     /// Background/Window channel.
     pub bgw: fetch::Background,
     /// Sprite channel.

@@ -1,5 +1,4 @@
 use crate::mem::{Memory, Result};
-use crate::{Byte, Word};
 
 /// Random device.
 ///
@@ -20,11 +19,11 @@ impl Random {
 }
 
 impl Memory for Random {
-    fn read(&self, _: Word) -> Result<Byte> {
+    fn read(&self, _: u16) -> Result<u8> {
         Ok(rand::random())
     }
 
-    fn write(&mut self, _: Word, _: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, _: u8) -> Result<()> {
         Ok(())
     }
 }

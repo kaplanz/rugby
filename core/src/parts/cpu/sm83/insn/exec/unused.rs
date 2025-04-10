@@ -1,5 +1,3 @@
-use rugby_arch::Byte;
-
 use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
@@ -14,7 +12,7 @@ pub enum Unused {
 
 impl Execute for Unused {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Execute => execute(code, cpu),
         }
@@ -27,6 +25,6 @@ impl From<Unused> for Operation {
     }
 }
 
-fn execute(code: Byte, _: &mut Cpu) -> Return {
+fn execute(code: u8, _: &mut Cpu) -> Return {
     Err(Error::Illegal(code))
 }
