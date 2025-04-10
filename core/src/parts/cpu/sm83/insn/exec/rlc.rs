@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
@@ -11,13 +10,13 @@ pub const fn default() -> Operation {
 pub enum Rlc {
     #[default]
     Fetch,
-    Execute(Byte),
+    Execute(u8),
     Delay,
 }
 
 impl Execute for Rlc {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op1) => execute(code, cpu, op1),
@@ -32,7 +31,7 @@ impl From<Rlc> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0x06 => {
@@ -51,10 +50,10 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(code: Byte, cpu: &mut Cpu, op1: Byte) -> Return {
+fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
     // Execute RLC
     let carry = op1 & 0x80 != 0;
-    let res = (op1 << 1) | (carry as Byte);
+    let res = (op1 << 1) | (carry as u8);
 
     // Set flags
     let flags = &mut cpu.reg.f.load();
@@ -82,7 +81,7 @@ fn execute(code: Byte, cpu: &mut Cpu, op1: Byte) -> Return {
     }
 }
 
-fn delay(_: Byte, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish

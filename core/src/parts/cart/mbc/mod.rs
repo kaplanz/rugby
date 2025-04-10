@@ -8,8 +8,8 @@ use std::fmt::Debug;
 use std::io;
 
 use log::{debug, trace};
+use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Device, Mmio};
-use rugby_arch::{Block, Byte};
 
 use super::header::Header;
 use super::{Error, Info, Result};
@@ -26,7 +26,7 @@ pub use self::mbc3::Mbc3;
 pub use self::mbc5::Mbc5;
 
 /// Memory data.
-type Data = Box<[Byte]>;
+type Data = Box<[u8]>;
 
 /// Memory bank controller.
 pub trait Mbc {
@@ -60,11 +60,11 @@ impl Body {
     ///
     /// Returns an error if unsupported cartridge type is specified in the
     /// header.
-    pub fn new(head: &Header, rom: &[Byte]) -> Result<Self> {
+    pub fn new(head: &Header, rom: &[u8]) -> Result<Self> {
         // Initialize ROM
         let rom = init::rom(head, rom);
         if !rom.is_empty() {
-            trace!("cart ROM:\n{}", hexd::Printer::<Byte>::new(0, &rom));
+            trace!("cart ROM:\n{}", hexd::Printer::<u8>::new(0, &rom));
         }
         // Initialize RAM
         let ram = init::ram(head);
@@ -151,7 +151,7 @@ impl Body {
         let mut flash = |ram: &mut [u8]| {
             buf.read(ram).inspect(|&nbytes| {
                 debug!("loaded {size}", size = bfmt::Size::from(nbytes));
-                trace!("cart RAM:\n{}", hexd::Printer::<Byte>::new(0, ram));
+                trace!("cart RAM:\n{}", hexd::Printer::<u8>::new(0, ram));
             })
         };
         match self {
@@ -172,7 +172,7 @@ impl Body {
         let mut dump = |ram: &[u8]| {
             buf.write(ram).inspect(|&nbytes| {
                 debug!("dumped {size}", size = bfmt::Size::from(nbytes));
-                trace!("cart RAM:\n{}", hexd::Printer::<Byte>::new(0, ram));
+                trace!("cart RAM:\n{}", hexd::Printer::<u8>::new(0, ram));
             })
         };
         match self {

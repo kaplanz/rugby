@@ -13,7 +13,6 @@ use std::fmt::Display;
 use std::str::Utf8Error;
 
 use log::{error, warn};
-use rugby_arch::{Byte, Word};
 use thiserror::Error;
 
 /// Nintendo logo.
@@ -28,7 +27,7 @@ use thiserror::Error;
 /// Compressed copy of Nintendo's logo rendered by the boot ROM. The console
 /// will refuse to pass control to cartridges that do not contain an exact copy
 /// of this data.
-pub const LOGO: [Byte; 0x30] = [
+pub const LOGO: [u8; 0x30] = [
     0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b, 0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00, 0x0d,
     0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e, 0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99,
     0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc, 0xdd, 0xdc, 0x99, 0x9f, 0xbb, 0xb9, 0x33, 0x3e,
@@ -36,7 +35,7 @@ pub const LOGO: [Byte; 0x30] = [
 
 /// Calculates the header checksum.
 #[must_use]
-pub fn hchk(rom: &[Byte]) -> Byte {
+pub fn hchk(rom: &[u8]) -> u8 {
     rom[0x134..=0x14c]
         .iter()
         .copied()
@@ -45,12 +44,12 @@ pub fn hchk(rom: &[Byte]) -> Byte {
 
 /// Calculates the global checksum.
 #[must_use]
-pub fn gchk(rom: &[Byte]) -> Word {
+pub fn gchk(rom: &[u8]) -> u16 {
     rom.iter()
         .copied()
-        .fold(0u16, |accum, item| accum.wrapping_add(Word::from(item)))
-        .wrapping_sub(Word::from(rom[0x14e]))
-        .wrapping_sub(Word::from(rom[0x14f]))
+        .fold(0u16, |accum, item| accum.wrapping_add(u16::from(item)))
+        .wrapping_sub(u16::from(rom[0x14e]))
+        .wrapping_sub(u16::from(rom[0x14f]))
 }
 
 /// Cartridge header.
@@ -142,7 +141,7 @@ pub struct Header {
     /// See more details [here][version].
     ///
     /// [version]: https://gbdev.io/pandocs/The_Cartridge_Header.html#014c--mask-rom-version-number
-    pub version: Byte,
+    pub version: u8,
     /// `[$014D]`: Header checksum.
     ///
     /// An 8-bit checksum computed from the cartridge header bytes
@@ -151,7 +150,7 @@ pub struct Header {
     /// See more details [here][hchk].
     ///
     /// [hchk]: https://gbdev.io/pandocs/The_Cartridge_Header.html#014d--header-checksum
-    pub hchk: Byte,
+    pub hchk: u8,
     /// `[$014E..=$014F]`: Global checksum.
     ///
     /// A 16-bit checksum computed from the entire cartridge ROM (excluding
@@ -160,7 +159,7 @@ pub struct Header {
     /// See more details [here][gchk].
     ///
     /// [gchk]: https://gbdev.io/pandocs/The_Cartridge_Header.html#014e-014f--global-checksum
-    pub gchk: Word,
+    pub gchk: u16,
 }
 
 impl Header {
@@ -181,9 +180,9 @@ impl Header {
     /// # Errors
     ///
     /// Returns an error if the ROM contained invalid header bytes.
-    pub fn new(rom: &[Byte]) -> Result<Self> {
+    pub fn new(rom: &[u8]) -> Result<Self> {
         // Extract header bytes
-        let head: &[Byte; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
+        let head: &[u8; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
 
         // Construct header
         let this = Self {
@@ -241,9 +240,9 @@ impl Header {
     /// Returns an error if the ROM contained invalid header bytes, or if
     /// cartridge integrity seems compromised. (This is detected using
     /// checksums.)
-    pub fn checked(rom: &[Byte]) -> Result<Self> {
+    pub fn checked(rom: &[u8]) -> Result<Self> {
         // Extract header bytes
-        let head: &[Byte; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
+        let head: &[u8; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
 
         // Construct header
         let this = Self {
@@ -298,9 +297,9 @@ impl Header {
     /// # Errors
     ///
     /// Header construction will fail if the ROM is missing header bytes.
-    pub fn unchecked(rom: &[Byte]) -> Result<Self> {
+    pub fn unchecked(rom: &[u8]) -> Result<Self> {
         // Extract header bytes
-        let head: &[Byte; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
+        let head: &[u8; 0x50] = rom.get(0x100..0x150).ok_or(Error::Missing)?.try_into()?;
 
         // Construct header
         let ramsz = parse::ramsz(head);
@@ -364,17 +363,16 @@ impl Header {
 
 mod parse {
     use log::warn;
-    use rugby_arch::{Byte, Word};
 
     use super::{Error, Info, LOGO, Region, Result};
 
     /// Parse the `logo` field from the header.
-    pub fn logo(head: &[Byte; 0x50]) -> bool {
+    pub fn logo(head: &[u8; 0x50]) -> bool {
         head[0x04..=0x33] == LOGO
     }
 
     /// Parse the `title` field from the header.
-    pub fn title(head: &[Byte; 0x50]) -> Result<Option<String>> {
+    pub fn title(head: &[u8; 0x50]) -> Result<Option<String>> {
         let tlen = if head[0x43] & 0x80 == 0 { 16 } else { 15 };
         std::str::from_utf8(&head[0x34..0x34 + tlen])
             .map_err(Error::Title)
@@ -388,12 +386,12 @@ mod parse {
     }
 
     /// Parse the `dmg` field from the header.
-    pub fn dmg(head: &[Byte; 0x50]) -> bool {
+    pub fn dmg(head: &[u8; 0x50]) -> bool {
         (head[0x43] & 0xc0) != 0xc0
     }
 
     /// Parse the `cgb` field from the header.
-    pub fn cgb(head: &[Byte; 0x50]) -> Result<bool> {
+    pub fn cgb(head: &[u8; 0x50]) -> Result<bool> {
         match head[0x43] & 0xbf {
             0x00 => Ok(false),
             0x80 => Ok(true),
@@ -402,7 +400,7 @@ mod parse {
     }
 
     /// Parse the `sgb` field from the header.
-    pub fn sgb(head: &[Byte; 0x50]) -> bool {
+    pub fn sgb(head: &[u8; 0x50]) -> bool {
         match head[0x46] {
             0x00 => false,
             0x03 => true,
@@ -414,12 +412,12 @@ mod parse {
     }
 
     /// Parse the `info` field from the header.
-    pub fn info(head: &[Byte; 0x50]) -> Result<Info> {
+    pub fn info(head: &[u8; 0x50]) -> Result<Info> {
         head[0x47].try_into()
     }
 
     /// Parse the `romsz` field from the header.
-    pub fn romsz(head: &[Byte; 0x50]) -> Result<usize> {
+    pub fn romsz(head: &[u8; 0x50]) -> Result<usize> {
         match head[0x48] {
             byte @ 0x00..=0x08 => Ok(0x8000 << byte),
             byte => Err(Error::Rom(byte)),
@@ -427,7 +425,7 @@ mod parse {
     }
 
     /// Parse the `ramsz` field from the header.
-    pub fn ramsz(head: &[Byte; 0x50]) -> Result<usize> {
+    pub fn ramsz(head: &[u8; 0x50]) -> Result<usize> {
         match head[0x49] {
             0x00 => Ok(0x00000),
             0x01 => Ok(0x00800),
@@ -440,7 +438,7 @@ mod parse {
     }
 
     /// Parse the `region` field from the header.
-    pub fn region(head: &[Byte; 0x50]) -> Result<Region> {
+    pub fn region(head: &[u8; 0x50]) -> Result<Region> {
         match head[0x4a] {
             0x00 => Ok(Region::Japan),
             0x01 => Ok(Region::World),
@@ -449,18 +447,18 @@ mod parse {
     }
 
     /// Parse the `version` field from the header.
-    pub fn version(head: &[Byte; 0x50]) -> Byte {
+    pub fn version(head: &[u8; 0x50]) -> u8 {
         head[0x4c]
     }
 
     /// Parse the `hchk` field from the header.
-    pub fn hchk(head: &[Byte; 0x50]) -> Byte {
+    pub fn hchk(head: &[u8; 0x50]) -> u8 {
         head[0x4d]
     }
 
     /// Parse the `gchk` field from the header.
-    pub fn gchk(head: &[Byte; 0x50]) -> Word {
-        Word::from_be_bytes([head[0x4e], head[0x4f]])
+    pub fn gchk(head: &[u8; 0x50]) -> u16 {
+        u16::from_be_bytes([head[0x4e], head[0x4f]])
     }
 }
 
@@ -487,10 +485,10 @@ impl Display for Header {
     }
 }
 
-impl TryFrom<&[Byte]> for Header {
+impl TryFrom<&[u8]> for Header {
     type Error = Error;
 
-    fn try_from(rom: &[Byte]) -> Result<Self, Self::Error> {
+    fn try_from(rom: &[u8]) -> Result<Self, Self::Error> {
         Self::new(rom)
     }
 }
@@ -563,12 +561,12 @@ impl Display for Info {
     }
 }
 
-impl TryFrom<Byte> for Info {
+impl TryFrom<u8> for Info {
     type Error = Error;
 
     #[expect(clippy::too_many_lines)]
     #[rustfmt::skip]
-    fn try_from(value: Byte) -> Result<Self, Self::Error> {
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
             0x00 => Ok(Info::Bare {
                 ram: false,
@@ -707,23 +705,23 @@ pub enum Error {
     Title(#[from] Utf8Error),
     /// Invalid CGB flag.
     #[error("invalid CGB flag: {0:#04x}")]
-    Color(Byte),
+    Color(u8),
     /// Unknown hardware.
     #[error("unknown hardware: {0:#04x}")]
-    Kind(Byte),
+    Kind(u8),
     /// Invalid ROM size.
     #[error("invalid ROM size: {0:#04x}")]
-    Rom(Byte),
+    Rom(u8),
     /// Invalid RAM size.
     #[error("invalid RAM size: {0:#04x}")]
-    Ram(Byte),
+    Ram(u8),
     /// Destination code.
     #[error("destination code: {0:#04x}")]
-    Region(Byte),
+    Region(u8),
     /// Bad header checksum.
     #[error("bad header checksum (found {found:#04x}, expected {expected:#04x})")]
-    HeaderChk { found: Byte, expected: Byte },
+    HeaderChk { found: u8, expected: u8 },
     /// Bad global checksum.
     #[error("bad global checksum (found {found:#06x}, expected {expected:#06x})")]
-    GlobalChk { found: Word, expected: Word },
+    GlobalChk { found: u16, expected: u16 },
 }

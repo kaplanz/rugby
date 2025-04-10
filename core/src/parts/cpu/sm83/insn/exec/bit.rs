@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
@@ -11,12 +10,12 @@ pub const fn default() -> Operation {
 pub enum Bit {
     #[default]
     Fetch,
-    Execute(Byte),
+    Execute(u8),
 }
 
 impl Execute for Bit {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op2) => execute(code, cpu, op2),
@@ -30,7 +29,7 @@ impl From<Bit> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0x46 | 0x4e | 0x56 | 0x5e | 0x66 | 0x6e | 0x76 | 0x7e => {
@@ -49,7 +48,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(code: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Execute BIT
     let op1 = (code & 0x38) >> 3;
     let res = (0b1 << op1) & op2;
