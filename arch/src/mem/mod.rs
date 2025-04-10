@@ -10,8 +10,8 @@ use std::fmt::Debug;
 
 use thiserror::Error;
 
+use crate::Shared;
 use crate::reg::Register;
-use crate::{Byte, Shared, Word};
 
 mod ram;
 mod rom;
@@ -26,85 +26,85 @@ pub trait Memory: Debug {
     /// # Errors
     ///
     /// Errors if the device could not successfully be read from.
-    fn read(&self, addr: Word) -> Result<Byte>;
+    fn read(&self, addr: u16) -> Result<u8>;
 
     /// Writes to the specified address.
     ///
     /// # Errors
     ///
     /// Errors if the device could not successfully be written to.
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()>;
+    fn write(&mut self, addr: u16, data: u8) -> Result<()>;
 }
 
-impl Memory for Byte {
-    fn read(&self, _: Word) -> Result<Byte> {
+impl Memory for u8 {
+    fn read(&self, _: u16) -> Result<u8> {
         Ok(self.load())
     }
 
-    fn write(&mut self, _: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, _: u16, data: u8) -> Result<()> {
         self.store(data);
         Ok(())
     }
 }
 
-impl Memory for [Byte] {
-    fn read(&self, addr: Word) -> Result<Byte> {
+impl Memory for [u8] {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.get(usize::from(addr)).copied().ok_or(Error::Range)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         self.get_mut(usize::from(addr))
             .map(|val| *val = data)
             .ok_or(Error::Range)
     }
 }
 
-impl<const N: usize> Memory for [Byte; N] {
-    fn read(&self, addr: Word) -> Result<Byte> {
+impl<const N: usize> Memory for [u8; N] {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.as_ref().read(addr)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         self.as_mut().write(addr, data)
     }
 }
 
-impl Memory for Box<[Byte]> {
-    fn read(&self, addr: Word) -> Result<Byte> {
+impl Memory for Box<[u8]> {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.as_ref().read(addr)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         self.as_mut().write(addr, data)
     }
 }
 
-impl<const N: usize> Memory for Box<[Byte; N]> {
-    fn read(&self, addr: Word) -> Result<Byte> {
+impl<const N: usize> Memory for Box<[u8; N]> {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.as_ref().read(addr)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         self.as_mut().write(addr, data)
     }
 }
 
 impl<M: Memory + ?Sized> Memory for Shared<M> {
-    fn read(&self, addr: Word) -> Result<Byte> {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.borrow().read(addr)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         self.borrow_mut().write(addr, data)
     }
 }
 
-impl Memory for Vec<Byte> {
-    fn read(&self, addr: Word) -> Result<Byte> {
+impl Memory for Vec<u8> {
+    fn read(&self, addr: u16) -> Result<u8> {
         self.as_slice().read(addr)
     }
 
-    fn write(&mut self, addr: Word, data: Byte) -> Result<()> {
+    fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         self.as_mut_slice().write(addr, data)
     }
 }

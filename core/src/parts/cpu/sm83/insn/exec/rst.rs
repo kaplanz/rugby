@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Operation, Return};
@@ -11,14 +10,14 @@ pub const fn default() -> Operation {
 pub enum Rst {
     #[default]
     Fetch,
-    Push0(Byte),
-    Push1(Byte),
-    Jump(Byte),
+    Push0(u8),
+    Push1(u8),
+    Jump(u8),
 }
 
 impl Execute for Rst {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch     => fetch(code, cpu),
             Self::Push0(v8) => push0(code, cpu, v8),
@@ -34,7 +33,7 @@ impl From<Rst> for Operation {
     }
 }
 
-fn fetch(code: Byte, _: &mut Cpu) -> Return {
+fn fetch(code: u8, _: &mut Cpu) -> Return {
     // Check opcode
     let v8 = match code {
         0xc7 => 0x00,
@@ -52,7 +51,7 @@ fn fetch(code: Byte, _: &mut Cpu) -> Return {
     Ok(Some(Rst::Push0(v8).into()))
 }
 
-fn push0(_: Byte, cpu: &mut Cpu, v8: Byte) -> Return {
+fn push0(_: u8, cpu: &mut Cpu, v8: u8) -> Return {
     // Load PC
     let pc = cpu.reg.pc.load().to_le_bytes();
     // Push upper(PC) -> [--SP]
@@ -62,7 +61,7 @@ fn push0(_: Byte, cpu: &mut Cpu, v8: Byte) -> Return {
     Ok(Some(Rst::Push1(v8).into()))
 }
 
-fn push1(_: Byte, cpu: &mut Cpu, v8: Byte) -> Return {
+fn push1(_: u8, cpu: &mut Cpu, v8: u8) -> Return {
     // Load PC
     let pc = cpu.reg.pc.load().to_le_bytes();
     // Push lower(PC) -> [--SP]
@@ -72,7 +71,7 @@ fn push1(_: Byte, cpu: &mut Cpu, v8: Byte) -> Return {
     Ok(Some(Rst::Jump(v8).into()))
 }
 
-fn jump(_: Byte, cpu: &mut Cpu, v8: Byte) -> Return {
+fn jump(_: u8, cpu: &mut Cpu, v8: u8) -> Return {
     // Combine into v16
     let v16 = u16::from_le_bytes([v8, 0x00]);
     // Perform jump

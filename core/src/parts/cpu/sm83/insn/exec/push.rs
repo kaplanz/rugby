@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Operation, Return};
@@ -18,7 +17,7 @@ pub enum Push {
 
 impl Execute for Push {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch => fetch(code, cpu),
             Self::Push0 => push0(code, cpu),
@@ -34,14 +33,14 @@ impl From<Push> for Operation {
     }
 }
 
-fn fetch(_: Byte, _: &mut Cpu) -> Return {
+fn fetch(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Proceed
     Ok(Some(Push::Push0.into()))
 }
 
-fn push0(code: Byte, cpu: &mut Cpu) -> Return {
+fn push0(code: u8, cpu: &mut Cpu) -> Return {
     // Load MSB
     let msb = match code {
         0xc5 => &cpu.reg.b,
@@ -59,7 +58,7 @@ fn push0(code: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Push::Push1.into()))
 }
 
-fn push1(code: Byte, cpu: &mut Cpu) -> Return {
+fn push1(code: u8, cpu: &mut Cpu) -> Return {
     // Load LSB
     let lsb = match code {
         0xc5 => &cpu.reg.c,
@@ -77,7 +76,7 @@ fn push1(code: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Push::Delay.into()))
 }
 
-fn delay(_: Byte, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish

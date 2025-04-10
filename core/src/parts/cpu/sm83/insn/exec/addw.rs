@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
@@ -13,13 +12,13 @@ pub enum Addw {
     Fetch,
     Execute(u16, u16),
     Fetch0xE8,
-    Delay0xE8(Byte),
-    Execute0xE8(Byte),
+    Delay0xE8(u8),
+    Execute0xE8(u8),
 }
 
 impl Execute for Addw {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch             => fetch(code, cpu),
             Self::Execute(op1, op2) => execute(code, cpu, op1, op2),
@@ -36,7 +35,7 @@ impl From<Addw> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0x09 => {
@@ -71,7 +70,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(_: Byte, cpu: &mut Cpu, op1: u16, op2: u16) -> Return {
+fn execute(_: u8, cpu: &mut Cpu, op1: u16, op2: u16) -> Return {
     // Execute ADDW
     let (res, carry) = op1.overflowing_add(op2);
     cpu.reg.hl_mut().store(res);
@@ -87,7 +86,7 @@ fn execute(_: Byte, cpu: &mut Cpu, op1: u16, op2: u16) -> Return {
     Ok(None)
 }
 
-fn fetch_0xe8(_: Byte, cpu: &mut Cpu) -> Return {
+fn fetch_0xe8(_: u8, cpu: &mut Cpu) -> Return {
     // Fetch e8 <- [PC++]
     let e8 = cpu.fetchbyte();
 
@@ -95,14 +94,14 @@ fn fetch_0xe8(_: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Addw::Delay0xE8(e8).into()))
 }
 
-fn delay_0xe8(_: Byte, _: &mut Cpu, e8: Byte) -> Return {
+fn delay_0xe8(_: u8, _: &mut Cpu, e8: u8) -> Return {
     // Delay by 1 cycle
 
     // Proceed
     Ok(Some(Addw::Execute0xE8(e8).into()))
 }
 
-fn execute_0xe8(_: Byte, cpu: &mut Cpu, e8: Byte) -> Return {
+fn execute_0xe8(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
     // Execute ADDW
     let op1 = cpu.reg.sp.load();
     let op2 = e8 as i8 as u16;

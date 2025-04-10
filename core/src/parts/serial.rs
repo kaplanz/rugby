@@ -6,7 +6,7 @@ use std::io::{BufRead, Write};
 use log::{debug, trace};
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
-use rugby_arch::{Block, Byte, Shared};
+use rugby_arch::{Block, Shared};
 
 use super::pic::{self, Interrupt};
 use crate::api::part::serial::Serial as Api;
@@ -51,11 +51,11 @@ pub struct Serial {
 #[derive(Debug, Default)]
 pub struct Internal {
     /// In-progress byte.
-    ip: Byte,
+    ip: u8,
     /// Received queue.
-    rx: VecDeque<Byte>,
+    rx: VecDeque<u8>,
     /// Transmitted queue.
-    tx: VecDeque<Byte>,
+    tx: VecDeque<u8>,
 }
 
 impl Internal {
@@ -86,8 +86,8 @@ impl Serial {
         let mut data = sb.load();
         // Perform transfer
         let tx = data & 0x80 != 0;
-        data = (data << 1) | (Byte::from(rx));
-        trace!("tx: {}, rx: {}", Byte::from(tx), Byte::from(rx));
+        data = (data << 1) | (u8::from(rx));
+        trace!("tx: {}, rx: {}", u8::from(tx), u8::from(rx));
         // Update bitmask
         sc.bit >>= 1;
         // Store data
@@ -156,17 +156,17 @@ impl Mmio for Serial {
     }
 }
 
-impl Port<Byte> for Serial {
+impl Port<u8> for Serial {
     type Select = Select;
 
-    fn load(&self, reg: Self::Select) -> Byte {
+    fn load(&self, reg: Self::Select) -> u8 {
         match reg {
             Select::Sb => self.reg.sb.load(),
             Select::Sc => self.reg.sc.load(),
         }
     }
 
-    fn store(&mut self, reg: Self::Select, value: Byte) {
+    fn store(&mut self, reg: Self::Select, value: u8) {
         match reg {
             Select::Sb => self.reg.sb.store(value),
             Select::Sc => self.reg.sc.store(value),
@@ -207,35 +207,34 @@ pub mod reg {
     use log::{debug, warn};
     use rugby_arch::mem::Memory;
     use rugby_arch::reg::Register;
-    use rugby_arch::{Byte, Word};
 
     /// Serial data.
-    pub type Sb = Byte;
+    pub type Sb = u8;
 
     /// Serial control.
     #[derive(Debug, Default)]
     pub struct Sc {
         pub(super) ena: bool,
         pub(super) clk: bool,
-        pub(super) bit: Byte,
+        pub(super) bit: u8,
     }
 
     impl Memory for Sc {
-        fn read(&self, _: Word) -> rugby_arch::mem::Result<Byte> {
+        fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
             Ok(self.load())
         }
 
-        fn write(&mut self, _: Word, data: Byte) -> rugby_arch::mem::Result<()> {
+        fn write(&mut self, _: u16, data: u8) -> rugby_arch::mem::Result<()> {
             self.store(data);
             Ok(())
         }
     }
 
     impl Register for Sc {
-        type Value = Byte;
+        type Value = u8;
 
         fn load(&self) -> Self::Value {
-            (Byte::from(self.ena) << 7) | 0x7e | Byte::from(self.clk)
+            (u8::from(self.ena) << 7) | 0x7e | u8::from(self.clk)
         }
 
         fn store(&mut self, value: Self::Value) {

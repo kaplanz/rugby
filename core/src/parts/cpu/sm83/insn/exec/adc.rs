@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
@@ -11,12 +10,12 @@ pub const fn default() -> Operation {
 pub enum Adc {
     #[default]
     Fetch,
-    Execute(Byte),
+    Execute(u8),
 }
 
 impl Execute for Adc {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op2) => execute(code, cpu, op2),
@@ -30,7 +29,7 @@ impl From<Adc> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0x8e => {
@@ -55,11 +54,11 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     }
 }
 
-fn execute(_: Byte, cpu: &mut Cpu, op2: Byte) -> Return {
+fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Execute ADC
     let acc = cpu.reg.a.load();
     let flags = &cpu.reg.f.load();
-    let cin = Flag::C.get(flags) as Byte;
+    let cin = Flag::C.get(flags) as u8;
     let (res, carry0) = acc.overflowing_add(op2);
     let (res, carry1) = res.overflowing_add(cin);
     cpu.reg.a.store(res);

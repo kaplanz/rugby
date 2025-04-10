@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Operation, Return};
@@ -16,7 +15,7 @@ pub enum Decw {
 
 impl Execute for Decw {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op1) => execute(code, cpu, op1),
@@ -30,7 +29,7 @@ impl From<Decw> for Operation {
     }
 }
 
-fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     let op1 = match code {
         0x0b => cpu.reg.bc().load(),
@@ -44,7 +43,7 @@ fn fetch(code: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Decw::Execute(op1).into()))
 }
 
-fn execute(code: Byte, cpu: &mut Cpu, op1: u16) -> Return {
+fn execute(code: u8, cpu: &mut Cpu, op1: u16) -> Return {
     // Execute DECW
     let res = op1.wrapping_sub(1);
     match code {

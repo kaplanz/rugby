@@ -1,4 +1,3 @@
-use rugby_arch::Byte;
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Flag, Operation, Return};
@@ -11,7 +10,7 @@ pub const fn default() -> Operation {
 pub enum Call {
     #[default]
     Fetch0,
-    Fetch1(Byte),
+    Fetch1(u8),
     Check(u16),
     Push0(u16),
     Push1(u16),
@@ -20,7 +19,7 @@ pub enum Call {
 
 impl Execute for Call {
     #[rustfmt::skip]
-    fn exec(self, code: Byte, cpu: &mut Cpu) -> Return {
+    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
         match self {
             Self::Fetch0      => fetch0(code, cpu),
             Self::Fetch1(lsb) => fetch1(code, cpu, lsb),
@@ -38,7 +37,7 @@ impl From<Call> for Operation {
     }
 }
 
-fn fetch0(code: Byte, cpu: &mut Cpu) -> Return {
+fn fetch0(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0xc4 | 0xcc | 0xcd | 0xd4 | 0xdc => (),
@@ -51,7 +50,7 @@ fn fetch0(code: Byte, cpu: &mut Cpu) -> Return {
     Ok(Some(Call::Fetch1(lsb).into()))
 }
 
-fn fetch1(_: Byte, cpu: &mut Cpu, lsb: Byte) -> Return {
+fn fetch1(_: u8, cpu: &mut Cpu, lsb: u8) -> Return {
     // Fetch upper(a16) <- [PC++]
     let msb = cpu.fetchbyte();
     // Combine into a16
@@ -61,7 +60,7 @@ fn fetch1(_: Byte, cpu: &mut Cpu, lsb: Byte) -> Return {
     Ok(Some(Call::Check(a16).into()))
 }
 
-fn check(code: Byte, cpu: &mut Cpu, a16: u16) -> Return {
+fn check(code: u8, cpu: &mut Cpu, a16: u16) -> Return {
     // Evaluate condition
     let flags = &cpu.reg.f.load();
     #[rustfmt::skip]
@@ -84,7 +83,7 @@ fn check(code: Byte, cpu: &mut Cpu, a16: u16) -> Return {
     }
 }
 
-fn push0(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
+fn push0(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
     // Load PC
     let pc = cpu.reg.pc.load().to_le_bytes();
     // Push [--SP] <- upper(PC++)
@@ -94,7 +93,7 @@ fn push0(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
     Ok(Some(Call::Push1(a16).into()))
 }
 
-fn push1(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
+fn push1(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
     // Load PC
     let pc = cpu.reg.pc.load().to_le_bytes();
     // Push [--SP] <- lower(PC++)
@@ -104,7 +103,7 @@ fn push1(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
     Ok(Some(Call::Jump(a16).into()))
 }
 
-fn jump(_: Byte, cpu: &mut Cpu, a16: u16) -> Return {
+fn jump(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
     // Perform jump
     cpu.reg.pc.store(a16);
 
