@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct AppHeader: View {
+    @State var icon: AppIcon
+
     var body: some View {
         // Header
         Section {
             HStack(spacing: 20) {
-                Image(uiImage: UIImage(named: "AppIcon60x60")!)
+                Image(icon.preview)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 80)
@@ -26,6 +28,7 @@ struct AppHeader: View {
                 }
             }
         }
+        .id(icon)
         .listRowBackground(Color.clear)
         .listSectionSpacing(10)
         // About
@@ -72,6 +75,6 @@ struct AppHeader: View {
 
 #Preview {
     List {
-        AppHeader()
+        AppHeader(icon: .gamePak)
     }
 }
