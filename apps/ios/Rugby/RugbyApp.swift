@@ -27,7 +27,7 @@ func rugby_log(level: UInt64, target: UnsafePointer<CChar>, message: UnsafePoint
         // debug
         .debug,
         // trace
-        .debug
+        .debug,
     ][Int(level)]
     // Write with global logger
     log.log(level: level, "[\(String(cString: target))]: \(String(cString: message))")
