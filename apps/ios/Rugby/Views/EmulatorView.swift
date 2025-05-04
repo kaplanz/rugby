@@ -162,7 +162,7 @@ struct EmulatorView: View {
                 paused.toggle()
             } label: {
                 paused
-                ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
+                    ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
             }
             Button("Reset", systemImage: "arrow.counterclockwise") {
                 emu.reset()
