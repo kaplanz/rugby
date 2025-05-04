@@ -33,7 +33,7 @@ struct LibraryView: View {
         .refreshable {
             lib.reload()
         }
-        .background(.regularMaterial)
+        .background(.background.secondary)
         .navigationTitle("Library")
         .toolbar {
             Button("Import", systemImage: "plus") {
