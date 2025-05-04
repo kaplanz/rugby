@@ -14,16 +14,32 @@ struct GameIcon: View {
         game.icon.flatMap(Image.init(uiImage:))
     }
 
+    var rect: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 10)
+    }
+
     var body: some View {
-        (image ?? Image(systemName: "questionmark.app"))
-            .frame(width: 160, height: 144)
-            .background(.ultraThinMaterial)
-            .clipShape(.rect(cornerRadius: 15))
-            .contentShape(.contextMenuPreview, .rect(cornerRadius: 15))
-            .overlay {
-                RoundedRectangle(cornerRadius: 15)
-                    .stroke(.foreground.secondary)
+        ZStack {
+            rect
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    rect
+                        .stroke(.foreground.secondary)
+                }
+            if let image = image {
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .clipShape(rect)
+            } else {
+                Image(systemName: "questionmark.app")
+                    .font(.system(size: 40))
+                    .foregroundColor(.secondary)
             }
+        }
+        .aspectRatio(10 / 9, contentMode: .fit)
+        .frame(minWidth: 80, maxWidth: .infinity)
+        .contentShape(.contextMenuPreview, rect)
     }
 }
 
