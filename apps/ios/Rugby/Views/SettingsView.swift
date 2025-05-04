@@ -11,9 +11,10 @@ struct SettingsView: View {
     @Environment(GameBoy.self) private var emu
     @Environment(\.openURL) private var openURL
 
-    @State private var icon = UIApplication.shared.alternateIconName.flatMap(
-        AppIcon.from(appIcon:)
-    ) ?? .gamePak
+    @State private var icon =
+        UIApplication.shared.alternateIconName.flatMap(
+            AppIcon.from(appIcon:)
+        ) ?? .gamePak
 
     let game: Game?
 
@@ -48,8 +49,11 @@ struct SettingsView: View {
                                     .clipShape(.rect(cornerRadius: 13.5, style: .continuous))
                                 Text(icon.description)
                                 Spacer()
-                                Image(systemName: self.icon == icon ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(.tint)
+                                Image(
+                                    systemName: self.icon == icon
+                                        ? "checkmark.circle.fill" : "circle"
+                                )
+                                .foregroundStyle(.tint)
                             }
                             .contentShape(.rect)
                         }
