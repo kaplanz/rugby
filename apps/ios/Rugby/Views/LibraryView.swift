@@ -13,6 +13,18 @@ struct LibraryView: View {
 
     /// Present file import dialog.
     @State private var file = false
+    /// Searchable text query.
+    @State private var query = String()
+
+    /// Filtered and sorted games
+    private var games: [Game] {
+        lib
+            .games
+            .filter {
+                query.isEmpty || $0.name.localizedStandardContains(query)
+            }
+            .sorted(using: KeyPathComparator(\.name.localizedLowercase))
+    }
 
     var body: some View {
         ScrollView {
@@ -21,20 +33,22 @@ struct LibraryView: View {
                     GridItem(.adaptive(minimum: 172), alignment: .top)
                 ]
             ) {
-                ForEach(
-                    lib.games.sorted(by: {
-                        $0.name.lowercased() < $1.name.lowercased()
-                    }), id: \.self
-                ) { game in
+                ForEach(games, id: \.self) { game in
                     GameItem(game: game)
                 }
             }
         }
+        .navigationTitle("Library")
+        .background(.background.secondary)
         .refreshable {
             lib.reload()
         }
-        .background(.background.secondary)
-        .navigationTitle("Library")
+        .searchable(text: $query)
+        .overlay {
+            if !query.isEmpty && games.isEmpty {
+                ContentUnavailableView.search(text: query)
+            }
+        }
         .toolbar {
             Button("Import", systemImage: "plus") {
                 file.toggle()
