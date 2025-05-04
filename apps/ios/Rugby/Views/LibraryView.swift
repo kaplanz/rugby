@@ -30,13 +30,14 @@ struct LibraryView: View {
         ScrollView {
             LazyVGrid(
                 columns: [
-                    GridItem(.adaptive(minimum: 172), alignment: .top)
-                ]
+                    GridItem(.adaptive(minimum: 125, maximum: 240), spacing: 16, alignment: .top)
+                ],
             ) {
                 ForEach(games, id: \.self) { game in
                     GameItem(game: game)
                 }
             }
+            .padding()
         }
         .navigationTitle("Library")
         .background(.background.secondary)
