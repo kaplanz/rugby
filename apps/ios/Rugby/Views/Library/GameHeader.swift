@@ -18,6 +18,7 @@ struct GameHeader: View {
             HStack {
                 Spacer()
                 GameIcon(game: game)
+                    .frame(maxWidth: 240)
                     .shadow(radius: 4)
                 Spacer()
             }
