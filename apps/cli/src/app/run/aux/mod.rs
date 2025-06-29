@@ -25,7 +25,7 @@ pub const LATENCY: usize = 100;
 pub fn main(args: &Cli) -> Result<()> {
     // No-op if muted
     if args.feat.mute {
-        debug!("playback muted");
+        debug!("playback disabled");
         return Ok(());
     }
 
