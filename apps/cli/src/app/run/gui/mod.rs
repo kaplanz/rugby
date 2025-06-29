@@ -15,7 +15,7 @@ mod init;
 pub fn main(args: &Cli) -> Result<()> {
     // No-op if headless
     if args.feat.headless {
-        debug!("frontend headless");
+        debug!("graphics disabled");
         return Ok(());
     }
 
