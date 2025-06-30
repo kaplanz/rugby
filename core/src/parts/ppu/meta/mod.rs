@@ -5,10 +5,10 @@ mod obj;
 mod pixel;
 mod tile;
 
-pub use color::Color;
-pub use obj::{Attributes, Sprite};
-pub use pixel::{Meta, Pixel};
-pub use tile::{Row, Tile};
+pub use self::color::Color;
+pub use self::obj::{Attributes, Sprite};
+pub use self::pixel::{Meta, Pixel};
+pub use self::tile::{Row, Tile};
 
 /// Graphics layer.
 ///
