@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 
 mod api;
 
-pub use api::*;
+pub use self::api::*;
 
 #[wasm_bindgen(start)]
 fn start() {

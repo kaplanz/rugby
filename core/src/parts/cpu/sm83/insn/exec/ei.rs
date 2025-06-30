@@ -32,7 +32,7 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     }
 
     // Execute EI
-    if matches!(cpu.etc.ime, Ime::Disabled) {
+    if let Ime::Disabled = cpu.etc.ime {
         cpu.etc.ime = Ime::WillEnable;
     }
 
