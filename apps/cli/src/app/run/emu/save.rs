@@ -82,12 +82,6 @@ pub fn dump(args: &opt::emu::Cart, cart: &Cartridge) -> Result<()> {
             trace!("dump RAM enabled by user");
         }
     }
-    if let Some(When::Never) = args.save {
-        return Ok(());
-    }
-    if matches!(args.save, Some(When::Auto)) && !cart.header().info.has_battery() {
-        return Ok(());
-    }
     if !cart.header().info.has_ram() {
         error!("cannot dump: cartridge does not support RAM");
         return Ok(());
