@@ -206,7 +206,7 @@ pub enum ParseSpeedError {
 }
 
 #[cfg(feature = "clap")]
-pub use imp::SpeedValueParser;
+pub use self::imp::SpeedValueParser;
 
 #[cfg(feature = "clap")]
 mod imp {

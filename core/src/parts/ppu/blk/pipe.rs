@@ -40,13 +40,13 @@ impl Pipeline {
         // Fetch most-pending sprite
         if let Some(obj) = self.ipr.front().map(|&idx| &objs[idx]) {
             // Mark sprite as found
-            if matches!(self.obj.step, Step::Fetch) {
+            if let Step::Fetch = self.obj.step {
                 trace!("found sprite: {obj:?}");
             }
             // Fetch pending sprite
             self.obj.exec(ppu, obj);
             // Mark sprites as completed
-            if matches!(self.obj.step, Step::Fetch) {
+            if let Step::Fetch = self.obj.step {
                 self.ipr.pop_front();
                 trace!("completed sprite: {obj:?}");
             }
