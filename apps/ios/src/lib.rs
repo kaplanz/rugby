@@ -15,9 +15,9 @@ mod log;
 
 use std::sync::Once;
 
-pub use api::*;
-pub use err::*;
-pub use log::*;
+pub use self::api::*;
+pub use self::err::*;
+pub use self::log::*;
 
 /// Initialization singleton.
 static INIT: Once = Once::new();
