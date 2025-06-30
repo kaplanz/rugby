@@ -172,20 +172,52 @@ impl Api for Apu {
                 rt: f32::from(nr50.vol_r()) / 7.,
             },
             ch1: Sample {
-                lt: nr51.ch1_l().then_some(self.ch1.out).unwrap_or_default(),
-                rt: nr51.ch1_r().then_some(self.ch1.out).unwrap_or_default(),
+                lt: if nr51.ch1_l() {
+                    self.ch1.out
+                } else {
+                    Default::default()
+                },
+                rt: if nr51.ch1_r() {
+                    self.ch1.out
+                } else {
+                    Default::default()
+                },
             },
             ch2: Sample {
-                lt: nr51.ch2_l().then_some(self.ch2.out).unwrap_or_default(),
-                rt: nr51.ch2_r().then_some(self.ch2.out).unwrap_or_default(),
+                lt: if nr51.ch2_l() {
+                    self.ch2.out
+                } else {
+                    Default::default()
+                },
+                rt: if nr51.ch2_r() {
+                    self.ch2.out
+                } else {
+                    Default::default()
+                },
             },
             ch3: Sample {
-                lt: nr51.ch3_l().then_some(self.ch3.out).unwrap_or_default(),
-                rt: nr51.ch3_r().then_some(self.ch3.out).unwrap_or_default(),
+                lt: if nr51.ch3_l() {
+                    self.ch3.out
+                } else {
+                    Default::default()
+                },
+                rt: if nr51.ch3_r() {
+                    self.ch3.out
+                } else {
+                    Default::default()
+                },
             },
             ch4: Sample {
-                lt: nr51.ch4_l().then_some(self.ch4.out).unwrap_or_default(),
-                rt: nr51.ch4_r().then_some(self.ch4.out).unwrap_or_default(),
+                lt: if nr51.ch4_l() {
+                    self.ch4.out
+                } else {
+                    Default::default()
+                },
+                rt: if nr51.ch4_r() {
+                    self.ch4.out
+                } else {
+                    Default::default()
+                },
             },
         }
     }
