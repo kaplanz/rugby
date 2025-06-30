@@ -51,7 +51,9 @@ mod select {
         // 2. If the BG-to-OBJ priority bit is 1 and the color number of the
         //    background pixel is anything other than 0, the background pixel is
         //    used.
-        else if bgw.col != Color::C0 && matches!(obj.meta, Meta::Obj { prty: true, .. }) {
+        else if bgw.col != Color::C0
+            && let Meta::Obj { prty: true, .. } = obj.meta
+        {
             bgw
         }
         // 3. If none of the above conditions apply, the sprite pixel is used.

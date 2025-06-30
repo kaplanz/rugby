@@ -131,21 +131,21 @@ pub fn main(args: &Cli) -> Result<()> {
         // Processor tracing only occurs on the the first T-cycle of the CPU's
         // fetch/done stage.
         #[cfg(feature = "trace")]
-        if let Some(trace) = trace.as_mut() {
-            if matches!(
+        if let Some(trace) = trace.as_mut()
+            && matches!(
                 emu.main.soc.cpu.stage(),
                 dmg::cpu::Stage::Fetch | dmg::cpu::Stage::Done
-            ) && ctx.total % 4 == 0
-            {
-                match trace.emit(&emu) {
-                    // Exit on completion
-                    Err(trace::Error::Finished) => {
-                        info!("trace comparison successful");
-                        app::exit(app::Exit::Tracecmp);
-                        break;
-                    }
-                    res => res.context("failed to emit trace entry")?,
+            )
+            && ctx.total % 4 == 0
+        {
+            match trace.emit(&emu) {
+                // Exit on completion
+                Err(trace::Error::Finished) => {
+                    info!("trace comparison successful");
+                    app::exit(app::Exit::Tracecmp);
+                    break;
                 }
+                res => res.context("failed to emit trace entry")?,
             }
         }
 
