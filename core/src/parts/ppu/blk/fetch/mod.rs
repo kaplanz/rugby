@@ -7,8 +7,8 @@ use super::{Lcdc, Ppu};
 mod bgw;
 mod obj;
 
-pub use bgw::Fetcher as Background;
-pub use obj::Fetcher as Sprite;
+pub use self::bgw::Fetcher as Background;
+pub use self::obj::Fetcher as Sprite;
 
 /// Fetcher step.
 #[derive(Clone, Debug, Default)]
