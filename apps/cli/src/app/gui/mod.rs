@@ -55,14 +55,14 @@ impl app::joypad::Joypad for Frontend {
             .into_iter()
             // Perform key mapping
             .filter_map(|Event { input, state }| match input {
-                Key::X     => Some(Event { input: Button::A,      state }),
-                Key::Z     => Some(Event { input: Button::B,      state }),
-                Key::Space => Some(Event { input: Button::Select, state }),
-                Key::Enter => Some(Event { input: Button::Start,  state }),
-                Key::Right => Some(Event { input: Button::Right,  state }),
-                Key::Left  => Some(Event { input: Button::Left,   state }),
-                Key::Up    => Some(Event { input: Button::Up,     state }),
-                Key::Down  => Some(Event { input: Button::Down,   state }),
+                Key::X         => Some(Event { input: Button::A,      state }),
+                Key::Z         => Some(Event { input: Button::B,      state }),
+                Key::Backspace => Some(Event { input: Button::Select, state }),
+                Key::Enter     => Some(Event { input: Button::Start,  state }),
+                Key::Right     => Some(Event { input: Button::Right,  state }),
+                Key::Left      => Some(Event { input: Button::Left,   state }),
+                Key::Up        => Some(Event { input: Button::Up,     state }),
+                Key::Down      => Some(Event { input: Button::Down,   state }),
                 _ => None,
             }).collect()
     }
