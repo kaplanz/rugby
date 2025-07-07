@@ -38,13 +38,13 @@ corresponding to their emulator inputs. You can toggle power by clicking the
 In addition to the on-screen buttons, these key bindings can be used as joypad
 inputs:
 
-| Keyboard | Emulator |
-|----------|----------|
-| X        | A        |
-| Z        | B        |
-| Enter    | Start    |
-| Space    | Select   |
-| Arrows   | D-pad    |
+| Keyboard  | Emulator |
+|-----------|----------|
+| X         | A        |
+| Z         | B        |
+| Enter     | Start    |
+| Backspace | Select   |
+| Arrows    | D-pad    |
 
 There are also key bindings for the application:
 
