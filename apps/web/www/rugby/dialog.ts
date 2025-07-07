@@ -391,7 +391,7 @@ export class Dialog extends LitElement {
                   <tr><td>X</td><td>A</td></tr>
                   <tr><td>Z</td><td>B</td></tr>
                   <tr><td>Enter</td><td>Start</td></tr>
-                  <tr><td>Space</td><td>Select</td></tr>
+                  <tr><td>Backspace</td><td>Select</td></tr>
                   <tr><td>Arrows</td><td>D-pad</td></tr>
                 </tbody>
               </table>

@@ -20,7 +20,7 @@ export class Joypad extends LitElement {
   private static keymap: Record<string, Kind> = {
     x: Kind.A,
     z: Kind.B,
-    " ": Kind.Select,
+    Backspace: Kind.Select,
     Enter: Kind.Start,
     ArrowRight: Kind.Right,
     ArrowLeft: Kind.Left,
