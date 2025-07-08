@@ -1,4 +1,4 @@
-//! Generate static files.
+//! Show help information.
 
 use std::process;
 
