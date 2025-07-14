@@ -4,7 +4,7 @@ use anyhow::{Context as _, Result};
 use rugby::core::dmg::LCD;
 use rugby::extra::pal::Palette;
 
-use crate::app;
+use super::util;
 use crate::app::gui::Frontend;
 use crate::exe::run::Cli;
 
@@ -16,7 +16,7 @@ pub fn gui(args: &Cli) -> Result<Frontend> {
     // Initialize main window
     let pal = Palette::from(args.cfg.data.app.pal.clone().unwrap_or_default());
     gui.lcd.redraw(&vec![pal[0].into(); LCD.depth()])?;
-    gui.lcd.title(app::util::title(&args.cfg.data.emu.cart));
+    gui.lcd.title(util::title(&args.cfg.data.emu.cart));
     // Open debug windows
     #[cfg(feature = "gfx")]
     if args.dbg.gfx {
