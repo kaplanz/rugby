@@ -28,7 +28,15 @@ pub fn main(args: Cli) -> Result<()> {
     save::ram::load(&args.cart, &mut cart).context("error flashing save RAM")?;
 
     // Print header
-    println!("{}", cart.header());
+    let header = cart.header();
+    println!(
+        "{}",
+        match args.fmt.unwrap_or_default() {
+            cli::Format::Pretty => format!("{header}"),
+            cli::Format::Json =>
+                serde_json::to_string_pretty(header).context("unable to render cartridge header")?,
+        }
+    );
 
     Ok(())
 }
