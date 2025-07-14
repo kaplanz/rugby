@@ -1913,6 +1913,7 @@ dependencies = [
  "rubato",
  "rugby",
  "rustyline",
+ "serde_json",
  "supports-color",
  "sysexits",
  "tempfile",
@@ -1932,6 +1933,7 @@ dependencies = [
  "itertools 0.14.0",
  "log",
  "rugby-arch",
+ "serde",
  "thiserror 2.0.12",
 ]
 
