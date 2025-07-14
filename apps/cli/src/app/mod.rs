@@ -12,6 +12,70 @@ pub use self::run::main as run;
 /// Application assembly.
 pub mod init {
     pub use super::run::emu::init::*;
+
+    /// Initialization utilities.
+    pub mod util {
+        use std::fs::File;
+        use std::io::Read;
+        use std::path::Path;
+
+        use anyhow::Context;
+        use log::debug;
+
+        use crate::err::Result;
+
+        /// Loads data from a file, up to a maximum number of bytes.
+        ///
+        /// # Errors
+        ///
+        /// Returns an error if the file could not be read.
+        pub fn load_until(path: &Path, limit: u64) -> Result<Box<[u8]>> {
+            // Open ROM file
+            let file = File::open(path)
+                .with_context(|| format!("failed to open: `{}`", path.display()))?;
+            // Read ROM data
+            let mut buf = Vec::new();
+            let nbytes = file
+                .take(limit)
+                .read_to_end(&mut buf)
+                .with_context(|| format!("failed to read: `{}`", path.display()))?;
+
+            // Report length
+            debug!(
+                "read {size}: `{path}`",
+                size = bfmt::Size::from(nbytes),
+                path = path.display(),
+            );
+
+            Ok(buf.into_boxed_slice())
+        }
+
+        /// Loads data from a file with a statically known size.
+        ///
+        /// # Errors
+        ///
+        /// Returns an error if the file could not be read.
+        pub fn load_exact<const N: usize>(path: &Path) -> Result<[u8; N]> {
+            // Open ROM file
+            let mut file = File::open(path)
+                .with_context(|| format!("failed to open: `{}`", path.display()))?;
+
+            // Read ROM data
+            let mut buf = [0u8; N];
+            file.read_exact(&mut buf)
+                .with_context(|| format!("failed to read: `{}`", path.display()))?;
+
+            // Report length
+            let nbytes = buf.len();
+            debug!(
+                "read {size}: `{path}`",
+                size = bfmt::Size::from(nbytes),
+                path = path.display(),
+            );
+
+            Ok(buf)
+        }
+    }
 }
 
 /// Application teardown.
