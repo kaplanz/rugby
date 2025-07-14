@@ -30,6 +30,9 @@ default = []
 debug = [
   "rugby-core/debug",
 ]
+serde = [
+  "rugby-core/serde"
+]
 extra = [
   "cfg",
   "gbd",
