@@ -1,12 +1,8 @@
 //! Analyze provided ROM.
 
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-
-use anyhow::Context;
+use anyhow::{Context, anyhow};
 use constcat::concat;
-use log::{debug, trace};
+use log::trace;
 use rugby::core::dmg::cart;
 
 use crate::app::{init, save};
@@ -27,17 +23,18 @@ pub fn main(args: Cli) -> Result<()> {
     // Log arguments
     trace!("{args:#?}");
 
+    // Extract cartridge path
+    let Some(path) = &args.cart.rom else {
+        return Err(anyhow!("missing path to ROM image").into());
+    };
+
     // Check cartridge header
     let head = {
         // Read ROM data
-        let path = args
-            .cart
-            .rom
-            .as_ref()
-            .context("missing path to ROM image")?;
-        let data = self::load::<0x150>(path).context("unable to load cartridge header")?;
+        let data =
+            init::util::load_exact::<0x150>(path).context("unable to load cartridge header")?;
         // Load cartridge header
-        cart::header::Header::new(&data).context("failed to construct valid header")?
+        cart::header::Header::new(&data).context("failed to construct cartridge header")?
     };
     println!(
         "{}",
@@ -54,23 +51,4 @@ pub fn main(args: Cli) -> Result<()> {
     save::ram::load(&args.cart, &mut cart).context("error flashing save RAM")?;
 
     Ok(())
-}
-
-/// Loads a ROM from disk.
-fn load<const N: usize>(path: &Path) -> Result<[u8; N]> {
-    // Open ROM file
-    let mut file =
-        File::open(path).with_context(|| format!("failed to open: `{}`", path.display()))?;
-    // Read ROM into a buffer
-    let mut buf = [0u8; N];
-    file.read_exact(&mut buf)
-        .with_context(|| format!("failed to read: `{}`", path.display()))?;
-    let nbytes = buf.len();
-    debug!(
-        "read {size}: `{path}`",
-        size = bfmt::Size::from(nbytes),
-        path = path.display(),
-    );
-    // Use ROM contents
-    Ok(buf)
 }

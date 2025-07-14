@@ -1,14 +1,12 @@
 //! Emulator assembly.
 
-use std::fs::File;
-use std::io::Read;
-
-use anyhow::{Context, Result, ensure};
+use anyhow::{Context, Result, bail, ensure};
 use log::{debug, info, warn};
 use rugby::core::dmg::{Boot, Cartridge, GameBoy};
 use rugby::extra::cfg::{Config, opt};
 
 use super::save;
+use crate::app::init;
 
 /// Builds an emulator instance.
 pub fn emu(cfg: &Config) -> Result<GameBoy> {
@@ -48,26 +46,12 @@ pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
         return Ok(None);
     }
     // Otherwise, extract path
-    let path = args.rom.as_deref().context("missing path to ROM image")?;
+    let Some(path) = &args.rom else {
+        bail!("missing path to ROM image");
+    };
 
     // Read ROM file
-    let rom = {
-        // Open ROM file
-        let mut file =
-            File::open(path).with_context(|| format!("failed to open: `{}`", path.display()))?;
-        // Read ROM into a buffer (must be exactly 256 bytes)
-        let mut buf = [0u8; 0x0100];
-        file.read_exact(&mut buf)
-            .with_context(|| format!("failed to read: `{}`", path.display()))?;
-        let nbytes = buf.len();
-        debug!(
-            "read {size}: `{path}`",
-            size = bfmt::Size::from(nbytes),
-            path = path.display(),
-        );
-        // Use ROM contents
-        buf
-    };
+    let rom = init::util::load_exact::<0x0100>(path).context("unable to load ROM image")?;
 
     // Initialize boot ROM
     let boot = Boot::from(rom);
@@ -84,28 +68,14 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
         return Ok(None);
     }
     // Otherwise, extract path
-    let path = args.rom.as_deref().context("missing path to ROM image")?;
+    let Some(path) = &args.rom else {
+        bail!("missing path to ROM image");
+    };
 
     // Read ROM file
-    let rom = {
-        // Open ROM file
-        let file =
-            File::open(path).with_context(|| format!("failed to open: `{}`", path.display()))?;
-        // Read ROM into a buffer
-        let mut buf = Vec::new();
-        let nbytes = file
-            // Game Paks manufactured by Nintendo have a maximum 8 MiB ROM
-            .take(0x0080_0000)
-            .read_to_end(&mut buf)
-            .with_context(|| format!("failed to read: `{}`", path.display()))?;
-        debug!(
-            "read {size}: `{path}`",
-            size = bfmt::Size::from(nbytes),
-            path = path.display(),
-        );
-        // Use ROM contents
-        buf
-    };
+    //
+    // NOTE: Game Paks manufactured by Nintendo have a maximum 8 MiB ROM.
+    let rom = init::util::load_until(path, 0x0080_0000).context("unable to load ROM image")?;
 
     // Initialize cartridge
     let cart = if args.force {
@@ -122,7 +92,7 @@ pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
         // Construct a cartridge
         Cartridge::new
     }(&rom)
-    .with_context(|| format!("failed to load: `{}`", path.display()))?;
+    .context("unable to construct cartridge")?;
     info!("loaded cart ROM");
 
     // Return success
