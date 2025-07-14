@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
-use anyhow::Context;
+use anyhow::{Context, bail};
 use cmp::Tracer as Tracecmp;
 use either::Either;
 use log::Tracer as Tracelog;
@@ -47,7 +47,7 @@ pub fn init(Trace { fmt, log, cmp }: &Trace) -> anyhow::Result<Tracer> {
                 })),
             })
         }
-        _ => anyhow::bail!("unspecified mode for tracer"),
+        _ => bail!("unspecified mode for tracer"),
     })
 }
 
