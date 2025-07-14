@@ -55,7 +55,7 @@ pub fn main(args: &Cli) -> Result<()> {
             // Update window title
             gui.lcd.title(&format!(
                 "{title} ({speed:.1} FPS)",
-                title = app::util::title(&args.cfg.data.emu.cart),
+                title = util::title(&args.cfg.data.emu.cart),
                 speed = freq / f64::from(ppu::RATE)
             ));
         }
@@ -68,4 +68,21 @@ pub fn main(args: &Cli) -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Frontend utilities.
+mod util {
+    use std::ffi::OsStr;
+    use std::path::Path;
+
+    use rugby::extra::cfg::opt;
+
+    /// Resolves the application title.
+    pub fn title(args: &opt::emu::Cart) -> &str {
+        args.rom
+            .as_deref()
+            .and_then(Path::file_stem)
+            .and_then(OsStr::to_str)
+            .unwrap_or(crate::NAME)
+    }
 }
