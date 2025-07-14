@@ -57,6 +57,7 @@ pub fn gchk(rom: &[u8]) -> u16 {
 /// Information about the ROM and the cartridge containing it. Stored in the
 /// address range `[$0100, $0150)`.
 #[derive(Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[expect(clippy::struct_excessive_bools)]
 pub struct Header {
     /// `[$0104..=$0133]`: Nintendo logo.
@@ -495,6 +496,7 @@ impl TryFrom<&[u8]> for Header {
 
 /// Hardware information.
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[non_exhaustive]
 pub enum Info {
     Bare { ram: bool, pwr: bool },
@@ -677,6 +679,7 @@ impl TryFrom<u8> for Info {
 
 /// Destination code.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum Region {
     World,
     Japan,
