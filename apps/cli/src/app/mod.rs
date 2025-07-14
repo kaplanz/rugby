@@ -295,20 +295,3 @@ mod ctrl {
         let _ = EXIT.compare_exchange(0, reason as u8, Ordering::Relaxed, Ordering::Relaxed);
     }
 }
-
-/// Application utilities.
-mod util {
-    use std::ffi::OsStr;
-    use std::path::Path;
-
-    use rugby::extra::cfg::opt;
-
-    /// Resolves the application title.
-    pub fn title(args: &opt::emu::Cart) -> &str {
-        args.rom
-            .as_deref()
-            .and_then(Path::file_stem)
-            .and_then(OsStr::to_str)
-            .unwrap_or(crate::NAME)
-    }
-}
