@@ -1,6 +1,6 @@
 //! Command-line interface.
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use rugby::extra::cfg::opt::emu::Cart;
 
 use super::NAME;
@@ -14,4 +14,19 @@ pub struct Cli {
     /// Cartridge options.
     #[command(flatten)]
     pub cart: Cart,
+
+    /// Output header format.
+    #[arg(long)]
+    #[arg(value_name = "FORMAT")]
+    pub fmt: Option<Format>,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, ValueEnum)]
+#[non_exhaustive]
+pub enum Format {
+    /// Pretty, human readable.
+    #[default]
+    Pretty,
+    /// JavaScript Object Notation (JSON).
+    Json,
 }
