@@ -15,8 +15,10 @@ hexd = { workspace = true }
 itertools = { workspace = true, optional = true }
 log = { workspace = true }
 rugby-arch = { workspace = true }
+serde = { workspace = true, optional = true }
 thiserror = { workspace = true }
 
 [features]
 default = []
 debug = ["dep:itertools"]
+serde = ["dep:serde"]
