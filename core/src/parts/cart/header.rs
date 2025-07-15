@@ -13,7 +13,7 @@ use std::fmt::Display;
 use std::str::Utf8Error;
 
 use log::error;
-use parts::{About, Board, Check, Memory, Region, Support};
+use parts::{About, Board, Check, Memory, Region, Compat};
 use thiserror::Error;
 
 /// Nintendo logo.
@@ -68,8 +68,8 @@ pub struct Header {
     pub board: Board,
     /// Memory hardware.
     pub memory: Memory,
-    /// Console support.
-    pub support: Support,
+    /// Model compatibility.
+    pub compat: Compat,
 }
 
 impl Header {
@@ -99,7 +99,7 @@ impl Header {
                 romsz: parse::romsz(head)?,
                 ramsz: parse::ramsz(head)?,
             },
-            support: Support {
+            compat: Compat {
                 dmg: parse::dmg(head),
                 cgb: parse::cgb(head),
                 sgb: parse::sgb(head),
@@ -187,7 +187,7 @@ impl Header {
                     default
                 }),
             },
-            support: Support {
+            compat: Compat {
                 dmg: parse::dmg(head),
                 cgb: parse::cgb(head),
                 sgb: parse::sgb(head),
@@ -207,9 +207,9 @@ impl Display for Header {
             self.about.title.as_deref().unwrap_or("Unknown")
         )?;
         writeln!(f, "├──────────────────┤")?;
-        writeln!(f, "│ DMG: {:>11} │", self.support.dmg)?;
-        writeln!(f, "│ CGB: {:>11} │", self.support.cgb)?;
-        writeln!(f, "│ SGB: {:>11} │", self.support.sgb)?;
+        writeln!(f, "│ DMG: {:>11} │", self.compat.dmg)?;
+        writeln!(f, "│ CGB: {:>11} │", self.compat.cgb)?;
+        writeln!(f, "│ SGB: {:>11} │", self.compat.sgb)?;
         writeln!(f, "├──────────────────┤")?;
         writeln!(f, "│ MBC: {:>11} │", self.board)?;
         writeln!(f, "├──────────────────┤")?;
@@ -338,10 +338,10 @@ pub mod parts {
         pub ramsz: usize,
     }
 
-    /// Console support.
+    /// Model compatibility.
     #[derive(Debug, Eq, PartialEq)]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
-    pub struct Support {
+    pub struct Compat {
         /// `[$0143]`: DMG flag.
         ///
         /// Whether this cartridge is compatible with the DMG model.
