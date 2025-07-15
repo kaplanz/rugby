@@ -11,15 +11,15 @@ license = { workspace = true }
 [dependencies]
 advise = { workspace = true }
 bfmt = { workspace = true }
-bytecount = { version = "0.6.8" }
+bytecount = { version = "0.6.9" }
 displaydoc = { version = "0.2.5" }
 hexd = { workspace = true }
-indexmap = { version = "2.8.0" }
+indexmap = { version = "2.10.0" }
 itertools = { workspace = true }
 log = { workspace = true }
 num = { workspace = true }
-pest = { version = "2.8.0" }
-pest_derive = { version = "2.8.0" }
+pest = { version = "2.8.1" }
+pest_derive = { version = "2.8.1" }
 png = { workspace = true }
 rugby-arch = { workspace = true }
 rugby-core = { workspace = true, features = ["debug"] }
