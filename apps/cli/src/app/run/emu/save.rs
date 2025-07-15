@@ -20,8 +20,8 @@ pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
             return Ok(());
         }
         When::Auto => {
-            let info = &cart.header().info;
-            if info.has_ram() && info.has_battery() {
+            let board = &cart.header().board;
+            if board.has_ram() && board.has_battery() {
                 trace!("load RAM automatically enabled");
             } else {
                 trace!("load RAM automatically disabled");
@@ -32,7 +32,7 @@ pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
             trace!("load RAM enabled by user");
         }
     }
-    if !cart.header().info.has_ram() {
+    if !cart.header().board.has_ram() {
         error!("cannot load: cartridge does not support RAM");
         return Ok(());
     }
@@ -70,8 +70,8 @@ pub fn dump(args: &opt::emu::Cart, cart: &Cartridge) -> Result<()> {
             return Ok(());
         }
         When::Auto => {
-            let info = &cart.header().info;
-            if info.has_ram() && info.has_battery() {
+            let board = &cart.header().board;
+            if board.has_ram() && board.has_battery() {
                 trace!("dump RAM automatically enabled");
             } else {
                 trace!("dump RAM automatically disabled");
@@ -82,7 +82,7 @@ pub fn dump(args: &opt::emu::Cart, cart: &Cartridge) -> Result<()> {
             trace!("dump RAM enabled by user");
         }
     }
-    if !cart.header().info.has_ram() {
+    if !cart.header().board.has_ram() {
         error!("cannot dump: cartridge does not support RAM");
         return Ok(());
     }

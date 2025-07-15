@@ -8,15 +8,17 @@ type Rom = rugby_arch::mem::Rom<Data>;
 /// Cartridge RAM.
 type Ram = rugby_arch::mem::Ram<Data>;
 
-/// Bare ROM + RAM.
+/// [No MBC][none] cartridge type.
+///
+/// [none]: https://gbdev.io/pandocs/nombc.html
 #[derive(Debug)]
-pub struct Bare {
+pub struct None {
     pub(super) rom: Shared<Rom>,
     pub(super) ram: Shared<Ram>,
 }
 
-impl Bare {
-    /// Constructs a new `Bare`.
+impl None {
+    /// Constructs a new `None`.
     #[must_use]
     pub fn new(rom: Data, ram: Data) -> Self {
         Self {
@@ -26,9 +28,9 @@ impl Bare {
     }
 }
 
-impl Block for Bare {}
+impl Block for None {}
 
-impl Mbc for Bare {
+impl Mbc for None {
     fn rom(&self) -> Device {
         self.rom.clone().into()
     }
