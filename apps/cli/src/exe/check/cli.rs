@@ -15,6 +15,10 @@ pub struct Cli {
     #[command(flatten)]
     pub cart: Cart,
 
+    /// Check header only.
+    #[arg(short = 'H', long = "header")]
+    pub head: bool,
+
     /// Output header format.
     #[arg(long)]
     #[arg(value_name = "FORMAT")]
