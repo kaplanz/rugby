@@ -10,7 +10,7 @@ license = { workspace = true }
 
 [dependencies]
 bfmt = { workspace = true }
-bitfield-struct = "0.10.1"
+bitfield-struct = "0.11.0"
 hexd = { workspace = true }
 itertools = { workspace = true, optional = true }
 log = { workspace = true }
