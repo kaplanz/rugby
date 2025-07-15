@@ -146,17 +146,17 @@ pub struct Header {
 impl From<&dmg::cart::header::Header> for Header {
     fn from(header: &dmg::cart::header::Header) -> Self {
         Self {
-            title: header.title.clone(),
-            dmg: header.dmg,
-            cgb: header.cgb,
-            sgb: header.sgb,
-            cart: header.info.to_string(),
-            romsz: bfmt::Size::from(header.romsz).to_string(),
-            ramsz: bfmt::Size::from(header.ramsz).to_string(),
-            region: header.region.to_string(),
-            version: header.revision(),
-            hchk: header.hchk,
-            gchk: header.gchk,
+            title: header.about.title.clone(),
+            dmg: header.support.dmg,
+            cgb: header.support.cgb,
+            sgb: header.support.sgb,
+            cart: header.board.to_string(),
+            romsz: bfmt::Size::from(header.memory.romsz).to_string(),
+            ramsz: bfmt::Size::from(header.memory.ramsz).to_string(),
+            region: header.about.region.to_string(),
+            version: header.about.revision(),
+            hchk: header.check.hchk,
+            gchk: header.check.gchk,
         }
     }
 }
