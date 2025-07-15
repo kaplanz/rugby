@@ -14,7 +14,8 @@ use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Mmio};
 use thiserror::Error;
 
-use self::header::{Header, Info};
+use self::header::Header;
+use self::header::parts::Board;
 use self::mbc::Body;
 
 pub mod header;
@@ -78,7 +79,7 @@ impl Cartridge {
     /// Gets the cartridge's title.
     #[must_use]
     pub fn title(&self) -> &str {
-        self.head.title.as_deref().unwrap_or("Unknown")
+        self.head.about.title.as_deref().unwrap_or("Unknown")
     }
 
     /// Gets the cartridge's header.
@@ -127,5 +128,5 @@ pub enum Error {
     Header(#[from] header::Error),
     /// Unsupported cartridge type.
     #[error("unsupported cartridge: {0}")]
-    Unsupported(Info),
+    Unsupported(Board),
 }
