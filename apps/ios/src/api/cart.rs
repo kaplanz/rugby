@@ -147,9 +147,9 @@ impl From<&dmg::cart::header::Header> for Header {
     fn from(header: &dmg::cart::header::Header) -> Self {
         Self {
             title: header.about.title.clone(),
-            dmg: header.support.dmg,
-            cgb: header.support.cgb,
-            sgb: header.support.sgb,
+            dmg: header.compat.dmg,
+            cgb: header.compat.cgb,
+            sgb: header.compat.sgb,
             cart: header.board.to_string(),
             romsz: bfmt::Size::from(header.memory.romsz).to_string(),
             ramsz: bfmt::Size::from(header.memory.ramsz).to_string(),
