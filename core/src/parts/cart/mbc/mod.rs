@@ -12,18 +12,17 @@ use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Device, Mmio};
 
 use super::header::Header;
-use super::{Error, Info, Result};
+use super::{Board, Error, Result};
 
-mod bare;
-mod init;
 mod mbc1;
 mod mbc3;
 mod mbc5;
+mod none;
 
-pub use self::bare::Bare;
 pub use self::mbc1::Mbc1;
 pub use self::mbc3::Mbc3;
 pub use self::mbc5::Mbc5;
+pub use self::none::None;
 
 /// Memory data.
 type Data = Box<[u8]>;
@@ -43,13 +42,9 @@ pub trait Mbc {
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Body {
-    /// Bare ROM + RAM.
-    Bare(Bare),
-    /// MBC1 cartridge type.
+    None(None),
     Mbc1(Mbc1),
-    /// MBC5 cartridge type.
     Mbc3(Mbc3),
-    /// MBC5 cartridge type.
     Mbc5(Mbc5),
 }
 
@@ -69,11 +64,11 @@ impl Body {
         // Initialize RAM
         let ram = init::ram(head);
         // Construct body
-        match &head.info {
-            &Info::Bare { .. } => Ok(Body::Bare(Bare::new(rom, ram))),
-            &Info::Mbc1 { .. } => Ok(Body::Mbc1(Mbc1::new(rom, ram))),
-            &Info::Mbc3 { .. } => Ok(Body::Mbc3(Mbc3::new(rom, ram))),
-            &Info::Mbc5 { .. } => Ok(Body::Mbc5(Mbc5::new(rom, ram))),
+        match &head.board {
+            &Board::None { .. } => Ok(Body::None(None::new(rom, ram))),
+            &Board::Mbc1 { .. } => Ok(Body::Mbc1(Mbc1::new(rom, ram))),
+            &Board::Mbc3 { .. } => Ok(Body::Mbc3(Mbc3::new(rom, ram))),
+            &Board::Mbc5 { .. } => Ok(Body::Mbc5(Mbc5::new(rom, ram))),
             kind => Err(Error::Unsupported(kind.clone())),
         }
     }
@@ -82,7 +77,7 @@ impl Body {
 impl Block for Body {
     fn ready(&self) -> bool {
         match self {
-            Body::Bare(mbc) => mbc.ready(),
+            Body::None(mbc) => mbc.ready(),
             Body::Mbc1(mbc) => mbc.ready(),
             Body::Mbc3(mbc) => mbc.ready(),
             Body::Mbc5(mbc) => mbc.ready(),
@@ -91,7 +86,7 @@ impl Block for Body {
 
     fn cycle(&mut self) {
         match self {
-            Body::Bare(mbc) => mbc.cycle(),
+            Body::None(mbc) => mbc.cycle(),
             Body::Mbc1(mbc) => mbc.cycle(),
             Body::Mbc3(mbc) => mbc.cycle(),
             Body::Mbc5(mbc) => mbc.cycle(),
@@ -100,7 +95,7 @@ impl Block for Body {
 
     fn reset(&mut self) {
         match self {
-            Body::Bare(mbc) => mbc.reset(),
+            Body::None(mbc) => mbc.reset(),
             Body::Mbc1(mbc) => mbc.reset(),
             Body::Mbc3(mbc) => mbc.reset(),
             Body::Mbc5(mbc) => mbc.reset(),
@@ -111,7 +106,7 @@ impl Block for Body {
 impl Mbc for Body {
     fn rom(&self) -> Device {
         match self {
-            Body::Bare(mbc) => mbc.rom(),
+            Body::None(mbc) => mbc.rom(),
             Body::Mbc1(mbc) => mbc.rom(),
             Body::Mbc3(mbc) => mbc.rom(),
             Body::Mbc5(mbc) => mbc.rom(),
@@ -120,7 +115,7 @@ impl Mbc for Body {
 
     fn ram(&self) -> Device {
         match self {
-            Body::Bare(mbc) => mbc.ram(),
+            Body::None(mbc) => mbc.ram(),
             Body::Mbc1(mbc) => mbc.ram(),
             Body::Mbc3(mbc) => mbc.ram(),
             Body::Mbc5(mbc) => mbc.ram(),
@@ -155,7 +150,7 @@ impl Body {
             })
         };
         match self {
-            Body::Bare(mbc) => flash(mbc.ram.borrow_mut().inner_mut()),
+            Body::None(mbc) => flash(mbc.ram.borrow_mut().inner_mut()),
             Body::Mbc1(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
             Body::Mbc3(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
             Body::Mbc5(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
@@ -176,10 +171,63 @@ impl Body {
             })
         };
         match self {
-            Body::Bare(mbc) => dump(mbc.ram.borrow_mut().inner_mut()),
+            Body::None(mbc) => dump(mbc.ram.borrow_mut().inner_mut()),
             Body::Mbc1(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
             Body::Mbc3(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
             Body::Mbc5(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
         }
+    }
+}
+
+mod init {
+    use std::cmp::Ordering;
+    use std::iter;
+
+    use log::{debug, warn};
+
+    use super::{Data, Header};
+
+    /// Constructs a new ROM.
+    pub fn rom(head: &Header, rom: &[u8]) -> Data {
+        let read = rom.len();
+        match read.cmp(&head.memory.romsz) {
+            Ordering::Less => {
+                warn!(
+                    "loaded {init}; remaining {diff} uninitialized",
+                    init = bfmt::Size::from(read),
+                    diff = bfmt::Size::from(head.memory.romsz - read),
+                );
+            }
+            Ordering::Equal => debug!("loaded {read}", read = bfmt::Size::from(read)),
+            Ordering::Greater => {
+                warn!(
+                    "loaded {init}; remaining {diff} truncated",
+                    init = bfmt::Size::from(head.memory.romsz),
+                    diff = bfmt::Size::from(read - head.memory.romsz),
+                );
+            }
+        }
+        rom.iter()
+            .copied()
+            // pad missing values with open bus value
+            .chain(iter::repeat(0xff))
+            // truncate based on recorded cartridge size
+            .take(head.memory.romsz)
+            // collect as a heap-allocated slice
+            .collect::<Box<_>>()
+    }
+
+    /// Constructs a new RAM.
+    pub fn ram(head: &Header) -> Data {
+        if head.board.has_ram() && head.memory.ramsz == 0 {
+            warn!("cartridge supports RAM, but specified size is zero");
+        }
+        if !head.board.has_ram() && head.memory.ramsz > 0 {
+            warn!(
+                "cartridge does not support RAM, but specified size is non-zero (found: {})",
+                head.memory.ramsz
+            );
+        }
+        vec![0; head.memory.ramsz].into_boxed_slice()
     }
 }
