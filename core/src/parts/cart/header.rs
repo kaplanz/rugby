@@ -101,7 +101,7 @@ impl Header {
             },
             support: Support {
                 dmg: parse::dmg(head),
-                cgb: parse::cgb(head)?,
+                cgb: parse::cgb(head),
                 sgb: parse::sgb(head),
             },
         })
@@ -189,11 +189,7 @@ impl Header {
             },
             support: Support {
                 dmg: parse::dmg(head),
-                cgb: parse::cgb(head).unwrap_or_else(|err| {
-                    let default = bool::default();
-                    error!("{err} (default: {default:?})");
-                    default
-                }),
+                cgb: parse::cgb(head),
                 sgb: parse::sgb(head),
             },
         };
@@ -293,8 +289,8 @@ pub mod parts {
         /// `[$0104..=$0133]`: Nintendo logo.
         ///
         /// Check for if the cartridge was officially licensed by Nintendo.
-        /// Cartridges must include the [expected bytes](super::LOGO) to render Nintendo's
-        /// logo in the boot ROM.
+        /// Cartridges must include the [expected bytes](super::LOGO) to render
+        /// Nintendo's logo in the boot ROM.
         ///
         /// See more details [here][logo].
         ///
@@ -637,12 +633,9 @@ pub mod parse {
     }
 
     /// Parse the `cgb` field from the header.
-    pub fn cgb(head: &[u8; 0x50]) -> Result<bool> {
-        match head[0x43] & 0xbf {
-            0x00 => Ok(false),
-            0x80 => Ok(true),
-            byte => Err(Error::Color(byte)),
-        }
+    #[must_use]
+    pub fn cgb(head: &[u8; 0x50]) -> bool {
+        head[0x43] & 0x80 != 0x00
     }
 
     /// Parse the `sgb` field from the header.
@@ -727,9 +720,6 @@ pub enum Error {
     /// Invalid bytes in title.
     #[error("invalid bytes in title")]
     Title(#[from] Utf8Error),
-    /// Invalid CGB flag.
-    #[error("invalid CGB flag: {0:#04x}")]
-    Color(u8),
     /// Unknown hardware.
     #[error("unknown hardware: {0:#04x}")]
     Kind(u8),

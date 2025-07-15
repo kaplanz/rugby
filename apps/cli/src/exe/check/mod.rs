@@ -45,9 +45,14 @@ pub fn main(args: Cli) -> Result<()> {
         }
     );
 
-    // Load cart ROM
+    // Skip cartridge body
+    if args.head {
+        return Ok(());
+    }
+
+    // Check cart ROM
     let mut cart = init::cart(&args.cart)?.context("try again with a valid ROM")?;
-    // Load cart RAM
+    // Check cart RAM
     save::ram::load(&args.cart, &mut cart).context("error flashing save RAM")?;
 
     Ok(())
