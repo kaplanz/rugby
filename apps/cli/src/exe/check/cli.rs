@@ -20,7 +20,8 @@ pub struct Cli {
     pub head: bool,
 
     /// Output header format.
-    #[arg(long)]
+    #[arg(long = "format")]
+    #[arg(visible_alias = "fmt")]
     #[arg(value_name = "FORMAT")]
     pub fmt: Option<Format>,
 }
