@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIFileSharingEnabled</key>
-	<true/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -33,6 +29,22 @@
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).gbc</string>
 		</dict>
 	</array>
+	<key>GCSupportedGameControllers</key>
+	<array>
+		<dict>
+			<key>ProfileName</key>
+			<string>ExtendedGamepad</string>
+		</dict>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Cabin.ttf</string>
+		<string>Cabin-Italic.ttf</string>
+		<string>Orbitron.ttf</string>
+		<string>Pretendo.ttf</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -41,7 +53,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Game Boy</string>
+			<string>DMG image</string>
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
@@ -60,7 +72,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Game Boy Color</string>
+			<string>CGB image</string>
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
@@ -73,20 +85,6 @@
 				</array>
 			</dict>
 		</dict>
-	</array>
-	<key>GCSupportedGameControllers</key>
-	<array>
-		<dict>
-			<key>ProfileName</key>
-			<string>ExtendedGamepad</string>
-		</dict>
-	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Cabin.ttf</string>
-		<string>Cabin-Italic.ttf</string>
-		<string>Orbitron.ttf</string>
-		<string>Pretendo.ttf</string>
 	</array>
 </dict>
 </plist>

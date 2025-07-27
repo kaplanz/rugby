@@ -18,14 +18,19 @@ struct Screen: View {
         ).uiImage!
     }
 
+    private var shape: some Shape {
+        .rect(cornerRadius: 4)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Image(uiImage: emu.image ?? empty)
                 .resizable()
                 .interpolation(.none)
                 .padding(6)
-                .border(.black, width: 6)
-                .clipShape(.rect(cornerRadius: 4))
+                .border(.black, width: 8)
+                .clipShape(shape)
+                .glassEffect(in: shape)
                 .scaledToFit()
             HStack(alignment: .firstTextBaseline) {
                 Text("Rugby")
