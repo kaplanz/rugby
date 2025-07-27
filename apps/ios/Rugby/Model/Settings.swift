@@ -23,7 +23,7 @@ class Settings {
 @Observable
 class Config {
     /// Palette selection.
-    var pal = Palette.mono
+    var pal = Palette.blueDream
     /// Emulation speed.
     var spd = Speed.actual
 }

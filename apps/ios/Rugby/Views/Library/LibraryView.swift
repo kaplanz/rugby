@@ -30,8 +30,9 @@ struct LibraryView: View {
         ScrollView {
             LazyVGrid(
                 columns: [
-                    GridItem(.adaptive(minimum: 125, maximum: 240), spacing: 16, alignment: .top)
+                    GridItem(.adaptive(minimum: 125, maximum: 240), spacing: 12, alignment: .top)
                 ],
+                spacing: 12,
             ) {
                 ForEach(games, id: \.self) { game in
                     GameItem(game: game)
@@ -45,36 +46,42 @@ struct LibraryView: View {
             lib.reload()
         }
         .searchable(text: $query)
+        .searchToolbarBehavior(.minimize)
         .overlay {
             if !query.isEmpty && games.isEmpty {
                 ContentUnavailableView.search(text: query)
             }
         }
         .toolbar {
-            Button("Import", systemImage: "plus") {
-                file.toggle()
-            }
-            .fileImporter(
-                isPresented: $file,
-                allowedContentTypes: [.dmg, .cgb],
-                allowsMultipleSelection: true
-            ) { result in
-                // Extract files on success
-                guard case let .success(files) = result else {
-                    return
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button("Import", systemImage: "plus") {
+                    file.toggle()
                 }
-                // Iterate over selected files
-                files
-                    .filter { file in
-                        // Ensure valid ROM
-                        return (try? lib.precheck(url: file)) ?? false
+                .buttonStyle(.glassProminent)
+                .fileImporter(
+                    isPresented: $file,
+                    allowedContentTypes: [.dmg, .cgb],
+                    allowsMultipleSelection: true
+                ) { result in
+                    // Extract files on success
+                    guard case let .success(files) = result else {
+                        return
                     }
-                    .forEach { file in
-                        // Attempt to add to library
-                        lib.insert(src: file)
-                        // Release access permission
-                        file.stopAccessingSecurityScopedResource()
-                    }
+                    // Iterate over selected files
+                    files
+                        .filter { file in
+                            // Ensure valid ROM
+                            return (try? lib.precheck(url: file)) ?? false
+                        }
+                        .forEach { file in
+                            // Attempt to add to library
+                            lib.insert(src: file)
+                            // Release access permission
+                            file.stopAccessingSecurityScopedResource()
+                        }
+                }
             }
         }
         .alert(
