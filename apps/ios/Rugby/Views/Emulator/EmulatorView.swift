@@ -80,11 +80,9 @@ struct EmulatorView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Background())
         .toolbar {
-            ToolbarItemGroup(placement: .topBarLeading) {
-                toolbarLeft
-            }
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                toolbarMenu
+            ToolbarSpacer(placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                Controls
             }
         }
         .alert(
@@ -102,9 +100,9 @@ struct EmulatorView: View {
         }
         .sheet(isPresented: $detail) {
             NavigationStack {
-                GameDetails(game: emu.game!)
+                GameInfo(game: emu.game!)
                     .toolbar {
-                        Button("Done") {
+                        Button("Done", systemImage: "checkmark", role: .confirm) {
                             detail.toggle()
                         }
                         .bold()
@@ -113,9 +111,9 @@ struct EmulatorView: View {
         }
         .sheet(isPresented: $manage) {
             NavigationStack {
-                SettingsView(game: emu.game)
+                SettingsView()
                     .toolbar {
-                        Button("Done") {
+                        Button("Done", systemImage: "checkmark", role: .confirm) {
                             manage.toggle()
                         }
                         .bold()
@@ -127,64 +125,51 @@ struct EmulatorView: View {
         }
     }
 
-    var toolbarLeft: some View {
-        Group {
-            if extras.rate, let rate = emu.stats.rate {
-                Text(String(format: "%.1f FPS", rate))
-                    .bold()
-                    .foregroundStyle(.tint)
-            }
-            if extras.ctrl {
+    var Controls: some View {
+        Menu("Controls", systemImage: "ellipsis") {
+            // Playback
+            ControlGroup {
                 Button {
                     status = (status == .rewind) ? nil : .rewind
                 } label: {
-                    Image(systemName: status == .rewind ? "backward.fill" : "backward")
+                    Label("Rewind", systemImage: status == .rewind ? "backward.fill" : "backward")
                 }
                 .disabled(true)
                 Button {
                     paused.toggle()
                 } label: {
-                    Image(systemName: paused ? "play" : "pause.fill")
+                    paused
+                        ? Label("Play", systemImage: "play")
+                        : Label("Pause", systemImage: "pause.fill")
                 }
-                .frame(width: 25)
                 Button {
                     status = (status == .sprint) ? nil : .sprint
                 } label: {
-                    Image(systemName: status == .sprint ? "forward.fill" : "forward")
+                    Label("Forward", systemImage: status == .sprint ? "forward.fill" : "forward")
                 }
             }
-        }
-    }
-
-    var toolbarMenu: some View {
-        Menu("Help", systemImage: "ellipsis.circle") {
-            Button {
-                paused.toggle()
-            } label: {
-                paused
-                    ? Label("Play", systemImage: "play") : Label("Pause", systemImage: "pause")
-            }
+            .labelStyle(.iconOnly)
+            // Emulator
             Button("Reset", systemImage: "arrow.counterclockwise") {
                 emu.reset()
             }
-            Divider()
-            Menu("Toolbar", systemImage: "switch.2") {
-                Toggle("Frequency", systemImage: "stopwatch", isOn: $extras.rate)
-                Toggle("Playback", systemImage: "av.remote", isOn: $extras.ctrl)
+            // Information
+            Section {
+                Button("Get Info", systemImage: "info.circle") {
+                    detail.toggle()
+                }
+                Button("Settings", systemImage: "gearshape") {
+                    manage.toggle()
+                }
             }
-            Divider()
-            Button("Get Info", systemImage: "info.circle") {
-                detail.toggle()
-            }
-            Button("Settings", systemImage: "gearshape") {
-                manage.toggle()
-            }
-            Divider()
-            Button("Exit", systemImage: "xmark.circle", role: .destructive) {
-                emu.stop()
+            // Application
+            Section {
+                Button("Exit", systemImage: "xmark", role: .destructive) {
+                    emu.stop()
+                }
             }
         }
-        .labelStyle(.iconOnly)
+        .menuActionDismissBehavior(.disabled)
     }
 }
 
