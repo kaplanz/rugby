@@ -1,20 +1,19 @@
 //
-//  AppHeader.swift
+//  AboutView.swift
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2025-01-20.
 //
 
 import SwiftUI
+import WebKit
 
-struct AppHeader: View {
-    @State var icon: AppIcon
-
+struct AboutView: View {
     var body: some View {
         // Header
         Section {
             HStack(spacing: 20) {
-                Image(icon.preview)
+                Image("AppIcon")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 80)
@@ -28,17 +27,17 @@ struct AppHeader: View {
                 }
             }
         }
-        .id(icon)
         .listRowBackground(Color.clear)
         .listSectionSpacing(10)
         // About
         Section {
             // Website
-            Link(
-                destination: URL(
-                    string: "https://github.com/kaplanz/rugby"
-                )!
-            ) {
+            NavigationLink {
+                WebView(
+                    url: URL(
+                        string: "https://git.zakhary.dev/rugby",
+                    ))
+            } label: {
                 Label("Website", systemImage: "globe")
             }
             // License
@@ -61,7 +60,7 @@ struct AppHeader: View {
             }
             // Credit
             NavigationLink {
-                CreditsView()
+                EmptyView()
             } label: {
                 Label("Credits", systemImage: "person.2")
                     .foregroundStyle(.tint)
@@ -74,7 +73,9 @@ struct AppHeader: View {
 }
 
 #Preview {
-    List {
-        AppHeader(icon: .gamePak)
+    NavigationView {
+        List {
+            AboutView()
+        }
     }
 }
