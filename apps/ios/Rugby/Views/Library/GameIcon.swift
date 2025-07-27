@@ -10,36 +10,29 @@ import SwiftUI
 struct GameIcon: View {
     @State var game: Game
 
-    private var image: Image? {
-        game.icon.flatMap(Image.init(uiImage:))
+    private var image: Image {
+        game.icon.flatMap(Image.init(uiImage:)) ?? Image("Missing")
     }
 
-    var rect: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 10)
+    var shape: some Shape {
+        .rect(cornerRadius: 12)
     }
 
     var body: some View {
         ZStack {
-            rect
-                .fill(.ultraThinMaterial)
-                .overlay {
-                    rect
-                        .stroke(.foreground.secondary)
-                }
-            if let image = image {
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .clipShape(rect)
-            } else {
-                Image(systemName: "questionmark.app")
-                    .font(.system(size: 40))
-                    .foregroundColor(.secondary)
-            }
+            // Image
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+            // Shape
+            shape
+                .foregroundStyle(.clear)
+                .blur(radius: 4)
         }
         .aspectRatio(10 / 9, contentMode: .fit)
+        .glassEffect(in: shape)
+        .clipShape(shape)
         .frame(minWidth: 80, maxWidth: .infinity)
-        .contentShape(.contextMenuPreview, rect)
     }
 }
 

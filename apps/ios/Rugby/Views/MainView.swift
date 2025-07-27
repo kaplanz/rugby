@@ -18,22 +18,25 @@ struct MainView: View {
 
         NavigationStack {
             LibraryView()
-                .sheet(isPresented: $manage) {
-                    NavigationStack {
-                        SettingsView()
-                            .toolbar {
-                                Button("Done") {
-                                    manage.toggle()
-                                }
-                                .bold()
-                            }
-                    }
-                }
                 .toolbar {
-                    Button("Settings", systemImage: "gearshape") {
-                        manage.toggle()
+                    ToolbarItem {
+                        Button("Settings", systemImage: "gearshape.fill") {
+                            manage.toggle()
+                        }
                     }
                 }
+        }
+        .sheet(isPresented: $manage) {
+            NavigationStack {
+                SettingsView()
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done", systemImage: "checkmark", role: .confirm) {
+                                manage.toggle()
+                            }
+                        }
+                    }
+            }
         }
         .fullScreenCover(isPresented: $emu.show) {
             NavigationStack {

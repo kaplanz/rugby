@@ -9,19 +9,58 @@ import Algorithms
 import CryptoKit
 import RugbyKit
 import SwiftUI
+import UniformTypeIdentifiers
 import zlib
 
-struct GameDetails: View {
+struct GameInfo: View {
     @Environment(GameBoy.self) var emu
     @Environment(\.dismiss) var dismiss
 
     /// Game instance.
     @State var game: Game
 
+    private var type: UTType? {
+        UTType(filenameExtension: game.path.pathExtension)
+    }
+
     var body: some View {
         List {
             // Header
-            GameHeader(game: game)
+            VStack(alignment: .leading) {
+                // Icon
+                HStack {
+                    GameIcon(game: game)
+                        .frame(maxHeight: 286)
+                        .shadow(radius: 6, y: 4)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                // Name
+                Text(game.path.lastPathComponent)
+                    .font(.title2)
+                    .bold()
+                // Type
+                Text(
+                    String(
+                        format: "%@ - %d KiB",
+                        type?.localizedDescription ?? "ROM image",
+                        game.data.count / 1024,
+                    )
+                )
+                .font(.body)
+                .foregroundStyle(.secondary)
+                // Play
+                Button("Play") {
+                    dismiss()
+                    // Only play if not playing anything
+                    if emu.game == nil {
+                        emu.play(game)
+                    }
+                }
+                .bold()
+                .padding(.top, 8)
+                .buttonStyle(.glassProminent)
+            }
+            .listRowSeparator(.hidden)
             // Information
             Section("Information") {
                 Row("Title") {
@@ -33,7 +72,7 @@ struct GameDetails: View {
                 Row("Region") {
                     Text(game.info.region)
                 }
-                Row("Compatible") {
+                Row("Compatibility") {
                     let support = [
                         (title: "DMG", allow: game.info.dmg, color: Color.blue),
                         (title: "CGB", allow: game.info.cgb, color: Color.purple),
@@ -108,7 +147,7 @@ struct GameDetails: View {
             }
         }
         .listStyle(.plain)
-        .environment(\.defaultMinListRowHeight, 32.5)
+        .environment(\.defaultMinListRowHeight, 0)
         .navigationTitle("Info")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -120,7 +159,7 @@ struct GameDetails: View {
         .url(forResource: "porklike", withExtension: "gb")
         .flatMap({ try? Game(path: $0) })
     {
-        GameDetails(game: game)
+        GameInfo(game: game)
             .environment(GameBoy())
     }
 }
@@ -147,9 +186,10 @@ private struct Section<Content: View>: View {
                 Text(title)
                     .font(.title3)
                     .bold()
-                    .foregroundStyle(Color.primary)
+                    .foregroundStyle(Color.secondary)
             }
         }
+        .listSectionSpacing(8)
     }
 }
 
@@ -168,18 +208,19 @@ private struct Row<Content: View>: View {
                 .foregroundStyle(.secondary)
             Spacer()
             value
+                .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.trailing)
                 .textSelection(.enabled)
         }
         .font(.footnote)
-        .listRowSeparator(.hidden, edges: .top)
-        .listRowSeparator(.visible, edges: .bottom)
+        .listRowSeparator(.visible)
         .alignmentGuide(.listRowSeparatorLeading) { row in
             row[.leading]
         }
         .alignmentGuide(.listRowSeparatorTrailing) { row in
             row[.trailing]
         }
+        .listRowInsets(.vertical, 8)
     }
 }
 
