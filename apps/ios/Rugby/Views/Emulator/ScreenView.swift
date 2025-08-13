@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct Screen: View {
-    @Environment(GameBoy.self) var emu
+struct ScreenView: View {
+    @State var frame: UIImage?
 
     private var empty: UIImage {
         ImageRenderer(
@@ -24,7 +24,7 @@ struct Screen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Image(uiImage: emu.image ?? empty)
+            Image(uiImage: frame ?? empty)
                 .resizable()
                 .interpolation(.none)
                 .padding(6)
@@ -42,13 +42,12 @@ struct Screen: View {
                     .textCase(.uppercase)
             }
             .baselineOffset(5)
-            .foregroundStyle(.text)
+            .foregroundStyle(.print)
         }
         .padding(6)
     }
 }
 
 #Preview {
-    Screen()
-        .environment(GameBoy())
+    ScreenView()
 }

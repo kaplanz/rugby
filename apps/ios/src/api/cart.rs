@@ -1,7 +1,9 @@
 //! Cartridge API.
 
-use std::sync::{Arc, Mutex};
+use std::io;
+use std::sync::Arc;
 
+use parking_lot::Mutex;
 use rugby::core::dmg;
 
 use super::GameBoy;
@@ -15,23 +17,21 @@ impl GameBoy {
     /// [ejected](Self::eject).
     #[uniffi::method]
     pub fn insert(&self, cart: Arc<Cartridge>) -> Result<()> {
-        // Eject previous cartridge, if any
-        if self.eject() {
-            return Err("inserted cartiridge without previous eject"
-                .to_string()
-                .into());
+        // Ensure cartridge slot is empty
+        if self.inner.read().cart().is_some() {
+            return Err("cartridge slot is not empty".to_string().into());
         }
-        // Take unique ownership of this cartridge's game.
-        let game = cart
-            .game
-            .try_lock()
-            .map_err(|err| err.to_string())?
-            .take()
-            .ok_or("cartridge is missing game data".to_string())?;
+
+        // Obtain internal cartridge model
+        let cart = Arc::try_unwrap(cart).map_or_else(
+            // consume cart if unique
+            |cart| cart.inner.lock().clone(),
+            // otherwise, clone inner
+            |cart| cart.inner.into_inner(),
+        );
+
         // Insert the cartridge
-        self.emu.write().unwrap().insert(game);
-        // Retain cartridge
-        self.pak.write().unwrap().replace(cart);
+        self.inner.write().insert(cart);
 
         Ok(())
     }
@@ -41,22 +41,13 @@ impl GameBoy {
     /// If no cartridge was inserted, this is a no-op. Check the return value to
     /// see if a cartridge was ejected.
     #[uniffi::method]
-    pub fn eject(&self) -> bool {
-        // Retrieve cartridge
-        let Some(cart) = self.pak.write().unwrap().take() else {
-            return false;
-        };
-        // Eject inserted game
-        let Some(game) = self.emu.write().unwrap().eject() else {
-            return false;
-        };
-        // Ensure game matches cartridge
-        if cart.header() != game.header().into() {
-            return false;
-        }
-        // Restore ownership of this cartridge's game
-        cart.game.lock().unwrap().replace(game);
-        true
+    pub fn eject(&self) -> Option<Arc<Cartridge>> {
+        // Eject the cartridge
+        self.inner.write().eject().map(|cart| {
+            Arc::new(Cartridge {
+                inner: Mutex::new(cart),
+            })
+        })
     }
 }
 
@@ -65,40 +56,68 @@ impl GameBoy {
 /// Models the hardware specified by the provided ROM.
 #[derive(Debug, uniffi::Object)]
 pub struct Cartridge {
-    /// Cartridge header information.
-    info: Header,
     /// Internal cartridge model.
-    game: Mutex<Option<dmg::Cartridge>>,
+    inner: Mutex<dmg::Cartridge>,
+}
+
+/// Checks a if ROM has can reasonably be constructed.
+///
+/// # Errors
+///
+/// Returns an error if the ROM contained invalid header bytes, or if
+/// cartridge integrity seems compromised. (This is detected using
+/// checksums.)
+#[uniffi::export]
+pub fn check(data: &[u8]) -> Result<()> {
+    dmg::Cartridge::check(data).map_err(|err| err.to_string().into())
 }
 
 #[uniffi::export]
 impl Cartridge {
-    /// Constructs a new `Cartridge`.
+    // Constructs a new `Cartridge`.
     ///
     /// # Errors
     ///
     /// Returns an error when the cartridge could not be constructed. This will
     /// either be due to invalid header bytes or an unsupported cartridge type.
     #[uniffi::constructor]
-    pub fn new(rom: &[u8]) -> Result<Cartridge> {
+    pub fn new(data: &[u8]) -> Result<Self> {
         // Construct internal game cartridge
-        let game = dmg::Cartridge::new(rom).map_err(|err| err.to_string())?;
-        // Build external model from game
-        Ok(Self {
-            info: game.header().into(),
-            game: Mutex::new(game.into()),
-        })
-    }
-
-    /// Checks if the game is currently in use.
-    fn busy(&self) -> bool {
-        self.game.lock().is_ok_and(|cart| cart.is_some())
+        dmg::Cartridge::new(data)
+            .map(|cart| Self {
+                // Build external model from game
+                inner: Mutex::new(cart),
+            })
+            .map_err(|err| err.to_string().into())
     }
 
     /// Retrieves the cartridge header.
     #[uniffi::method]
     pub fn header(&self) -> Header {
-        self.info.clone()
+        self.inner.lock().header().clone().into()
+    }
+
+    /// Flashes data onto the cartridge's RAM.
+    #[uniffi::method]
+    pub fn flash(&self, save: &[u8]) -> Result<()> {
+        // Flash data to RAM
+        self.inner
+            .lock()
+            .flash(&mut io::Cursor::new(save))
+            .map(|_| ())
+            .map_err(|err| err.to_string().into())
+    }
+
+    /// Dumps contents of the cartridge's RAM.
+    #[uniffi::method]
+    pub fn dump(&self) -> Result<Vec<u8>> {
+        // Dump RAM as data
+        let mut buf = Vec::new();
+        self.inner
+            .lock()
+            .dump(&mut buf)
+            .map_err(|err| err.to_string())?;
+        Ok(buf)
     }
 }
 
@@ -143,20 +162,32 @@ pub struct Header {
     pub gchk: u16,
 }
 
-impl From<&dmg::cart::header::Header> for Header {
-    fn from(header: &dmg::cart::header::Header) -> Self {
+/// Constructs a new `Header`.
+///
+/// # Errors
+///
+/// Returns an error if the ROM contained invalid header bytes.
+#[uniffi::export]
+pub fn header(data: &[u8]) -> Result<Header> {
+    dmg::cart::Header::new(data)
+        .map(Into::into)
+        .map_err(|err| err.to_string().into())
+}
+
+impl From<dmg::cart::Header> for Header {
+    fn from(head: dmg::cart::Header) -> Self {
         Self {
-            title: header.about.title.clone(),
-            dmg: header.compat.dmg,
-            cgb: header.compat.cgb,
-            sgb: header.compat.sgb,
-            cart: header.board.to_string(),
-            romsz: bfmt::Size::from(header.memory.romsz).to_string(),
-            ramsz: bfmt::Size::from(header.memory.ramsz).to_string(),
-            region: header.about.region.to_string(),
-            version: header.about.revision(),
-            hchk: header.check.hchk,
-            gchk: header.check.gchk,
+            title: head.about.title.clone(),
+            dmg: head.compat.dmg,
+            cgb: head.compat.cgb,
+            sgb: head.compat.sgb,
+            cart: head.board.to_string(),
+            romsz: bfmt::Size::from(head.memory.romsz).to_string(),
+            ramsz: bfmt::Size::from(head.memory.ramsz).to_string(),
+            region: head.about.region.to_string(),
+            version: head.about.revision(),
+            hchk: head.check.hchk,
+            gchk: head.check.gchk,
         }
     }
 }

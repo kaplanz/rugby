@@ -11,7 +11,7 @@ type Ram = rugby_arch::mem::Ram<Data>;
 /// [No MBC][none] cartridge type.
 ///
 /// [none]: https://gbdev.io/pandocs/nombc.html
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct None {
     pub(super) rom: Shared<Rom>,
     pub(super) ram: Shared<Ram>,

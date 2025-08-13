@@ -15,5 +15,5 @@ crate-type = ["cdylib"]
 [dependencies]
 constcat = { workspace = true }
 log = { workspace = true }
-parking_lot = "0.12.4"
+parking_lot = { workspace = true }
 rugby = { workspace = true, features = ["pal"] }

@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(GameBoy.self) private var emu
-    @Environment(\.openURL) private var openURL
+    @Environment(Options.self) private var opt
 
     /// Open the danger zone.
     @State private var dangerZone = false
@@ -17,7 +16,7 @@ struct SettingsView: View {
     @State private var alertReset = false
 
     var body: some View {
-        @Bindable var cfg = emu.cfg.data
+        @Bindable var cfg = opt.data
 
         Form {
             // Header
@@ -37,15 +36,15 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.navigationLink)
                 // Speed
-                Picker(selection: $cfg.spd) {
-                    ForEach(Speed.allCases) { spd in
-                        Text(spd.description)
-                    }
+                NavigationLink {
+                    SpeedPicker(speed: $cfg.spd)
                 } label: {
-                    Label("Speed", systemImage: "stopwatch")
-                }
-                .onChange(of: cfg.spd) { _, speed in
-                    emu.clock(speed: speed.rawValue)
+                    HStack {
+                        Label("Speed", systemImage: "stopwatch")
+                        Spacer()
+                        Text(cfg.spd.description)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             // Danger Zone
@@ -73,7 +72,7 @@ struct SettingsView: View {
                 ) {
                     Button("Reset", role: .destructive) {
                         withAnimation {
-                            // TODO: reset settings
+                            opt.reset()
                         }
                     }
                 } message: {
@@ -97,12 +96,12 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+        .id(opt.uuid)
     }
 }
 
 #Preview {
     NavigationStack {
         SettingsView()
-            .environment(GameBoy())
     }
 }

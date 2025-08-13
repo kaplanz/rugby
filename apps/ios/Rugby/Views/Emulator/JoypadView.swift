@@ -1,5 +1,5 @@
 //
-//  Joypad.swift
+//  JoypadView.swift
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2025-01-13.
@@ -8,11 +8,17 @@
 import RugbyKit
 import SwiftUI
 
-struct Joypad: View {
+struct JoypadView: View {
+    typealias Callback = (RugbyKit.Button, Bool) -> Void
+
+    /// Event callback.
+    let call: Callback
+
     /// Region of the joypad to render.
     let part: Region
 
-    init(part: Region = .full) {
+    init(_ call: @escaping Callback, part: Region = .full) {
+        self.call = call
         self.part = part
     }
 
@@ -29,24 +35,24 @@ struct Joypad: View {
             case .full:
                 VStack(spacing: 32) {
                     HStack {
-                        DPadInput()
+                        DPadInput(call: call)
                         Spacer()
-                        GameInput()
+                        GameInput(call: call)
                     }
-                    MenuInput()
+                    MenuInput(call: call)
                 }
             case .left:
                 VStack {
                     Spacer()
-                    DPadInput()
+                    DPadInput(call: call)
                     Spacer()
-                    MenuInput()
+                    MenuInput(call: call)
                 }
                 .padding()
             case .right:
                 VStack {
                     Spacer()
-                    GameInput()
+                    GameInput(call: call)
                     Spacer()
                     Spacer()
                 }
@@ -57,12 +63,11 @@ struct Joypad: View {
 }
 
 #Preview {
-    Joypad()
-        .environment(GameBoy())
+    JoypadView { (_, _) in }
 }
 
 private struct DPadInput: View {
-    @Environment(GameBoy.self) private var emu
+    let call: JoypadView.Callback
 
     /// Location within the D-pad's touch area.
     @State private var touch: (x: Float, y: Float)?
@@ -124,11 +129,11 @@ private struct DPadInput: View {
         }
         .sensoryFeedback(.impact, trigger: input)
         .onChange(of: input) { prev, next in
-            for button in next.subtracting(prev) {
-                emu.input(button, pressed: true)
+            for role in next.subtracting(prev) {
+                call(role, true)
             }
-            for button in prev.subtracting(next) {
-                emu.input(button, pressed: false)
+            for role in prev.subtracting(next) {
+                call(role, false)
             }
         }
     }
@@ -165,18 +170,19 @@ private struct DPadTouchArea: View {
 }
 
 private struct GameInput: View {
+    let call: JoypadView.Callback
+
     var body: some View {
         HStack {
-            GameButton(role: .b)
-            GameButton(role: .a)
+            GameButton(call: call, role: .b)
+            GameButton(call: call, role: .a)
         }
         .rotationEffect(.degrees(-30))
     }
 }
 
 private struct GameButton: View {
-    @Environment(GameBoy.self) private var emu
-
+    let call: JoypadView.Callback
     let role: RugbyKit.Button
 
     @State private var isPressed = false
@@ -192,7 +198,7 @@ private struct GameButton: View {
             Text(String(describing: role))
                 .font(.custom("Orbitron", size: 16))
                 .fontWeight(.heavy)
-                .foregroundStyle(.text)
+                .foregroundStyle(.print)
                 .textCase(.uppercase)
         }
         .gesture(
@@ -206,25 +212,26 @@ private struct GameButton: View {
         )
         .sensoryFeedback(.impact, trigger: isPressed)
         .onChange(of: isPressed) {
-            emu.input(role, pressed: isPressed)
+            call(role, isPressed)
         }
     }
 }
 
 private struct MenuInput: View {
+    let call: JoypadView.Callback
+
     var body: some View {
         HStack {
-            MenuButton(role: .select)
+            MenuButton(call: call, role: .select)
                 .rotationEffect(.degrees(-30))
-            MenuButton(role: .start)
+            MenuButton(call: call, role: .start)
                 .rotationEffect(.degrees(-30))
         }
     }
 }
 
 private struct MenuButton: View {
-    @Environment(GameBoy.self) private var emu
-
+    let call: JoypadView.Callback
     let role: RugbyKit.Button
 
     @State private var isPressed = false
@@ -240,7 +247,7 @@ private struct MenuButton: View {
             Text(String(describing: role))
                 .font(.custom("Orbitron", size: 12))
                 .fontWeight(.heavy)
-                .foregroundStyle(.text)
+                .foregroundStyle(.print)
                 .textCase(.uppercase)
         }
         .gesture(
@@ -254,7 +261,7 @@ private struct MenuButton: View {
         )
         .sensoryFeedback(.impact, trigger: isPressed)
         .onChange(of: isPressed) {
-            emu.input(role, pressed: isPressed)
+            call(role, isPressed)
         }
     }
 }

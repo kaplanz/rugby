@@ -1,5 +1,5 @@
 //
-//  GameInfo.swift
+//  GameInfoView.swift
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2025-01-10.
@@ -9,18 +9,21 @@ import Algorithms
 import CryptoKit
 import RugbyKit
 import SwiftUI
-import UniformTypeIdentifiers
 import zlib
 
-struct GameInfo: View {
-    @Environment(GameBoy.self) var emu
-    @Environment(\.dismiss) var dismiss
+struct GameInfoView: View {
+    @Environment(Runtime.self) private var app
+    @Environment(\.dismiss) private var dismiss
 
     /// Game instance.
     @State var game: Game
 
-    private var type: UTType? {
-        UTType(filenameExtension: game.path.pathExtension)
+    /// Cartridge header.
+    private var info: Header
+
+    init(game: Game) {
+        self.game = game
+        self.info = try! header(data: game.data)
     }
 
     var body: some View {
@@ -35,25 +38,26 @@ struct GameInfo: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 // Name
-                Text(game.path.lastPathComponent)
+                Text(game.name)
                     .font(.title2)
                     .bold()
                 // Type
                 Text(
                     String(
-                        format: "%@ - %d KiB",
-                        type?.localizedDescription ?? "ROM image",
-                        game.data.count / 1024,
+                        format: "%@ - %@",
+                        game.path.type?.localizedDescription ?? "ROM image",
+                        game.data.count.formatted(.byteCount(style: .file))
                     )
                 )
                 .font(.body)
                 .foregroundStyle(.secondary)
                 // Play
                 Button("Play") {
+                    // Dismiss this view
                     dismiss()
-                    // Only play if not playing anything
-                    if emu.game == nil {
-                        emu.play(game)
+                    // Start playing game
+                    if app.game == nil {
+                        app.play(game)
                     }
                 }
                 .bold()
@@ -64,19 +68,19 @@ struct GameInfo: View {
             // Information
             Section("Information") {
                 Row("Title") {
-                    Text(game.info.title ?? "Unknown")
+                    Text(info.title ?? "Unknown")
                 }
                 Row("Version") {
-                    Text(game.info.version)
+                    Text(info.version)
                 }
                 Row("Region") {
-                    Text(game.info.region)
+                    Text(info.region)
                 }
                 Row("Compatibility") {
                     let support = [
-                        (title: "DMG", allow: game.info.dmg, color: Color.blue),
-                        (title: "CGB", allow: game.info.cgb, color: Color.purple),
-                        (title: "SGB", allow: game.info.sgb, color: Color.red),
+                        (title: "DMG", allow: info.dmg, color: Color.blue),
+                        (title: "CGB", allow: info.cgb, color: Color.purple),
+                        (title: "SGB", allow: info.sgb, color: Color.red),
                     ]
                     .filter { $0.allow }
                     ForEach(support, id: \.title) {
@@ -87,24 +91,24 @@ struct GameInfo: View {
             // Cartridge
             Section("Cartridge") {
                 Row("Kind") {
-                    Text(game.info.cart)
+                    Text(info.cart)
                 }
                 Row("ROM") {
-                    Text(game.info.romsz)
+                    Text(info.romsz)
                 }
                 Row("RAM") {
-                    Text(game.info.ramsz)
+                    Text(info.ramsz)
                 }
             }
             // Checksum
             Section("Checksum") {
                 Row("Header") {
-                    Text(String(format: "%02X", game.info.hchk))
+                    Text(String(format: "%02X", info.hchk))
                         .monospaced()
                         .textSelection(.enabled)
                 }
                 Row("Global") {
-                    Text(String(format: "%04X", game.info.gchk))
+                    Text(String(format: "%04X", info.gchk))
                         .monospaced()
                         .textSelection(.enabled)
                 }
@@ -148,6 +152,7 @@ struct GameInfo: View {
         }
         .listStyle(.plain)
         .environment(\.defaultMinListRowHeight, 0)
+        .scrollContentBackground(.visible)
         .navigationTitle("Info")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -159,8 +164,7 @@ struct GameInfo: View {
         .url(forResource: "porklike", withExtension: "gb")
         .flatMap({ try? Game(path: $0) })
     {
-        GameInfo(game: game)
-            .environment(GameBoy())
+        GameInfoView(game: game)
     }
 }
 

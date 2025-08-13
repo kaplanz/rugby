@@ -1,5 +1,5 @@
 //
-//  GameItem.swift
+//  LibraryItem.swift
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2024-06-23.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct GameItem: View {
-    @Environment(GameBoy.self) private var emu
+struct LibraryItem: View {
+    @Environment(Runtime.self) private var app
     @Environment(Library.self) private var lib
 
     /// Game instance.
@@ -18,8 +18,6 @@ struct GameItem: View {
     @State private var detail = false
     /// Rename this game.
     @State private var rename = (show: false, text: String())
-    /// Manage this game.
-    @State private var manage = false
     /// Delete this game.
     @State private var delete = false
 
@@ -38,21 +36,50 @@ struct GameItem: View {
                     .padding(4)
             }
             .contextMenu {
-                Button("Play", systemImage: "play") {
-                    emu.play(game)
+                ControlGroup {
+                    Button("Play", systemImage: "play.fill") {
+                        app.play(game)
+                    }
+                    ShareLink(item: game.path.game) {
+                        Label("Share", systemImage: "square.and.arrow.up.fill")
+                    }
                 }
-                Divider()
-                Button("Get Info", systemImage: "info.circle") {
-                    detail.toggle()
+                Section {
+                    Button("Get Info", systemImage: "info.circle") {
+                        detail.toggle()
+                    }
+                    RenameButton()
+                    Button("Duplicate", systemImage: "plus.square.on.square") {
+                        lib.copy(game: game)
+                    }
                 }
-                RenameButton()
-                Divider()
-                Button("Delete", systemImage: "trash", role: .destructive) {
-                    delete.toggle()
+                Section {
+                    Button("Show in Enclosing Folder", systemImage: "arrow.up.folder") {
+                        if let url = URL(
+                            string: game.path.root.absoluteString
+                                .replacingOccurrences(of: "file://", with: "shareddocuments://"))
+                        {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                }
+                Section {
+                    !game.star
+                        ? Button("Favourite", systemImage: "star") {
+                            game.star.toggle()
+                        }
+                        : Button("Unfavourite", systemImage: "star.slash") {
+                            game.star.toggle()
+                        }
+                }
+                Section {
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        delete.toggle()
+                    }
                 }
             }
             .onTapGesture {
-                emu.play(game)
+                app.play(game)
             }
             .renameAction {
                 rename = (show: true, text: game.name)
@@ -61,7 +88,7 @@ struct GameItem: View {
                 TextField(game.name, text: $rename.text)
                 Button("Cancel", role: .cancel) {}
                 Button("Rename") {
-                    lib.rename(game: game, to: rename.text)
+                    lib.move(game: game, to: rename.text)
                 }
             }
             .alert(
@@ -77,7 +104,7 @@ struct GameItem: View {
             }
             .sheet(isPresented: $detail) {
                 NavigationStack {
-                    GameInfo(game: game)
+                    GameInfoView(game: game)
                         .toolbar {
                             Button("Done", systemImage: "checkmark", role: .confirm) {
                                 detail.toggle()
@@ -95,9 +122,8 @@ struct GameItem: View {
         .url(forResource: "porklike", withExtension: "gb")
         .flatMap({ try? Game(path: $0) })
     {
-        GameItem(game: game)
+        LibraryItem(game: game)
             .frame(width: 160, height: 144)
-            .environment(GameBoy())
             .environment(Library())
     }
 }

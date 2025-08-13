@@ -5,60 +5,88 @@
 //  Created by Zakhary Kaplan on 2025-01-09.
 //
 
-import RugbyKit
 import SwiftUI
 import UniformTypeIdentifiers
 
 @Observable
-class Game {
-    /// Game ROM path.
-    let path: URL
-    /// Game ROM data.
-    let data: Data
-    /// Game cartridge.
-    let cart: Cartridge
-    /// Game configuration.
-    let conf: Settings
+final class Game {
+    /// Game folder.
+    let path: Folder
 
     init(path: URL) throws {
-        // Initialize game path
-        self.path = path
-        // Initialize game data
+        self.path = .init(game: path)
         self.data = try Data(contentsOf: path)
-        // Initialize game cartridge
-        self.cart = try Cartridge(rom: data)
-        // Initialize game configuration
-        self.conf = Settings(path: path.deletingPathExtension().appendingPathExtension("toml"))
     }
 
-    /// Game name.
+    /// Game folder structure.
+    struct Folder {
+        /// Folder root.
+        var root: URL {
+            game.deletingLastPathComponent()
+        }
+
+        /// Game ROM.
+        var game: URL
+
+        /// Game RAM.
+        var save: URL {
+            root.appending(component: name).appendingPathExtension("sav")
+        }
+
+        /// Title text.
+        var name: String {
+            root.lastPathComponent
+        }
+
+        /// Title type.
+        var type: UTType? {
+            .init(filenameExtension: game.pathExtension)
+        }
+
+        /// Title icon.
+        var icon: URL {
+            root.appending(component: name).appendingPathExtension("png")
+        }
+    }
+
+    /// Favourite game.
+    var star: Bool = false
+
+    /// Cartridge title.
     var name: String {
-        path.deletingPathExtension().lastPathComponent
+        path.name
     }
 
-    /// Game information.
-    var info: Header {
-        cart.header()
+    /// Cartridge ROM.
+    let data: Data
+
+    /// Cartridge RAM.
+    var save: Data? {
+        get {
+            access(keyPath: \.save)
+            return try? Data(contentsOf: path.save)
+        }
+        set {
+            withMutation(keyPath: \.save) {
+                do {
+                    try newValue?.write(to: path.save)
+                } catch let error {
+                    fatalError(error.localizedDescription)
+                }
+            }
+        }
     }
 
-    /// Game busy status.
-    var busy: Bool {
-        cart.busy()
-    }
-
-    /// Game icon.
+    /// Gameplay image.
     var icon: UIImage? {
         get {
             access(keyPath: \.icon)
-            let path = path.deletingPathExtension().appendingPathExtension("png")
-            let data = try? Data(contentsOf: path)
-            return data.flatMap { UIImage(data: $0) }
+            return (try? Data(contentsOf: path.icon)).flatMap { UIImage(data: $0) }
         }
         set {
             withMutation(keyPath: \.icon) {
-                let path = path.deletingPathExtension().appendingPathExtension("png")
                 do {
-                    try newValue?.pngData()?.write(to: path)
+                    try newValue?.pngData()?.write(to: path.icon)
                 } catch let error {
                     fatalError(error.localizedDescription)
                 }
@@ -69,16 +97,16 @@ class Game {
 
 extension Game: Equatable {
     static func == (lhs: Game, rhs: Game) -> Bool {
-        lhs.path == rhs.path
+        lhs.path.root == rhs.path.root
     }
 }
 
 extension Game: Hashable {
     func hash(into hasher: inout Hasher) {
-        hasher.combine(path)
+        hasher.combine(path.root)
     }
 }
 
 extension Game: Identifiable {
-    var id: URL { path }
+    var id: URL { path.root }
 }
