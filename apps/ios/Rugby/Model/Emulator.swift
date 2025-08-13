@@ -52,7 +52,9 @@ final class Emulator {
         // Eject cartridge
         let cart = core.stop()
         // Update save RAM
-        game?.save = try cart?.dump()
+        if cart?.header().board.power == true {
+            game?.save = try cart?.dump()
+        }
     }
 
     /// Pause emulation.
