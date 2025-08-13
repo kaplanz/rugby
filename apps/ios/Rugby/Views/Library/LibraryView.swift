@@ -36,7 +36,21 @@ struct LibraryView: View {
                 spacing: 12,
             ) {
                 ForEach(games, id: \.self) { game in
-                    LibraryItem(game: game)
+                    LibraryItem(game: game) {
+                        GameIcon(game: game)
+                            .overlay(alignment: .bottom) {
+                                Text(game.name)
+                                    .font(.footnote)
+                                    .bold()
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.5)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 4)
+                                    .glassEffect(in: .rect(cornerRadius: 8))
+                                    .padding(4)
+                            }
+                    }
                 }
             }
             .padding()
