@@ -1,6 +1,15 @@
 {
-  "originHash" : "82efe9e321f3dcfd8c08e45a362684101e8dd5da4232cfeaa30f6ad996076dea",
+  "originHash" : "ef715cde7d80a95918bb8b8ae8dc83009050800ae3fa85b67b1dc8d3750311b0",
   "pins" : [
+    {
+      "identity" : "colortokenskit-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/metasidd/ColorTokensKit-Swift.git",
+      "state" : {
+        "revision" : "c784ab8348cfad827d6ff43e56ff09462ccccb60",
+        "version" : "0.2.0"
+      }
+    },
     {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
