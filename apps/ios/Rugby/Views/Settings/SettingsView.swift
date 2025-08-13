@@ -104,4 +104,5 @@ struct SettingsView: View {
     NavigationStack {
         SettingsView()
     }
+    .environment(Options())
 }
