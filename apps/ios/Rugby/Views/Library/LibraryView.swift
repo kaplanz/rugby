@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct LibraryView: View {
+    @Environment(Failure.self) private var err
     @Environment(Library.self) private var lib
 
     /// Present file importer.
@@ -42,7 +43,7 @@ struct LibraryView: View {
         .navigationTitle("Library")
         .background(.background.secondary)
         .refreshable {
-            lib.reload()
+            do { try lib.reload() } catch { err.or = error }
         }
         .searchable(text: $query)
         .searchToolbarBehavior(.minimize)
@@ -76,25 +77,12 @@ struct LibraryView: View {
                         }
                         .forEach { file in
                             // Attempt to add to library
-                            lib.add(url: file)
+                            do { try lib.add(url: file) } catch { err.or = error }
                             // Release access permission
                             file.stopAccessingSecurityScopedResource()
                         }
                 }
             }
-        }
-        .alert(
-            "Error",
-            isPresented: Binding(
-                get: { lib.error.first != nil },
-                set: { _ in }
-            ), presenting: lib.error.first
-        ) { _ in
-            Button("OK", role: .cancel) {
-                lib.error.removeFirst()
-            }
-        } message: { error in
-            Text(String(describing: error))
         }
     }
 }
@@ -103,5 +91,6 @@ struct LibraryView: View {
     NavigationStack {
         LibraryView()
     }
+    .environment(Failure())
     .environment(Library())
 }
