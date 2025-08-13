@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LibraryItem: View {
+struct LibraryItem<V: View>: View {
     @Environment(Runtime.self) private var app
     @Environment(Failure.self) private var err
     @Environment(Library.self) private var lib
@@ -22,20 +22,11 @@ struct LibraryItem: View {
     /// Delete this game.
     @State private var delete = false
 
+    @ViewBuilder
+    var view: () -> V
+
     var body: some View {
-        GameIcon(game: game)
-            .overlay(alignment: .bottom) {
-                Text(game.name)
-                    .font(.footnote)
-                    .bold()
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.5)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .glassEffect(in: .rect(cornerRadius: 8))
-                    .padding(4)
-            }
+        view()
             .contextMenu {
                 ControlGroup {
                     Button("Play", systemImage: "play.fill") {
@@ -120,10 +111,12 @@ struct LibraryItem: View {
         .url(forResource: "porklike", withExtension: "gb")
         .flatMap({ try? Game(path: $0) })
     {
-        LibraryItem(game: game)
-            .frame(width: 160, height: 144)
-            .environment(Runtime())
-            .environment(Failure())
-            .environment(Library())
+        LibraryItem(game: game) {
+            GameIcon(game: game)
+                .frame(width: 160, height: 144)
+        }
+        .environment(Runtime())
+        .environment(Failure())
+        .environment(Library())
     }
 }
