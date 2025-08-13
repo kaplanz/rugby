@@ -68,19 +68,26 @@ struct GameInfoView: View {
             // Information
             Section("Information") {
                 Row("Title") {
-                    Text(info.title ?? "Unknown")
+                    Text(info.about.title ?? "Unknown")
                 }
                 Row("Version") {
-                    Text(info.version)
+                    Text(
+                        String(
+                            format:
+                                "v%d.%d",
+                            ((info.about.version & 0xf0) >> 4) + 1,
+                            info.about.version & 0x0f,
+                        )
+                    )
                 }
                 Row("Region") {
-                    Text(info.region)
+                    Text(String(describing: info.about.region).capitalized)
                 }
                 Row("Compatibility") {
                     let support = [
-                        (title: "DMG", allow: info.dmg, color: Color.blue),
-                        (title: "CGB", allow: info.cgb, color: Color.purple),
-                        (title: "SGB", allow: info.sgb, color: Color.red),
+                        (title: "DMG", allow: info.compat.dmg, color: Color.blue),
+                        (title: "CGB", allow: info.compat.cgb, color: Color.purple),
+                        (title: "SGB", allow: info.compat.sgb, color: Color.red),
                     ]
                     .filter { $0.allow }
                     ForEach(support, id: \.title) {
@@ -91,24 +98,39 @@ struct GameInfoView: View {
             // Cartridge
             Section("Cartridge") {
                 Row("Kind") {
-                    Text(info.cart)
+                    Text(info.board.kind)
                 }
                 Row("ROM") {
-                    Text(info.romsz)
+                    Text(info.memory.romsz.formatted(.byteCount(style: .memory)))
                 }
                 Row("RAM") {
-                    Text(info.ramsz)
+                    Text(info.memory.ramsz.formatted(.byteCount(style: .memory)))
+                }
+                if let power = info.board.power {
+                    Row("Battery") {
+                        Text(power ? "Yes" : "No")
+                    }
+                }
+                if let clock = info.board.clock {
+                    Row("Clock") {
+                        Text(clock ? "Yes" : "No")
+                    }
+                }
+                if let motor = info.board.motor {
+                    Row("Rumble") {
+                        Text(motor ? "Yes" : "No")
+                    }
                 }
             }
             // Checksum
             Section("Checksum") {
                 Row("Header") {
-                    Text(String(format: "%02X", info.hchk))
+                    Text(String(format: "%02X", info.check.hchk))
                         .monospaced()
                         .textSelection(.enabled)
                 }
                 Row("Global") {
-                    Text(String(format: "%04X", info.gchk))
+                    Text(String(format: "%04X", info.check.gchk))
                         .monospaced()
                         .textSelection(.enabled)
                 }

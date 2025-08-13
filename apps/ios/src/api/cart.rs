@@ -123,33 +123,23 @@ unsafe impl Send for Cartridge {}
 // internal reference-counting pointers.
 unsafe impl Sync for Cartridge {}
 
+use parts::{About, Board, Check, Compat, Memory};
+
 /// Cartridge header.
 ///
-/// Information about the cartridge ROM.
+/// See [`rugby::core::dmg::cart::Header`]
 #[derive(Clone, Debug, Eq, PartialEq, uniffi::Record)]
 pub struct Header {
-    /// Internal game title.
-    pub title: Option<String>,
-    /// Compatible with DMG (Game Boy).
-    pub dmg: bool,
-    /// Compatible with CGB (Game Boy Color).
-    pub cgb: bool,
-    /// Compatible with SGB (Super Game Boy).
-    pub sgb: bool,
-    /// Cartridge description.
-    pub cart: String,
-    /// Cartridge ROM size
-    pub romsz: String,
-    /// Cartridge RAM size.
-    pub ramsz: String,
-    /// Destination code.
-    pub region: String,
-    /// Game revision number.
-    pub version: String,
-    /// Header checksum.
-    pub hchk: u8,
-    /// Global checksum.
-    pub gchk: u16,
+    /// Game information.
+    pub about: About,
+    /// Data integrity.
+    pub check: Check,
+    /// Mapper hardware.
+    pub board: Board,
+    /// Memory hardware.
+    pub memory: Memory,
+    /// Model compatibility.
+    pub compat: Compat,
 }
 
 /// Constructs a new `Header`.
@@ -165,19 +155,131 @@ pub fn header(data: &[u8]) -> Result<Header> {
 }
 
 impl From<dmg::cart::Header> for Header {
-    fn from(head: dmg::cart::Header) -> Self {
+    fn from(
+        dmg::cart::Header {
+            about,
+            check,
+            board,
+            memory,
+            compat,
+        }: dmg::cart::Header,
+    ) -> Self {
         Self {
-            title: head.about.title.clone(),
-            dmg: head.compat.dmg,
-            cgb: head.compat.cgb,
-            sgb: head.compat.sgb,
-            cart: head.board.to_string(),
-            romsz: bfmt::Size::from(head.memory.romsz).to_string(),
-            ramsz: bfmt::Size::from(head.memory.ramsz).to_string(),
-            region: head.about.region.to_string(),
-            version: head.about.revision(),
-            hchk: head.check.hchk,
-            gchk: head.check.gchk,
+            about,
+            check,
+            board: board.into(),
+            memory: memory.into(),
+            compat,
         }
+    }
+}
+
+/// Header fields.
+pub mod parts {
+    use rugby::core::dmg::cart::head::parts;
+
+    pub use parts::About;
+
+    /// Game information.
+    ///
+    /// See [`rugby::core::dmg::cart::head::parts::About`]
+    #[uniffi::remote(Record)]
+    pub struct About {
+        pub title: Option<String>,
+        pub region: Region,
+        pub version: u8,
+    }
+
+    pub use parts::Check;
+
+    /// Data integrity.
+    ///
+    /// See [`rugby::core::dmg::cart::head::parts::Check`]
+    #[uniffi::remote(Record)]
+    pub struct Check {
+        pub logo: bool,
+        pub hchk: u8,
+        pub gchk: u16,
+    }
+
+    /// Memory hardware.
+    ///
+    /// See [`rugby::core::dmg::cart::head::parts::Memory`]
+    #[derive(Clone, Debug, Eq, PartialEq, uniffi::Record)]
+    pub struct Memory {
+        pub romsz: u32,
+        pub ramsz: u32,
+    }
+
+    impl From<parts::Memory> for Memory {
+        fn from(parts::Memory { romsz, ramsz }: parts::Memory) -> Self {
+            Self {
+                romsz: romsz as u32,
+                ramsz: ramsz as u32,
+            }
+        }
+    }
+
+    pub use parts::Compat;
+
+    /// Model compatibility.
+    ///
+    /// See [`rugby::core::dmg::cart::head::parts::Compat`]
+    #[uniffi::remote(Record)]
+    pub struct Compat {
+        pub dmg: bool,
+        pub cgb: bool,
+        pub sgb: bool,
+    }
+
+    pub use parts::Board;
+
+    /// Mapper hardware.
+    ///
+    /// See [`rugby::core::dmg::cart::head::parts::Board`]
+    #[uniffi::remote(Enum)]
+    pub enum Board {
+        None {
+            exram: bool,
+            power: bool,
+        },
+        Mbc1 {
+            exram: bool,
+            power: bool,
+        },
+        Mbc2 {
+            power: bool,
+        },
+        Mbc3 {
+            exram: bool,
+            power: bool,
+            clock: bool,
+        },
+        Mbc5 {
+            exram: bool,
+            power: bool,
+            motor: bool,
+        },
+        Mbc6,
+        Mbc7,
+        Mmm01 {
+            exram: bool,
+            power: bool,
+        },
+        M161,
+        HuC1,
+        HuC3,
+        Camera,
+    }
+
+    pub use parts::Region;
+
+    /// Destination code.
+    ///
+    /// See [`rugby::core::dmg::cart::head::parts::Region`]
+    #[uniffi::remote(Enum)]
+    pub enum Region {
+        World,
+        Japan,
     }
 }
