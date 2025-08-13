@@ -23,7 +23,7 @@ struct GameInfoView: View {
 
     init(game: Game) {
         self.game = game
-        self.info = try! header(data: game.data)
+        self.info = try! RugbyKit.header(data: game.data)
     }
 
     var body: some View {
