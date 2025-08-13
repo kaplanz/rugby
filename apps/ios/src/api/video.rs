@@ -11,7 +11,7 @@ impl GameBoy {
     /// Assuming the PPU is enabled (by the cartridge), this should be true
     /// exactly once every 70,224 cycles.
     pub fn vsync(&self) -> bool {
-        self.emu.read().unwrap().inside().video().vsync()
+        self.inner.read().inside().video().vsync()
     }
 
     /// Gets the current frame state.
@@ -30,9 +30,8 @@ impl GameBoy {
     /// `(20 * 160) + 16  = 3216`th element of the frame (zero indexed) as
     /// `frame[3215]`.
     pub fn frame(&self) -> Vec<u8> {
-        self.emu
+        self.inner
             .read()
-            .unwrap()
             .inside()
             .video()
             .frame()

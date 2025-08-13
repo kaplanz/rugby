@@ -6,32 +6,8 @@
 //
 
 import GameController
-import OSLog
 import RugbyKit
 import SwiftUI
-
-/// Global logger.
-let log = Logger()
-
-/// Define core logger.
-@_cdecl("log")
-func rugby_log(level: UInt64, target: UnsafePointer<CChar>, message: UnsafePointer<CChar>) {
-    // Decode log level
-    let level: OSLogType = [
-        // error
-        .error,
-        // warn
-        .error,
-        // info
-        .info,
-        // debug
-        .debug,
-        // trace
-        .debug,
-    ][Int(level)]
-    // Write with global logger
-    log.log(level: level, "[\(String(cString: target))]: \(String(cString: message))")
-}
 
 struct Build {
     /// Application name.
@@ -44,10 +20,12 @@ struct Build {
 
 @main
 struct RugbyApp: App {
-    /// Global emulator instance.
-    @State private var emu = GameBoy()
-    /// Global game library.
-    @State private var lib = Library()
+    /// Runtime data.
+    @State private var app: Runtime = .init()
+    /// Game library.
+    @State private var lib: Library = .init()
+    /// App settings.
+    @State private var opt: Options = .init()
 
     init() {
         // Initialize core
@@ -61,20 +39,21 @@ struct RugbyApp: App {
             MainView()
                 .onOpenURL { url in
                     // Ensure valid ROM
-                    guard let valid = try? lib.precheck(url: url), valid else {
+                    guard let valid = try? lib.check(url: url), valid else {
                         return
                     }
                     // Add to library
-                    lib.insert(src: url)
-                    // Play in emulator
+                    lib.add(url: url)
+                    // Play new import
                     let name = url.deletingPathExtension().lastPathComponent
                     if let game = lib.games.first(where: { $0.name == name }) {
-                        emu.play(game)
+                        app.play(game)
                     }
                 }
         }
-        .environment(emu)
+        .environment(app)
         .environment(lib)
+        .environment(opt)
     }
 }
 
@@ -116,32 +95,32 @@ extension RugbyApp {
     nonisolated func initGameControllerHandlers(pad: GCController) {
         pad.extendedGamepad?.buttonA.valueChangedHandler = { _, _, pressed in
             DispatchQueue.main.async {
-                emu.input(.a, pressed: pressed)
+                //                emu.input(.a, pressed: pressed)
             }
         }
         pad.extendedGamepad?.buttonB.valueChangedHandler = { _, _, pressed in
             DispatchQueue.main.async {
-                emu.input(.b, pressed: pressed)
+                //                emu.input(.b, pressed: pressed)
             }
         }
         pad.extendedGamepad?.dpad.right.valueChangedHandler = { _, _, pressed in
             DispatchQueue.main.async {
-                emu.input(.right, pressed: pressed)
+                //                emu.input(.right, pressed: pressed)
             }
         }
         pad.extendedGamepad?.dpad.left.valueChangedHandler = { _, _, pressed in
             DispatchQueue.main.async {
-                emu.input(.left, pressed: pressed)
+                //                emu.input(.left, pressed: pressed)
             }
         }
         pad.extendedGamepad?.dpad.up.valueChangedHandler = { _, _, pressed in
             DispatchQueue.main.async {
-                emu.input(.up, pressed: pressed)
+                //                emu.input(.up, pressed: pressed)
             }
         }
         pad.extendedGamepad?.dpad.down.valueChangedHandler = { _, _, pressed in
             DispatchQueue.main.async {
-                emu.input(.down, pressed: pressed)
+                //                emu.input(.down, pressed: pressed)
             }
         }
     }

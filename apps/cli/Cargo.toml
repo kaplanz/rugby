@@ -27,7 +27,7 @@ either = { workspace = true }
 log = { workspace = true }
 minifb = "0.28.0"
 num_enum = "0.7.4"
-parking_lot = "0.12.4"
+parking_lot = { workspace = true }
 prettydiff = { version = "0.8.1", optional = true }
 ringbuf = "0.4.8"
 rubato = "0.16.2"

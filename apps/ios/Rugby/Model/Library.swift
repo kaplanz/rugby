@@ -17,7 +17,7 @@ extension UTType {
 }
 
 @Observable
-class Library {
+final class Library {
     /// Filesystem root.
     static let root = URL.documentsDirectory
 
@@ -79,10 +79,13 @@ class Library {
     }
 
     /// Checks if a game ROM is valid.
-    func precheck(url: URL) throws -> Bool {
+    func check(url: URL) throws -> Bool {
         // Acquire access permission
         if !url.startAccessingSecurityScopedResource() {
             throw Self.Error.access
+        }
+        defer {
+            url.stopAccessingSecurityScopedResource()
         }
         // Ensure valid ROM
         var valid = false
@@ -90,68 +93,117 @@ class Library {
             // Read the file data
             let data = try Data(contentsOf: url)
             // Try to construct a cartridge
-            let _ = try Cartridge(rom: data)
+            let _ = try Cartridge(data: data)
             // Mark as valid
             valid = true
         } catch let error as RugbyKit.Error {
             // Retain cartridge errors
             self.error.append(error)
         }
-        // Release access permission
-        url.stopAccessingSecurityScopedResource()
+
         // Return validity
         return valid
     }
 
-    /// Inserts a new title into the library.
-    func insert(src: URL) {
+    /// Adds a new title to the library
+    func add(url: URL) {
         // Acquire access permission
-        if !src.startAccessingSecurityScopedResource() {
-            fatalError("failed to securely access path: “\(src)”")
+        if !url.startAccessingSecurityScopedResource() {
+            fatalError("failed to securely access path: “\(url)”")
+        }
+        defer {
+            url.stopAccessingSecurityScopedResource()
         }
         // Filesystem operations
         let fs = FileManager.default
         do {
             // Create game directory
-            let dir = Self.root.appending(path: src.deletingPathExtension().lastPathComponent)
+            let dir = Self.root.appending(path: url.deletingPathExtension().lastPathComponent)
             try fs.createDirectory(at: dir, withIntermediateDirectories: true)
             // Copy game ROM
-            let rom = dir.appending(path: src.lastPathComponent)
-            try fs.copyItem(at: src, to: rom)
+            let rom = dir.appending(path: url.lastPathComponent)
+            try fs.copyItem(at: url, to: rom)
         } catch let error {
             log.error("filesystem: \(error.localizedDescription)")
         }
-        // Release access permission
-        src.stopAccessingSecurityScopedResource()
+
+        // Reload game library
+        reload()
+    }
+
+    /// Copies a title in the library.
+    func copy(game: Game, as name: String? = nil) {
+        let fs = FileManager.default
+
+        // Generate a unique name
+        let name =
+            name
+            ?? {
+                // Declare starting name, index
+                var base = game.name  // base off of source's name
+                var idx = 2  // start the copy index at 2
+                // Update base, index on existing copies
+                if let range = base.range(of: " ", options: .backwards),
+                    let count = Int(base[range.upperBound...]),
+                    count < 500
+                {
+                    base = String(base[..<range.lowerBound])
+                    idx = count + 1
+                }
+                // Search for available name
+                let root = Library.root
+                var name: String
+                repeat {
+                    name = "\(base) \(idx)"
+                    idx += 1
+                } while fs.fileExists(
+                    atPath: root.appending(component: name).path(percentEncoded: false)
+                )
+                // Return first available name
+                return name
+            }()
+
+        // Filesystem operations
+        do {
+            // Copy game directory
+            let src = game.path.root
+            let dst = src.deletingLastPathComponent().appendingPathComponent(name)
+            try fs.copyItem(at: src, to: dst)
+            // Rename copied files
+            try fs.contentsOfDirectory(at: dst, includingPropertiesForKeys: nil)
+                .filter { $0.lastPathComponent != name }
+                .forEach { old in
+                    let new = dst.appending(path: name).appendingPathExtension(old.pathExtension)
+                    try fs.moveItem(at: old, to: new)
+                }
+        } catch let error {
+            log.error("filesystem: \(error.localizedDescription)")
+        }
+
         // Reload game library
         reload()
     }
 
     /// Renames a title in the library.
-    func rename(game: Game, to name: String) {
+    func move(game: Game, to name: String) {
         // Filesystem operations
         let fs = FileManager.default
         do {
             // Rename game files
-            let src = game.path.deletingLastPathComponent()
-            try fs.contentsOfDirectory(
-                at: src,
-                includingPropertiesForKeys: nil
-            )
-            .filter { $0.lastPathComponent != name }
-            .forEach { file in
-                let dest =
-                    src
-                    .appending(path: name)
-                    .appendingPathExtension(file.pathExtension)
-                try fs.moveItem(at: file, to: dest)
-            }
+            let src = game.path.root
+            try fs.contentsOfDirectory(at: src, includingPropertiesForKeys: nil)
+                .filter { $0.lastPathComponent != name }
+                .forEach { old in
+                    let new = src.appending(path: name).appendingPathExtension(old.pathExtension)
+                    try fs.moveItem(at: old, to: new)
+                }
             // Rename game directory
             let dst = src.deletingLastPathComponent().appendingPathComponent(name)
             try fs.moveItem(at: src, to: dst)
         } catch let error {
             log.error("filesystem: \(error.localizedDescription)")
         }
+
         // Reload game library
         reload()
     }
@@ -162,11 +214,11 @@ class Library {
         let fs = FileManager.default
         do {
             // Remove game directory
-            let dir = game.path.deletingLastPathComponent()
-            try fs.trashItem(at: dir, resultingItemURL: nil)
+            try fs.trashItem(at: game.path.root, resultingItemURL: nil)
         } catch let error {
             log.error("filesystem: \(error.localizedDescription)")
         }
+
         // Reload game library
         reload()
     }

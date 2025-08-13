@@ -13,6 +13,8 @@ use super::pic::{self, Interrupt};
 use crate::api::part::joypad::{Event, Input, Joypad as Api, State};
 
 /// Joypad inputs.
+///
+/// Represents the 4 face buttons and directional inputs on the joypad.
 #[rustfmt::skip]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Button {
