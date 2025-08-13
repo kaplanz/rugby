@@ -13,7 +13,7 @@ mod api;
 mod err;
 mod log;
 
-use std::sync::Once;
+use parking_lot::Once;
 
 pub use self::api::*;
 pub use self::err::*;

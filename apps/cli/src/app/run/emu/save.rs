@@ -46,7 +46,6 @@ pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
         .take(0x0002_0000); // cartridge ROM has a maximum of 128 KiB
     // Load into cartridge
     let nbytes = cart
-        .body_mut()
         .flash(&mut file)
         .with_context(|| format!("failed to read: `{}", path.display()))?;
     debug!(
@@ -92,7 +91,6 @@ pub fn dump(args: &opt::emu::Cart, cart: &Cartridge) -> Result<()> {
         File::create(&path).with_context(|| format!("failed to open: `{}`", path.display()))?;
     // Save from cartridge
     let nbytes = cart
-        .body()
         .dump(&mut file)
         .with_context(|| format!("failed to write: `{}", path.display()))?;
     debug!(

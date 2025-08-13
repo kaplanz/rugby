@@ -9,12 +9,12 @@ pub(crate) mod has;
 /// Emulator core.
 pub trait Core: Block + Sized {
     /// Borrow the core's insides.
-    fn inside(&self) -> Inside<Self> {
+    fn inside(&'_ self) -> Inside<'_, Self> {
         Inside(self)
     }
 
     /// Mutably borrow the core's insides.
-    fn inside_mut(&mut self) -> InsideMut<Self> {
+    fn inside_mut(&'_ mut self) -> InsideMut<'_, Self> {
         InsideMut(self)
     }
 }

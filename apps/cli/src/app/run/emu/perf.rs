@@ -4,7 +4,7 @@ use std::time::Instant;
 
 /// Emulator performance measurements.
 ///
-/// Calculates the running frame rate of an emulator task,
+/// Calculates the running frame rate of the emulator thread.
 #[derive(Clone, Debug)]
 pub struct Profiler {
     /// Clock instant
@@ -16,8 +16,8 @@ pub struct Profiler {
 impl Default for Profiler {
     fn default() -> Self {
         Self {
-            idx: u32::default(),
             clk: Instant::now(),
+            idx: u32::default(),
         }
     }
 }
@@ -35,16 +35,12 @@ impl Profiler {
     }
 
     /// Ticks the profiler.
-    ///
-    /// # Returns
-    ///
-    /// Every second, the profiler will return the wall-clock cycle count.
     pub fn tick(&mut self) {
         // Increment counter
         self.idx += 1;
     }
 
-    /// Ticks the profiler by the specified amount.
+    /// Ticks the profiler by the specified number of cycles.
     #[allow(unused)]
     pub fn tick_by(&mut self, count: u32) {
         // Increment counter

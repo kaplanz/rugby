@@ -9,7 +9,7 @@ use super::{Data, Mbc};
 /// [MBC5][mbc5] cartridge type.
 ///
 /// [mbc5]: https://gbdev.io/pandocs/MBC5.html
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Mbc5 {
     ctl: Control,
     pub(super) rom: Shared<Rom>,

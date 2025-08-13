@@ -173,7 +173,7 @@ pub fn main(args: &Cli) -> Result<()> {
             }
         }
 
-        // Register clocked cycle
+        // Count clocked cycle
         ctx.clock.tick();
         ctx.batch.tick();
         ctx.total += 1;
