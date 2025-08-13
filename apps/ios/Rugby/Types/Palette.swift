@@ -5,6 +5,7 @@
 //  Created by Zakhary Kaplan on 2025-01-20.
 //
 
+import ColorTokensKit
 import Foundation
 import SwiftUI
 
@@ -75,6 +76,13 @@ enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
         case .velvetCherry:
             return .velvetCherry
         }
+    }
+
+    /// Palette tint.
+    var tint: Color {
+        let base = Color.blue.toLCH()
+        let tint = Color(rgb: data.c1).toLCH()
+        return LCHColor(l: base.l, c: base.c, h: tint.h).toColor()
     }
 
     // impl CustomStringConvertible
