@@ -1,10 +1,8 @@
 //! Emulator API.
 
-use std::sync::{Arc, RwLock};
-
+use parking_lot::RwLock;
 use rugby::arch::Block;
 use rugby::core::dmg;
-use rugby::prelude::*;
 
 pub mod cart;
 pub mod joypad;
@@ -15,9 +13,7 @@ pub mod video;
 #[uniffi::export(Debug)]
 pub struct GameBoy {
     /// Internal emulator model.
-    emu: RwLock<dmg::GameBoy>,
-    /// External cartridge model.
-    pak: RwLock<Option<Arc<cart::Cartridge>>>,
+    inner: RwLock<dmg::GameBoy>,
 }
 
 #[uniffi::export]
@@ -32,42 +28,8 @@ impl GameBoy {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            emu: dmg::GameBoy::new().into(),
-            pak: None.into(),
+            inner: dmg::GameBoy::new().into(),
         }
-    }
-
-    /// Runs the emulator for a number of cycles.
-    ///
-    /// This simply [cycles](Self::cycle) the emulator until the next frame is
-    /// ready. It is practically useful mostly as an optimization.
-    ///
-    /// # Returns
-    ///
-    /// Returns the number of cycles emulated.
-    #[uniffi::method(default(timeout = Some(70224)))]
-    pub fn run(&self, timeout: Option<u32>) -> u32 {
-        // Define cycle count
-        let mut idx = 0;
-        // Unlock emulator
-        let mut emu = self.emu.write().unwrap();
-        // Loop until vsync or timeout
-        loop {
-            // Check for timeout
-            if timeout.is_some_and(|max| idx >= max) {
-                break;
-            }
-            // Tick emulator
-            emu.cycle();
-            // Increment count
-            idx += 1;
-            // Check for vsync
-            if emu.inside().video().vsync() {
-                break;
-            }
-        }
-        // Return cycle count
-        idx
     }
 }
 
@@ -82,7 +44,7 @@ impl GameBoy {
     /// This should generally be checked before calling [`Self::cycle`].
     #[uniffi::method]
     pub fn ready(&self) -> bool {
-        self.emu.read().unwrap().ready()
+        self.inner.read().ready()
     }
 
     /// Emulates a single cycle.
@@ -96,7 +58,7 @@ impl GameBoy {
     /// of 4 MiHz).
     #[uniffi::method]
     pub fn cycle(&self) {
-        self.emu.write().unwrap().cycle();
+        self.inner.write().cycle();
     }
 
     /// Performs a soft reset.
@@ -110,7 +72,7 @@ impl GameBoy {
     /// [`Self::new`].
     #[uniffi::method]
     pub fn reset(&self) {
-        self.emu.write().unwrap().reset();
+        self.inner.write().reset();
     }
 }
 

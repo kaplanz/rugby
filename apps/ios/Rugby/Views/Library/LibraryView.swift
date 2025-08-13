@@ -5,18 +5,17 @@
 //  Created by Zakhary Kaplan on 2024-06-20.
 //
 
-import RugbyKit
 import SwiftUI
 
 struct LibraryView: View {
     @Environment(Library.self) private var lib
 
-    /// Present file import dialog.
-    @State private var file = false
+    /// Present file importer.
+    @State private var fileImport = false
     /// Searchable text query.
     @State private var query = String()
 
-    /// Filtered and sorted games
+    /// Game library.
     private var games: [Game] {
         lib
             .games
@@ -35,7 +34,7 @@ struct LibraryView: View {
                 spacing: 12,
             ) {
                 ForEach(games, id: \.self) { game in
-                    GameItem(game: game)
+                    LibraryItem(game: game)
                 }
             }
             .padding()
@@ -57,27 +56,27 @@ struct LibraryView: View {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button("Import", systemImage: "plus") {
-                    file.toggle()
+                    fileImport.toggle()
                 }
                 .buttonStyle(.glassProminent)
                 .fileImporter(
-                    isPresented: $file,
+                    isPresented: $fileImport,
                     allowedContentTypes: [.dmg, .cgb],
                     allowsMultipleSelection: true
                 ) { result in
                     // Extract files on success
-                    guard case let .success(files) = result else {
+                    guard case .success(let files) = result else {
                         return
                     }
                     // Iterate over selected files
                     files
                         .filter { file in
                             // Ensure valid ROM
-                            return (try? lib.precheck(url: file)) ?? false
+                            return (try? lib.check(url: file)) ?? false
                         }
                         .forEach { file in
                             // Attempt to add to library
-                            lib.insert(src: file)
+                            lib.add(url: file)
                             // Release access permission
                             file.stopAccessingSecurityScopedResource()
                         }

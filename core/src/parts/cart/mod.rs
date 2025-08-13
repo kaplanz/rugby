@@ -10,27 +10,30 @@
 //! [header]: https://gbdev.io/pandocs/The_Cartridge_Header.html
 //! [mbcs]:   https://gbdev.io/pandocs/MBCs.html
 
+use std::io;
+
 use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Mmio};
 use thiserror::Error;
 
-use self::header::Header;
-use self::header::parts::Board;
-use self::mbc::Body;
+use self::chip::Chip;
+use self::head::parts::Board;
 
-pub mod header;
-pub mod mbc;
+pub mod chip;
+pub mod head;
+
+pub use self::head::Header;
 
 /// Game cartridge.
 ///
 /// Parses a [`Header`] from the ROM, then initializes the memory bank
 /// controller ([`mbc`]).
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Cartridge {
     /// Cartridge header.
-    head: Header,
-    /// Cartridge body.
-    body: Body,
+    pub(crate) head: Header,
+    /// Cartridge hardware.
+    pub(crate) chip: Chip,
 }
 
 impl Cartridge {
@@ -43,12 +46,23 @@ impl Cartridge {
     pub fn new(rom: &[u8]) -> Result<Self> {
         let head = Header::new(rom)?;
         Ok(Self {
-            body: Body::new(&head, rom)?,
+            chip: Chip::new(&head, rom)?,
             head,
         })
     }
 
-    /// Constructs a new `Cartridge` explicitly checking the entire header.
+    /// Checks a if ROM has can reasonably be constructed.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the ROM contained invalid header bytes, or if
+    /// cartridge integrity seems compromised. (This is detected using
+    /// checksums.)
+    pub fn check(rom: &[u8]) -> Result<()> {
+        Header::check(rom).map_err(Into::into)
+    }
+
+    /// Constructs a new `Cartridge`, checking for cartridge integrity.
     ///
     /// # Errors
     ///
@@ -57,7 +71,7 @@ impl Cartridge {
     pub fn checked(rom: &[u8]) -> Result<Self> {
         let head = Header::checked(rom)?;
         Ok(Self {
-            body: Body::new(&head, rom)?,
+            chip: Chip::new(&head, rom)?,
             head,
         })
     }
@@ -71,49 +85,62 @@ impl Cartridge {
     pub fn unchecked(rom: &[u8]) -> Result<Self> {
         let head = Header::unchecked(rom)?;
         Ok(Self {
-            body: Body::new(&head, rom)?,
+            chip: Chip::new(&head, rom)?,
             head,
         })
     }
 
-    /// Gets the cartridge's title.
+    /// Reads the cartridge's title from the header.
+    ///
+    /// # Note
+    ///
+    /// If the header's title field is either unspecified or invalid, a
+    /// placeholder of "Unknown" is used instead.
     #[must_use]
     pub fn title(&self) -> &str {
         self.head.about.title.as_deref().unwrap_or("Unknown")
     }
 
-    /// Gets the cartridge's header.
+    /// Gets the cartridge's parsed header.
     #[must_use]
     pub fn header(&self) -> &Header {
         &self.head
     }
 
-    /// Gets the cartridge's body.
-    #[must_use]
-    pub fn body(&self) -> &Body {
-        &self.body
+    /// Flashes data onto the cartridge's RAM.
+    ///
+    /// # Errors
+    ///
+    /// May generate an I/O error indicating that the operation could not be
+    /// completed. If an error is returned then no bytes were read.
+    pub fn flash(&mut self, buf: &mut impl io::Read) -> io::Result<usize> {
+        self.chip.flash(buf)
     }
 
-    /// Mutably gets the cartridge's body.
-    #[must_use]
-    pub fn body_mut(&mut self) -> &mut Body {
-        &mut self.body
+    /// Dumps contents of the cartridge's RAM.
+    ///
+    /// # Errors
+    ///
+    /// May generate an I/O error indicating that the operation could not be
+    /// completed. If an error is returned then no bytes were written.
+    pub fn dump(&self, buf: &mut impl io::Write) -> io::Result<usize> {
+        self.chip.dump(buf)
     }
 }
 
 impl Block for Cartridge {
     fn reset(&mut self) {
-        self.body.reset();
+        self.chip.reset();
     }
 }
 
 impl Mmio for Cartridge {
     fn attach(&self, bus: &mut Bus) {
-        self.body.attach(bus);
+        self.chip.attach(bus);
     }
 
     fn detach(&self, bus: &mut Bus) {
-        self.body.detach(bus);
+        self.chip.detach(bus);
     }
 }
 
@@ -125,7 +152,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 pub enum Error {
     /// Bad cartridge header.
     #[error("bad cartridge header")]
-    Header(#[from] header::Error),
+    Header(#[from] head::Error),
     /// Unsupported cartridge type.
     #[error("unsupported cartridge: {0}")]
     Unsupported(Board),
