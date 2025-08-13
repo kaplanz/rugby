@@ -393,7 +393,6 @@ pub mod parts {
         derive(serde::Deserialize, serde::Serialize),
         serde(tag = "chip", content = "spec")
     )]
-    #[non_exhaustive]
     pub enum Board {
         #[cfg_attr(feature = "serde", serde(rename = "None"))]
         None { exram: bool, power: bool },
