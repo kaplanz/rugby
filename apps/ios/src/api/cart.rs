@@ -16,12 +16,7 @@ impl GameBoy {
     /// If a cartridge is already inserted, it will first be
     /// [ejected](Self::eject).
     #[uniffi::method]
-    pub fn insert(&self, cart: Arc<Cartridge>) -> Result<()> {
-        // Ensure cartridge slot is empty
-        if self.inner.read().cart().is_some() {
-            return Err("cartridge slot is not empty".to_string().into());
-        }
-
+    pub fn insert(&self, cart: Arc<Cartridge>) {
         // Obtain internal cartridge model
         let cart = Arc::try_unwrap(cart).map_or_else(
             // consume cart if unique
@@ -32,8 +27,6 @@ impl GameBoy {
 
         // Insert the cartridge
         self.inner.write().insert(cart);
-
-        Ok(())
     }
 
     /// Ejects the inserted game cartridge.
@@ -69,7 +62,7 @@ pub struct Cartridge {
 /// checksums.)
 #[uniffi::export]
 pub fn check(data: &[u8]) -> Result<()> {
-    dmg::Cartridge::check(data).map_err(|err| err.to_string().into())
+    dmg::Cartridge::check(data).map_err(Into::into)
 }
 
 #[uniffi::export]
@@ -88,7 +81,7 @@ impl Cartridge {
                 // Build external model from game
                 inner: Mutex::new(cart),
             })
-            .map_err(|err| err.to_string().into())
+            .map_err(Into::into)
     }
 
     /// Retrieves the cartridge header.
@@ -105,7 +98,7 @@ impl Cartridge {
             .lock()
             .flash(&mut io::Cursor::new(save))
             .map(|_| ())
-            .map_err(|err| err.to_string().into())
+            .map_err(Into::into)
     }
 
     /// Dumps contents of the cartridge's RAM.
@@ -113,10 +106,7 @@ impl Cartridge {
     pub fn dump(&self) -> Result<Vec<u8>> {
         // Dump RAM as data
         let mut buf = Vec::new();
-        self.inner
-            .lock()
-            .dump(&mut buf)
-            .map_err(|err| err.to_string())?;
+        self.inner.lock().dump(&mut buf)?;
         Ok(buf)
     }
 }
@@ -171,7 +161,7 @@ pub struct Header {
 pub fn header(data: &[u8]) -> Result<Header> {
     dmg::cart::Header::new(data)
         .map(Into::into)
-        .map_err(|err| err.to_string().into())
+        .map_err(Into::into)
 }
 
 impl From<dmg::cart::Header> for Header {

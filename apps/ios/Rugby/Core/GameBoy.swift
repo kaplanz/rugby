@@ -84,7 +84,7 @@ private func main(cxn: Connect) {
             switch event.take() {
             case .insert(let cart):
                 // Insert cartridge
-                try! emu.insert(cart: cart)
+                emu.insert(cart: cart)
                 event = nil
             case .eject:
                 // Remove cartridge
@@ -317,7 +317,11 @@ extension GameBoy: Core {
     }
 
     func eject() -> Cartridge? {
-        cxn.slot.eject()
+        if job != nil {
+            cxn.slot.eject()
+        } else {
+            nil
+        }
     }
 
     func start() {

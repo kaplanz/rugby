@@ -1,19 +1,20 @@
 //! Error types.
 
+use rugby::core::dmg;
 use thiserror::Error;
 
 /// A convenient type alias for [`Result`](std::result::Result).
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by an invalid operation.
-#[derive(Clone, Debug, Error, uniffi::Error)]
-#[error("{0}")]
+#[derive(Debug, Error, uniffi::Error)]
+#[error(transparent)]
+#[uniffi(flat_error)]
 pub enum Error {
-    Message(String),
-}
-
-impl From<String> for Error {
-    fn from(msg: String) -> Self {
-        Self::Message(msg)
-    }
+    /// Input error.
+    Ioput(#[from] std::io::Error),
+    /// Header error.
+    Header(#[from] dmg::cart::head::Error),
+    /// Cartridge error.
+    Cartridge(#[from] dmg::cart::Error),
 }

@@ -22,6 +22,8 @@ struct Build {
 struct RugbyApp: App {
     /// Runtime data.
     @State private var app: Runtime = .init()
+    /// Emulator error.
+    @State private var err: Failure = .init()
     /// Game library.
     @State private var lib: Library = .init()
     /// App settings.
@@ -43,16 +45,29 @@ struct RugbyApp: App {
                         return
                     }
                     // Add to library
-                    lib.add(url: url)
+                    do { try lib.add(url: url) } catch { err.or = error }
                     // Play new import
                     let name = url.deletingPathExtension().lastPathComponent
                     if let game = lib.games.first(where: { $0.name == name }) {
                         app.play(game)
                     }
                 }
+                .alert(
+                    "Error",
+                    isPresented: Binding(
+                        get: { err.or != nil },
+                        set: { if !$0 { err.or = nil } },
+                    ),
+                    presenting: err.or,
+                ) { _ in
+                    Button("OK", role: .cancel) {}
+                } message: { error in
+                    Text(error.localizedDescription)
+                }
                 .tint(opt.data.pal.tint)
         }
         .environment(app)
+        .environment(err)
         .environment(lib)
         .environment(opt)
     }
