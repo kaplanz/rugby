@@ -264,5 +264,6 @@ private struct Badge: View {
                 RoundedRectangle(cornerRadius: 4)
                     .stroke(color, lineWidth: 1.5)
             }
+            .environment(Runtime())
     }
 }

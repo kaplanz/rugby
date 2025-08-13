@@ -122,6 +122,8 @@ struct LibraryItem: View {
     {
         LibraryItem(game: game)
             .frame(width: 160, height: 144)
+            .environment(Runtime())
+            .environment(Failure())
             .environment(Library())
     }
 }

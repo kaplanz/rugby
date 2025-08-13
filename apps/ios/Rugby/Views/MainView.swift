@@ -72,5 +72,7 @@ struct MainView: View {
 #Preview {
     MainView()
         .environment(Runtime())
+        .environment(Failure())
+        .environment(Options())
         .environment(Library())
 }
