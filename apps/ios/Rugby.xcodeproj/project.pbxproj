@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		964989392E43AFC900AA1C84 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 964989382E43AFC900AA1C84 /* Atomics */; };
+		96AAAA362E4290E50062F554 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 96AAAA352E4290E50062F554 /* Collections */; };
 		96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0C2D40299D009ED7D7 /* RugbyKit */; };
 		96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0F2D4029A5009ED7D7 /* Algorithms */; };
 /* End PBXBuildFile section */
@@ -41,8 +43,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96AAAA362E4290E50062F554 /* Collections in Frameworks */,
 				96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */,
 				96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */,
+				964989392E43AFC900AA1C84 /* Atomics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +91,8 @@
 			packageProductDependencies = (
 				96EFDD0C2D40299D009ED7D7 /* RugbyKit */,
 				96EFDD0F2D4029A5009ED7D7 /* Algorithms */,
+				96AAAA352E4290E50062F554 /* Collections */,
+				964989382E43AFC900AA1C84 /* Atomics */,
 			);
 			productName = Rugby;
 			productReference = 9695680B2D4028A700AA8A83 /* Rugby.app */;
@@ -119,6 +125,8 @@
 			packageReferences = (
 				96EFDD0B2D40299D009ED7D7 /* XCLocalSwiftPackageReference "pkg" */,
 				96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9695680C2D4028A700AA8A83 /* Products */;
@@ -282,7 +290,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = Rugby/Previews;
+				DEVELOPMENT_ASSET_PATHS = Rugby/Files/ROMs;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rugby/Info.plist;
@@ -315,7 +323,6 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = Rugby/Previews;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Rugby/Info.plist;
@@ -371,6 +378,22 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-atomics.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+		96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
 		96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
@@ -382,6 +405,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		964989382E43AFC900AA1C84 /* Atomics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */;
+			productName = Atomics;
+		};
+		96AAAA352E4290E50062F554 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
 		96EFDD0C2D40299D009ED7D7 /* RugbyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RugbyKit;

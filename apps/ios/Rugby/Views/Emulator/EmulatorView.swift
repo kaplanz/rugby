@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct EmulatorView: View {
-    @Environment(GameBoy.self) private var emu
-    @Environment(\.scenePhase) var scenePhase
+    @Environment(Runtime.self) private var app
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// Emulator instance.
+    @State var emu: Emulator = .init()
 
     /// Emulator paused.
     @State private var paused = false
@@ -18,62 +21,39 @@ struct EmulatorView: View {
     /// Manage this game.
     @State private var manage = false
 
-    /// Emulation play status.
-    @State private var status: Status? {
-        didSet {
-            if let status {
-                switch status {
-                case .sprint:
-                    emu.clock(speed: nil)
-                case .rewind:
-                    print("unimplemented")
-                }
-            } else {
-                emu.clock(speed: emu.cfg.data.spd.rawValue)
-            }
-        }
-    }
-
-    /// Emulation play status.
-    enum Status {
-        /// Fast forward.
-        case sprint
-        /// Rewind history.
-        case rewind
-    }
-
-    /// Extra toolbar items.
-    @State private var extras = Extras()
-
-    /// Extra toolbar items.
-    struct Extras {
-        /// Quick controls.
-        var ctrl = false
-        /// Frame rate.
-        var rate = false
-    }
-
-    /// Should the emulator be running?
+    /// Emulator enabled.
     private var enable: Bool {
         !paused && !detail && !manage && scenePhase == .active
     }
 
+    /// Video output frame.
+    private var frame: UIImage? {
+        emu.video.image.map { UIImage(cgImage: $0) }
+    }
+
     var body: some View {
+        let call = { (input, press) in
+            emu.input.queue.withLock { queue in
+                queue.append((input, press))
+            }
+        }
+
         GeometryReader { geo in
             if geo.size.height > geo.size.width {
                 VStack {
-                    Screen()
+                    ScreenView(frame: frame)
+                        .id(frame)
                     Spacer()
-                    Joypad()
+                    JoypadView(call)
                     Spacer()
                 }
             } else {
                 HStack {
-                    Joypad(part: .left)
+                    JoypadView(call, part: .left)
                     Spacer()
-                    Screen()
+                    ScreenView()
                     Spacer()
-                    Joypad(part: .right)
+                    JoypadView(call, part: .right)
                 }
             }
         }
@@ -82,25 +62,12 @@ struct EmulatorView: View {
         .toolbar {
             ToolbarSpacer(placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                Controls
+                menu
             }
-        }
-        .alert(
-            "Error",
-            isPresented: Binding(
-                get: { emu.error != nil },
-                set: { if !$0 { emu.error = nil } }
-            ), presenting: emu.error
-        ) { _ in
-            Button("OK", role: .cancel) {
-                emu.stop()
-            }
-        } message: { error in
-            Text(error.localizedDescription)
         }
         .sheet(isPresented: $detail) {
             NavigationStack {
-                GameInfo(game: emu.game!)
+                GameInfoView(game: app.game!)
                     .toolbar {
                         Button("Done", systemImage: "checkmark", role: .confirm) {
                             detail.toggle()
@@ -120,19 +87,25 @@ struct EmulatorView: View {
                     }
             }
         }
+        .onAppear {
+            emu.play(app.game!)
+        }
         .onChange(of: enable) {
             emu.pause(!enable)
         }
+        .onDisappear {
+            emu.stop()
+        }
     }
 
-    var Controls: some View {
+    var menu: some View {
         Menu("Controls", systemImage: "ellipsis") {
             // Playback
             ControlGroup {
                 Button {
-                    status = (status == .rewind) ? nil : .rewind
+                    // TODO: Implement rewind
                 } label: {
-                    Label("Rewind", systemImage: status == .rewind ? "backward.fill" : "backward")
+                    Label("Rewind", systemImage: false ? "backward.fill" : "backward")
                 }
                 .disabled(true)
                 Button {
@@ -143,15 +116,17 @@ struct EmulatorView: View {
                         : Label("Pause", systemImage: "pause.fill")
                 }
                 Button {
-                    status = (status == .sprint) ? nil : .sprint
+                    // TODO: Implement forward
                 } label: {
-                    Label("Forward", systemImage: status == .sprint ? "forward.fill" : "forward")
+                    Label("Forward", systemImage: false ? "forward.fill" : "forward")
                 }
+                .disabled(true)
             }
-            .labelStyle(.iconOnly)
             // Emulator
-            Button("Reset", systemImage: "arrow.counterclockwise") {
-                emu.reset()
+            Section {
+                Button("Reset", systemImage: "arrow.counterclockwise") {
+                    emu.reset(.soft)
+                }
             }
             // Information
             Section {
@@ -165,11 +140,10 @@ struct EmulatorView: View {
             // Application
             Section {
                 Button("Exit", systemImage: "xmark", role: .destructive) {
-                    emu.stop()
+                    app.stop()
                 }
             }
         }
-        .menuActionDismissBehavior(.disabled)
     }
 }
 
@@ -177,7 +151,7 @@ struct EmulatorView: View {
     NavigationStack {
         EmulatorView()
     }
-    .environment(GameBoy())
+    .environment(Runtime())
 }
 
 private struct Background: View {

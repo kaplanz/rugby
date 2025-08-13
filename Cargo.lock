@@ -1937,6 +1937,7 @@ version = "0.1.0"
 dependencies = [
  "bfmt",
  "log",
+ "parking_lot",
  "rugby",
  "thiserror 2.0.12",
  "uniffi",
