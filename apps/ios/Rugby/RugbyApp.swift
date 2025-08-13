@@ -64,7 +64,13 @@ struct RugbyApp: App {
                 } message: { error in
                     Text(error.localizedDescription)
                 }
-                .tint(opt.data.pal.tint)
+        }
+        .onChange(of: opt.data.pal.tint, initial: true) { _, tint in
+            UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap {
+                $0.windows
+            }.forEach { window in
+                window.tintColor = UIColor(tint)
+            }
         }
         .environment(app)
         .environment(err)
