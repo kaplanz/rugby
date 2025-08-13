@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EmulatorView: View {
     @Environment(Runtime.self) private var app
+    @Environment(Failure.self) private var err
     @Environment(\.scenePhase) private var scenePhase
 
     /// Emulator instance.
@@ -88,13 +89,13 @@ struct EmulatorView: View {
             }
         }
         .onAppear {
-            emu.play(app.game!)
+            do { try emu.play(app.game!) } catch { err.or = error }
         }
         .onChange(of: enable) {
             emu.pause(!enable)
         }
         .onDisappear {
-            emu.stop()
+            do { try emu.stop() } catch { err.or = error }
         }
     }
 

@@ -33,10 +33,12 @@ final class Emulator {
     }
 
     /// Plays a game.
-    func play(_ game: Game) {
+    func play(_ game: Game) throws {
         // Initialize
-        let cart = try! Cartridge(data: game.data)
-        game.save.map { try! cart.flash(save: $0) }
+        let cart = try Cartridge(data: game.data)
+        if let save = game.save {
+            try cart.flash(save: save)
+        }
         // Insert cart
         core.play(cart)
         // Retain game
@@ -44,13 +46,13 @@ final class Emulator {
     }
 
     /// Stops emulation.
-    func stop() {
+    func stop() throws {
         // Pause emulation
         self.pause()
         // Eject cartridge
         let cart = core.stop()
         // Update save RAM
-        game?.save = try! cart?.dump()
+        game?.save = try cart?.dump()
     }
 
     /// Pause emulation.
