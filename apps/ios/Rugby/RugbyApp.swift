@@ -50,6 +50,7 @@ struct RugbyApp: App {
                         app.play(game)
                     }
                 }
+                .tint(opt.data.pal.tint)
         }
         .environment(app)
         .environment(lib)
