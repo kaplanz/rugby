@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		964989392E43AFC900AA1C84 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 964989382E43AFC900AA1C84 /* Atomics */; };
 		96AAAA362E4290E50062F554 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 96AAAA352E4290E50062F554 /* Collections */; };
+		96E2B0CB2E4BF6C4003F9028 /* ColorTokensKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */; };
 		96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0C2D40299D009ED7D7 /* RugbyKit */; };
 		96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0F2D4029A5009ED7D7 /* Algorithms */; };
 /* End PBXBuildFile section */
@@ -45,6 +46,7 @@
 			files = (
 				96AAAA362E4290E50062F554 /* Collections in Frameworks */,
 				96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */,
+				96E2B0CB2E4BF6C4003F9028 /* ColorTokensKit in Frameworks */,
 				96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */,
 				964989392E43AFC900AA1C84 /* Atomics in Frameworks */,
 			);
@@ -93,6 +95,7 @@
 				96EFDD0F2D4029A5009ED7D7 /* Algorithms */,
 				96AAAA352E4290E50062F554 /* Collections */,
 				964989382E43AFC900AA1C84 /* Atomics */,
+				96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */,
 			);
 			productName = Rugby;
 			productReference = 9695680B2D4028A700AA8A83 /* Rugby.app */;
@@ -127,6 +130,7 @@
 				96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */,
+				96E2B0C92E4BF6C4003F9028 /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9695680C2D4028A700AA8A83 /* Products */;
@@ -394,6 +398,14 @@
 				minimumVersion = 1.2.1;
 			};
 		};
+		96E2B0C92E4BF6C4003F9028 /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/metasidd/ColorTokensKit-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
 		96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
@@ -414,6 +426,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
+		};
+		96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 96E2B0C92E4BF6C4003F9028 /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */;
+			productName = ColorTokensKit;
 		};
 		96EFDD0C2D40299D009ED7D7 /* RugbyKit */ = {
 			isa = XCSwiftPackageProductDependency;
