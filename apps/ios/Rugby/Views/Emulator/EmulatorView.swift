@@ -153,6 +153,7 @@ struct EmulatorView: View {
         EmulatorView()
     }
     .environment(Runtime())
+    .environment(Failure())
 }
 
 private struct Background: View {
