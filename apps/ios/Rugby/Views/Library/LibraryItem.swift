@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LibraryItem: View {
     @Environment(Runtime.self) private var app
+    @Environment(Failure.self) private var err
     @Environment(Library.self) private var lib
 
     /// Game instance.
@@ -50,7 +51,7 @@ struct LibraryItem: View {
                     }
                     RenameButton()
                     Button("Duplicate", systemImage: "plus.square.on.square") {
-                        lib.copy(game: game)
+                        do { try lib.copy(game: game) } catch { err.or = error }
                     }
                 }
                 Section {
@@ -88,16 +89,13 @@ struct LibraryItem: View {
                 TextField(game.name, text: $rename.text)
                 Button("Cancel", role: .cancel) {}
                 Button("Rename") {
-                    lib.move(game: game, to: rename.text)
+                    do { try lib.move(game: game, to: rename.text) } catch { err.or = error }
                 }
             }
-            .alert(
-                "Are you sure you want to delete “\(game.name)”?",
-                isPresented: $delete
-            ) {
+            .alert("Are you sure you want to delete “\(game.name)”?", isPresented: $delete) {
                 Button("Cancel", role: .cancel) {}
                 Button("Delete", role: .destructive) {
-                    lib.delete(game: game)
+                    do { try lib.delete(game: game) } catch { err.or = error }
                 }
             } message: {
                 Text("This item will be moved to the trash.")
