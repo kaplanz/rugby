@@ -5,6 +5,7 @@
 //  Created by Zakhary Kaplan on 2025-01-09.
 //
 
+import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -68,11 +69,7 @@ final class Game {
         }
         set {
             withMutation(keyPath: \.save) {
-                do {
-                    try newValue?.write(to: path.save)
-                } catch let error {
-                    fatalError(error.localizedDescription)
-                }
+                try? newValue?.write(to: path.save)
             }
         }
     }
@@ -85,11 +82,7 @@ final class Game {
         }
         set {
             withMutation(keyPath: \.icon) {
-                do {
-                    try newValue?.pngData()?.write(to: path.icon)
-                } catch let error {
-                    fatalError(error.localizedDescription)
-                }
+                try? newValue?.pngData()?.write(to: path.icon)
             }
         }
     }
