@@ -10,6 +10,7 @@ import SwiftUI
 struct LibraryView: View {
     @Environment(Failure.self) private var err
     @Environment(Library.self) private var lib
+    @Environment(\.scenePhase) private var scenePhase
 
     /// Present file importer.
     @State private var fileImport = false
@@ -82,6 +83,11 @@ struct LibraryView: View {
                             file.stopAccessingSecurityScopedResource()
                         }
                 }
+            }
+        }
+        .onChange(of: scenePhase) {
+            if case .active = scenePhase {
+                do { try lib.reload() } catch { err.or = error }
             }
         }
     }
