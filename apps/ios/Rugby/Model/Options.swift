@@ -37,7 +37,7 @@ class Config {
         get {
             access(keyPath: \.pal)
             return UserDefaults.standard.string(forKey: "pal").flatMap { Palette(rawValue: $0) }
-                ?? .blueDream
+                ?? .demichrome
         }
         set {
             withMutation(keyPath: \.pal) {
