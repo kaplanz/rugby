@@ -11,8 +11,7 @@ use log::{debug, trace};
 use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Device, Mmio};
 
-use super::header::Header;
-use super::{Board, Error, Result};
+use super::{Board, Error, Header, Result};
 
 mod mbc1;
 mod mbc3;
@@ -39,16 +38,16 @@ pub trait Mbc {
 /// Cartridge body.
 ///
 /// Contains the cartridge's ROM and RAM, modelling cartridge-specific hardware.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
-pub enum Body {
+pub(crate) enum Chip {
     None(None),
     Mbc1(Mbc1),
     Mbc3(Mbc3),
     Mbc5(Mbc5),
 }
 
-impl Body {
+impl Chip {
     /// Constructs a new `Body`.
     ///
     /// # Errors
@@ -65,65 +64,65 @@ impl Body {
         let ram = init::ram(head);
         // Construct body
         match &head.board {
-            &Board::None { .. } => Ok(Body::None(None::new(rom, ram))),
-            &Board::Mbc1 { .. } => Ok(Body::Mbc1(Mbc1::new(rom, ram))),
-            &Board::Mbc3 { .. } => Ok(Body::Mbc3(Mbc3::new(rom, ram))),
-            &Board::Mbc5 { .. } => Ok(Body::Mbc5(Mbc5::new(rom, ram))),
+            &Board::None { .. } => Ok(Chip::None(None::new(rom, ram))),
+            &Board::Mbc1 { .. } => Ok(Chip::Mbc1(Mbc1::new(rom, ram))),
+            &Board::Mbc3 { .. } => Ok(Chip::Mbc3(Mbc3::new(rom, ram))),
+            &Board::Mbc5 { .. } => Ok(Chip::Mbc5(Mbc5::new(rom, ram))),
             kind => Err(Error::Unsupported(kind.clone())),
         }
     }
 }
 
-impl Block for Body {
+impl Block for Chip {
     fn ready(&self) -> bool {
         match self {
-            Body::None(mbc) => mbc.ready(),
-            Body::Mbc1(mbc) => mbc.ready(),
-            Body::Mbc3(mbc) => mbc.ready(),
-            Body::Mbc5(mbc) => mbc.ready(),
+            Chip::None(mbc) => mbc.ready(),
+            Chip::Mbc1(mbc) => mbc.ready(),
+            Chip::Mbc3(mbc) => mbc.ready(),
+            Chip::Mbc5(mbc) => mbc.ready(),
         }
     }
 
     fn cycle(&mut self) {
         match self {
-            Body::None(mbc) => mbc.cycle(),
-            Body::Mbc1(mbc) => mbc.cycle(),
-            Body::Mbc3(mbc) => mbc.cycle(),
-            Body::Mbc5(mbc) => mbc.cycle(),
+            Chip::None(mbc) => mbc.cycle(),
+            Chip::Mbc1(mbc) => mbc.cycle(),
+            Chip::Mbc3(mbc) => mbc.cycle(),
+            Chip::Mbc5(mbc) => mbc.cycle(),
         }
     }
 
     fn reset(&mut self) {
         match self {
-            Body::None(mbc) => mbc.reset(),
-            Body::Mbc1(mbc) => mbc.reset(),
-            Body::Mbc3(mbc) => mbc.reset(),
-            Body::Mbc5(mbc) => mbc.reset(),
+            Chip::None(mbc) => mbc.reset(),
+            Chip::Mbc1(mbc) => mbc.reset(),
+            Chip::Mbc3(mbc) => mbc.reset(),
+            Chip::Mbc5(mbc) => mbc.reset(),
         }
     }
 }
 
-impl Mbc for Body {
+impl Mbc for Chip {
     fn rom(&self) -> Device {
         match self {
-            Body::None(mbc) => mbc.rom(),
-            Body::Mbc1(mbc) => mbc.rom(),
-            Body::Mbc3(mbc) => mbc.rom(),
-            Body::Mbc5(mbc) => mbc.rom(),
+            Chip::None(mbc) => mbc.rom(),
+            Chip::Mbc1(mbc) => mbc.rom(),
+            Chip::Mbc3(mbc) => mbc.rom(),
+            Chip::Mbc5(mbc) => mbc.rom(),
         }
     }
 
     fn ram(&self) -> Device {
         match self {
-            Body::None(mbc) => mbc.ram(),
-            Body::Mbc1(mbc) => mbc.ram(),
-            Body::Mbc3(mbc) => mbc.ram(),
-            Body::Mbc5(mbc) => mbc.ram(),
+            Chip::None(mbc) => mbc.ram(),
+            Chip::Mbc1(mbc) => mbc.ram(),
+            Chip::Mbc3(mbc) => mbc.ram(),
+            Chip::Mbc5(mbc) => mbc.ram(),
         }
     }
 }
 
-impl Mmio for Body {
+impl Mmio for Chip {
     fn attach(&self, bus: &mut Bus) {
         bus.map(0x0000..=0x7fff, self.rom());
         bus.map(0xa000..=0xbfff, self.ram());
@@ -135,7 +134,7 @@ impl Mmio for Body {
     }
 }
 
-impl Body {
+impl Chip {
     /// Flashes data onto the cartridge's RAM.
     ///
     /// # Errors
@@ -150,10 +149,10 @@ impl Body {
             })
         };
         match self {
-            Body::None(mbc) => flash(mbc.ram.borrow_mut().inner_mut()),
-            Body::Mbc1(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
-            Body::Mbc3(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
-            Body::Mbc5(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::None(mbc) => flash(mbc.ram.borrow_mut().inner_mut()),
+            Chip::Mbc1(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::Mbc3(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::Mbc5(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
         }
     }
 
@@ -171,10 +170,10 @@ impl Body {
             })
         };
         match self {
-            Body::None(mbc) => dump(mbc.ram.borrow_mut().inner_mut()),
-            Body::Mbc1(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
-            Body::Mbc3(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
-            Body::Mbc5(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::None(mbc) => dump(mbc.ram.borrow_mut().inner_mut()),
+            Chip::Mbc1(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::Mbc3(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::Mbc5(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
         }
     }
 }

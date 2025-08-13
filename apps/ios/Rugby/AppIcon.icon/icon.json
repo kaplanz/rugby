@@ -5,11 +5,12 @@
   "groups" : [
     {
       "blur-material" : 0.5,
+      "hidden" : false,
       "layers" : [
         {
           "hidden" : false,
-          "image-name" : "2 – Layer.svg",
-          "name" : "2 – Layer"
+          "image-name" : "Sticker.svg",
+          "name" : "Sticker"
         }
       ],
       "shadow" : {
@@ -24,11 +25,12 @@
     },
     {
       "blur-material" : null,
+      "hidden" : false,
       "layers" : [
         {
           "hidden" : false,
-          "image-name" : "1 – Layer.png",
-          "name" : "1 – Layer"
+          "image-name" : "Outline.png",
+          "name" : "Outline"
         }
       ],
       "lighting" : "individual",

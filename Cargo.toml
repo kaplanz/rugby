@@ -72,6 +72,7 @@ hexd = { version = "0.1.0", path = "crates/hexd" }
 itertools = "0.14.0"
 log = "0.4.27"
 num = "0.4.3"
+parking_lot = "0.12.4"
 png = "0.17.16"
 rugby = { version = "0.1.0", path = "." }
 rugby-arch = { version = "0.1.0", path = "arch" }

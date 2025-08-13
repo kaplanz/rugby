@@ -34,7 +34,7 @@ pub fn main(args: Cli) -> Result<()> {
         let data =
             init::util::load_exact::<0x150>(path).context("unable to load cartridge header")?;
         // Load cartridge header
-        cart::header::Header::new(&data).context("failed to construct cartridge header")?
+        cart::Header::new(&data).context("failed to construct cartridge header")?
     };
     println!(
         "{}",

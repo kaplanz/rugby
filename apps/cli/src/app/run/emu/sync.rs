@@ -47,7 +47,7 @@ impl Clocking {
     ///
     /// # Returns
     ///
-    /// Returns an indicator on whether an sync occurred.
+    /// Returns an indicator on whether a sync occurred.
     pub fn sync(&self) -> bool {
         // Only synchronze if a target frequency is provided.
         let &Self {
@@ -58,6 +58,7 @@ impl Clocking {
         else {
             return false;
         };
+
         // Compute sync timestamp
         //
         // Note the order of operations here is important, namely that the
@@ -65,12 +66,13 @@ impl Clocking {
         // frequency. Otherwise, rounding within the duration leads to a
         // precision loss, amounting to an overall skew in the emulated clock.
         let sync = clk + idx * Duration::from_secs(1) / frq;
+
         // Compare current time against schedule
         if sync.elapsed() > Duration::ZERO {
-            // If running early, no sync needed
+            // If running behind, no sync needed
             false
         } else {
-            // If running late, simply yield this thread. This causes the
+            // If running ahead, simply yield this thread. This causes the
             // operating system to reschedule us, allowing the wall-clock to
             // catch up.
             thread::yield_now();
@@ -81,7 +83,7 @@ impl Clocking {
 
     /// Ticks the synchronizer.
     pub fn tick(&mut self) {
-        // Checking for overflow in increment
+        // Check for overflow in increment
         if let Some(idx) = self.idx.checked_add(1) {
             // Increment cycle counter
             self.idx = idx;

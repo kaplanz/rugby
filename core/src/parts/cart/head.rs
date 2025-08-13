@@ -13,7 +13,7 @@ use std::fmt::Display;
 use std::str::Utf8Error;
 
 use log::error;
-use parts::{About, Board, Check, Memory, Region, Compat};
+use parts::{About, Board, Check, Compat, Memory, Region};
 use thiserror::Error;
 
 /// Nintendo logo.
@@ -57,7 +57,7 @@ pub fn gchk(rom: &[u8]) -> u16 {
 ///
 /// Information about the ROM and the cartridge containing it. Stored in the
 /// address range `[$0100, $0150)`.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Header {
     /// Game information.
@@ -107,13 +107,23 @@ impl Header {
         })
     }
 
-    /// Constructs a new `Header`, checking cartridge integrity.
+    /// Checks a if ROM contains a valid header.
     ///
     /// # Errors
     ///
     /// Returns an error if the ROM contained invalid header bytes, or if
     /// cartridge integrity seems compromised. (This is detected using
     /// checksums.)
+    pub fn check(rom: &[u8]) -> Result<()> {
+        Self::checked(rom).map(|_| ())
+    }
+
+    /// Constructs a new `Header`, checking for data integrity.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the ROM contained invalid header bytes, or if data
+    /// integrity seems compromised. (This is detected using checksums.)
     pub fn checked(rom: &[u8]) -> Result<Self> {
         let this = Self::new(rom)?;
 
@@ -240,7 +250,7 @@ pub mod parts {
     use super::Error;
 
     /// Game information.
-    #[derive(Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, Eq, PartialEq)]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     pub struct About {
         /// `[$0134..=$0143]`: Title.
@@ -283,7 +293,7 @@ pub mod parts {
     }
 
     /// Data integrity.
-    #[derive(Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, Eq, PartialEq)]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     pub struct Check {
         /// `[$0104..=$0133]`: Nintendo logo.
@@ -317,7 +327,7 @@ pub mod parts {
     }
 
     /// Memory hardware.
-    #[derive(Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, Eq, PartialEq)]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     pub struct Memory {
         /// `[$0148]`: ROM size.
@@ -339,7 +349,7 @@ pub mod parts {
     }
 
     /// Model compatibility.
-    #[derive(Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, Eq, PartialEq)]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     pub struct Compat {
         /// `[$0143]`: DMG flag.
@@ -586,7 +596,9 @@ pub mod parts {
         serde(rename_all = "lowercase")
     )]
     pub enum Region {
+        /// Worldwide release.
         World,
+        /// Japanese exclusive.
         Japan,
     }
 
