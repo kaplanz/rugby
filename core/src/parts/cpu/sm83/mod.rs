@@ -354,7 +354,7 @@ pub struct Control {
 
 impl Control {
     /// Joint AF register.
-    pub(crate) fn af(&self) -> Alias {
+    pub(crate) fn af(&'_ self) -> Alias<'_> {
         Alias {
             hi: &self.a,
             lo: &self.f,
@@ -362,7 +362,7 @@ impl Control {
     }
 
     /// Joint mutable AF register.
-    pub(crate) fn af_mut(&mut self) -> AliasMut {
+    pub(crate) fn af_mut(&'_ mut self) -> AliasMut<'_> {
         AliasMut {
             hi: &mut self.a,
             lo: &mut self.f,
@@ -370,7 +370,7 @@ impl Control {
     }
 
     /// Joint BC register.
-    pub(crate) fn bc(&self) -> Alias {
+    pub(crate) fn bc(&'_ self) -> Alias<'_> {
         Alias {
             hi: &self.b,
             lo: &self.c,
@@ -378,7 +378,7 @@ impl Control {
     }
 
     /// Joint mutable BC register.
-    pub(crate) fn bc_mut(&mut self) -> AliasMut {
+    pub(crate) fn bc_mut(&'_ mut self) -> AliasMut<'_> {
         AliasMut {
             hi: &mut self.b,
             lo: &mut self.c,
@@ -386,7 +386,7 @@ impl Control {
     }
 
     /// Joint DE register.
-    pub(crate) fn de(&self) -> Alias {
+    pub(crate) fn de(&'_ self) -> Alias<'_> {
         Alias {
             hi: &self.d,
             lo: &self.e,
@@ -394,7 +394,7 @@ impl Control {
     }
 
     /// Joint mutable DE register.
-    pub(crate) fn de_mut(&mut self) -> AliasMut {
+    pub(crate) fn de_mut(&'_ mut self) -> AliasMut<'_> {
         AliasMut {
             hi: &mut self.d,
             lo: &mut self.e,
@@ -402,7 +402,7 @@ impl Control {
     }
 
     /// Address register.
-    pub(crate) fn hl(&self) -> Alias {
+    pub(crate) fn hl(&'_ self) -> Alias<'_> {
         Alias {
             hi: &self.h,
             lo: &self.l,
@@ -410,7 +410,7 @@ impl Control {
     }
 
     /// Mutable address register.
-    pub(crate) fn hl_mut(&mut self) -> AliasMut {
+    pub(crate) fn hl_mut(&'_ mut self) -> AliasMut<'_> {
         AliasMut {
             hi: &mut self.h,
             lo: &mut self.l,

@@ -1,6 +1,6 @@
 use rugby_arch::mem::Memory;
 
-use self::cart::mbc::Mbc;
+use self::cart::chip::Mbc;
 use self::pic::Pic;
 use self::timer::Timer;
 use super::*;
@@ -60,7 +60,7 @@ fn bus_all_works() {
     // Cartridge ROM
     if let Some(cart) = &emu.cart {
         (0x0100..=0x7fff)
-            .map(|addr| cart.body().rom().read(addr).unwrap())
+            .map(|addr| cart.chip.rom().read(addr).unwrap())
             .zip(&GAME[0x0100..=0x7fff])
             .for_each(|(byte, &boot)| assert_eq!(byte, boot));
     }
@@ -75,13 +75,13 @@ fn bus_all_works() {
         bus.write(0x0100, 0x0a); // enable RAM
         (0xa400..=0xa7ff).for_each(|addr| bus.write(addr, 0x40));
         (0x0000..=0x03ff)
-            .map(|addr| cart.body().ram().read(addr).unwrap())
+            .map(|addr| cart.chip.ram().read(addr).unwrap())
             .for_each(|byte| assert_eq!(byte, 0x00));
         (0x0400..=0x07ff)
-            .map(|addr| cart.body().ram().read(addr).unwrap())
+            .map(|addr| cart.chip.ram().read(addr).unwrap())
             .for_each(|byte| assert_eq!(byte, 0x40));
         (0x0800..=0x1fff)
-            .map(|addr| cart.body().ram().read(addr).ok())
+            .map(|addr| cart.chip.ram().read(addr).ok())
             .for_each(|byte| assert_eq!(byte, None));
     }
     // Object memory
