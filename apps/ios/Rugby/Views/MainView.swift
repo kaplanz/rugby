@@ -5,10 +5,23 @@
 //  Created by Zakhary Kaplan on 2024-06-20.
 //
 
+import SemVer
 import SwiftUI
 
 struct MainView: View {
     @Environment(Runtime.self) private var app
+
+    /// Welcome page.
+    @AppStorage("dev.zakhary.rugby.welcome") private var welcome: String?
+
+    /// Show welcome page.
+    private var showWelcome: Binding<Bool> {
+        Binding {
+            welcome.flatMap(SemVer.Version.init).map { $0 < Build.VERSION } ?? true
+        } set: { show in
+            welcome = show ? nil : Build.VERSION.versionString()
+        }
+    }
 
     /// Presented subview.
     @State private var page: Subview?
@@ -57,6 +70,9 @@ struct MainView: View {
                         }
                     }
             }
+        }
+        .sheet(isPresented: showWelcome) {
+            WelcomeView()
         }
         .fullScreenCover(isPresented: showEmulator) {
             NavigationStack {
