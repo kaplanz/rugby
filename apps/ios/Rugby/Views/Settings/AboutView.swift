@@ -13,16 +13,13 @@ struct AboutView: View {
         // Header
         Section {
             HStack(spacing: 20) {
-                Image("AppIcon")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80)
-                    .clipShape(.rect(cornerRadius: 18, style: .continuous))
+                AppIcon()
                 VStack(alignment: .leading) {
                     Text(Build.NAME)
                         .bold()
                         .font(.title)
-                    Text("Version \(Build.VERSION)")
+                        .fontDesign(.rounded)
+                    Text("Version \(Build.VERSION.description)")
                         .foregroundStyle(.secondary)
                 }
             }

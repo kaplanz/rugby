@@ -1,5 +1,5 @@
 {
-  "originHash" : "ef715cde7d80a95918bb8b8ae8dc83009050800ae3fa85b67b1dc8d3750311b0",
+  "originHash" : "a0dad1d50eb120d215f63082bd7c2d329ab71498b929508ed1f332980b038893",
   "pins" : [
     {
       "identity" : "colortokenskit-swift",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "c784ab8348cfad827d6ff43e56ff09462ccccb60",
         "version" : "0.2.0"
+      }
+    },
+    {
+      "identity" : "semver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sersoft-gmbh/semver",
+      "state" : {
+        "revision" : "6e97c2d21e73c3e683ca5b41962722eb6b790bd3",
+        "version" : "5.3.0"
       }
     },
     {
@@ -44,6 +53,15 @@
       "state" : {
         "revision" : "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
+        "version" : "601.0.1"
       }
     }
   ],

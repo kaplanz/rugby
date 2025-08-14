@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import SemVer
 
 struct Build {
     /// Application name.
     static let NAME = Bundle.main.infoDictionary?["CFBundleName"] as! String
     /// Version number.
-    static let VERSION = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+    static let VERSION = Version(
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)!
     /// Compilation date.
     static let DATE = Date.now
 }
