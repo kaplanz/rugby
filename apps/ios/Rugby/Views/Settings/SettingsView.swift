@@ -59,18 +59,11 @@ struct SettingsView: View {
                 Button(role: .destructive) {
                     defaultOpt = true
                 } label: {
-                    Label {
-                        VStack(alignment: .leading) {
-                            Text("Reset Settings")
-                                .foregroundStyle(.tint)
-                            Text("Restore all settings to their defaults.")
-                                .font(.caption)
-                                .foregroundStyle(Color.secondary)
-                        }
-                    } icon: {
-                        Image(systemName: "gearshape.arrow.trianglehead.2.clockwise.rotate.90")
-                            .foregroundStyle(.tint)
-                    }
+                    MultiLineLabel(
+                        "Reset Settings",
+                        about: "Restore all settings to their defaults.",
+                        systemImage: "gearshape.arrow.trianglehead.2.clockwise.rotate.90",
+                    )
                 }
                 .confirmationDialog(
                     "Are you sure?",
@@ -88,18 +81,11 @@ struct SettingsView: View {
                 Button(role: .destructive) {
                     delLibrary = true
                 } label: {
-                    Label {
-                        VStack(alignment: .leading) {
-                            Text("Delete Library")
-                                .foregroundStyle(.tint)
-                            Text("Remove all games in your library.")
-                                .font(.caption)
-                                .foregroundStyle(Color.secondary)
-                        }
-                    } icon: {
-                        Image(systemName: "trash.fill")
-                            .foregroundStyle(.tint)
-                    }
+                    MultiLineLabel(
+                        "Delete Library",
+                        about: "Remove all games in your library.",
+                        systemImage: "trash.fill",
+                    )
                 }
                 .confirmationDialog(
                     "Are you sure?",
@@ -119,18 +105,11 @@ struct SettingsView: View {
                 Button {
                     welcomeUsr = true
                 } label: {
-                    Label {
-                        VStack(alignment: .leading) {
-                            Text("Show Welcome")
-                                .foregroundStyle(.tint)
-                            Text("Present the welcome splash screen.")
-                                .font(.caption)
-                                .foregroundStyle(Color.secondary)
-                        }
-                    } icon: {
-                        Image(systemName: "app.gift")
-                            .foregroundStyle(.tint)
-                    }
+                    MultiLineLabel(
+                        "Show Welcome",
+                        about: "Present the welcome splash screen.",
+                        systemImage: "app.gift",
+                    )
                 }
                 .sheet(isPresented: $welcomeUsr) {
                     WelcomeView()
@@ -165,4 +144,31 @@ struct SettingsView: View {
     .environment(Failure())
     .environment(Library())
     .environment(Options())
+}
+
+private struct MultiLineLabel: View {
+    @State private var title: String
+    @State private var about: String
+    @State private var systemImage: String
+
+    init(_ titleKey: String, about: String, systemImage: String) {
+        self.title = titleKey
+        self.about = about
+        self.systemImage = systemImage
+    }
+
+    var body: some View {
+        Label {
+            VStack(alignment: .leading) {
+                Text(title)
+                    .foregroundStyle(.tint)
+                Text(about)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+            }
+        } icon: {
+            Image(systemName: systemImage)
+                .foregroundStyle(.tint)
+        }
+    }
 }
