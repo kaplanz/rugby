@@ -79,17 +79,18 @@ struct WelcomeView: View {
             }
             .fontDesign(.rounded)
             .padding(24)
-            .toolbar {
-                // Footer
-                ToolbarItem(placement: .bottomBar) {
-                    Button("Continue") { dismiss() }
-                        .bold()
-                        .buttonStyle(.glassProminent)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity)
-                }
-            }
         }
+        .safeAreaInset(edge: .bottom) {
+            // Footer
+            Button { dismiss() } label: {
+                Text("Continue")
+                    .bold()
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .controlSize(.large)
+        }
+        .safeAreaPadding(.horizontal, 24)
     }
 }
 
