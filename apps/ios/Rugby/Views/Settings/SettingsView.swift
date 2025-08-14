@@ -8,12 +8,16 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(Failure.self) private var err
+    @Environment(Library.self) private var lib
     @Environment(Options.self) private var opt
 
     /// Open the danger zone.
     @State private var dangerZone = false
-    /// Show alert for reset.
-    @State private var alertReset = false
+    /// Reset settings.
+    @State private var defaultOpt = false
+    /// Delete library.
+    @State private var delLibrary = false
 
     var body: some View {
         @Bindable var cfg = opt.data
@@ -49,15 +53,15 @@ struct SettingsView: View {
             }
             // Danger Zone
             Section(isExpanded: $dangerZone) {
-                // Reset All
+                // Reset Settings
                 Button(role: .destructive) {
-                    alertReset = true
+                    defaultOpt = true
                 } label: {
                     Label {
                         VStack(alignment: .leading) {
                             Text("Reset Settings")
                                 .foregroundStyle(.tint)
-                            Text("This will restore all settings to their defaults.")
+                            Text("Restore all settings to their defaults.")
                                 .font(.caption)
                                 .foregroundStyle(Color.secondary)
                         }
@@ -68,11 +72,42 @@ struct SettingsView: View {
                 }
                 .confirmationDialog(
                     "Are you sure?",
-                    isPresented: $alertReset,
+                    isPresented: $defaultOpt,
                 ) {
                     Button("Reset", role: .destructive) {
                         withAnimation {
                             opt.reset()
+                        }
+                    }
+                } message: {
+                    Text("This action cannot be undone.")
+                }
+                // Delete library
+                Button(role: .destructive) {
+                    delLibrary = true
+                } label: {
+                    Label {
+                        VStack(alignment: .leading) {
+                            Text("Delete Library")
+                                .foregroundStyle(.tint)
+                            Text("Remove all games in your library.")
+                                .font(.caption)
+                                .foregroundStyle(Color.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "trash.fill")
+                            .foregroundStyle(.tint)
+                    }
+                }
+                .confirmationDialog(
+                    "Are you sure?",
+                    isPresented: $delLibrary,
+                ) {
+                    Button("Delete", role: .destructive) {
+                        withAnimation {
+                            lib.games.forEach { game in
+                                do { try lib.delete(game: game) } catch { err.or = error }
+                            }
                         }
                     }
                 } message: {
@@ -104,5 +139,7 @@ struct SettingsView: View {
     NavigationStack {
         SettingsView()
     }
+    .environment(Failure())
+    .environment(Library())
     .environment(Options())
 }
