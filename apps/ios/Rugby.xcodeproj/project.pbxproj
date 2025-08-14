@@ -12,6 +12,7 @@
 		96E2B0CB2E4BF6C4003F9028 /* ColorTokensKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */; };
 		96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0C2D40299D009ED7D7 /* RugbyKit */; };
 		96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 96EFDD0F2D4029A5009ED7D7 /* Algorithms */; };
+		96FE21422E4E27C4006DDC41 /* SemVer in Frameworks */ = {isa = PBXBuildFile; productRef = 96FE21412E4E27C4006DDC41 /* SemVer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 				96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */,
 				96E2B0CB2E4BF6C4003F9028 /* ColorTokensKit in Frameworks */,
 				96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */,
+				96FE21422E4E27C4006DDC41 /* SemVer in Frameworks */,
 				964989392E43AFC900AA1C84 /* Atomics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +98,7 @@
 				96AAAA352E4290E50062F554 /* Collections */,
 				964989382E43AFC900AA1C84 /* Atomics */,
 				96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */,
+				96FE21412E4E27C4006DDC41 /* SemVer */,
 			);
 			productName = Rugby;
 			productReference = 9695680B2D4028A700AA8A83 /* Rugby.app */;
@@ -131,6 +134,7 @@
 				96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				96E2B0C92E4BF6C4003F9028 /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */,
+				96FE21402E4E27C4006DDC41 /* XCRemoteSwiftPackageReference "semver" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9695680C2D4028A700AA8A83 /* Products */;
@@ -414,6 +418,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		96FE21402E4E27C4006DDC41 /* XCRemoteSwiftPackageReference "semver" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sersoft-gmbh/semver";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -440,6 +452,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
+		};
+		96FE21412E4E27C4006DDC41 /* SemVer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 96FE21402E4E27C4006DDC41 /* XCRemoteSwiftPackageReference "semver" */;
+			productName = SemVer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
