@@ -18,6 +18,8 @@ struct SettingsView: View {
     @State private var defaultOpt = false
     /// Delete library.
     @State private var delLibrary = false
+    /// Present welcome.
+    @State private var welcomeUsr = false
 
     var body: some View {
         @Bindable var cfg = opt.data
@@ -113,6 +115,27 @@ struct SettingsView: View {
                 } message: {
                     Text("This action cannot be undone.")
                 }
+                // Show welcome
+                Button {
+                    welcomeUsr = true
+                } label: {
+                    Label {
+                        VStack(alignment: .leading) {
+                            Text("Show Welcome")
+                                .foregroundStyle(.tint)
+                            Text("Present the welcome splash screen.")
+                                .font(.caption)
+                                .foregroundStyle(Color.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "app.gift")
+                            .foregroundStyle(.tint)
+                    }
+                }
+                .sheet(isPresented: $welcomeUsr) {
+                    WelcomeView()
+                }
+                .tint(nil)
             } header: {
                 Button {
                     withAnimation {
