@@ -50,6 +50,7 @@ struct LibraryView: View {
                                     .glassEffect(in: .rect(cornerRadius: 8))
                                     .padding(4)
                             }
+                            .background(.clear, in: .rect(cornerRadius: 12))
                     }
                 }
             }
