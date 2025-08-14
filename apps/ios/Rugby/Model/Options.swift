@@ -36,12 +36,14 @@ class Config {
     var pal: Palette {
         get {
             access(keyPath: \.pal)
-            return UserDefaults.standard.string(forKey: "pal").flatMap { Palette(rawValue: $0) }
+            return UserDefaults.standard.string(forKey: "dev.zakhary.rugby.pal").flatMap {
+                Palette(rawValue: $0)
+            }
                 ?? .demichrome
         }
         set {
             withMutation(keyPath: \.pal) {
-                UserDefaults.standard.setValue(newValue.rawValue, forKey: "pal")
+                UserDefaults.standard.setValue(newValue.rawValue, forKey: "dev.zakhary.rugby.pal")
             }
         }
     }
@@ -49,14 +51,14 @@ class Config {
     var spd: Speed {
         get {
             access(keyPath: \.spd)
-            return UserDefaults.standard.data(forKey: "spd").flatMap {
+            return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.spd").flatMap {
                 try? JSONDecoder().decode(Speed.self, from: $0)
             } ?? .actual
         }
         set {
             withMutation(keyPath: \.spd) {
                 if let data = try? JSONEncoder().encode(newValue) {
-                    UserDefaults.standard.set(data, forKey: "spd")
+                    UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.spd")
                 }
             }
         }
