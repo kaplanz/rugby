@@ -14,25 +14,12 @@ struct GameIcon: View {
         game.icon.flatMap(Image.init(uiImage:)) ?? Image("Missing")
     }
 
-    var shape: some Shape {
-        .rect(cornerRadius: 12)
-    }
-
     var body: some View {
-        ZStack {
-            // Image
-            image
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-            // Shape
-            shape
-                .foregroundStyle(.clear)
-                .blur(radius: 4)
-        }
-        .aspectRatio(10 / 9, contentMode: .fit)
-        .glassEffect(in: shape)
-        .clipShape(shape)
-        .frame(minWidth: 80, maxWidth: .infinity)
+        image
+            .resizable()
+            .aspectRatio(10 / 9, contentMode: .fit)
+            .clipShape(.containerRelative)
+            .glassEffect(in: .containerRelative)
     }
 }
 
