@@ -42,7 +42,9 @@ struct LibraryItem<V: View>: View {
                     }
                     RenameButton()
                     Button("Duplicate", systemImage: "plus.square.on.square") {
-                        do { try lib.copy(game: game) } catch { err.or = error }
+                        withAnimation {
+                            do { try lib.copy(game: game) } catch { err.or = error }
+                        }
                     }
                 }
                 Section {
@@ -58,10 +60,10 @@ struct LibraryItem<V: View>: View {
                 Section {
                     !game.star
                         ? Button("Favourite", systemImage: "star") {
-                            game.star.toggle()
+                            withAnimation { game.star.toggle() }
                         }
                         : Button("Unfavourite", systemImage: "star.slash") {
-                            game.star.toggle()
+                            withAnimation { game.star.toggle() }
                         }
                 }
                 Section {
@@ -80,13 +82,17 @@ struct LibraryItem<V: View>: View {
                 TextField(game.name, text: $rename.text)
                 Button("Cancel", role: .cancel) {}
                 Button("Rename") {
-                    do { try lib.move(game: game, to: rename.text) } catch { err.or = error }
+                    withAnimation {
+                        do { try lib.move(game: game, to: rename.text) } catch { err.or = error }
+                    }
                 }
             }
             .alert("Are you sure you want to delete “\(game.name)”?", isPresented: $delete) {
                 Button("Cancel", role: .cancel) {}
                 Button("Delete", role: .destructive) {
-                    do { try lib.delete(game: game) } catch { err.or = error }
+                    withAnimation {
+                        do { try lib.delete(game: game) } catch { err.or = error }
+                    }
                 }
             } message: {
                 Text("This item will be moved to the trash.")
