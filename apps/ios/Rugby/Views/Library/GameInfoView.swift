@@ -33,6 +33,7 @@ struct GameInfoView: View {
                 // Icon
                 HStack {
                     GameIcon(game: game)
+                        .background(.clear, in: .rect(cornerRadius: 12))
                         .frame(maxHeight: 286)
                         .shadow(radius: 6, y: 4)
                 }
