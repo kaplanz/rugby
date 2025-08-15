@@ -32,9 +32,10 @@ struct SettingsView: View {
                 // Palette
                 Picker(selection: $cfg.pal) {
                     ForEach(Palette.allCases) { pal in
-                        HStack {
-                            PaletteIcon(pal: pal)
+                        Label {
                             Text(pal.description)
+                        } icon: {
+                            PaletteIcon(pal: pal)
                         }
                     }
                 } label: {
