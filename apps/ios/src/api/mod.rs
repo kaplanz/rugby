@@ -4,6 +4,7 @@ use parking_lot::RwLock;
 use rugby::arch::Block;
 use rugby::core::dmg;
 
+pub mod audio;
 pub mod cart;
 pub mod joypad;
 pub mod video;
