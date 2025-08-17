@@ -27,7 +27,7 @@ impl GameBoy {
     ///
     /// To render a frame as an image, map each pixel to the 160x144 screen. For
     /// example, to get the 20th pixel of the 16th line, you would access the
-    /// `(20 * 160) + 16  = 3216`th element of the frame (zero indexed) as
+    /// `(20 * 160) + 16 = 3216`th element of the frame (zero indexed) as
     /// `frame[3215]`.
     pub fn frame(&self) -> Vec<u8> {
         self.inner
