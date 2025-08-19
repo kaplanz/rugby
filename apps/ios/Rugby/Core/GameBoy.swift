@@ -8,8 +8,12 @@
 import Foundation
 import RugbyKit
 
-let FREQ: UInt32 = 4_194_304
-let RATE: UInt32 = 70224
+/// Clock frequency.
+let CLOCK: UInt32 = 4_194_304
+/// Audio sample rate.
+let AUDIO: UInt32 = CLOCK / 32
+/// Video frame rate.
+let VIDEO: UInt32 = 70224
 
 /// Emulation context.
 private struct Context {
@@ -153,9 +157,14 @@ private func main(cxn: Connect) {
 
         // Sample audio
         //
-        // Audio is sampled each cycle in order to ensure the audio system
-        // remain busy, otherwise, audible "pops" will sound.
-        // TODO: Implement audio
+        // Audio is downsampled to a more reasonable frequency, as practically
+        // generating samples each cycle is unnecessary.
+        if ctx.total % UInt64(CLOCK / AUDIO) == 0 {
+            // Produce audio sample
+            let sample = emu.sample()
+            // Forward to audio output
+            cxn.audio.push(sample: sample)
+        }
 
         // Sample video
         //
@@ -172,7 +181,7 @@ private func main(cxn: Connect) {
         }
 
         // Perform lower-frequency actions
-        if ctx.total % UInt64((ctx.clock.frq ?? FREQ) / 64) == 0 {
+        if ctx.total % UInt64((ctx.clock.frq ?? CLOCK) / 64) == 0 {
             // Sample input
             //
             // Joypad input is sampled to the emulator ~64 times per second,
@@ -230,8 +239,8 @@ private func frequency(rate freq: Double) -> String {
         format:
             "frequency: %10.6f MHz, speedup: %4.2fx, frames: %6.2f FPS",
         freq / 1e6,
-        freq / Double(FREQ),
-        freq / Double(RATE),
+        freq / Double(CLOCK),
+        freq / Double(VIDEO),
     )
 }
 
