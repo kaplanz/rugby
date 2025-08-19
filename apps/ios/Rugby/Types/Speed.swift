@@ -38,13 +38,13 @@ extension Speed {
     var freq: UInt32? {
         switch self {
         case .actual:
-            FREQ
+            CLOCK
         case .clock(let freq):
             freq
         case .ratio(let mult):
-            UInt32(Double(FREQ) * mult)
+            UInt32(Double(CLOCK) * mult)
         case .frame(let rate):
-            UInt32(rate) * RATE
+            UInt32(rate) * VIDEO
         case .turbo:
             nil
         }
