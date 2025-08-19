@@ -5,6 +5,7 @@
 //  Created by Zakhary Kaplan on 2024-06-20.
 //
 
+import AVFoundation
 import GameController
 import RugbyKit
 import SwiftUI
@@ -21,10 +22,12 @@ struct RugbyApp: App {
     @State private var opt: Options = .init()
 
     init() {
-        // Initialize core
+        // Initialize emulator
         RugbyKit.initialize()
-        // Initialize game
+        // Connect controllers
         initGameController()
+        // Enable audio playback
+        enableAudio()
     }
 
     var body: some Scene {
@@ -67,6 +70,18 @@ struct RugbyApp: App {
         .environment(err)
         .environment(lib)
         .environment(opt)
+    }
+}
+
+extension RugbyApp {
+    func enableAudio() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playback)
+            try session.setActive(true)
+        } catch {
+            err.or = error
+        }
     }
 }
 
