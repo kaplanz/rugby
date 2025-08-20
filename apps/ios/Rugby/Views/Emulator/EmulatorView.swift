@@ -29,15 +29,11 @@ struct EmulatorView: View {
 
     /// Video output frame.
     private var frame: UIImage? {
-        emu.video.image.map { UIImage(cgImage: $0) }
+        emu.frame.map { UIImage(cgImage: $0) }
     }
 
     var body: some View {
-        let call = { (input, press) in
-            emu.input.queue.withLock { queue in
-                queue.append((input, press))
-            }
-        }
+        let call = emu.input(_:state:)
 
         GeometryReader { geo in
             if geo.size.height > geo.size.width {
