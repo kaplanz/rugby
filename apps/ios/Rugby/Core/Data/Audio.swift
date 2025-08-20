@@ -30,15 +30,29 @@ final class Audio {
     func push(sample: Sample) {
         data.push(sample)
     }
+
+    /// Resume audio.
+    func start() {
+        try? play.engine.start()
+    }
+
+    /// Pause audio.
+    func pause() {
+        play.engine.pause()
+    }
 }
 
 @Observable
 private final class Playback: @unchecked Sendable {
-    private let engine: AVAudioEngine = .init()
-    private var source: AVAudioSourceNode!
-    private var worker: AVAudioConverter!
-    private let sample: RingBuffer<Audio.Sample>
-    private let buffer: AVAudioPCMBuffer!
+    fileprivate let engine: AVAudioEngine = .init()
+    fileprivate var source: AVAudioSourceNode!
+    fileprivate var worker: AVAudioConverter!
+    fileprivate let sample: RingBuffer<Audio.Sample>
+    fileprivate let buffer: AVAudioPCMBuffer!
+
+    deinit {
+        engine.stop()
+    }
 
     init(data: RingBuffer<Audio.Sample>) {
         // Retain sample buffer
