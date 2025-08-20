@@ -63,6 +63,8 @@ final class Emulator {
         game?.icon = video.image.map { UIImage(cgImage: $0) }
         // Pause emulation
         (state ? core.pause : core.start)()
+        // Pause playback
+        (state ? audio.pause : audio.start)()
     }
 
     /// Reset emulator.
