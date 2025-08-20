@@ -17,12 +17,12 @@ final class Emulator {
     private var game: Game?
 
     /// Joypad input.
-    var input: Input
+    private var input: Input
 
     /// Audio output.
-    var audio: Audio
+    private var audio: Audio
     /// Video output.
-    var video: Video
+    private var video: Video
 
     init() {
         let core = GameBoy()
@@ -70,5 +70,17 @@ final class Emulator {
     /// Reset emulator.
     func reset(_ kind: Reset) {
         core.reset(kind)
+    }
+
+    /// Video frame.
+    var frame: CGImage? {
+        video.image
+    }
+
+    /// Forward user input.
+    func input(_ input: RugbyKit.Button, state: Bool) {
+        self.input.queue.withLock { queue in
+            queue.append((input, state))
+        }
     }
 }

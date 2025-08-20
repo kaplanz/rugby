@@ -249,7 +249,7 @@ final class GameBoy {
     /// Emulator thread.
     private var job: Thread?
     /// Emulator connection.
-    private var cxn: Connect = .init()
+    private let cxn: Connect = .init()
 
     deinit {
         self.cancel()
