@@ -89,13 +89,17 @@ struct EmulatorView: View {
             }
         }
         .onAppear {
-            do { try emu.play(app.game!) } catch { err.or = error }
+            if let game = app.game {
+                do { try emu.play(game) } catch { err.or = error }
+            }
         }
         .onChange(of: enable) {
             emu.pause(!enable)
         }
-        .onDisappear {
-            do { try emu.stop() } catch { err.or = error }
+        .onChange(of: app.game) {
+            if app.game == nil {
+                do { try emu.stop() } catch { err.or = error }
+            }
         }
     }
 
