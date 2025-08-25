@@ -40,6 +40,14 @@ final class Audio {
     func pause() {
         play.engine.pause()
     }
+
+    /// Reset audio.
+    func reset() {
+        // Reset engine
+        play.engine.reset()
+        // Clear buffer
+        play.sample.clear()
+    }
 }
 
 @Observable
