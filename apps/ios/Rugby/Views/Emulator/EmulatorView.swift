@@ -16,15 +16,15 @@ struct EmulatorView: View {
     @State var emu: Emulator = .init()
 
     /// Emulator paused.
-    @State private var paused = false
-    /// About this game.
-    @State private var detail = false
-    /// Manage this game.
-    @State private var manage = false
+    @State private var isPaused = false
+    /// Show game info.
+    @State private var showInfo = false
+    /// Show settings.
+    @State private var showConf = false
 
-    /// Emulator enabled.
-    private var enable: Bool {
-        !paused && !detail && !manage && scenePhase == .active
+    /// Emulator is active.
+    private var active: Bool {
+        !isPaused && !showInfo && !showConf && scenePhase == .active
     }
 
     /// Video output frame.
@@ -33,24 +33,22 @@ struct EmulatorView: View {
     }
 
     var body: some View {
-        let call = emu.input(_:state:)
-
         GeometryReader { geo in
             if geo.size.height > geo.size.width {
                 VStack {
                     ScreenView(frame: frame)
                         .id(frame)
                     Spacer()
-                    JoypadView(call)
+                    JoypadView(emu.input(_:state:))
                     Spacer()
                 }
             } else {
                 HStack {
-                    JoypadView(call, part: .left)
+                    JoypadView(emu.input(_:state:), part: .left)
                     Spacer()
                     ScreenView()
                     Spacer()
-                    JoypadView(call, part: .right)
+                    JoypadView(emu.input(_:state:), part: .right)
                 }
             }
         }
@@ -62,40 +60,44 @@ struct EmulatorView: View {
                 menu
             }
         }
-        .sheet(isPresented: $detail) {
+        .sheet(isPresented: $showInfo) {
             NavigationStack {
                 GameInfoView(game: app.game!)
                     .toolbar {
                         Button("Done", systemImage: "checkmark", role: .confirm) {
-                            detail.toggle()
+                            showInfo.toggle()
                         }
                         .bold()
                     }
             }
         }
-        .sheet(isPresented: $manage) {
+        .sheet(isPresented: $showConf) {
             NavigationStack {
                 SettingsView()
                     .toolbar {
                         Button("Done", systemImage: "checkmark", role: .confirm) {
-                            manage.toggle()
+                            showConf.toggle()
                         }
                         .bold()
                     }
             }
         }
-        .onAppear {
-            if let game = app.game {
-                do { try emu.play(game) } catch { err.or = error }
+        .onChange(of: app.game, initial: true) {
+            do {
+                if let game = app.game {
+                    // Insert cartridge
+                    try emu.play(game)
+                } else {
+                    // Remove cartridge
+                    try emu.stop()
+                }
+            } catch {
+                err.or = error
             }
         }
-        .onChange(of: enable) {
-            emu.pause(!enable)
-        }
-        .onChange(of: app.game) {
-            if app.game == nil {
-                do { try emu.stop() } catch { err.or = error }
-            }
+        .onChange(of: active, initial: true) {
+            // Sync emulator
+            emu.pause(!active)
         }
     }
 
@@ -110,9 +112,9 @@ struct EmulatorView: View {
                 }
                 .disabled(true)
                 Button {
-                    paused.toggle()
+                    isPaused.toggle()
                 } label: {
-                    paused
+                    isPaused
                         ? Label("Play", systemImage: "play")
                         : Label("Pause", systemImage: "pause.fill")
                 }
@@ -132,10 +134,10 @@ struct EmulatorView: View {
             // Information
             Section {
                 Button("Get Info", systemImage: "info.circle") {
-                    detail.toggle()
+                    showInfo.toggle()
                 }
                 Button("Settings", systemImage: "gearshape") {
-                    manage.toggle()
+                    showConf.toggle()
                 }
             }
             // Application
