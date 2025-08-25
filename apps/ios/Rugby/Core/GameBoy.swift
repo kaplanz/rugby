@@ -50,6 +50,15 @@ private final class Connect: @unchecked Sendable {
 
 /// Emulator main.
 private func main(cxn: Connect) {
+    do {
+        // Start thread
+        log.debug("starting thread: \(Thread.current)")
+    }
+    defer {
+        // Close thread
+        log.debug("finished thread: \(Thread.current)")
+    }
+
     // Fetch configuration
     let cfg = Options().data
     // Instantiate emulator
@@ -309,6 +318,7 @@ extension GameBoy: Core {
     func reset(_ kind: Reset) {
         // No-op if stopped
         guard power == .on else { return }
+
         // Perform reset
         switch kind {
         case .soft:
@@ -319,6 +329,9 @@ extension GameBoy: Core {
             self.power(.off)
             self.power(.on)
         }
+
+        // Reset audio
+        cxn.audio.reset()
     }
 
     func insert(cart: Cartridge) {
@@ -334,10 +347,16 @@ extension GameBoy: Core {
     }
 
     func start() {
+        // Start emulator
         cxn.pause = false
+        // Start playback
+        cxn.audio.start()
     }
 
     func pause() {
+        // Pause emulator
         cxn.pause = true
+        // Pause playback
+        cxn.audio.pause()
     }
 }

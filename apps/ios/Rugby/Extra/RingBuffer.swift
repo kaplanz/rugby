@@ -60,6 +60,19 @@ public final class RingBuffer<T> {
         return head == tail
     }
 
+    /// Clears the buffer.
+    ///
+    /// This should be called by the consumer.
+    public func clear() {
+        let tail = self.tail.load(ordering: .acquiring)
+        let head = self.head.load(ordering: .acquiring)
+
+        // Reinitialize storage
+        data.advanced(by: Int(head)).initialize(repeating: nil, count: Int(tail &- head))
+        // Clear read pointer
+        self.head.store(tail, ordering: .releasing)
+    }
+
     /// Push a value. (Lock-free.)
     ///
     /// This should be called by the producer.
