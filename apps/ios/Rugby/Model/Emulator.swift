@@ -12,25 +12,9 @@ import SwiftUI
 @Observable
 final class Emulator {
     /// Emulator core.
-    private var core: GameBoy
+    private var core: GameBoy = .init()
     /// Inserted game.
     private var game: Game?
-
-    /// Joypad input.
-    private var input: Input
-
-    /// Audio output.
-    private var audio: Audio
-    /// Video output.
-    private var video: Video
-
-    init() {
-        let core = GameBoy()
-        self.core = core
-        self.input = core.input
-        self.audio = core.audio
-        self.video = core.video
-    }
 
     /// Plays a game.
     func play(_ game: Game) throws {
@@ -60,11 +44,9 @@ final class Emulator {
     /// Pause emulation.
     func pause(_ state: Bool = true) {
         // Take screenshot
-        game?.icon = video.image.map { UIImage(cgImage: $0) }
+        game?.icon = core.video.image.map { UIImage(cgImage: $0) }
         // Pause emulation
         (state ? core.pause : core.start)()
-        // Pause playback
-        (state ? audio.pause : audio.start)()
     }
 
     /// Reset emulator.
@@ -74,12 +56,12 @@ final class Emulator {
 
     /// Video frame.
     var frame: CGImage? {
-        video.image
+        core.video.image
     }
 
     /// Forward user input.
     func input(_ input: RugbyKit.Button, state: Bool) {
-        self.input.queue.withLock { queue in
+        core.input.queue.withLock { queue in
             queue.append((input, state))
         }
     }
