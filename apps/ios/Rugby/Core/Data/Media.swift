@@ -1,5 +1,5 @@
 //
-//  Slot.swift
+//  Media.swift
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2025-08-08.
@@ -9,7 +9,8 @@ import Foundation
 import RugbyKit
 import Synchronization
 
-final class Slot: Sendable {
+/// Media driver.
+final class Media: Sendable {
     /// Request events.
     internal let request: Mutex<Request?> = .init(nil)
     internal enum Request {

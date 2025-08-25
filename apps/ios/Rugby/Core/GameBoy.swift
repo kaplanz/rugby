@@ -38,7 +38,7 @@ private final class Connect: @unchecked Sendable {
     @Atomic var reset: Bool = false
 
     /// Cartridge slot.
-    let slot: Slot = .init()
+    let media: Media = .init()
     /// Joypad input.
     let input: Input = .init()
 
@@ -85,7 +85,7 @@ private func main(cxn: Connect) {
             // Pause emulation
             cxn.pause = true
             // Eject cartridge
-            cxn.slot.request.withLock { event in
+            cxn.media.request.withLock { event in
                 event = .eject
             }
         }
@@ -93,7 +93,7 @@ private func main(cxn: Connect) {
         // Cartridge events
         //
         // When requested, insert or eject the cartridge.
-        cxn.slot.request.withLockIfAvailable { event in
+        cxn.media.request.withLockIfAvailable { event in
             switch event.take() {
             case .insert(let cart):
                 // Insert cartridge
@@ -101,7 +101,7 @@ private func main(cxn: Connect) {
                 event = nil
             case .eject:
                 // Remove cartridge
-                cxn.slot.respond.withLock { event in
+                cxn.media.respond.withLock { event in
                     event =
                         if let cart = emu.eject() {
                             .eject(cart)
@@ -335,12 +335,12 @@ extension GameBoy: Core {
     }
 
     func insert(cart: Cartridge) {
-        cxn.slot.insert(cart)
+        cxn.media.insert(cart)
     }
 
     func eject() -> Cartridge? {
         if job != nil {
-            cxn.slot.eject()
+            cxn.media.eject()
         } else {
             nil
         }
