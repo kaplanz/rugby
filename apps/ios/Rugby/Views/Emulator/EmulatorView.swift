@@ -98,6 +98,12 @@ struct EmulatorView: View {
         .onChange(of: active, initial: true) {
             // Sync emulator
             emu.pause(!active)
+            // Prevent idle
+            UIApplication.shared.isIdleTimerDisabled = active
+        }
+        .onDisappear {
+            // Reallow idle
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
