@@ -39,7 +39,7 @@ sysexits = "0.9.1"
 tempfile = "3.20.0"
 thiserror = { workspace = true }
 tinyaudio = "1.1.0"
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
 xdir = { workspace = true }
 
 [features]
