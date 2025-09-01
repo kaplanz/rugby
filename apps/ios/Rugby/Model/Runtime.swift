@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RugbyKit
 
 @Observable
 final class Runtime {
@@ -13,12 +14,16 @@ final class Runtime {
     private(set) var game: Game?
 
     /// Play a game.
-    func play(_ game: Game) {
+    func play(_ game: Game) throws {
+        // Ensure game is playable
+        let _ = try Cartridge(data: game.data)
+        // Retain game to play
         self.game = game
     }
 
     /// Stop playing.
     func stop() {
+        // Remove game from play
         game = nil
     }
 }
