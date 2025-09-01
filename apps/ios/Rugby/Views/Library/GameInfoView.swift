@@ -13,6 +13,7 @@ import zlib
 
 struct GameInfoView: View {
     @Environment(Runtime.self) private var app
+    @Environment(Failure.self) private var err
     @Environment(\.dismiss) private var dismiss
 
     /// Game instance.
@@ -58,7 +59,7 @@ struct GameInfoView: View {
                     dismiss()
                     // Start playing game
                     if app.game == nil {
-                        app.play(game)
+                        do { try app.play(game) } catch { err.or = error }
                     }
                 }
                 .bold()

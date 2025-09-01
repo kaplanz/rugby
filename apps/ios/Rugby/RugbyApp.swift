@@ -43,7 +43,7 @@ struct RugbyApp: App {
                     // Play new import
                     let name = url.deletingPathExtension().lastPathComponent
                     if let game = lib.games.first(where: { $0.name == name }) {
-                        app.play(game)
+                        do { try app.play(game) } catch { err.or = error }
                     }
                 }
                 .alert(
