@@ -30,7 +30,7 @@ struct LibraryItem<V: View>: View {
             .contextMenu {
                 ControlGroup {
                     Button("Play", systemImage: "play.fill") {
-                        app.play(game)
+                        do { try app.play(game) } catch { err.or = error }
                     }
                     ShareLink(item: game.path.game) {
                         Label("Share", systemImage: "square.and.arrow.up.fill")
@@ -73,7 +73,7 @@ struct LibraryItem<V: View>: View {
                 }
             }
             .onTapGesture {
-                app.play(game)
+                do { try app.play(game) } catch { err.or = error }
             }
             .renameAction {
                 rename = (show: true, text: game.name)
