@@ -154,6 +154,18 @@ pub fn header(data: &[u8]) -> Result<Header> {
         .map_err(Into::into)
 }
 
+/// Calculates the header checksum.
+#[uniffi::export]
+pub fn hchk(data: &[u8]) -> u8 {
+    dmg::cart::head::hchk(data)
+}
+
+/// Calculates the global checksum.
+#[uniffi::export]
+pub fn gchk(data: &[u8]) -> u16 {
+    dmg::cart::head::gchk(data)
+}
+
 impl From<dmg::cart::Header> for Header {
     fn from(
         dmg::cart::Header {
