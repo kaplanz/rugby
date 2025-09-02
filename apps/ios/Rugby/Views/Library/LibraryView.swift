@@ -59,7 +59,7 @@ struct LibraryView: View {
         .navigationTitle("Library")
         .background(.background.secondary)
         .refreshable {
-            do { try lib.reload() } catch { err.or = error }
+            do { try lib.reload() } catch { err.log(error) }
         }
         .searchable(text: $query)
         .searchToolbarBehavior(.minimize)
@@ -93,7 +93,7 @@ struct LibraryView: View {
                         }
                         .forEach { file in
                             // Attempt to add to library
-                            do { try lib.add(url: file) } catch { err.or = error }
+                            do { try lib.add(url: file) } catch { err.log(error) }
                             // Release access permission
                             file.stopAccessingSecurityScopedResource()
                         }
@@ -102,7 +102,7 @@ struct LibraryView: View {
         }
         .onChange(of: scenePhase) {
             if case .active = scenePhase {
-                do { try lib.reload() } catch { err.or = error }
+                do { try lib.reload() } catch { err.log(error) }
             }
         }
     }

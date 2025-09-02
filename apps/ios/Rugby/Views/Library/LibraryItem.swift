@@ -30,7 +30,7 @@ struct LibraryItem<V: View>: View {
             .contextMenu {
                 ControlGroup {
                     Button("Play", systemImage: "play.fill") {
-                        do { try app.play(game) } catch { err.or = error }
+                        do { try app.play(game) } catch { err.log(error) }
                     }
                     ShareLink(item: game.path.game) {
                         Label("Share", systemImage: "square.and.arrow.up.fill")
@@ -43,7 +43,7 @@ struct LibraryItem<V: View>: View {
                     RenameButton()
                     Button("Duplicate", systemImage: "plus.square.on.square") {
                         withAnimation {
-                            do { try lib.copy(game: game) } catch { err.or = error }
+                            do { try lib.copy(game: game) } catch { err.log(error) }
                         }
                     }
                 }
@@ -73,7 +73,7 @@ struct LibraryItem<V: View>: View {
                 }
             }
             .onTapGesture {
-                do { try app.play(game) } catch { err.or = error }
+                do { try app.play(game) } catch { err.log(error) }
             }
             .renameAction {
                 rename = (show: true, text: game.name)
@@ -83,7 +83,7 @@ struct LibraryItem<V: View>: View {
                 Button("Cancel", role: .cancel) {}
                 Button("Rename") {
                     withAnimation {
-                        do { try lib.move(game: game, to: rename.text) } catch { err.or = error }
+                        do { try lib.move(game: game, to: rename.text) } catch { err.log(error) }
                     }
                 }
             }
@@ -91,7 +91,7 @@ struct LibraryItem<V: View>: View {
                 Button("Cancel", role: .cancel) {}
                 Button("Delete", role: .destructive) {
                     withAnimation {
-                        do { try lib.delete(game: game) } catch { err.or = error }
+                        do { try lib.delete(game: game) } catch { err.log(error) }
                     }
                 }
             } message: {

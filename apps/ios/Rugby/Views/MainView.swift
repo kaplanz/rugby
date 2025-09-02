@@ -10,11 +10,21 @@ import SwiftUI
 
 struct MainView: View {
     @Environment(Runtime.self) private var app
+    @Environment(Failure.self) private var err
 
     /// Emulator page.
     @State private var showEmulator = false
     /// Settings page.
     @State private var showSettings = false
+
+    /// Failure page.
+    private var showFailure: Binding<Bool> {
+        .init {
+            err.this != nil
+        } set: {
+            if !$0 { err.clear() }
+        }
+    }
 
     /// Welcome data.
     @AppStorage("dev.zakhary.rugby.welcome") private var welcome: String?
@@ -55,11 +65,21 @@ struct MainView: View {
                     }
             }
         }
+        .sheet(isPresented: showFailure) {
+            NavigationStack {
+                FailureView()
+            }
+            .presentationDragIndicator(.visible)
+            .presentationDetents([.medium, .large])
+        }
         .sheet(isPresented: showWelcome) {
             WelcomeView()
         }
         .onChange(of: app.game) { _, newValue in
             showEmulator = newValue != nil
+        }
+        .onChange(of: showFailure.wrappedValue) { _, newValue in
+            if !newValue { app.stop() }
         }
     }
 }
