@@ -59,7 +59,8 @@ impl Cartridge {
     /// cartridge integrity seems compromised. (This is detected using
     /// checksums.)
     pub fn check(rom: &[u8]) -> Result<()> {
-        Header::check(rom).map_err(Into::into)
+        let head = Header::new(rom)?;
+        Chip::check(&head, rom)
     }
 
     /// Constructs a new `Cartridge`, checking for cartridge integrity.
