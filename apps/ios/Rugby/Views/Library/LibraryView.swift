@@ -87,15 +87,13 @@ struct LibraryView: View {
                     }
                     // Iterate over selected files
                     files
-                        .filter { file in
-                            // Ensure valid ROM
-                            return (try? lib.check(url: file)) ?? false
-                        }
                         .forEach { file in
-                            // Attempt to add to library
-                            do { try lib.add(url: file) } catch { err.log(error) }
-                            // Release access permission
-                            file.stopAccessingSecurityScopedResource()
+                            do {
+                                // Ensure valid ROM
+                                try lib.check(url: file)
+                                // Attempt to add to library
+                                try lib.add(url: file)
+                            } catch { err.log(error) }
                         }
                 }
             }
