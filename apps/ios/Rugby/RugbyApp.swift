@@ -39,24 +39,12 @@ struct RugbyApp: App {
                         return
                     }
                     // Add to library
-                    do { try lib.add(url: url) } catch { err.or = error }
+                    do { try lib.add(url: url) } catch { err.log(error) }
                     // Play new import
                     let name = url.deletingPathExtension().lastPathComponent
                     if let game = lib.games.first(where: { $0.name == name }) {
-                        do { try app.play(game) } catch { err.or = error }
+                        do { try app.play(game) } catch { err.log(error) }
                     }
-                }
-                .alert(
-                    "Error",
-                    isPresented: Binding(
-                        get: { err.or != nil },
-                        set: { if !$0 { err.or = nil } },
-                    ),
-                    presenting: err.or,
-                ) { _ in
-                    Button("OK", role: .cancel) {}
-                } message: { error in
-                    Text(error.localizedDescription)
                 }
         }
         .onChange(of: opt.data.pal.tint, initial: true) { _, tint in
@@ -79,9 +67,7 @@ extension RugbyApp {
         do {
             try session.setCategory(.playback)
             try session.setActive(true)
-        } catch {
-            err.or = error
-        }
+        } catch { err.log(error) }
     }
 }
 
