@@ -16,15 +16,8 @@ struct MainView: View {
     @State private var showEmulator = false
     /// Settings page.
     @State private var showSettings = false
-
-    /// Failure page.
-    private var showFailure: Binding<Bool> {
-        .init {
-            err.this != nil
-        } set: {
-            if !$0 { err.clear() }
-        }
-    }
+    /// Failures page.
+    @State private var showFailures = false
 
     /// Welcome data.
     @AppStorage("dev.zakhary.rugby.welcome") private var welcome: String?
@@ -41,6 +34,15 @@ struct MainView: View {
         NavigationStack {
             LibraryView()
                 .toolbar {
+                    if !err.past.isEmpty {
+                        ToolbarItem {
+                            Button("Failures", systemImage: "exclamationmark.triangle") {
+                                showFailures.toggle()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.yellow)
+                        }
+                    }
                     ToolbarItem {
                         Button("Settings", systemImage: "gearshape.fill") {
                             showSettings.toggle()
@@ -65,9 +67,16 @@ struct MainView: View {
                     }
             }
         }
-        .sheet(isPresented: showFailure) {
+        .sheet(isPresented: $showFailures) {
             NavigationStack {
                 FailureView()
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done", systemImage: "checkmark", role: .confirm) {
+                                showFailures.toggle()
+                            }
+                        }
+                    }
             }
             .presentationDragIndicator(.visible)
             .presentationDetents([.medium, .large])
@@ -78,8 +87,12 @@ struct MainView: View {
         .onChange(of: app.game) { _, newValue in
             showEmulator = newValue != nil
         }
-        .onChange(of: showFailure.wrappedValue) { _, newValue in
-            if !newValue { app.stop() }
+        .onChange(of: err.this) { _, newValue in
+            showFailures = newValue != nil
+            // Stop emulation
+            if newValue != nil {
+                app.stop()
+            }
         }
     }
 }
