@@ -91,9 +91,7 @@ struct EmulatorView: View {
                     // Remove cartridge
                     try emu.stop()
                 }
-            } catch {
-                err.or = error
-            }
+            } catch { err.log(error) }
         }
         .onChange(of: active, initial: true) {
             // Sync emulator
