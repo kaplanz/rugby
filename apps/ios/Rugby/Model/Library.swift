@@ -67,7 +67,7 @@ final class Library {
     }
 
     /// Checks if a game ROM is valid.
-    func check(url: URL) throws -> Bool {
+    func check(url: URL) throws {
         // Acquire access permission
         if !url.startAccessingSecurityScopedResource() {
             throw Self.Error.access
@@ -75,17 +75,10 @@ final class Library {
         defer {
             url.stopAccessingSecurityScopedResource()
         }
-        // Ensure valid ROM
-        var valid = false
         // Read the file data
         let data = try Data(contentsOf: url)
-        // Try to construct a cartridge
-        let _ = try RugbyKit.check(data: data)
-        // Mark as valid
-        valid = true
-
-        // Return validity
-        return valid
+        // Check data validity
+        try RugbyKit.check(data: data)
     }
 
     /// Adds a new title to the library

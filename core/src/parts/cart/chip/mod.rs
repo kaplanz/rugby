@@ -71,6 +71,23 @@ impl Chip {
             kind => Err(Error::Unsupported(kind.clone())),
         }
     }
+
+    /// Checks a if ROM has can reasonably be constructed.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if unsupported cartridge type is specified in the
+    /// header.
+    #[expect(unused_variables)]
+    pub fn check(head: &Header, rom: &[u8]) -> Result<()> {
+        match &head.board {
+            Board::None { .. } => Ok(()),
+            Board::Mbc1 { .. } => Ok(()),
+            Board::Mbc3 { .. } => Ok(()),
+            Board::Mbc5 { .. } => Ok(()),
+            kind => Err(Error::Unsupported(kind.clone()))
+        }
+    }
 }
 
 impl Block for Chip {
