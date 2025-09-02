@@ -22,6 +22,11 @@ struct GameInfoView: View {
     /// Cartridge header.
     private var info: Header
 
+    /// Global checksum message.
+    @State private var showGlobal = false
+    /// Header checksum message.
+    @State private var showHeader = false
+
     init(game: Game) {
         self.game = game
         self.info = try! RugbyKit.header(data: game.data)
@@ -127,12 +132,50 @@ struct GameInfoView: View {
             // Checksum
             Section("Checksum") {
                 Row("Header") {
-                    Text(String(format: "%02X", info.check.hchk))
-                        .monospaced()
+                    let format = { String(format: "%02X", $0) }
+                    let expect = RugbyKit.hchk(data: game.data)
+                    let actual = info.check.hchk
+                    Group {
+                        if expect != actual {
+                            Button("Warning", systemImage: "exclamationmark.circle") {
+                                showGlobal.toggle()
+                            }
+                            .labelStyle(.iconOnly)
+                            .confirmationDialog(
+                                "Invalid Checksum", isPresented: $showGlobal,
+                                titleVisibility: .visible
+                            ) {
+                            } message: {
+                                Text("Expected: \(format(expect))")
+                            }
+                        }
+                        Text(format(actual))
+                            .monospaced()
+                    }
+                    .foregroundStyle(expect == actual ? .primary : Color.red)
                 }
                 Row("Global") {
-                    Text(String(format: "%04X", info.check.gchk))
-                        .monospaced()
+                    let format = { String(format: "%04X", $0) }
+                    let expect = RugbyKit.gchk(data: game.data)
+                    let actual = info.check.gchk
+                    Group {
+                        if expect != actual {
+                            Button("Warning", systemImage: "exclamationmark.circle") {
+                                showGlobal.toggle()
+                            }
+                            .labelStyle(.iconOnly)
+                            .confirmationDialog(
+                                "Invalid Checksum", isPresented: $showGlobal,
+                                titleVisibility: .visible
+                            ) {
+                            } message: {
+                                Text("Expected: \(format(expect))")
+                            }
+                        }
+                        Text(format(actual))
+                            .monospaced()
+                    }
+                    .foregroundStyle(expect == actual ? .primary : Color.red)
                 }
                 Row("CRC32") {
                     let hash = game.data.withUnsafeBytes {
