@@ -33,15 +33,15 @@ struct RugbyApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .onOpenURL { url in
-                    // Ensure valid ROM
-                    guard let valid = try? lib.check(url: url), valid else {
-                        return
-                    }
-                    // Add to library
-                    do { try lib.add(url: url) } catch { err.log(error) }
+                .onOpenURL { file in
+                    do {
+                        // Ensure valid ROM
+                        try lib.check(url: file)
+                        // Add to library
+                        try lib.add(url: file)
+                    } catch { err.log(error) }
                     // Play new import
-                    let name = url.deletingPathExtension().lastPathComponent
+                    let name = file.deletingPathExtension().lastPathComponent
                     if let game = lib.games.first(where: { $0.name == name }) {
                         do { try app.play(game) } catch { err.log(error) }
                     }
