@@ -129,12 +129,10 @@ struct GameInfoView: View {
                 Row("Header") {
                     Text(String(format: "%02X", info.check.hchk))
                         .monospaced()
-                        .textSelection(.enabled)
                 }
                 Row("Global") {
                     Text(String(format: "%04X", info.check.gchk))
                         .monospaced()
-                        .textSelection(.enabled)
                 }
                 Row("CRC32") {
                     let hash = game.data.withUnsafeBytes {
@@ -143,7 +141,6 @@ struct GameInfoView: View {
                     let repr = String(format: "%08X", hash)
                     Text(repr)
                         .monospaced()
-                        .textSelection(.enabled)
                 }
                 Row("MD5") {
                     let hash = Insecure.MD5.hash(data: game.data)
@@ -152,7 +149,6 @@ struct GameInfoView: View {
                     }.joined(separator: " ")
                     Text(repr)
                         .monospaced()
-                        .textSelection(.enabled)
                 }
                 Row("SHA-1") {
                     let hash = Insecure.SHA1.hash(data: game.data)
@@ -161,7 +157,6 @@ struct GameInfoView: View {
                     }.joined(separator: " ")
                     Text(repr)
                         .monospaced()
-                        .textSelection(.enabled)
                 }
                 Row("SHA-256") {
                     let hash = SHA256.hash(data: game.data)
@@ -170,7 +165,6 @@ struct GameInfoView: View {
                     }.joined(separator: " ")
                     Text(repr)
                         .monospaced()
-                        .textSelection(.enabled)
                 }
             }
         }
