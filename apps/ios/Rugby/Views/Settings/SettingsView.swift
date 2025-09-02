@@ -95,7 +95,7 @@ struct SettingsView: View {
                     Button("Delete", role: .destructive) {
                         withAnimation {
                             lib.games.forEach { game in
-                                do { try lib.delete(game: game) } catch { err.or = error }
+                                do { try lib.delete(game: game) } catch { err.log(error) }
                             }
                         }
                     }
