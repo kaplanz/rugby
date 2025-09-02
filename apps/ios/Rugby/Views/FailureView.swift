@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FailureView: View {
     @Environment(Failure.self) private var err
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
@@ -32,15 +33,18 @@ struct FailureView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Clear", systemImage: "trash", role: .destructive) {
-                    withAnimation { err.clearAll() }
+                    withAnimation {
+                        // Clear errors
+                        err.clearAll()
+                        // Dismiss view
+                        dismiss()
+                    }
                 }
                 .tint(.red)
             }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Done", systemImage: "checkmark", role: .confirm) {
-                    withAnimation { err.clear() }
-                }
-            }
+        }
+        .onDisappear {
+            withAnimation { err.clear() }
         }
     }
 }
