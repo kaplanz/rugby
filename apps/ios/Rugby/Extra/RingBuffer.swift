@@ -65,10 +65,9 @@ public final class RingBuffer<T> {
     /// This should be called by the consumer.
     public func clear() {
         let tail = self.tail.load(ordering: .acquiring)
-        let head = self.head.load(ordering: .acquiring)
 
         // Reinitialize storage
-        data.advanced(by: Int(head)).initialize(repeating: nil, count: Int(tail &- head))
+        data.initialize(repeating: nil, count: Int(size))
         // Clear read pointer
         self.head.store(tail, ordering: .releasing)
     }
