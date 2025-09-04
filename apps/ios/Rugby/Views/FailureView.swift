@@ -11,6 +11,9 @@ struct FailureView: View {
     @Environment(Failure.self) private var err
     @Environment(\.dismiss) private var dismiss
 
+    /// Error history.
+    @State private var showHistory = false
+
     var body: some View {
         List {
             // Current
@@ -19,17 +22,24 @@ struct FailureView: View {
                     ForEach(err.this.enumerated().reversed(), id: \.offset) { _, error in
                         FailureItem(item: error)
                     }
+                    .onDelete { offsets in
+                        err.this.remove(atOffsets: offsets)
+                    }
                 }
             }
             // History
             if !err.past.isEmpty {
-                Section("History") {
+                Section("History", isExpanded: $showHistory) {
                     ForEach(err.past.enumerated().reversed(), id: \.offset) { _, error in
                         FailureItem(item: error)
+                    }
+                    .onDelete { offsets in
+                        err.past.remove(atOffsets: offsets)
                     }
                 }
             }
         }
+        .listStyle(.sidebar)
         .navigationTitle("Errors")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -42,6 +52,10 @@ struct FailureView: View {
                 }
                 .tint(.red)
             }
+        }
+        .onAppear {
+            // Expand history when there's no current errors
+            showHistory = err.this.isEmpty
         }
         .onDisappear {
             err.clear()
