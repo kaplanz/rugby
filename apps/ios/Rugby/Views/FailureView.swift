@@ -19,7 +19,7 @@ struct FailureView: View {
             // Current
             if !err.this.isEmpty {
                 Section {
-                    ForEach(err.this.enumerated().reversed(), id: \.offset) { _, error in
+                    ForEach(err.this.reversed()) { error in
                         FailureItem(item: error)
                     }
                     .onDelete { offsets in
@@ -30,7 +30,7 @@ struct FailureView: View {
             // History
             if !err.past.isEmpty {
                 Section("History", isExpanded: $showHistory) {
-                    ForEach(err.past.enumerated().reversed(), id: \.offset) { _, error in
+                    ForEach(err.past.reversed()) { error in
                         FailureItem(item: error)
                     }
                     .onDelete { offsets in
