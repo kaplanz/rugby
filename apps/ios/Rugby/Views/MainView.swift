@@ -89,7 +89,6 @@ struct MainView: View {
             showEmulator = newValue != nil
         }
         .onChange(of: err.this) { _, newValue in
-            showFailures = !newValue.isEmpty
             // Stop emulation
             if !newValue.isEmpty {
                 app.stop()
