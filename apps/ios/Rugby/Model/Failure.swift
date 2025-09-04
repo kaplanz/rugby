@@ -7,36 +7,38 @@
 
 import Foundation
 import RugbyKit
+import SwiftUI
 
 /// Internal error.
 @Observable
 final class Failure {
     /// Current error.
-    private(set) var this: Error? {
-        willSet {
-            if let prev = this {
-                past.append(prev)
-            }
-        }
-    }
+    private(set) var this: [Error] = .init()
 
     /// Error history.
     private(set) var past: [Error] = .init()
 
     /// Log a new error.
     func log(_ error: any Swift.Error) {
-        this = .init(src: error)
+        withAnimation {
+            this.append(.init(src: error))
+        }
     }
 
     /// Clear the main error.
     func clear() {
-        this = nil
+        withAnimation {
+            past.append(contentsOf: this)
+            this.removeAll()
+        }
     }
 
     /// Clears all saved errors.
     func clearAll() {
-        self.clear()
-        past.removeAll()
+        withAnimation {
+            this.removeAll()
+            past.removeAll()
+        }
     }
 }
 
