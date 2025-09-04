@@ -13,10 +13,10 @@ import SwiftUI
 @Observable
 final class Failure {
     /// Current error.
-    private(set) var this: [Error] = .init()
+    var this: [Error] = .init()
 
     /// Error history.
-    private(set) var past: [Error] = .init()
+    var past: [Error] = .init()
 
     /// Log a new error.
     func log(_ error: any Swift.Error) {
