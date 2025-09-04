@@ -41,6 +41,7 @@ struct MainView: View {
                             }
                             .buttonStyle(.borderedProminent)
                             .tint(.yellow)
+                            .badge(err.past.count)
                         }
                     }
                     ToolbarItem {
