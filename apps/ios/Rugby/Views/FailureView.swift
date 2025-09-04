@@ -14,9 +14,11 @@ struct FailureView: View {
     var body: some View {
         List {
             // Current
-            if let error = err.this {
+            if !err.this.isEmpty {
                 Section {
-                    FailureItem(item: error)
+                    ForEach(err.this.enumerated().reversed(), id: \.offset) { _, error in
+                        FailureItem(item: error)
+                    }
                 }
             }
             // History
@@ -33,18 +35,16 @@ struct FailureView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Clear", systemImage: "trash", role: .destructive) {
-                    withAnimation {
-                        // Clear errors
-                        err.clearAll()
-                        // Dismiss view
-                        dismiss()
-                    }
+                    // Clear errors
+                    err.clearAll()
+                    // Dismiss view
+                    dismiss()
                 }
                 .tint(.red)
             }
         }
         .onDisappear {
-            withAnimation { err.clear() }
+            err.clear()
         }
     }
 }

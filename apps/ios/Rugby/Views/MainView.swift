@@ -34,14 +34,14 @@ struct MainView: View {
         NavigationStack {
             LibraryView()
                 .toolbar {
-                    if !err.past.isEmpty {
+                    if !err.this.isEmpty || !err.past.isEmpty {
                         ToolbarItem {
                             Button("Failures", systemImage: "exclamationmark.triangle") {
                                 showFailures.toggle()
                             }
                             .buttonStyle(.borderedProminent)
                             .tint(.yellow)
-                            .badge(err.past.count)
+                            .badge(err.this.count)
                         }
                     }
                     ToolbarItem {
@@ -89,9 +89,9 @@ struct MainView: View {
             showEmulator = newValue != nil
         }
         .onChange(of: err.this) { _, newValue in
-            showFailures = newValue != nil
+            showFailures = !newValue.isEmpty
             // Stop emulation
-            if newValue != nil {
+            if !newValue.isEmpty {
                 app.stop()
             }
         }
