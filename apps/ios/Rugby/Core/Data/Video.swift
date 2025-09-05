@@ -27,7 +27,7 @@ final class Video: @unchecked Sendable {
         queue.async { [weak self] in
             guard let self else { return }
             // Draw frame to image
-            let image = self.draw(frame: frame)
+            let image = Self.draw(frame: frame)
             // Publish on main thread
             Task { @MainActor in
                 self.image = image
@@ -36,36 +36,47 @@ final class Video: @unchecked Sendable {
     }
 
     /// Draw a video frame.
-    private func draw(frame: Frame) -> CGImage? {
-        // Colour frame to buffer
-        let pal = Options().data.pal
-        let buf = frame.map { pal.data[Int($0)].bigEndian }
+    static func draw(frame: Frame) -> CGImage? {
+        // Use frame indices directly (no colour lookup)
+        let pal = Options().data.pal.data
+        let buf = Data(frame)
 
-        // Cast buffer to data
-        let data = buf.withUnsafeBufferPointer { ptr in
-            return ptr.baseAddress!.withMemoryRebound(
-                to: UInt8.self, capacity: buf.count * MemoryLayout<UInt32>.size
-            ) { ptr in
-                return Data(bytes: ptr, count: buf.count * MemoryLayout<UInt32>.size)
-            }
+        // Convert palette to colour table data
+        let data = Array(
+            pal.flatMap { value in
+                withUnsafeBytes(of: value.littleEndian) { bytes in
+                    [
+                        bytes[2],  // red
+                        bytes[1],  // green
+                        bytes[0],  // blue
+                    ]
+                }
+            })
+
+        // Create indexed colour space
+        guard
+            let space = CGColorSpace(
+                indexedBaseSpace: CGColorSpaceCreateDeviceRGB(),
+                last: pal.count - 1,
+                colorTable: data.withUnsafeBytes { $0.bindMemory(to: UInt8.self).baseAddress! }
+            )
+        else {
+            return nil
         }
 
         // Define image parameters
         let (wd, ht) = (160, 144)
-        let bpp = 4
-        let bpc = 8
-        let bpr = wd * bpp
 
         // Render data as image
         return CGImage(
             width: wd,
             height: ht,
-            bitsPerComponent: bpc,
-            bitsPerPixel: bpc * bpp,
-            bytesPerRow: bpr,
-            space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue),
-            provider: CGDataProvider(data: data as CFData)!,
+            bitsPerComponent: 8,
+            bitsPerPixel: 8,
+            bytesPerRow: wd,
+            space: space,
+            bitmapInfo: CGBitmapInfo(rawValue: 0),
+            provider: CGDataProvider(data: buf as CFData)!,
             decode: nil,
             shouldInterpolate: true,
             intent: .defaultIntent

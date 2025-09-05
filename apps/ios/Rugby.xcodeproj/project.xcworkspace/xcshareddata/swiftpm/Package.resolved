@@ -1,5 +1,5 @@
 {
-  "originHash" : "2c2b5d1a33c8d5feb35fd7fb75cb9ed82d03732e5e3745d129c96519a3511745",
+  "originHash" : "a0dad1d50eb120d215f63082bd7c2d329ab71498b929508ed1f332980b038893",
   "pins" : [
     {
       "identity" : "colortokenskit-swift",
@@ -47,30 +47,12 @@
       }
     },
     {
-      "identity" : "swift-hash",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tayloraswift/swift-hash",
-      "state" : {
-        "revision" : "ea0b9fc3152ed5941dd82e4a01e65f99fe1a75d2",
-        "version" : "0.7.1"
-      }
-    },
-    {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-numerics.git",
       "state" : {
         "revision" : "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
         "version" : "1.0.3"
-      }
-    },
-    {
-      "identity" : "swift-png",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tayloraswift/swift-png",
-      "state" : {
-        "revision" : "d444d98aa32f022bf4a8e74b5a697c7ee856a6ad",
-        "version" : "4.4.9"
       }
     },
     {
