@@ -43,9 +43,7 @@ final class Failure {
 }
 
 extension Failure {
-    struct Error: Swift.Error {
-        /// Error global identifier.
-        let eid: UUID = .init()
+    struct Error: Swift.Error, Identifiable {
         /// Error upstream source.
         let src: any Swift.Error
         /// Error logging timestamp.
@@ -62,6 +60,9 @@ extension Failure {
                 src.localizedDescription
             }
         }
+
+        // MARK: `impl Identifiable`
+        let id: UUID = .init()
     }
 }
 
@@ -69,8 +70,4 @@ extension Failure.Error: Equatable {
     static func == (lhs: Failure.Error, rhs: Failure.Error) -> Bool {
         lhs.id == rhs.id
     }
-}
-
-extension Failure.Error: Identifiable {
-    var id: UUID { eid }
 }

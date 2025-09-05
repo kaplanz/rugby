@@ -21,6 +21,12 @@ struct FailureView: View {
                 Section {
                     ForEach(err.this.reversed()) { error in
                         FailureItem(item: error)
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button("Report", systemImage: "exclamationmark.bubble") {
+                                    Self.report(error: error)
+                                }
+                                .tint(.accentColor)
+                            }
                     }
                     .onDelete { offsets in
                         err.this.remove(atOffsets: offsets)
@@ -32,6 +38,12 @@ struct FailureView: View {
                 Section("History", isExpanded: $showHistory) {
                     ForEach(err.past.reversed()) { error in
                         FailureItem(item: error)
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button("Report", systemImage: "exclamationmark.bubble") {
+                                    Self.report(error: error)
+                                }
+                                .tint(.accentColor)
+                            }
                     }
                     .onDelete { offsets in
                         err.past.remove(atOffsets: offsets)
@@ -61,6 +73,32 @@ struct FailureView: View {
             err.clear()
         }
     }
+
+    static private func report(error: Failure.Error) {
+        // Make mailto URL
+        var mailto = URLComponents()
+        mailto.scheme = "mailto"
+        mailto.path = "bugs@zakhary.dev"
+        mailto.queryItems = [
+            URLQueryItem(
+                name: "subject", value: "[\(Build.NAME)/iOS] Error Report"),
+            URLQueryItem(
+                name: "body",
+                value: """
+                    UUID: \(error.id)
+                    Date: \(error.clk.formatted(.iso8601))
+                    Info: \(error.msg)
+                    """,
+            ),
+        ]
+        // Open mailto URL
+        guard let url = mailto.url else {
+            log.error("failed to create mailto URL")
+            return
+        }
+        UIApplication.shared.open(url)
+    }
+
 }
 
 #Preview {
@@ -83,6 +121,5 @@ private struct FailureItem: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.yellow)
         }
-
     }
 }
