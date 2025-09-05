@@ -5,7 +5,7 @@
 //  Created by Zakhary Kaplan on 2024-06-23.
 //
 
-import PNG
+import ImageIO
 import SwiftUI
 
 struct GameIcon: View {
@@ -13,22 +13,41 @@ struct GameIcon: View {
 
     @State var game: Game
 
-    private var frame: Image? {
-        game.icon.flatMap(Image.init(uiImage:))
-    }
-
-    private var empty: Image {
-        let url = Bundle.main.url(forResource: "unused", withExtension: "png")!
-        let img: PNG.Image = try! .decompress(path: url.path())!
-        return recolor(img, pal: opt.data.pal)
-    }
-
     var body: some View {
-        (frame ?? empty)
+        Image(uiImage: frame ?? empty)
             .resizable()
             .aspectRatio(10 / 9, contentMode: .fit)
             .clipShape(.containerRelative)
             .glassEffect(in: .containerRelative)
+            .onChange(of: opt.data.pal) {
+                // Makes this view subscribe to changes in the palette.
+            }
+    }
+
+    private var frame: UIImage? {
+        game.icon?.cgImage.flatMap(Self.redraw).map(UIImage.init(cgImage:))
+    }
+
+    private var empty: UIImage {
+        // Load bundled unused image
+        let url = Bundle.main.url(forResource: "unused", withExtension: "png")!
+        let img = UIImage(named: url.path())!
+        // Recolor with this palette
+        return img.cgImage.flatMap(Self.redraw).map(UIImage.init(cgImage:)) ?? img
+    }
+
+    private static func redraw(image: CGImage) -> CGImage? {
+        guard case .indexed = image.colorSpace?.model,
+            let data = image.dataProvider?.data
+        else {
+            return nil
+        }
+
+        // Extract indexed frame data
+        let frame = Data(
+            UnsafeBufferPointer(start: CFDataGetBytePtr(data), count: CFDataGetLength(data)))
+        // Draw using current palette
+        return Video.draw(frame: frame)
     }
 }
 
@@ -40,44 +59,4 @@ struct GameIcon: View {
     {
         GameIcon(game: game)
     }
-}
-
-private func recolor(_ img: PNG.Image, pal: Palette) -> Image {
-    // Convert image to buffer
-    let buf = img.storage.map { pixel in
-        pal.data[Int(pixel)].bigEndian
-    }
-
-    // Cast buffer to data
-    let data = buf.withUnsafeBufferPointer { ptr in
-        return ptr.baseAddress!.withMemoryRebound(
-            to: UInt8.self, capacity: buf.count * MemoryLayout<UInt32>.size
-        ) { ptr in
-            return Data(bytes: ptr, count: buf.count * MemoryLayout<UInt32>.size)
-        }
-    }
-
-    // Define image parameters
-    let (wd, ht) = img.size
-    let bpp = 4
-    let bpc = 8
-    let bpr = wd * bpp
-
-    // Render data as image
-    return Image(
-        uiImage: UIImage(
-            cgImage: CGImage(
-                width: wd,
-                height: ht,
-                bitsPerComponent: bpc,
-                bitsPerPixel: bpc * bpp,
-                bytesPerRow: bpr,
-                space: CGColorSpaceCreateDeviceRGB(),
-                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue),
-                provider: CGDataProvider(data: data as CFData)!,
-                decode: nil,
-                shouldInterpolate: true,
-                intent: .defaultIntent
-            )!))
-
 }
