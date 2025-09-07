@@ -50,6 +50,17 @@ struct FailureView: View {
                     }
                 }
             }
+            // Message
+            Text(
+                """
+                Errors will be reported here as they occur. Not all errors are \
+                considered bugs! Please consider before making a report.
+                """
+            )
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .listRowBackground(Color.clear)
+            .listRowSpacing(0)
         }
         .listStyle(.sidebar)
         .navigationTitle("Errors")
