@@ -29,7 +29,11 @@ struct FailureView: View {
                             }
                     }
                     .onDelete { offsets in
-                        err.this.remove(atOffsets: offsets)
+                        // Reverse offsets to correct for reversed list
+                        let offsets = IndexSet(offsets.map { err.this.count - 1 - $0 })
+                        withAnimation {
+                            err.this.remove(atOffsets: offsets)
+                        }
                     }
                 }
             }
@@ -46,7 +50,11 @@ struct FailureView: View {
                             }
                     }
                     .onDelete { offsets in
-                        err.past.remove(atOffsets: offsets)
+                        // Reverse offsets to correct for reversed list
+                        let offsets = IndexSet(offsets.map { err.past.count - 1 - $0 })
+                        withAnimation {
+                            err.past.remove(atOffsets: offsets)
+                        }
                     }
                 }
             }
