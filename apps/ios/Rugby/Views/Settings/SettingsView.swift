@@ -43,15 +43,33 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.navigationLink)
                 // Speed
-                NavigationLink {
-                    SpeedPicker(speed: $cfg.spd)
-                } label: {
-                    HStack {
-                        Label("Speed", systemImage: "stopwatch")
-                        Spacer()
-                        Text(cfg.spd.description)
-                            .foregroundStyle(.secondary)
+                DisclosureGroup {
+                    // Reverse
+                    NavigationLink {
+                        SpeedPicker(speed: $cfg.spd.rev)
+                    } label: {
+                        HStack {
+                            Label("Reverse", systemImage: "backward.circle")
+                            Spacer()
+                            Text(cfg.spd.rev.description)
+                                .foregroundStyle(.secondary)
+                        }
                     }
+                    // Forward
+                    NavigationLink {
+                        SpeedPicker(speed: $cfg.spd.fwd)
+                    } label: {
+                        HStack {
+                            Label("Forward", systemImage: "forward.circle")
+                            Spacer()
+                            Text(cfg.spd.fwd.description)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } label: {
+                    Label(
+                        "Speed",
+                        systemImage: "gauge.open.with.lines.needle.67percent.and.arrowtriangle")
                 }
             }
             // Danger Zone

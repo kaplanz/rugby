@@ -59,14 +59,11 @@ private func main(cxn: Connect) {
         log.debug("finished thread: \(Thread.current)")
     }
 
-    // Fetch configuration
-    let cfg = Options().data
     // Instantiate emulator
     let emu = RugbyKit.GameBoy()
     // Instantiate context
     var ctx = Context()
     // Prepare clocking
-    ctx.clock.frq = cfg.spd.freq
     var delay: Date?
 
     // Emulator loop
