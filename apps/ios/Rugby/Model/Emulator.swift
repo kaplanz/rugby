@@ -54,6 +54,11 @@ final class Emulator {
         core.reset(kind)
     }
 
+    /// Change speed.
+    func speed(_ speed: Speed) {
+        core.speed(speed)
+    }
+
     /// Video frame.
     var frame: CGImage? {
         core.video.image
