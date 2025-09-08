@@ -10,6 +10,7 @@ import SwiftUI
 struct EmulatorView: View {
     @Environment(Runtime.self) private var app
     @Environment(Failure.self) private var err
+    @Environment(Options.self) private var opt
     @Environment(\.scenePhase) private var scenePhase
 
     /// Emulator instance.
@@ -21,6 +22,11 @@ struct EmulatorView: View {
     @State private var showInfo = false
     /// Show settings.
     @State private var showConf = false
+    /// Play controls.
+    @State private var playback: Playback?
+    enum Playback {
+        case forward, reverse
+    }
 
     /// Emulator is active.
     private var active: Bool {
@@ -72,6 +78,9 @@ struct EmulatorView: View {
             }
         }
         .sheet(isPresented: $showConf) {
+            // Refresh configuration
+            self.player(playback)
+        } content: {
             NavigationStack {
                 SettingsView()
                     .toolbar {
@@ -99,9 +108,25 @@ struct EmulatorView: View {
             // Prevent idle
             UIApplication.shared.isIdleTimerDisabled = active
         }
+        .onChange(of: playback) { _, newValue in
+            self.player(playback)
+        }
         .onDisappear {
             // Reallow idle
             UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    /// Update emulation playback.
+    func player(_ event: Playback?) {
+        switch event {
+        case .forward:
+            emu.speed(opt.data.spd.fwd)
+        case .reverse:
+            // TODO: Implement reverse
+            break
+        default:
+            emu.speed(.actual)
         }
     }
 
@@ -110,9 +135,14 @@ struct EmulatorView: View {
             // Playback
             ControlGroup {
                 Button {
-                    // TODO: Implement rewind
+                    if playback.take() == nil {
+                        playback = .reverse
+                    }
                 } label: {
-                    Label("Rewind", systemImage: false ? "backward.fill" : "backward")
+                    Label(
+                        "Reverse",
+                        systemImage:
+                            playback == .reverse ? "backward.fill" : "backward")
                 }
                 .disabled(true)
                 Button {
@@ -123,11 +153,16 @@ struct EmulatorView: View {
                         : Label("Pause", systemImage: "pause.fill")
                 }
                 Button {
-                    // TODO: Implement forward
+                    if playback.take() == nil {
+                        playback = .forward
+                    }
                 } label: {
-                    Label("Forward", systemImage: false ? "forward.fill" : "forward")
+                    Label(
+                        "Forward",
+                        systemImage:
+                            playback == .forward ? "forward.fill" : "forward"
+                    )
                 }
-                .disabled(true)
             }
             // Emulator
             Section {

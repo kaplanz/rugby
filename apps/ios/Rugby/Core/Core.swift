@@ -76,6 +76,11 @@ protocol Core {
     ///
     /// When running, causes the emulator to pause.
     func pause()
+
+    /// Change speed.
+    ///
+    /// Changes the emulated clock speed.
+    func speed(_ speed: Speed)
 }
 
 extension Core {
