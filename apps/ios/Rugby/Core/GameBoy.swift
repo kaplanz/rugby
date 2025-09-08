@@ -7,6 +7,7 @@
 
 import Foundation
 import RugbyKit
+import Synchronization
 
 /// Clock frequency.
 let CLOCK: UInt32 = 4_194_304
@@ -36,6 +37,9 @@ private final class Connect: @unchecked Sendable {
     @Atomic var pause: Bool = false
     /// Reset signal.
     @Atomic var reset: Bool = false
+
+    /// Clock speed.
+    let speed: Mutex<Speed?> = .init(nil)
 
     /// Cartridge slot.
     let media: Media = .init()
@@ -85,6 +89,16 @@ private func main(cxn: Connect) {
             cxn.media.request.withLock { event in
                 event = .eject
             }
+        }
+
+        // Re-timing events
+        cxn.speed.withLockIfAvailable { speed in
+            guard let speed = speed.take() else { return }
+            // Update emulation speed
+            //
+            // Also resets the synchronization, which is necessary whenever the
+            // clock speed has been changed.
+            ctx.clock.frq = speed.freq
         }
 
         // Cartridge events
@@ -355,5 +369,9 @@ extension GameBoy: Core {
         cxn.pause = true
         // Pause playback
         cxn.audio.pause()
+    }
+
+    func speed(_ speed: Speed) {
+        cxn.speed.withLock { $0 = speed }
     }
 }
