@@ -186,6 +186,7 @@ struct EmulatorView: View {
                 }
             }
         }
+        .menuActionDismissBehavior(.disabled)
     }
 
     var back: some View {
