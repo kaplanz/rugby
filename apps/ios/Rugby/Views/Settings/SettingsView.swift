@@ -29,6 +29,17 @@ struct SettingsView: View {
             AboutView()
             // Application
             Section("Application") {
+                // Shader
+                Picker(selection: $cfg.tex) {
+                    Text("None")
+                        .tag(Shader?.none)
+                    ForEach(Shader.allCases) { tex in
+                        Text(tex.description)
+                            .tag(Shader?.some(tex))
+                    }
+                } label: {
+                    Label("Shader", systemImage: "sparkles.tv")
+                }
                 // Palette
                 Picker(selection: $cfg.pal) {
                     ForEach(Palette.allCases) { pal in
