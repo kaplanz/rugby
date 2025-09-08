@@ -47,18 +47,41 @@ class Config {
             }
         }
     }
+
     /// Emulation speed.
-    var spd: Speed {
-        get {
-            access(keyPath: \.spd)
-            return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.spd").flatMap {
-                try? JSONDecoder().decode(Speed.self, from: $0)
-            } ?? .actual
+    var spd: Speedup = .init()
+
+    @Observable
+    class Speedup {
+        /// Forward speed.
+        var fwd: Speed {
+            get {
+                access(keyPath: \.fwd)
+                return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.spd.fwd").flatMap {
+                    try? JSONDecoder().decode(Speed.self, from: $0)
+                } ?? .ratio(2.0)
+            }
+            set {
+                withMutation(keyPath: \.fwd) {
+                    if let data = try? JSONEncoder().encode(newValue) {
+                        UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.spd.fwd")
+                    }
+                }
+            }
         }
-        set {
-            withMutation(keyPath: \.spd) {
-                if let data = try? JSONEncoder().encode(newValue) {
-                    UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.spd")
+        /// Reverse speed.
+        var rev: Speed {
+            get {
+                access(keyPath: \.rev)
+                return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.spd.rev").flatMap {
+                    try? JSONDecoder().decode(Speed.self, from: $0)
+                } ?? .ratio(0.5)
+            }
+            set {
+                withMutation(keyPath: \.rev) {
+                    if let data = try? JSONEncoder().encode(newValue) {
+                        UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.spd.rev")
+                    }
                 }
             }
         }
