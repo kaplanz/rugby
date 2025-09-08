@@ -39,10 +39,10 @@ extension Speed {
         switch self {
         case .actual:
             CLOCK
-        case .clock(let freq):
-            freq
         case .ratio(let mult):
             UInt32(Double(CLOCK) * mult)
+        case .clock(let freq):
+            freq
         case .frame(let rate):
             UInt32(rate) * VIDEO
         case .turbo:
@@ -58,14 +58,14 @@ extension Speed: CustomStringConvertible {
         switch self {
         case .actual:
             "Actual"
+        case .ratio(let mult):
+            mult.formatted(.percent.precision(.fractionLength(0)))
         case .clock(let freq):
             Measurement(value: Double(freq), unit: UnitFrequency.hertz).converted(to: .megahertz)
                 .formatted(
                     .measurement(
                         width: .abbreviated,
                         numberFormatStyle: .number.precision(.fractionLength(3))))
-        case .ratio(let mult):
-            mult.formatted(.percent)
         case .frame(let rate):
             Measurement(value: Double(rate), unit: UnitFrequency.framesPerSecond).formatted()
         case .turbo:
@@ -73,3 +73,5 @@ extension Speed: CustomStringConvertible {
         }
     }
 }
+
+extension Speed: Hashable {}
