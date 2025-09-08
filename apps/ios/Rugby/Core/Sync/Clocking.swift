@@ -10,7 +10,11 @@ import Foundation
 /// Clock synchronizer.
 struct Clocking {
     /// Target frequency.
-    var frq: UInt32? = Speed.actual.freq
+    var frq: UInt32? = Speed.actual.freq {
+        willSet {
+            self.reset()
+        }
+    }
     /// Clock instant.
     var clk: Date = .now
     /// Cycle counter.
