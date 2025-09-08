@@ -32,12 +32,32 @@ class Options {
 /// Configuration data.
 @Observable
 class Config {
+    /// Video shader.
+    var tex: Shader? {
+        get {
+            access(keyPath: \.tex)
+            return UserDefaults.standard.string(forKey: "dev.zakhary.rugby.tex").flatMap {
+                .init(rawValue: $0)
+            }
+        }
+        set {
+            withMutation(keyPath: \.tex) {
+                if let newValue {
+                    UserDefaults.standard.setValue(
+                        newValue.rawValue, forKey: "dev.zakhary.rugby.tex")
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "dev.zakhary.rugby.tex")
+                }
+            }
+        }
+    }
+
     /// Palette selection.
     var pal: Palette {
         get {
             access(keyPath: \.pal)
             return UserDefaults.standard.string(forKey: "dev.zakhary.rugby.pal").flatMap {
-                Palette(rawValue: $0)
+                .init(rawValue: $0)
             }
                 ?? .demichrome
         }
