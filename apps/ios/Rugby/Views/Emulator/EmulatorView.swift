@@ -53,7 +53,7 @@ struct EmulatorView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Background())
+        .background(back)
         .toolbar {
             ToolbarSpacer(placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
@@ -152,18 +152,8 @@ struct EmulatorView: View {
             }
         }
     }
-}
 
-#Preview {
-    NavigationStack {
-        EmulatorView()
-    }
-    .environment(Runtime())
-    .environment(Failure())
-}
-
-private struct Background: View {
-    var body: some View {
+    var back: some View {
         Color.shell
             .overlay {
                 Image("Noise")
@@ -172,4 +162,12 @@ private struct Background: View {
             }
             .ignoresSafeArea()
     }
+}
+
+#Preview {
+    NavigationStack {
+        EmulatorView()
+    }
+    .environment(Runtime())
+    .environment(Failure())
 }
