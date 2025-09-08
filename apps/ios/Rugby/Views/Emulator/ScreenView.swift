@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct ScreenView: View {
+    @Environment(Options.self) private var opt
+
     @State var frame: UIImage?
+
+    private var scale: ShaderFunction? {
+        opt.data.tex?.scale
+    }
 
     private var empty: UIImage {
         ImageRenderer(
@@ -24,14 +30,25 @@ struct ScreenView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Image(uiImage: frame ?? empty)
-                .resizable()
-                .interpolation(.none)
-                .padding(6)
-                .border(.black, width: 8)
-                .clipShape(shape)
-                .glassEffect(in: shape)
-                .scaledToFit()
+            GeometryReader { geo in
+                Image(uiImage: frame ?? empty)
+                    .resizable()
+                    .interpolation(.none)
+                    .if(scale != nil) { view in
+                        view.layerEffect(
+                            scale!(
+                                .float2(160, 144),
+                                .float2(geo.size),
+                            ),
+                            maxSampleOffset: .zero,
+                        )
+                    }
+            }
+            .aspectRatio(10 / 9, contentMode: .fit)
+            .padding(6)
+            .border(.black, width: 8)
+            .clipShape(shape)
+            .glassEffect(in: shape)
             HStack(alignment: .firstTextBaseline) {
                 Text("Rugby")
                     .font(.custom("Pretendo", size: 20))
