@@ -30,15 +30,15 @@ struct SettingsView: View {
             // Application
             Section("Application") {
                 // Shader
-                Picker(selection: $cfg.tex) {
-                    Text("None")
-                        .tag(Shader?.none)
-                    ForEach(Shader.allCases) { tex in
-                        Text(tex.description)
-                            .tag(Shader?.some(tex))
-                    }
+                NavigationLink {
+                    ShaderPicker(shader: $cfg.tex)
                 } label: {
-                    Label("Shader", systemImage: "sparkles.tv")
+                    HStack {
+                        Label("Shader", systemImage: "sparkles.tv")
+                        Spacer()
+                        Text(cfg.tex?.description ?? "None")
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 // Palette
                 Picker(selection: $cfg.pal) {
