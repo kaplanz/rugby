@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ShaderPicker: View {
-    @Binding var shader: Shader?
+    @Binding var tex: Shader?
 
     var body: some View {
         Form {
@@ -16,7 +16,7 @@ struct ShaderPicker: View {
             ScreenView(frame: UIImage(named: "unused"))
                 .listRowBackground(Color.clear)
             // Picker
-            Picker(selection: $shader) {
+            Picker(selection: $tex) {
                 Text("None")
                     .tag(Shader?.none)
                 ForEach(Shader.allCases) { tex in
@@ -32,6 +32,6 @@ struct ShaderPicker: View {
 }
 
 #Preview {
-    ShaderPicker(shader: .constant(.lcd))
+    ShaderPicker(tex: .constant(.lcd))
         .environment(Options())
 }

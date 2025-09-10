@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SpeedPicker: View {
-    @Binding var speed: Speed
+    @Binding var spd: Speed
 
     var body: some View {
         Form {
@@ -16,18 +16,18 @@ struct SpeedPicker: View {
             Picker(
                 "Speed",
                 selection: .init(
-                    get: { speed.kind },
+                    get: { spd.kind },
                     set: { newValue in
-                        speed =
+                        spd =
                             switch newValue {
                             case .actual:
                                 .actual
                             case .ratio:
-                                .ratio(Double(speed.freq ?? CLOCK) / Double(CLOCK))
+                                .ratio(Double(spd.freq ?? CLOCK) / Double(CLOCK))
                             case .clock:
-                                .clock(speed.freq ?? CLOCK)
+                                .clock(spd.freq ?? CLOCK)
                             case .frame:
-                                .frame(UInt8((speed.freq ?? CLOCK) / VIDEO))
+                                .frame(UInt8((spd.freq ?? CLOCK) / VIDEO))
                             case .turbo:
                                 .turbo
                             }
@@ -40,14 +40,14 @@ struct SpeedPicker: View {
             }
             .pickerStyle(.inline)
             // Options
-            switch speed {
+            switch spd {
             case .ratio(let mult):
                 Section {
                     Stepper(
-                        speed.description,
+                        spd.description,
                         value: .init(
                             get: { mult },
-                            set: { speed = .ratio($0.rounded(toPlaces: 2)) },
+                            set: { spd = .ratio($0.rounded(toPlaces: 2)) },
                         ), step: 0.01)
                 } header: {
                     Text("Ratio")
@@ -57,10 +57,10 @@ struct SpeedPicker: View {
             case .clock(let freq):
                 Section {
                     Stepper(
-                        speed.description,
+                        spd.description,
                         value: .init(
                             get: { freq },
-                            set: { speed = .clock($0) },
+                            set: { spd = .clock($0) },
                         ), step: 1024)
                 } header: {
                     Text("Clock")
@@ -70,10 +70,10 @@ struct SpeedPicker: View {
             case .frame(let rate):
                 Section {
                     Stepper(
-                        speed.description,
+                        spd.description,
                         value: .init(
                             get: { rate },
-                            set: { speed = .frame($0) },
+                            set: { spd = .frame($0) },
                         ), step: 1)
                 } header: {
                     Text("Frame")
@@ -109,5 +109,5 @@ extension Speed {
 }
 
 #Preview {
-    SpeedPicker(speed: .constant(.actual))
+    SpeedPicker(spd: .constant(.actual))
 }
