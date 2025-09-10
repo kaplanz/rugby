@@ -44,7 +44,7 @@ struct Screen: View {
     private var empty: UIImage {
         ImageRenderer(
             content: Rectangle()
-                .fill(.black)
+                .fill(color)
                 .frame(width: 160, height: 144)
         ).uiImage!
     }
@@ -52,6 +52,11 @@ struct Screen: View {
     /// Border shape.
     private var shape: some Shape {
         .rect(cornerRadius: 4)
+    }
+
+    /// Background color.
+    private var color: Color {
+        Color(rgb: opt.data.pal.data.c0)
     }
 
     /// Shader function.
