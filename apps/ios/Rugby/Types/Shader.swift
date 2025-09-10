@@ -9,33 +9,36 @@ import Foundation
 import SwiftUI
 
 /// Video shader.
-enum Shader: String, CaseIterable, CustomStringConvertible, Identifiable {
-    /// Simulate an LCD.
-    case lcd = "LCD"
+enum Shader: String, CaseIterable {
+    /// Simulate DMG's LCD.
+    case dmg = "LCD (DMG)"
+    /// Simulate CGB's LCD.
+    case gbc = "LCD (GBC)"
+    /// Simulate AGB's LCD.
+    case gba = "LCD (GBA)"
     /// Scale2x algorithm.
     case scale2x = "Scale2x"
     /// Scale3x algorithm.
     case scale3x = "Scale3x"
-
-    // impl CustomStringConvertible
-    var description: String {
-        rawValue
-    }
-
-    // impl Identifiable
-    var id: Self { self }
 }
 
 extension Shader {
     /// Converts the `Shader` to its corresponding function.
-    var scale: ShaderFunction {
-        switch self {
-        case .lcd:
-            ShaderLibrary.lcd
-        case .scale2x:
-            ShaderLibrary.scale2x
-        case .scale3x:
-            ShaderLibrary.scale3x
-        }
+    var shader: ShaderFunction {
+        ShaderLibrary[dynamicMember: String(describing: self)]
     }
+}
+
+/// # Note
+///
+/// This is not implementing CustomStringConvertible, as that would override
+/// the internals used by `Mirror`.
+extension Shader {
+    var description: String {
+        rawValue
+    }
+}
+
+extension Shader: Identifiable {
+    var id: Self { self }
 }

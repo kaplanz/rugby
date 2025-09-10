@@ -44,6 +44,6 @@ struct ShaderPicker: View {
 }
 
 #Preview {
-    ShaderPicker(tex: .constant(.lcd))
+    ShaderPicker(tex: .constant(.dmg))
         .environment(Options())
 }

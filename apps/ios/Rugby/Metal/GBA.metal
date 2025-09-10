@@ -1,5 +1,5 @@
 //
-//  LCD.metal
+//  GBA.metal
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2025-09-08.
@@ -15,7 +15,7 @@ constant float COLOR_HI = 1.0;
 constant float SCANLINE = 0.1;
 
 [[ stitchable ]]
-half4 lcd(
+half4 gba(
     float2 position,
     SwiftUI::Layer layer,
     float2 ires,
@@ -31,32 +31,32 @@ half4 lcd(
     float2 mid = floor(pos) + 0.5;
 
     // Pixel coordinates
-    float2 midpoint = mid * ores / ires;
+    float2 midpoint = mid * i2o;
 
-    // horizontal
+    // Adjacent texels (horizontal)
     half4 lt = layer.sample(midpoint + float2(-1, 0) * i2o);
     half4 md = layer.sample(midpoint + float2(+0, 0) * i2o);
     half4 rt = layer.sample(midpoint + float2(+1, 0) * i2o);
 
-    // vertical
+    // Adjacent texels (vertical)
     if (sub.y < 1) {
         // sample
         lt = mix(lt, layer.sample(midpoint + float2(-1, -1) * i2o), .5 - sub.y / 2);
         md = mix(md, layer.sample(midpoint + float2(+0, -1) * i2o), .5 - sub.y / 2);
         rt = mix(rt, layer.sample(midpoint + float2(+1, -1) * i2o), .5 - sub.y / 2);
         // blend
-        lt *= sub.y * SCANLINE + (1 - SCANLINE);
-        md *= sub.y * SCANLINE + (1 - SCANLINE);
-        rt *= sub.y * SCANLINE + (1 - SCANLINE);
+        lt *= (1 - SCANLINE) + SCANLINE * sub.y;
+        md *= (1 - SCANLINE) + SCANLINE * sub.y;
+        rt *= (1 - SCANLINE) + SCANLINE * sub.y;
     } else if (sub.y > 5) {
         // sample
         lt = mix(lt, layer.sample(midpoint + float2(-1, +1) * i2o), (sub.y - 5) / 2);
         md = mix(md, layer.sample(midpoint + float2(+0, +1) * i2o), (sub.y - 5) / 2);
         rt = mix(rt, layer.sample(midpoint + float2(+1, +1) * i2o), (sub.y - 5) / 2);
         // blend
-        lt *= (6 - sub.y) * SCANLINE + (1 - SCANLINE);
-        md *= (6 - sub.y) * SCANLINE + (1 - SCANLINE);
-        rt *= (6 - sub.y) * SCANLINE + (1 - SCANLINE);
+        lt *= (1 - SCANLINE) + SCANLINE * (6 - sub.y);
+        md *= (1 - SCANLINE) + SCANLINE * (6 - sub.y);
+        rt *= (1 - SCANLINE) + SCANLINE * (6 - sub.y);
     }
 
     half4 ml = mix(lt, md, .5);
