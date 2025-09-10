@@ -11,6 +11,7 @@ struct WelcomeEnd: View {
     var body: some View {
         Text("Welcome!")
             .font(.largeTitle)
+            .fontDesign(.rounded)
             .fontWeight(.heavy)
             .foregroundStyle(Color.accentColor.gradient)
             .ignoresSafeArea()
