@@ -52,7 +52,8 @@ struct EmulatorView: View {
                 HStack {
                     JoypadView(emu.input(_:state:), part: .left)
                     Spacer()
-                    ScreenView()
+                    ScreenView(frame: frame)
+                        .id(frame)
                     Spacer()
                     JoypadView(emu.input(_:state:), part: .right)
                 }

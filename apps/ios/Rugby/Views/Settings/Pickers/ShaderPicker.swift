@@ -20,9 +20,12 @@ struct ShaderPicker: View {
     var body: some View {
         Form {
             // Preview
-            ScreenView(frame: frame)
-                .listRowBackground(Color.clear)
-                .id(frame)
+            Section {
+                Screen(frame: frame)
+                    .id(frame)
+            }
+            .listRowBackground(Color.clear)
+            .listRowInsets(.all, 8)
             // Picker
             Picker(selection: $tex) {
                 Text("None")
