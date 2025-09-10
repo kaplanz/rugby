@@ -81,6 +81,7 @@ struct PalettePicker: View {
                 }
             }
             .pickerStyle(.inline)
+            .navigationTitle("Palette")
         }
     }
 }
