@@ -30,13 +30,12 @@ struct GameIcon: View {
 
     private var empty: UIImage {
         // Load bundled unused image
-        let url = Bundle.main.url(forResource: "unused", withExtension: "png")!
-        let img = UIImage(named: url.path())!
+        let img = UIImage(named: "unused")!
         // Recolor with this palette
         return img.cgImage.flatMap(Self.redraw).map(UIImage.init(cgImage:)) ?? img
     }
 
-    private static func redraw(image: CGImage) -> CGImage? {
+    static func redraw(image: CGImage) -> CGImage? {
         guard case .indexed = image.colorSpace?.model,
             let data = image.dataProvider?.data
         else {
