@@ -39,6 +39,7 @@ struct ShaderPicker: View {
             }
             .pickerStyle(.inline)
         }
+        .navigationTitle("Shader")
     }
 }
 
