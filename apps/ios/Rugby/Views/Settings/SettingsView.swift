@@ -31,7 +31,7 @@ struct SettingsView: View {
             Section("Application") {
                 // Shader
                 NavigationLink {
-                    ShaderPicker(shader: $cfg.tex)
+                    ShaderPicker(tex: $cfg.tex)
                 } label: {
                     HStack {
                         Label("Shader", systemImage: "sparkles.tv")
@@ -57,7 +57,7 @@ struct SettingsView: View {
                 DisclosureGroup {
                     // Reverse
                     NavigationLink {
-                        SpeedPicker(speed: $cfg.spd.rev)
+                        SpeedPicker(spd: $cfg.spd.rev)
                     } label: {
                         HStack {
                             Label("Reverse", systemImage: "backward.circle")
@@ -68,7 +68,7 @@ struct SettingsView: View {
                     }
                     // Forward
                     NavigationLink {
-                        SpeedPicker(speed: $cfg.spd.fwd)
+                        SpeedPicker(spd: $cfg.spd.fwd)
                     } label: {
                         HStack {
                             Label("Forward", systemImage: "forward.circle")
