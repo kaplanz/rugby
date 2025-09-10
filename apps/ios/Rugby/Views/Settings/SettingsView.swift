@@ -41,18 +41,20 @@ struct SettingsView: View {
                     }
                 }
                 // Palette
-                Picker(selection: $cfg.pal) {
-                    ForEach(Palette.allCases) { pal in
-                        Label {
-                            Text(pal.description)
-                        } icon: {
-                            PaletteIcon(pal: pal)
-                        }
-                    }
+                NavigationLink {
+                    PalettePicker(pal: $cfg.pal)
                 } label: {
-                    Label("Palette", systemImage: "swatchpalette")
+                    HStack {
+                        Label("Palette", systemImage: "swatchpalette")
+                        Spacer()
+                        Label {
+                            Text(cfg.pal.description)
+                        } icon: {
+                            PaletteIcon(pal: cfg.pal)
+                        }
+                        .foregroundStyle(.secondary)
+                    }
                 }
-                .pickerStyle(.navigationLink)
                 // Speed
                 DisclosureGroup {
                     // Reverse
