@@ -10,40 +10,108 @@ import Foundation
 import SwiftUI
 
 /// Color palette.
-enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
-    /// Nostalgic autumn sunsets.
-    case autumnChill
-    /// Aquatic blues.
-    case blkAqu
-    /// Winter snowstorm blues.
-    case blueDream
-    /// Combining cool and warm tones.
-    case coldfire
-    /// Soft and pastel coral hues.
-    case coral
-    /// Cold metallic darks with warm dated plastic lights.
-    case demichrome
-    /// Greens and warm browns with an earthy feel.
-    case earth
-    /// Creamsicle inspired orange.
-    case iceCream
-    /// Old-school dot-matrix display.
-    case legacy
-    /// Misty forest greens.
-    case mist
-    /// Simple blacks and whites.
-    case mono
-    /// William Morris's rural palette.
-    case morris
-    /// Waterfront at dawn.
-    case purpleDawn
-    /// Rusty red and brown hues.
-    case rustic
-    /// Deep and passionate purples.
-    case velvetCherry
+enum Palette {
+    /// Preset palette.
+    case preset(named: Name)
+    /// Custom palette.
+    case custom(color: Data)
+}
 
+extension Palette {
+    static var `default`: Self {
+        .preset(named: .demichrome)
+    }
+}
+
+extension Palette {
     /// Palette data.
     var data: Data {
+        switch self {
+        case .preset(let name):
+            name.data
+        case .custom(let data):
+            data
+        }
+    }
+
+    /// Palette tint.
+    var tint: Color {
+        let base = Color.blue.toLCH()
+        let tint = Color(rgb: data.c1).toLCH()
+        return LCHColor(l: base.l, c: base.c, h: tint.h).toColor()
+    }
+}
+
+extension Palette: Codable {}
+
+extension Palette: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .preset(let name):
+            name.description
+        case .custom:
+            "Custom"
+        }
+    }
+}
+
+extension Palette: Hashable {}
+
+extension Palette: Identifiable {
+    typealias ID = Data
+
+    var id: Data {
+        data
+    }
+}
+
+extension Palette {
+    /// Named palette.
+    enum Name: String, CaseIterable, Codable, CustomStringConvertible, Identifiable {
+        /// Nostalgic autumn sunsets.
+        case autumnChill
+        /// Aquatic blues.
+        case blkAqu
+        /// Winter snowstorm blues.
+        case blueDream
+        /// Combining cool and warm tones.
+        case coldfire
+        /// Soft and pastel coral hues.
+        case coral
+        /// Cold metallic darks with warm dated plastic lights.
+        case demichrome
+        /// Greens and warm browns with an earthy feel.
+        case earth
+        /// Creamsicle inspired orange.
+        case iceCream
+        /// Old-school dot-matrix display.
+        case legacy
+        /// Misty forest greens.
+        case mist
+        /// Simple blacks and whites.
+        case mono
+        /// William Morris's rural palette.
+        case morris
+        /// Waterfront at dawn.
+        case purpleDawn
+        /// Rusty red and brown hues.
+        case rustic
+        /// Deep and passionate purples.
+        case velvetCherry
+
+        // impl CustomStringConvertible
+        var description: String {
+            rawValue.localizedCapitalized
+        }
+
+        // impl Identifiable
+        var id: Self { self }
+    }
+}
+
+extension Palette.Name {
+    /// Palette data.
+    var data: Palette.Data {
         switch self {
         case .autumnChill:
             return .autumnChill
@@ -77,26 +145,11 @@ enum Palette: String, CaseIterable, CustomStringConvertible, Identifiable {
             return .velvetCherry
         }
     }
-
-    /// Palette tint.
-    var tint: Color {
-        let base = Color.blue.toLCH()
-        let tint = Color(rgb: data.c1).toLCH()
-        return LCHColor(l: base.l, c: base.c, h: tint.h).toColor()
-    }
-
-    // impl CustomStringConvertible
-    var description: String {
-        rawValue.capitalized
-    }
-
-    // impl Identifiable
-    var id: Self { self }
 }
 
 extension Palette {
     /// Palette data.
-    final class Data: Identifiable, Sendable {
+    final class Data: Codable, Identifiable, Hashable, Sendable {
         let c0: UInt32
         let c1: UInt32
         let c2: UInt32
@@ -107,6 +160,17 @@ extension Palette {
             self.c1 = c1
             self.c2 = c2
             self.c3 = c3
+        }
+
+        static func == (lhs: Data, rhs: Data) -> Bool {
+            lhs.c0 == rhs.c0 && lhs.c1 == rhs.c1 && lhs.c2 == rhs.c2 && lhs.c3 == rhs.c3
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(c0)
+            hasher.combine(c1)
+            hasher.combine(c2)
+            hasher.combine(c3)
         }
     }
 }
@@ -381,5 +445,14 @@ extension Color {
 
     init(rgb: UInt32) {
         self.init(argb: rgb | 0xFF00_0000)
+    }
+
+    var rgb: UInt32 {
+        let color = self.toRGB()
+        return
+            UInt32(255 * color.alpha) >> 24
+            | UInt32(255 * color.r) << 16
+            | UInt32(255 * color.g) << 8
+            | UInt32(255 * color.b)
     }
 }

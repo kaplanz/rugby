@@ -28,14 +28,38 @@ struct PalettePicker: View {
             }
             .listRowBackground(Color.clear)
             .listRowInsets(.all, 8)
+            // Custom
+            NavigationLink {
+                CustomPalette(pal: $pal)
+            } label: {
+                HStack {
+                    Label {
+                        Text("Custom")
+                    } icon: {
+                        if case .custom = pal {
+                            PaletteIcon(pal: pal)
+                        } else {
+                            Image(systemName: "paintpalette")
+                        }
+                    }
+                    Spacer()
+                    if case .custom = pal {
+                        Image(systemName: "checkmark")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.tint)
+                    }
+                }
+            }
             // Picker
             Picker(selection: $pal) {
-                ForEach(Palette.allCases) { pal in
+                ForEach(Palette.Name.allCases) { pal in
+                    let pal = Palette.preset(named: pal)
                     Label {
                         Text(pal.description)
                     } icon: {
                         PaletteIcon(pal: pal)
                     }
+                    .tag(pal)
                 }
             } label: {
                 HStack {
@@ -62,6 +86,6 @@ struct PalettePicker: View {
 }
 
 #Preview {
-    PalettePicker(pal: .constant(.demichrome))
+    PalettePicker(pal: .constant(.default))
         .environment(Options())
 }
