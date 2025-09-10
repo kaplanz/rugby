@@ -17,14 +17,26 @@ half4 scale2x(
     float2 ires,
     float2 ores
 ) {
-    float2 sub = fract(position * ires / ores) * 2;
+    // Conversion ratio
+    float2 i2o = ores / ires;
+    float2 o2i = ires / ores;
 
-    half4 B = layer.sample(position + float2(+0, -1) * ores / ires);
-    half4 D = layer.sample(position + float2(-1, +0) * ores / ires);
-    half4 E = layer.sample(position + float2(+0, +0) * ores / ires);
-    half4 F = layer.sample(position + float2(+1, +0) * ores / ires);
-    half4 H = layer.sample(position + float2(+0, +1) * ores / ires);
+    // Texel coordinates
+    float2 pos = position * o2i;
+    float2 sub = fract(pos) * 2;
+    float2 mid = floor(pos) + 0.5;
 
+    // Pixel coordinates
+    float2 midpoint = mid * i2o;
+
+    // Adjacent texels
+    half4 B = layer.sample(midpoint + float2(+0, -1) * i2o);
+    half4 D = layer.sample(midpoint + float2(-1, +0) * i2o);
+    half4 E = layer.sample(midpoint + float2(+0, +0) * i2o);
+    half4 F = layer.sample(midpoint + float2(+1, +0) * i2o);
+    half4 H = layer.sample(midpoint + float2(+0, +1) * i2o);
+
+    // Scaling conversion
     if (any(B != H) && any(D != F)) {
         if (sub.y < 1)
             if (sub.x < 1)
