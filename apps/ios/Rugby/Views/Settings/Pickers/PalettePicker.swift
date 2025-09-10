@@ -74,8 +74,8 @@ struct PalettePicker: View {
                 } message: {
                     Text(
                         """
-                        Your palette selection will also be used as an accent for \
-                        within this app.
+                        Your selected palette will also be used as an accent \
+                        throughout the app.
                         """
                     )
                 }
