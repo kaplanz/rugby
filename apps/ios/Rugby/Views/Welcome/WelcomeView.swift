@@ -24,7 +24,7 @@ struct WelcomeView: View {
                 pages[0]
                     .navigationDestination(for: Int.self) { index in
                         pages[index]
-                            .navigationBarBackButtonHidden()
+                            .toolbar(.hidden, for: .navigationBar)
                             .safeAreaPadding(.vertical, 48)
                     }
             }
