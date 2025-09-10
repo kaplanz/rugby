@@ -55,6 +55,7 @@ struct CustomPalette: View {
                     c3: data[3].rgb,
                 ))
         }
+        .navigationTitle("Custom")
     }
 }
 
