@@ -60,6 +60,7 @@ struct SettingsView: View {
                     // Reverse
                     NavigationLink {
                         SpeedPicker(spd: $cfg.spd.rev)
+                            .navigationTitle("Reverse")
                     } label: {
                         HStack {
                             Label("Reverse", systemImage: "backward.circle")
@@ -71,6 +72,7 @@ struct SettingsView: View {
                     // Forward
                     NavigationLink {
                         SpeedPicker(spd: $cfg.spd.fwd)
+                            .navigationTitle("Forward")
                     } label: {
                         HStack {
                             Label("Forward", systemImage: "forward.circle")
