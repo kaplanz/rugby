@@ -55,8 +55,8 @@ struct Screen: View {
     }
 
     /// Shader function.
-    private var scale: ShaderFunction? {
-        opt.data.tex?.scale
+    private var shader: ShaderFunction? {
+        opt.data.tex?.shader
     }
 
     var body: some View {
@@ -64,9 +64,9 @@ struct Screen: View {
             Image(uiImage: frame ?? empty)
                 .resizable()
                 .interpolation(.none)
-                .if(scale != nil) { view in
+                .if(shader != nil) { view in
                     view.layerEffect(
-                        scale!(
+                        shader!(
                             .float2(160, 144),
                             .float2(geo.size),
                         ),
