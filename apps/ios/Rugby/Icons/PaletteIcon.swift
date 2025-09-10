@@ -32,5 +32,5 @@ struct PaletteIcon: View {
 }
 
 #Preview {
-    PaletteIcon(pal: .mono)
+    PaletteIcon(pal: .default)
 }
