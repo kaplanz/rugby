@@ -63,7 +63,6 @@ struct WelcomeView: View {
             }
         }
         .safeAreaPadding(.horizontal, 24)
-        .fontDesign(.rounded)
     }
 }
 

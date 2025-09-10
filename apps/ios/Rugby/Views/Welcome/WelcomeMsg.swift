@@ -86,6 +86,7 @@ struct WelcomeMsg: View {
             }
             Spacer()
         }
+        .fontDesign(.rounded)
         .padding(24)
     }
 }
