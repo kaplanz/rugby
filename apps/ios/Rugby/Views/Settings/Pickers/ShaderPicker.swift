@@ -10,11 +10,19 @@ import SwiftUI
 struct ShaderPicker: View {
     @Binding var tex: Shader?
 
+    private var frame: UIImage {
+        // Load bundled unused image
+        let img = UIImage(named: "unused")!
+        // Recolor with this palette
+        return img.cgImage.flatMap(GameIcon.redraw).map(UIImage.init(cgImage:)) ?? img
+    }
+
     var body: some View {
         Form {
             // Preview
-            ScreenView(frame: UIImage(named: "unused"))
+            ScreenView(frame: frame)
                 .listRowBackground(Color.clear)
+                .id(frame)
             // Picker
             Picker(selection: $tex) {
                 Text("None")
