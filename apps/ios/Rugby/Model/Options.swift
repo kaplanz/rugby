@@ -56,14 +56,15 @@ class Config {
     var pal: Palette {
         get {
             access(keyPath: \.pal)
-            return UserDefaults.standard.string(forKey: "dev.zakhary.rugby.pal").flatMap {
-                .init(rawValue: $0)
-            }
-                ?? .demichrome
+            return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.pal").flatMap {
+                try? JSONDecoder().decode(Palette.self, from: $0)
+            } ?? .default
         }
         set {
             withMutation(keyPath: \.pal) {
-                UserDefaults.standard.setValue(newValue.rawValue, forKey: "dev.zakhary.rugby.pal")
+                if let data = try? JSONEncoder().encode(newValue) {
+                    UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.pal")
+                }
             }
         }
     }
