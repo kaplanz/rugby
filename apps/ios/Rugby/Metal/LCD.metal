@@ -21,28 +21,38 @@ half4 lcd(
     float2 ires,
     float2 ores
 ) {
-    float2 sub = fract(position * ires / ores) * 6;
+    // Conversion ratio
+    float2 i2o = ores / ires;
+    float2 o2i = ires / ores;
+
+    // Texel coordinates
+    float2 pos = position * o2i;
+    float2 sub = fract(pos) * 6;
+    float2 mid = floor(pos) + 0.5;
+
+    // Pixel coordinates
+    float2 midpoint = mid * ores / ires;
 
     // horizontal
-    half4 lt = layer.sample(position + float2(-1, 0));
-    half4 md = layer.sample(position + float2(+0, 0));
-    half4 rt = layer.sample(position + float2(+1, 0));
+    half4 lt = layer.sample(midpoint + float2(-1, 0) * i2o);
+    half4 md = layer.sample(midpoint + float2(+0, 0) * i2o);
+    half4 rt = layer.sample(midpoint + float2(+1, 0) * i2o);
 
     // vertical
     if (sub.y < 1) {
         // sample
-        lt = mix(lt, layer.sample(position + float2(-1, -1)), .5 - sub.y / 2);
-        md = mix(md, layer.sample(position + float2(+0, -1)), .5 - sub.y / 2);
-        rt = mix(rt, layer.sample(position + float2(+1, -1)), .5 - sub.y / 2);
+        lt = mix(lt, layer.sample(midpoint + float2(-1, -1) * i2o), .5 - sub.y / 2);
+        md = mix(md, layer.sample(midpoint + float2(+0, -1) * i2o), .5 - sub.y / 2);
+        rt = mix(rt, layer.sample(midpoint + float2(+1, -1) * i2o), .5 - sub.y / 2);
         // blend
         lt *= sub.y * SCANLINE + (1 - SCANLINE);
         md *= sub.y * SCANLINE + (1 - SCANLINE);
         rt *= sub.y * SCANLINE + (1 - SCANLINE);
     } else if (sub.y > 5) {
         // sample
-        lt = mix(lt, layer.sample(position + float2(-1, +1)), (sub.y - 5) / 2);
-        md = mix(md, layer.sample(position + float2(+0, +1)), (sub.y - 5) / 2);
-        rt = mix(rt, layer.sample(position + float2(+1, +1)), (sub.y - 5) / 2);
+        lt = mix(lt, layer.sample(midpoint + float2(-1, +1) * i2o), (sub.y - 5) / 2);
+        md = mix(md, layer.sample(midpoint + float2(+0, +1) * i2o), (sub.y - 5) / 2);
+        rt = mix(rt, layer.sample(midpoint + float2(+1, +1) * i2o), (sub.y - 5) / 2);
         // blend
         lt *= (6 - sub.y) * SCANLINE + (1 - SCANLINE);
         md *= (6 - sub.y) * SCANLINE + (1 - SCANLINE);
