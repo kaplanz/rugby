@@ -17,7 +17,7 @@ struct SettingsView: View {
     /// Reset settings.
     @State private var defaultOpt = false
     /// Delete library.
-    @State private var delLibrary = false
+    @State private var libraryDel = false
     /// Present welcome.
     @State private var welcomeUsr = false
 
@@ -113,7 +113,7 @@ struct SettingsView: View {
                 }
                 // Delete library
                 Button(role: .destructive) {
-                    delLibrary = true
+                    libraryDel = true
                 } label: {
                     MultiLineLabel(
                         "Delete Library",
@@ -123,7 +123,7 @@ struct SettingsView: View {
                 }
                 .confirmationDialog(
                     "Are you sure?",
-                    isPresented: $delLibrary,
+                    isPresented: $libraryDel,
                 ) {
                     Button("Delete", role: .destructive) {
                         withAnimation {
