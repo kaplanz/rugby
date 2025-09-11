@@ -32,11 +32,13 @@ class Options {
 /// Configuration data.
 @Observable
 class Config {
+    fileprivate static let root = "dev.zakhary.rugby"
+
     /// Video shader.
     var tex: Shader? {
         get {
             access(keyPath: \.tex)
-            return UserDefaults.standard.string(forKey: "dev.zakhary.rugby.tex").flatMap {
+            return UserDefaults.standard.string(forKey: "\(Self.root).tex").flatMap {
                 .init(rawValue: $0)
             }
         }
@@ -44,9 +46,9 @@ class Config {
             withMutation(keyPath: \.tex) {
                 if let newValue {
                     UserDefaults.standard.setValue(
-                        newValue.rawValue, forKey: "dev.zakhary.rugby.tex")
+                        newValue.rawValue, forKey: "\(Self.root).tex")
                 } else {
-                    UserDefaults.standard.removeObject(forKey: "dev.zakhary.rugby.tex")
+                    UserDefaults.standard.removeObject(forKey: "\(Self.root).tex")
                 }
             }
         }
@@ -56,14 +58,14 @@ class Config {
     var pal: Palette {
         get {
             access(keyPath: \.pal)
-            return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.pal").flatMap {
+            return UserDefaults.standard.data(forKey: "\(Self.root).pal").flatMap {
                 try? JSONDecoder().decode(Palette.self, from: $0)
             } ?? .default
         }
         set {
             withMutation(keyPath: \.pal) {
                 if let data = try? JSONEncoder().encode(newValue) {
-                    UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.pal")
+                    UserDefaults.standard.set(data, forKey: "\(Self.root).pal")
                 }
             }
         }
@@ -74,18 +76,20 @@ class Config {
 
     @Observable
     class Speedup {
+        fileprivate static let root = "\(Config.root).spd"
+
         /// Forward speed.
         var fwd: Speed {
             get {
                 access(keyPath: \.fwd)
-                return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.spd.fwd").flatMap {
+                return UserDefaults.standard.data(forKey: "\(Self.root).fwd").flatMap {
                     try? JSONDecoder().decode(Speed.self, from: $0)
                 } ?? .ratio(2.0)
             }
             set {
                 withMutation(keyPath: \.fwd) {
                     if let data = try? JSONEncoder().encode(newValue) {
-                        UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.spd.fwd")
+                        UserDefaults.standard.set(data, forKey: "\(Self.root).fwd")
                     }
                 }
             }
@@ -94,14 +98,14 @@ class Config {
         var rev: Speed {
             get {
                 access(keyPath: \.rev)
-                return UserDefaults.standard.data(forKey: "dev.zakhary.rugby.spd.rev").flatMap {
+                return UserDefaults.standard.data(forKey: "\(Self.root).rev").flatMap {
                     try? JSONDecoder().decode(Speed.self, from: $0)
                 } ?? .ratio(0.5)
             }
             set {
                 withMutation(keyPath: \.rev) {
                     if let data = try? JSONEncoder().encode(newValue) {
-                        UserDefaults.standard.set(data, forKey: "dev.zakhary.rugby.spd.rev")
+                        UserDefaults.standard.set(data, forKey: "\(Self.root).rev")
                     }
                 }
             }
