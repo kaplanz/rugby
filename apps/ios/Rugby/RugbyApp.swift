@@ -24,9 +24,9 @@ struct RugbyApp: App {
     init() {
         // Initialize emulator
         RugbyKit.initialize()
-        // Connect controllers
-        initGameController()
-        // Enable audio playback
+        // Initialize gamepads
+        initGamepad()
+        // Initialize playback
         enableAudio()
     }
 
@@ -72,13 +72,13 @@ extension RugbyApp {
 }
 
 extension RugbyApp {
-    func initGameController() {
-        // Start looking for wireless controllers
+    func initGamepad() {
+        // Start looking wireless gamepads
         GCController.startWirelessControllerDiscovery {
             log.debug("discovering wireless controllers")
         }
 
-        // Observe controller connections
+        // Observe gamepad connections
         NotificationCenter.default.addObserver(
             forName: .GCControllerDidConnect,
             object: nil,
@@ -89,11 +89,11 @@ extension RugbyApp {
             }
             log.info("controller connected: \(pad)")
 
-            // Handle controller button input
-            initGameControllerHandlers(pad: pad)
+            // Handle button input
+            initGamepadHandlers(pad: pad)
         }
 
-        // Observe controller connections
+        // Observe gamepad connections
         NotificationCenter.default.addObserver(
             forName: .GCControllerDidDisconnect,
             object: nil,
@@ -106,35 +106,35 @@ extension RugbyApp {
         }
     }
 
-    nonisolated func initGameControllerHandlers(pad: GCController) {
-        pad.extendedGamepad?.buttonA.valueChangedHandler = { _, _, pressed in
+    nonisolated func initGamepadHandlers(pad: GCController) {
+        pad.extendedGamepad?.buttonA.valueChangedHandler = { _, _, state in
             DispatchQueue.main.async {
-                //                emu.input(.a, pressed: pressed)
+                app.emu?.input(.a, state: state)
             }
         }
-        pad.extendedGamepad?.buttonB.valueChangedHandler = { _, _, pressed in
+        pad.extendedGamepad?.buttonB.valueChangedHandler = { _, _, state in
             DispatchQueue.main.async {
-                //                emu.input(.b, pressed: pressed)
+                app.emu?.input(.b, state: state)
             }
         }
-        pad.extendedGamepad?.dpad.right.valueChangedHandler = { _, _, pressed in
+        pad.extendedGamepad?.dpad.right.valueChangedHandler = { _, _, state in
             DispatchQueue.main.async {
-                //                emu.input(.right, pressed: pressed)
+                app.emu?.input(.right, state: state)
             }
         }
-        pad.extendedGamepad?.dpad.left.valueChangedHandler = { _, _, pressed in
+        pad.extendedGamepad?.dpad.left.valueChangedHandler = { _, _, state in
             DispatchQueue.main.async {
-                //                emu.input(.left, pressed: pressed)
+                app.emu?.input(.left, state: state)
             }
         }
-        pad.extendedGamepad?.dpad.up.valueChangedHandler = { _, _, pressed in
+        pad.extendedGamepad?.dpad.up.valueChangedHandler = { _, _, state in
             DispatchQueue.main.async {
-                //                emu.input(.up, pressed: pressed)
+                app.emu?.input(.up, state: state)
             }
         }
-        pad.extendedGamepad?.dpad.down.valueChangedHandler = { _, _, pressed in
+        pad.extendedGamepad?.dpad.down.valueChangedHandler = { _, _, state in
             DispatchQueue.main.async {
-                //                emu.input(.down, pressed: pressed)
+                app.emu?.input(.down, state: state)
             }
         }
     }
