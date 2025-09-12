@@ -18,35 +18,53 @@ extension Audio {
 @Observable
 final class Audio {
     /// Sample storage.
-    private let data: RingBuffer<Sample> = .init()
+    private var data: RingBuffer<Sample>?
     /// Audio sampler.
-    private let play: Playback
+    private var play: Playback?
 
     init() {
-        play = .init(data: data)
+        self.retime(rate: CLOCK)
     }
 
     /// Publish an audio sample.
     func push(sample: Sample) {
-        data.push(sample)
+        data?.push(sample)
     }
 
     /// Resume audio.
     func start() {
-        try? play.engine.start()
+        try? play?.engine.start()
+    }
+
+    /// Stop audio.
+    func stop() {
+        play?.engine.stop()
     }
 
     /// Pause audio.
     func pause() {
-        play.engine.pause()
+        play?.engine.pause()
     }
 
     /// Reset audio.
     func reset() {
         // Reset engine
-        play.engine.reset()
+        play?.engine.reset()
         // Clear buffer
-        play.sample.clear()
+        play?.sample.clear()
+    }
+
+    /// Re-time audio.
+    func retime(rate: UInt32) {
+        // Stop old engine
+        self.stop()
+        // Make new buffer
+        let capacity = 4096 << max(CLOCK.leadingZeroBitCount - rate.leadingZeroBitCount, 0)
+        data = .init(capacity: capacity)
+        // Make new engine
+        play = .init(data: data!, rate: rate)
+        // Play new engine
+        self.start()
     }
 }
 
@@ -54,7 +72,7 @@ final class Audio {
 private final class Playback: @unchecked Sendable {
     fileprivate let engine: AVAudioEngine = .init()
     fileprivate var source: AVAudioSourceNode!
-    fileprivate var worker: AVAudioConverter!
+    fileprivate let worker: AVAudioConverter!
     fileprivate let sample: RingBuffer<Audio.Sample>
     fileprivate let buffer: AVAudioPCMBuffer!
 
@@ -62,7 +80,7 @@ private final class Playback: @unchecked Sendable {
         engine.stop()
     }
 
-    init(data: RingBuffer<Audio.Sample>) {
+    init(data: RingBuffer<Audio.Sample>, rate: UInt32 = CLOCK) {
         // Retain sample buffer
         sample = data
 
@@ -70,7 +88,7 @@ private final class Playback: @unchecked Sendable {
         let worker = AVAudioConverter(
             from: AVAudioFormat(
                 commonFormat: .pcmFormatFloat32,
-                sampleRate: Double(AUDIO),
+                sampleRate: Double(rate / AUDIO),
                 channels: 2,
                 interleaved: false,
             )!,
@@ -95,7 +113,7 @@ private final class Playback: @unchecked Sendable {
         engine.connect(source, to: engine.mainMixerNode, format: worker.outputFormat)
 
         // Start audio engine
-        try? engine.start()
+        try? self.engine.start()
     }
 
     private func refill(numberOfFrames: AVAudioPacketCount) -> AVAudioPCMBuffer {
