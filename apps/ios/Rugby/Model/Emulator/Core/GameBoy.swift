@@ -11,8 +11,8 @@ import Synchronization
 
 /// Clock frequency.
 let CLOCK: UInt32 = 4_194_304
-/// Audio sample rate.
-let AUDIO: UInt32 = CLOCK / 32
+/// Audio sample divider.
+let AUDIO: UInt32 = 32
 /// Video frame rate.
 let VIDEO: UInt32 = 70224
 
@@ -179,7 +179,7 @@ private func main(cxn: Connect) {
         //
         // Audio is downsampled to a more reasonable frequency, as practically
         // generating samples each cycle is unnecessary.
-        if ctx.total % UInt64(CLOCK / AUDIO) == 0 {
+        if ctx.total % UInt64(AUDIO) == 0 {
             // Produce audio sample
             let sample = emu.sample()
             // Forward to audio output
@@ -372,6 +372,9 @@ extension GameBoy: Core {
     }
 
     func speed(_ speed: Speed) {
+        // Re-time emulator
         cxn.speed.withLock { $0 = speed }
+        // Re-time playback
+        cxn.audio.retime(rate: speed.freq ?? CLOCK)
     }
 }
