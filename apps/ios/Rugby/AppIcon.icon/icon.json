@@ -24,13 +24,48 @@
       }
     },
     {
+      "blend-mode-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : "plus-lighter"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "normal"
+        }
+      ],
       "blur-material" : null,
       "hidden" : false,
       "layers" : [
         {
+          "blend-mode" : "normal",
           "hidden" : false,
           "image-name" : "Outline.png",
-          "name" : "Outline"
+          "name" : "Outline",
+          "opacity-specializations" : [
+            {
+              "appearance" : "tinted",
+              "value" : 0
+            }
+          ]
+        },
+        {
+          "hidden" : false,
+          "image-name" : "Outline-Dark.png",
+          "name" : "Outline (Dark)",
+          "opacity-specializations" : [
+            {
+              "value" : 0
+            },
+            {
+              "appearance" : "dark",
+              "value" : 1
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 1
+            }
+          ]
         }
       ],
       "lighting" : "individual",
