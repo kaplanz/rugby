@@ -63,7 +63,7 @@ struct GameInfoView: View {
                     // Dismiss this view
                     dismiss()
                     // Start playing game
-                    if app.game == nil {
+                    if !app.active {
                         do { try app.play(game) } catch { err.log(error) }
                     }
                 }
