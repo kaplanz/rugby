@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct EmulatorView: View {
-    @Environment(Runtime.self) private var app
     @Environment(Failure.self) private var err
     @Environment(Options.self) private var opt
+
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
 
     /// Emulator instance.
-    @State var emu: Emulator = .init()
+    @State var emu: Emulator
 
     /// Emulator paused.
     @State private var isPaused = false
@@ -28,8 +29,8 @@ struct EmulatorView: View {
         case forward, reverse
     }
 
-    /// Emulator is active.
-    private var active: Bool {
+    /// Emulator is playing.
+    private var playing: Bool {
         !isPaused && !showInfo && !showConf && scenePhase == .active
     }
 
@@ -69,7 +70,7 @@ struct EmulatorView: View {
         }
         .sheet(isPresented: $showInfo) {
             NavigationStack {
-                GameInfoView(game: app.game!)
+                GameInfoView(game: emu.game!)
                     .toolbar {
                         Button("Done", systemImage: "checkmark", role: .confirm) {
                             showInfo.toggle()
@@ -92,22 +93,11 @@ struct EmulatorView: View {
                     }
             }
         }
-        .onChange(of: app.game, initial: true) {
-            do {
-                if let game = app.game {
-                    // Insert cartridge
-                    try emu.play(game)
-                } else {
-                    // Remove cartridge
-                    try emu.stop()
-                }
-            } catch { err.log(error) }
-        }
-        .onChange(of: active, initial: true) {
+        .onChange(of: playing, initial: true) {
             // Sync emulator
-            emu.pause(!active)
+            emu.pause(!playing)
             // Prevent idle
-            UIApplication.shared.isIdleTimerDisabled = active
+            UIApplication.shared.isIdleTimerDisabled = playing
         }
         .onChange(of: playback) { _, newValue in
             self.player(playback)
@@ -115,6 +105,8 @@ struct EmulatorView: View {
         .onDisappear {
             // Reallow idle
             UIApplication.shared.isIdleTimerDisabled = false
+            // Stop emulator
+            do { try emu.stop() } catch { err.log(error) }
         }
     }
 
@@ -176,6 +168,7 @@ struct EmulatorView: View {
                 Button("Get Info", systemImage: "info.circle") {
                     showInfo.toggle()
                 }
+                .disabled(emu.game == nil)
                 Button("Settings", systemImage: "gearshape") {
                     showConf.toggle()
                 }
@@ -183,7 +176,7 @@ struct EmulatorView: View {
             // Application
             Section {
                 Button("Exit", systemImage: "xmark", role: .destructive) {
-                    app.stop()
+                    dismiss()
                 }
             }
         }
@@ -203,7 +196,7 @@ struct EmulatorView: View {
 
 #Preview {
     NavigationStack {
-        EmulatorView()
+        EmulatorView(emu: .init())
     }
     .environment(Runtime())
     .environment(Failure())

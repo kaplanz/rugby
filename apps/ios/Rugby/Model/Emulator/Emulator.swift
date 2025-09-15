@@ -14,7 +14,7 @@ final class Emulator {
     /// Emulator core.
     private var core: GameBoy = .init()
     /// Inserted game.
-    private var game: Game?
+    private(set) var game: Game?
 
     /// Plays a game.
     func play(_ game: Game) throws {
