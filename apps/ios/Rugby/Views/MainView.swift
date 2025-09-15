@@ -12,12 +12,21 @@ struct MainView: View {
     @Environment(Runtime.self) private var app
     @Environment(Failure.self) private var err
 
-    /// Emulator page.
-    @State private var showEmulator = false
     /// Settings page.
     @State private var showSettings = false
     /// Failures page.
     @State private var showFailures = false
+
+    /// Emulator page.
+    private var showEmulator: Binding<Bool> {
+        .init {
+            app.active
+        } set: { newValue in
+            if !newValue {
+                do { try app.stop() } catch { err.log(error) }
+            }
+        }
+    }
 
     /// Welcome data.
     @AppStorage("dev.zakhary.rugby.welcome") private var welcome: String?
@@ -51,9 +60,9 @@ struct MainView: View {
                     }
                 }
         }
-        .fullScreenCover(isPresented: $showEmulator) {
+        .fullScreenCover(isPresented: showEmulator) {
             NavigationStack {
-                EmulatorView()
+                EmulatorView(emu: app.emu!)
             }
         }
         .sheet(isPresented: $showSettings) {
@@ -85,13 +94,10 @@ struct MainView: View {
         .sheet(isPresented: showWelcome) {
             WelcomeView()
         }
-        .onChange(of: app.game) { _, newValue in
-            showEmulator = newValue != nil
-        }
         .onChange(of: err.this) { _, newValue in
-            // Stop emulation
+            // Stop emulation on error
             if !newValue.isEmpty {
-                app.stop()
+                do { try app.stop() } catch { err.log(error) }
             }
         }
     }
