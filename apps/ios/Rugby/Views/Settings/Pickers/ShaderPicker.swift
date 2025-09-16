@@ -35,7 +35,7 @@ struct ShaderPicker: View {
                         .tag(Shader?.some(tex))
                 }
             } label: {
-                Label("Shader", systemImage: "sparkles.tv")
+                Label("Shader", systemImage: "sparkles")
             }
             .pickerStyle(.inline)
         }

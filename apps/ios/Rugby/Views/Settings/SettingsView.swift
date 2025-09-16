@@ -24,69 +24,46 @@ struct SettingsView: View {
     var body: some View {
         @Bindable var cfg = opt.data
 
-        Form {
+        List {
             // Header
             AboutView()
-            // Application
-            Section("Application") {
-                // Shader
+
+            Section {
+                // Playback
                 NavigationLink {
-                    ShaderPicker(tex: $cfg.tex)
+                    PlaybackSettings()
                 } label: {
-                    HStack {
-                        Label("Shader", systemImage: "sparkles.tv")
-                        Spacer()
-                        Text(cfg.tex?.description ?? "None")
-                            .foregroundStyle(.secondary)
-                    }
+                    SettingsLabel("Playback", color: .gray, systemImage: "memories")
                 }
-                // Palette
+                // Emulator
                 NavigationLink {
-                    PalettePicker(pal: $cfg.pal)
+                    EmulatorSettings()
                 } label: {
-                    HStack {
-                        Label("Palette", systemImage: "swatchpalette")
-                        Spacer()
-                        Label {
-                            Text(cfg.pal.description)
-                        } icon: {
-                            PaletteIcon(pal: cfg.pal)
-                        }
-                        .foregroundStyle(.secondary)
-                    }
+                    SettingsLabel("Emulator", color: .green, systemImage: "cpu")
                 }
-                // Speed
-                DisclosureGroup {
-                    // Reverse
-                    NavigationLink {
-                        SpeedPicker(spd: $cfg.spd.rev)
-                            .navigationTitle("Reverse")
-                    } label: {
-                        HStack {
-                            Label("Reverse", systemImage: "backward.circle")
-                            Spacer()
-                            Text(cfg.spd.rev.description)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    // Forward
-                    NavigationLink {
-                        SpeedPicker(spd: $cfg.spd.fwd)
-                            .navigationTitle("Forward")
-                    } label: {
-                        HStack {
-                            Label("Forward", systemImage: "forward.circle")
-                            Spacer()
-                            Text(cfg.spd.fwd.description)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+                // Controls
+                NavigationLink {
+                    ControlsSettings()
                 } label: {
-                    Label(
-                        "Speed",
-                        systemImage: "gauge.open.with.lines.needle.67percent.and.arrowtriangle")
+                    SettingsLabel("Controls", color: .pink, systemImage: "gamecontroller.fill")
                 }
             }
+
+            Section {
+                // Audio
+                NavigationLink {
+                    AudioSettings()
+                } label: {
+                    SettingsLabel("Audio", color: .orange, systemImage: "waveform")
+                }
+                // Video
+                NavigationLink {
+                    VideoSettings()
+                } label: {
+                    SettingsLabel("Video", color: .indigo, systemImage: "display")
+                }
+            }
+
             // Danger Zone
             Section(isExpanded: $dangerZone) {
                 // Reset Settings
@@ -95,8 +72,8 @@ struct SettingsView: View {
                 } label: {
                     MultiLineLabel(
                         "Reset Settings",
-                        about: "Restore all settings to their defaults.",
-                        systemImage: "gearshape.arrow.trianglehead.2.clockwise.rotate.90",
+                        about: "Reset all settings to their defaults.",
+                        systemImage: "gear.badge.xmark",
                     )
                 }
                 .confirmationDialog(
@@ -150,21 +127,12 @@ struct SettingsView: View {
                 }
                 .tint(nil)
             } header: {
-                Button {
-                    withAnimation {
-                        dangerZone.toggle()
-                    }
-                } label: {
-                    Text("Danger Zone")
-                        .bold()
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .imageScale(.small)
-                        .rotationEffect(dangerZone ? .degrees(90) : .zero)
-                }
+                Label("Danger Zone", systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.tint)
             }
             .tint(.red)
         }
+        .listStyle(.sidebar)
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .id(opt.uuid)
@@ -178,6 +146,46 @@ struct SettingsView: View {
     .environment(Failure())
     .environment(Library())
     .environment(Options())
+}
+
+private struct SettingsLabel: View {
+    @Environment(\.colorScheme) var colorScheme
+
+    @State private var title: String
+    @State private var color: Color
+    @State private var systemImage: String
+
+    init(_ titleKey: String, color: Color, systemImage: String) {
+        self.title = titleKey
+        self.color = color
+        self.systemImage = systemImage
+    }
+
+    /// Border shape.
+    private var shape: some Shape {
+        RoundedRectangle(cornerRadius: 6, style: .continuous)
+    }
+
+    var body: some View {
+        Label {
+            Text(title)
+        } icon: {
+            Image(systemName: systemImage)
+                .resizable()
+                .foregroundStyle((colorScheme == .dark ? color : .white).gradient)
+                .scaledToFit()
+                .padding(4)
+                .frame(width: 28, height: 28)
+                .background {
+                    shape
+                        .fill((colorScheme == .dark ? .black : color).gradient)
+                }
+                .glassEffect(
+                    colorScheme == .dark ? .regular : .identity,
+                    in: shape
+                )
+        }
+    }
 }
 
 private struct MultiLineLabel: View {
