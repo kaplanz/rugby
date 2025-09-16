@@ -19,6 +19,7 @@ struct LicenseView: View {
             Text(file.text)
                 .monospaced()
                 .font(.caption)
+                .textSelection(.enabled)
         }
         .padding()
     }

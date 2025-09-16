@@ -38,7 +38,7 @@ struct AboutView: View {
                 Label("Website", systemImage: "globe")
             }
             // License
-            DisclosureGroup {
+            Menu {
                 NavigationLink {
                     LicenseView(path: "LICENSE-MIT")
                 } label: {
@@ -59,7 +59,7 @@ struct AboutView: View {
             NavigationLink {
                 EmptyView()
             } label: {
-                Label("Credits", systemImage: "person.2")
+                Label("Credits", systemImage: "person.2.shield")
                     .foregroundStyle(.tint)
             }
             .disabled(true)
