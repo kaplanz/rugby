@@ -25,7 +25,7 @@ final class Runtime {
         // Instantiate an emulator
         emu = .init()
         // Insert game to emulator
-        try emu?.play(game)
+        try emu?.prepare(game)
     }
 
     /// Stop playing.
