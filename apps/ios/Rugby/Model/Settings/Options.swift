@@ -34,6 +34,25 @@ class Options {
 class Config {
     fileprivate static let root = "dev.zakhary.rugby"
 
+    /// Audio sample rate.
+    var aud: Measurement<UnitFrequency> {
+        get {
+            access(keyPath: \.aud)
+            let value = UserDefaults.standard.value(forKey: "\(Self.root).aud") as? Double
+            return .init(value: value ?? 48000, unit: .hertz)
+        }
+        set {
+            withMutation(keyPath: \.aud) {
+                UserDefaults.standard
+                    .setValue(
+                        newValue.converted(to: .hertz).value,
+                        forKey: "\(Self.root).aud",
+                    )
+            }
+        }
+
+    }
+
     /// Video shader.
     var tex: Shader? {
         get {
