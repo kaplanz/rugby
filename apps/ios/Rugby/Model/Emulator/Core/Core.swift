@@ -33,15 +33,6 @@ protocol Core {
     /// Video output.
     var video: Video { get }
 
-    /// Power on/off emulator.
-    ///
-    /// When powered on from off, the emulator will have been re-initialized.
-    ///
-    /// # Note
-    ///
-    /// This is a no-op if the emulator is already in the requested power state.
-    func power(_ state: Power)
-
     /// Reset emulator.
     ///
     /// Performs a resets on the emulator according to the specified semantics.
@@ -67,7 +58,7 @@ protocol Core {
     /// unpredictable behaviour.
     func eject() -> Cartridge?
 
-    /// Resume emulator.
+    /// Start emulator.
     ///
     /// If paused, causes the emulator to resume.
     func start()
@@ -77,29 +68,13 @@ protocol Core {
     /// When running, causes the emulator to pause.
     func pause()
 
+    /// Stop emulator.
+    ///
+    /// Powers off the emulator.
+    func stop()
+
     /// Change speed.
     ///
     /// Changes the emulated clock speed.
     func speed(_ speed: Speed)
-}
-
-extension Core {
-    /// Plays a game.
-    ///
-    /// Insert the selected cartridge, reset the core, and start emulation.
-    func play(_ cart: Cartridge) {
-        self.power(.off)
-        self.insert(cart: cart)
-        self.power(.on)
-    }
-
-    /// Stops emulation.
-    ///
-    /// Power off the emulator and ejects the cartridge.
-    func stop() -> Cartridge? {
-        self.pause()
-        let cart = self.eject()
-        self.power(.off)
-        return cart
-    }
 }
