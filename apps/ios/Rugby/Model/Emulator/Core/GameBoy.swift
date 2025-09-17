@@ -296,6 +296,28 @@ final class GameBoy {
         job?.cancel()
         job = nil
     }
+
+    /// Power on/off emulator.
+    ///
+    /// When powered on from off, the emulator will have been re-initialized.
+    ///
+    /// # Note
+    ///
+    /// This is a no-op if the emulator is already in the requested power state.
+    private func power(_ state: Power) {
+        switch state {
+        case .off:
+            // No-op if stopped
+            guard job != nil else { return }
+            // Cancel emulation thread
+            self.cancel()
+        case .on:
+            // No-op if running
+            guard job == nil else { return }
+            // Launch emulation thread
+            self.launch()
+        }
+    }
 }
 
 extension GameBoy: Core {
@@ -311,21 +333,6 @@ extension GameBoy: Core {
         cxn.video
     }
 
-    func power(_ state: Power) {
-        switch state {
-        case .off:
-            // No-op if stopped
-            guard job != nil else { return }
-            // Cancel emulation thread
-            self.cancel()
-        case .on:
-            // No-op if running
-            guard job == nil else { return }
-            // Launch emulation thread
-            self.launch()
-        }
-    }
-
     func reset(_ kind: Reset) {
         // No-op if stopped
         guard power == .on else { return }
@@ -336,9 +343,18 @@ extension GameBoy: Core {
             // Signal reset
             cxn.reset = true
         case .hard:
-            // Toggle power
-            self.power(.off)
-            self.power(.on)
+            // Pause emulator
+            self.pause()
+            // Eject cartridge
+            let cart = self.eject()
+            // Stop emulator
+            self.stop()
+            // Re-insert cart
+            if let cart {
+                self.insert(cart: cart)
+            }
+            // Restart system
+            self.start()
         }
 
         // Reset audio
@@ -350,14 +366,12 @@ extension GameBoy: Core {
     }
 
     func eject() -> Cartridge? {
-        if job != nil {
-            cxn.media.eject()
-        } else {
-            nil
-        }
+        job.flatMap { _ in cxn.media.eject() }
     }
 
     func start() {
+        // Power emulator
+        self.power(.on)
         // Start emulator
         cxn.pause = false
         // Start playback
@@ -369,6 +383,13 @@ extension GameBoy: Core {
         cxn.pause = true
         // Pause playback
         cxn.audio.pause()
+    }
+
+    func stop() {
+        // Pause emulator
+        self.pause()
+        // Power emulator
+        self.power(.off)
     }
 
     func speed(_ speed: Speed) {
