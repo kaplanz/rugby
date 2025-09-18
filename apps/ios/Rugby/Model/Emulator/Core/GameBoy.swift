@@ -176,9 +176,7 @@ private func main(cxn: Connect) {
         //
         // Ensures the thread doesn't exceed nominal frequency as
         // configured.
-        if ctx.clock.sync() {
-            continue
-        }
+        let _ = ctx.clock.sync()
 
         // Cycle emulator
         //
