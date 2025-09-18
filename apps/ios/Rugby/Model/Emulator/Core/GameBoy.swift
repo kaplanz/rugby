@@ -11,6 +11,8 @@ import Synchronization
 
 /// Clock frequency.
 let CLOCK: UInt32 = 4_194_304
+/// Cycle batch size.
+let BATCH: UInt32 = 64
 /// Audio sample divider.
 let AUDIO: UInt32 = 32
 /// Video frame rate.
@@ -167,7 +169,8 @@ private func main(cxn: Connect) {
         // Exit condition
         //
         // If the exit condition was triggered this cycle (see top of emulation
-        // loop), then we can exit now having already performed necessary cleanup.
+        // loop), then we can exit now having already performed necessary
+        // cleanup.
         if !ctx.alive {
             break
         }
@@ -178,65 +181,68 @@ private func main(cxn: Connect) {
         // configured.
         let _ = ctx.clock.sync()
 
-        // Cycle emulator
+        // Batch execution
         //
-        // Advances the emulator by a single virtual clock cycle.
-        emu.cycle()
-
-        // Sample audio
-        //
-        // Audio is downsampled to a more reasonable frequency, as practically
-        // generating samples each cycle is unnecessary.
-        if ctx.total % UInt64(AUDIO) == 0 {
-            // Produce audio sample
-            let sample = emu.sample()
-            // Forward to audio output
-            cxn.audio.push(sample: sample)
-        }
-
-        // Sample video
-        //
-        // Video is sampled only once per vsync, then the emulator indicates
-        // it has completed drawing the frame.
-        if emu.vsync() {
-            // Produce frame as buffer
-            let frame = emu.frame()
-            // Forward to video output
-            cxn.video.push(frame: frame)
-        }
-
-        // Perform lower-frequency actions
-        if ctx.total % UInt64((ctx.clock.frq ?? CLOCK) / 64) == 0 {
-            // Sample input
+        // Running several cycles together allows for more efficient operation,
+        // as bookkeeping every cycle is unnecessary.
+        for _ in 0...BATCH {
+            // Cycle emulator
             //
-            // Joypad input is sampled to the emulator ~64 times per second,
-            // as doing so more often impacts performance and shouldn't be
-            // noticeable to users. This improves overall emulation
-            // efficiency.
-            if let events = cxn.input.queue.withLockIfAvailable({ queue in
-                defer { queue.removeAll() }
-                return queue
-            }) {
-                events.forEach { (input, state) in
-                    (state ? emu.press : emu.release)(input)
-                }
+            // Advances the emulator by a single virtual clock cycle.
+            emu.cycle()
+
+            // Sample audio
+            //
+            // Audio is downsampled to a more reasonable frequency, as
+            // practically generating samples each cycle is unnecessary.
+            if ctx.total % UInt64(AUDIO) == 0 {
+                // Produce audio sample
+                let sample = emu.sample()
+                // Forward to audio output
+                cxn.audio.push(sample: sample)
             }
 
-            // Report performance
+            // Sample video
             //
-            // Approximately once per second, we should generate a
-            // performance report. This will be logged and updated in the
-            // window's title.
-            if let freq = ctx.batch.reportDelay() {
-                // Log performance
-                log.notice("\(frequency(rate: freq))")
+            // Video is sampled only once per vsync, then the emulator indicates
+            // it has completed drawing the frame.
+            if emu.vsync() {
+                // Produce frame as buffer
+                let frame = emu.frame()
+                // Forward to video output
+                cxn.video.push(frame: frame)
+            }
+
+            // Count clocked cycle
+            ctx.clock.tick()
+            ctx.batch.tick()
+            ctx.total += 1
+        }
+
+        // Sample input
+        //
+        // Joypad input is sampled to the emulator ~64 times per second,
+        // as doing so more often impacts performance and shouldn't be
+        // noticeable to users. This improves overall emulation
+        // efficiency.
+        if let events = cxn.input.queue.withLockIfAvailable({ queue in
+            defer { queue.removeAll() }
+            return queue
+        }) {
+            events.forEach { (input, state) in
+                (state ? emu.press : emu.release)(input)
             }
         }
 
-        // Count clocked cycle
-        ctx.clock.tick()
-        ctx.batch.tick()
-        ctx.total += 1
+        // Report performance
+        //
+        // Approximately once per second, we should generate a
+        // performance report. This will be logged and updated in the
+        // window's title.
+        if let freq = ctx.batch.reportDelay() {
+            // Log performance
+            log.notice("\(frequency(rate: freq))")
+        }
     }
 
     // Report benchmark
