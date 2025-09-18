@@ -24,14 +24,9 @@ final class Video: @unchecked Sendable {
 
     /// Publish a video frame.
     func push(frame: Frame) {
-        queue.async { [weak self] in
-            guard let self else { return }
+        queue.async {
             // Draw frame to image
-            let image = Self.draw(frame: frame)
-            // Publish on main thread
-            Task { @MainActor in
-                self.image = image
-            }
+            self.image = Self.draw(frame: frame)
         }
     }
 
