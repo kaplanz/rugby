@@ -34,6 +34,21 @@ class Options {
 class Config {
     fileprivate static let root = "dev.zakhary.rugby"
 
+    /// Boot ROM image.
+    var img: URL? {
+        get {
+            access(keyPath: \.img)
+            return UserDefaults.standard.url(forKey: "\(Self.root).img").flatMap { url in
+                FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) ? url : nil
+            }
+        }
+        set {
+            withMutation(keyPath: \.img) {
+                UserDefaults.standard.set(newValue, forKey: "\(Self.root).img")
+            }
+        }
+    }
+
     /// Audio sample rate.
     var aud: Measurement<UnitFrequency> {
         get {
