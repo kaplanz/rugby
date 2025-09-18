@@ -91,6 +91,7 @@ impl GameBoy {
     #[uniffi::method]
     pub fn reset(&self) {
         self.inner.write().reset();
+        self.inner.write().boot();
     }
 }
 
