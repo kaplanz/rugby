@@ -82,60 +82,20 @@ extension RugbyApp {
         NotificationCenter.default.addObserver(
             forName: .GCControllerDidConnect,
             object: nil,
-            queue: nil
-        ) { note in
-            guard let pad = note.object as? GCController else {
-                return
-            }
-            log.info("controller connected: \(pad)")
-
-            // Handle button input
-            initGamepadHandlers(pad: pad)
+            queue: nil,
+        ) { notification in
+            guard let controller = notification.object as? GCController else { return }
+            log.notice("controller connected: \(controller)")
         }
 
-        // Observe gamepad connections
+        // Observe gamepad disconnects
         NotificationCenter.default.addObserver(
             forName: .GCControllerDidDisconnect,
             object: nil,
-            queue: nil
-        ) { note in
-            guard let pad = note.object as? GCController else {
-                return
-            }
-            log.info("controller disconnected: \(pad)")
-        }
-    }
-
-    nonisolated func initGamepadHandlers(pad: GCController) {
-        pad.extendedGamepad?.buttonA.valueChangedHandler = { _, _, state in
-            DispatchQueue.main.async {
-                app.emu?.input(.a, state: state)
-            }
-        }
-        pad.extendedGamepad?.buttonB.valueChangedHandler = { _, _, state in
-            DispatchQueue.main.async {
-                app.emu?.input(.b, state: state)
-            }
-        }
-        pad.extendedGamepad?.dpad.right.valueChangedHandler = { _, _, state in
-            DispatchQueue.main.async {
-                app.emu?.input(.right, state: state)
-            }
-        }
-        pad.extendedGamepad?.dpad.left.valueChangedHandler = { _, _, state in
-            DispatchQueue.main.async {
-                app.emu?.input(.left, state: state)
-            }
-        }
-        pad.extendedGamepad?.dpad.up.valueChangedHandler = { _, _, state in
-            DispatchQueue.main.async {
-                app.emu?.input(.up, state: state)
-            }
-        }
-        pad.extendedGamepad?.dpad.down.valueChangedHandler = { _, _, state in
-            DispatchQueue.main.async {
-                app.emu?.input(.down, state: state)
-            }
+            queue: nil,
+        ) { notification in
+            guard let controller = notification.object as? GCController else { return }
+            log.notice("controller disconnected: \(controller)")
         }
     }
 }
