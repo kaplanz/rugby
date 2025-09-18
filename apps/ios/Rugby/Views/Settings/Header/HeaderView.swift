@@ -1,5 +1,5 @@
 //
-//  AboutView.swift
+//  HeaderView.swift
 //  Rugby
 //
 //  Created by Zakhary Kaplan on 2025-01-20.
@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-struct AboutView: View {
+struct HeaderView: View {
     var body: some View {
         // Header
         Section {
@@ -72,7 +72,7 @@ struct AboutView: View {
 #Preview {
     NavigationView {
         List {
-            AboutView()
+            HeaderView()
         }
     }
 }
