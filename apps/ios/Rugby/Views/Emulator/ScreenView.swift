@@ -24,7 +24,7 @@ struct ScreenView: View {
                     .textCase(.uppercase)
             }
             .baselineOffset(5)
-            .foregroundStyle(.print)
+            .foregroundStyle(.label)
         }
         .padding(6)
     }
