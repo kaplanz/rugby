@@ -36,6 +36,9 @@ struct Clocking {
             return false
         }
 
+        // Take current timestamp
+        let time = Date.now
+
         // Compute sync timestamp
         //
         // Note the order of operations here is important, namely that the
@@ -45,14 +48,17 @@ struct Clocking {
         let sync = clk + TimeInterval(idx) / Double(frq)
 
         // Compare current time against schedule
-        if .now > sync {
+        if time > sync {
             // If running behind, no sync needed
             return false
         } else {
-            // If running ahead, simply yield this thread. This causes the
-            // operating system to reschedule us, allowing the wall-clock to
-            // catch up.
-            Thread.sleep(forTimeInterval: .zero)
+            // If running ahead, sleep this thread until scheduled wakeup. This
+            // causes the operating system to reschedule us, allowing the
+            // wall-clock to catch up.
+            Thread
+                .sleep(
+                    forTimeInterval: sync.timeIntervalSince(time)
+                )
             // Indicate to the caller that a sync occurred.
             return true
         }
