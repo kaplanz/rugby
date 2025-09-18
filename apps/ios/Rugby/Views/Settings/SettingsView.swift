@@ -26,7 +26,7 @@ struct SettingsView: View {
 
         List {
             // Header
-            AboutView()
+            HeaderView()
 
             Section {
                 // Playback
