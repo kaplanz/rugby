@@ -291,7 +291,6 @@ final class GameBoy {
         let cxn = cxn
         // Launch thread
         job = Thread { main(cxn: cxn) }
-        job?.qualityOfService = .userInitiated
         job?.start()
     }
 
