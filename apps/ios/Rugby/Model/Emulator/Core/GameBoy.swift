@@ -14,7 +14,7 @@ let CLOCK: UInt32 = 4_194_304
 /// Audio sample divider.
 let AUDIO: UInt32 = 32
 /// Video frame rate.
-let VIDEO: UInt32 = 70224
+let VIDEO: UInt32 = 70_224
 
 /// Emulation context.
 private struct Context {
