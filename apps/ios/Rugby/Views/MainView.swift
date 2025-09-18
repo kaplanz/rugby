@@ -5,6 +5,7 @@
 //  Created by Zakhary Kaplan on 2024-06-20.
 //
 
+import GameController
 import SemVer
 import SwiftUI
 
@@ -16,6 +17,8 @@ struct MainView: View {
     @State private var showSettings = false
     /// Failures page.
     @State private var showFailures = false
+    /// Controls page.
+    @State private var showControls = false
 
     /// Emulator page.
     private var showEmulator: Binding<Bool> {
@@ -43,6 +46,7 @@ struct MainView: View {
         NavigationStack {
             LibraryView()
                 .toolbar {
+                    // Failures
                     if !err.this.isEmpty || !err.past.isEmpty {
                         ToolbarItem {
                             Button("Failures", systemImage: "exclamationmark.triangle") {
@@ -53,7 +57,15 @@ struct MainView: View {
                             .badge(err.this.count)
                         }
                     }
-                    ToolbarItem {
+
+                    // Settings
+                    ToolbarItemGroup {
+                        if !GCController.controllers().isEmpty {
+                            Button("Controls", systemImage: "gamecontroller.fill") {
+                                showControls.toggle()
+                            }
+                            .tint(.pink)
+                        }
                         Button("Settings", systemImage: "gearshape.fill") {
                             showSettings.toggle()
                         }
@@ -75,6 +87,19 @@ struct MainView: View {
                             }
                         }
                     }
+            }
+        }
+        .sheet(isPresented: $showControls) {
+            NavigationStack {
+                ControlsSettings()
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done", systemImage: "checkmark", role: .confirm) {
+                                showControls.toggle()
+                            }
+                        }
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
             }
         }
         .sheet(isPresented: $showFailures) {
