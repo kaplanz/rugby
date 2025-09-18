@@ -204,10 +204,7 @@ private func main(cxn: Connect) {
             // Produce frame as buffer
             let frame = emu.frame()
             // Forward to video output
-            let video = cxn.video
-            Task.detached(priority: .userInitiated) { [video, frame] in
-                video.push(frame: frame)
-            }
+            cxn.video.push(frame: frame)
         }
 
         // Perform lower-frequency actions
