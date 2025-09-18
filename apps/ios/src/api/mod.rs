@@ -4,6 +4,8 @@ use parking_lot::RwLock;
 use rugby::arch::Block;
 use rugby::core::dmg;
 
+use crate::Result;
+
 pub mod audio;
 pub mod cart;
 pub mod joypad;
@@ -31,6 +33,21 @@ impl GameBoy {
         Self {
             inner: dmg::GameBoy::new().into(),
         }
+    }
+
+    /// Constructs a new `GameBoy`, initialized with the provided boot ROM.
+    ///
+    /// New instances will behave deterministically, and can be considered as
+    /// being a hard reset.
+    ///
+    /// Use [`Self::reset`] for a soft reset.
+    #[uniffi::constructor]
+    #[must_use]
+    pub fn with(boot: &[u8]) -> Result<Self> {
+        let boot = dmg::Boot::from(<[_; _]>::try_from(boot).unwrap());
+        Ok(Self {
+            inner: dmg::GameBoy::with(boot).into(),
+        })
     }
 }
 

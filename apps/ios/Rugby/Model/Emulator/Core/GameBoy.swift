@@ -63,8 +63,18 @@ private func main(cxn: Connect) {
         log.debug("finished thread: \(Thread.current)")
     }
 
+    // Fetch configuration
+    let cfg = Options().data
+
     // Instantiate emulator
-    let emu = RugbyKit.GameBoy()
+    let emu =
+        if let path = cfg.img, let boot = try? Data(contentsOf: path),
+            let emu = try? RugbyKit.GameBoy.with(boot: boot)
+        {
+            emu
+        } else {
+            RugbyKit.GameBoy()
+        }
     // Instantiate context
     var ctx = Context()
     // Prepare clocking
