@@ -291,6 +291,7 @@ final class GameBoy {
         let cxn = cxn
         // Launch thread
         job = Thread { main(cxn: cxn) }
+        job?.name = String(reflecting: self)
         job?.start()
     }
 
