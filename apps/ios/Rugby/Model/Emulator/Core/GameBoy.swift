@@ -27,7 +27,7 @@ private struct Context {
     var batch: Profiler = .init()
     /// Start instant.
     let start: Date = .now
-    /// Paused clock
+    /// Paused clock.
     var delay: TimeInterval = .zero
     /// Total counter.
     var total: UInt64 = 0
