@@ -81,6 +81,8 @@ private func main(cxn: Connect) {
     var ctx = Context()
     // Prepare clocking
     var delay: Date?
+    // Optimization values
+    var vsync: UInt64 = .init()
 
     // Emulator loop
     //
@@ -206,7 +208,14 @@ private func main(cxn: Connect) {
             //
             // Video is sampled only once per vsync, then the emulator indicates
             // it has completed drawing the frame.
-            if emu.vsync() {
+            //
+            // As a performance optimization, we can reduce FFI overhead from
+            // this call by noting that after a frame is produced, there must
+            // necessarily be a delay by `VIDEO` frames until the next frame is
+            // ready. This allows us to call `GameBoy.vsync` less often.
+            if ctx.total >= vsync + UInt64(VIDEO) && emu.vsync() {
+                // Record last vsync cycle
+                vsync = ctx.total
                 // Produce frame as buffer
                 let frame = emu.frame()
                 // Forward to video output
