@@ -14,7 +14,7 @@ let CLOCK: UInt32 = 4_194_304
 /// Cycle batch size.
 let BATCH: UInt32 = 64
 /// Audio sample divider.
-let AUDIO: UInt32 = 32
+let AUDIO: UInt32 = 64
 /// Video frame rate.
 let VIDEO: UInt32 = 70_224
 
