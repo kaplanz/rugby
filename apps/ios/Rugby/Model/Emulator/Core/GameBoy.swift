@@ -198,8 +198,31 @@ private func main(cxn: Connect) {
             // Audio is downsampled to a more reasonable frequency, as
             // practically generating samples each cycle is unnecessary.
             if ctx.total % UInt64(AUDIO) == 0 {
+                // Decode sample from a `UInt64`
+                //
+                // By encoding the sample's data within a `u64`, we can avoid
+                // UniFFI overhead. This should not be necessary, but it seems
+                // `Record` isn't very optimized.
+                //
+                // I understand this implementation may be considered a crime in
+                // some jurisdictions.
+                let decode: (UInt64) -> RugbyKit.Sample = { raw in
+                    // Extract bytes from little-endian `UInt64`
+                    var raw = raw.littleEndian
+                    let ptr: [UInt8] = withUnsafeBytes(of: &raw) { Array($0) }
+                    // Decode `Float`s from little-endian bytes
+                    let lt: Float = ptr.dropFirst(0).prefix(4).withUnsafeBytes { ptr in
+                        ptr.load(as: Float.self)
+                    }
+                    let rt: Float = ptr.dropFirst(4).prefix(4).withUnsafeBytes { ptr in
+                        ptr.load(as: Float.self)
+                    }
+                    // Construct audio sample
+                    return Sample(lt: lt, rt: rt)
+                }
+
                 // Produce audio sample
-                let sample = emu.sample()
+                let sample = decode(emu.sample())
                 // Forward to audio output
                 cxn.audio.push(sample: sample)
             }
