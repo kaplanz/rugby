@@ -11,6 +11,7 @@ impl GameBoy {
     ///
     /// Returns an audio sample with internal channels already mixed, ready for
     /// emulation.
+    #[uniffi::method]
     pub fn sample(&self) -> Sample {
         self.inner.read().inside().audio().sample().mix()
     }
@@ -18,7 +19,7 @@ impl GameBoy {
 
 /// Rich audio sample.
 ///
-/// See [` rugby::emu::part::audio::Chiptune`]
+/// See [`rugby::emu::part::audio::Chiptune`]
 #[uniffi::remote(Record)]
 pub struct Chiptune {
     /// Master volume.
@@ -37,7 +38,7 @@ pub struct Chiptune {
 
 /// Audio sample.
 ///
-/// See [` rugby::emu::part::audio::Sample`]
+/// See [`rugby::emu::part::audio::Sample`]
 #[uniffi::remote(Record)]
 pub struct Sample {
     /// Left channel.
