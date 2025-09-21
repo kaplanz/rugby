@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement } from "lit/decorators.js";
 
-import type { Chiptune } from "rugby-web";
+import type { Chiptune } from "rugby-wasm";
 
 export const SAMPLE = 96_000;
 

@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 
-import { Cartridge, demo } from "rugby-web";
+import { Cartridge, demo } from "rugby-wasm";
 
 import { Application } from "../app";
 import type { Dialog } from "./dialog";

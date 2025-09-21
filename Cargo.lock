@@ -1910,7 +1910,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "rugby-ios"
+name = "rugby-pal"
+version = "0.1.0"
+dependencies = [
+ "chex",
+ "serde",
+]
+
+[[package]]
+name = "rugby-swift"
 version = "0.1.0"
 dependencies = [
  "bfmt",
@@ -1922,15 +1930,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rugby-pal"
-version = "0.1.0"
-dependencies = [
- "chex",
- "serde",
-]
-
-[[package]]
-name = "rugby-web"
+name = "rugby-wasm"
 version = "0.1.0"
 dependencies = [
  "console_log",
