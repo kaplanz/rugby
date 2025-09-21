@@ -1,6 +1,6 @@
 //! WebAssembly library port.
 //!
-//! Exported as a JS package called `rugby-web`.
+//! Exported as a JS package called `rugby-wasm`.
 
 #![warn(clippy::pedantic)]
 

@@ -1,4 +1,4 @@
-import { GameBoy } from "rugby-web";
+import { GameBoy } from "rugby-wasm";
 
 import type { Screen } from "./rugby/screen";
 import type { Stereo } from "./rugby/stereo";

@@ -1,7 +1,7 @@
 import { css, html } from "lit";
 import { customElement } from "lit/decorators.js";
 
-import { Button as Kind } from "rugby-web";
+import { Button as Kind } from "rugby-wasm";
 
 import { Button } from "./button";
 
