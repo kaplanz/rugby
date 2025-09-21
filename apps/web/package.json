@@ -2,11 +2,11 @@
   "name": "rugby",
   "private": true,
   "version": "0.1.0",
-  "workspaces": ["pkg"],
+  "workspaces": ["../../bind/wasm/pkg"],
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
-    "build:wasm": "wasm-pack build",
+    "build:wasm": "wasm-pack build ../../bind/wasm",
     "check": "biome check --write .",
     "clean": "rm -rf ./dist ./pkg",
     "dev": "vite",
@@ -24,7 +24,7 @@
     "@shoelace-style/shoelace": "^2.19.0",
     "lit": "^3.2.1",
     "normalize.css": "^8.0.1",
-    "rugby-web": "workspace:pkg",
+    "rugby-wasm": "workspace:pkg",
     "vite-plugin-wasm": "^3.3.0"
   },
   "devDependencies": {

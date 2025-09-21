@@ -1,7 +1,7 @@
 import { LitElement, css, html, unsafeCSS } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 
-import { Cartridge } from "rugby-web";
+import { Cartridge } from "rugby-wasm";
 
 import type { Application } from "../app";
 

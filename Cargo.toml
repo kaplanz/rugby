@@ -47,8 +47,9 @@ opt-level = 3
 
 [workspace]
 members = [
-  "apps/*",
+  "apps/cli",
   "arch",
+  "bind/*",
   "core",
   "crates/*",
   "extras/*",

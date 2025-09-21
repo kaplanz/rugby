@@ -56,6 +56,9 @@ crates are used with the structure as follows:
 │  ├── ios/          # SwiftUI iOS app
 │  └── web/          # WebAssembly app
 ├── arch/            # arch primitives
+├── bind/            # language bindings
+│  ├── swift/        # Swift (UniFFI)
+│  └── wasm/         # WebAssembly
 ├── core/            # emulation core
 ├── crates/          # support crates
 │  ├── bfmt/         # bytes formatter
