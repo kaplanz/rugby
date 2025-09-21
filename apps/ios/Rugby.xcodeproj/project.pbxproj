@@ -129,12 +129,12 @@
 			mainGroup = 969568022D4028A700AA8A83;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				96EFDD0B2D40299D009ED7D7 /* XCLocalSwiftPackageReference "pkg" */,
 				96EFDD0E2D4029A4009ED7D7 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				96AAAA342E4290E50062F554 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				96E2B0C92E4BF6C4003F9028 /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */,
 				96FE21402E4E27C4006DDC41 /* XCRemoteSwiftPackageReference "semver" */,
+				9618E5412E808E3C007BED14 /* XCLocalSwiftPackageReference "../../bind/swift/pkg" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9695680C2D4028A700AA8A83 /* Products */;
@@ -379,9 +379,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		96EFDD0B2D40299D009ED7D7 /* XCLocalSwiftPackageReference "pkg" */ = {
+		9618E5412E808E3C007BED14 /* XCLocalSwiftPackageReference "../../bind/swift/pkg" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = pkg;
+			relativePath = ../../bind/swift/pkg;
 		};
 /* End XCLocalSwiftPackageReference section */
 

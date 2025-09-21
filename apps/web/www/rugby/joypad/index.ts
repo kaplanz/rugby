@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
-import { type GameBoy, Button as Kind } from "rugby-web";
+import { type GameBoy, Button as Kind } from "rugby-wasm";
 
 import "./button";
 import "./dirpad";
