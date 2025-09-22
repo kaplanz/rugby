@@ -150,7 +150,7 @@ pub fn main(args: &Cli) -> Result<()> {
         }
 
         // Perform lower-frequency actions
-        if ctx.total % u64::from(ctx.clock.frq.unwrap_or(dmg::FREQ) / 64) == 0 {
+        if ctx.total % u64::from(ctx.clock.frq.unwrap_or(dmg::CLOCK) / 64) == 0 {
             // Sample input
             //
             // Joypad input is sampled to the emulator ~64 times per second, as
@@ -207,7 +207,7 @@ fn frequency(freq: f64) -> String {
     format!(
         "frequency: {freq:>10.6} MHz, speedup: {pace:>4.2}x, frames: {rate:>6.2} FPS",
         freq = freq / 1e6,
-        pace = freq / f64::from(dmg::FREQ),
-        rate = freq / f64::from(ppu::RATE)
+        pace = freq / f64::from(dmg::CLOCK),
+        rate = freq / f64::from(ppu::VIDEO)
     )
 }

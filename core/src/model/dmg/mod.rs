@@ -36,7 +36,7 @@ pub use crate::parts::{apu, boot, cart, dma, joypad, pic, ppu, serial, timer};
 ///
 /// Crystal oscillator frequency of 4 KiHz.
 #[expect(clippy::doc_markdown)]
-pub const FREQ: u32 = 4_194_304;
+pub const CLOCK: u32 = 4_194_304;
 
 pub use self::ppu::LCD;
 

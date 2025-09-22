@@ -3,7 +3,7 @@
 use std::num::{ParseFloatError, ParseIntError};
 use std::str::FromStr;
 
-use rugby_core::dmg::{FREQ, ppu};
+use rugby_core::dmg::{CLOCK, ppu};
 use rugby_pal as pal;
 use thiserror::Error;
 
@@ -137,13 +137,13 @@ impl Speed {
     #[must_use]
     pub fn freq(&self) -> Option<u32> {
         match *self {
-            Speed::Actual      => Some(FREQ),
+            Speed::Actual      => Some(CLOCK),
             Speed::Clock(freq) => Some(freq),
             #[expect(clippy::cast_possible_truncation)]
             #[expect(clippy::cast_precision_loss)]
             #[expect(clippy::cast_sign_loss)]
-            Speed::Ratio(mult) => Some((FREQ as f32 * mult) as u32),
-            Speed::Frame(rate) => Some(u32::from(rate) * ppu::RATE),
+            Speed::Ratio(mult) => Some((CLOCK as f32 * mult) as u32),
+            Speed::Frame(rate) => Some(u32::from(rate) * ppu::VIDEO),
             Speed::Turbo       => None,
         }
     }
