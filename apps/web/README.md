@@ -16,8 +16,7 @@ dependencies. Afterwards, the application can be built with `bun run build`.
 
 > [!NOTE]
 >
-> The build scripts will automatically compile the core to Wasm. You can do this
-> manually by running `wasm-pack build`.
+> The build scripts will automatically compile [`rugby-wasm`](../../bind/wasm).
 
 ### Development
 
