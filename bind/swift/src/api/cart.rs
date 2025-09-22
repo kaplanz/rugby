@@ -188,9 +188,8 @@ impl From<dmg::cart::Header> for Header {
 
 /// Header fields.
 pub mod parts {
-    use rugby::core::dmg::cart::head::parts;
-
     pub use parts::About;
+    use rugby::core::dmg::cart::head::parts;
 
     /// Game information.
     ///
