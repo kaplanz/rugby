@@ -1,6 +1,6 @@
 [package]
 name = "rugby"
-version = "0.1.0"
+version = { workspace = true }
 authors = { workspace = true }
 edition = "2024"
 description = """
@@ -57,6 +57,7 @@ members = [
 ]
 
 [workspace.package]
+version = "0.1.0"
 authors = ["Zakhary Kaplan <me@zakhary.dev>"]
 repository = "https://github.com/kaplanz/rugby"
 license = "MIT OR Apache-2.0"
