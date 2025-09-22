@@ -38,7 +38,7 @@ pub fn main(args: &Cli) -> Result<()> {
         .clone()
         .unwrap_or_default()
         .freq()
-        .unwrap_or(dmg::FREQ);
+        .unwrap_or(dmg::CLOCK);
     let ofrq = args.cfg.data.app.aux;
 
     // Initialize audio system
