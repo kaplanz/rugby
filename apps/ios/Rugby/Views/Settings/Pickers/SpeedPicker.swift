@@ -43,12 +43,14 @@ struct SpeedPicker: View {
             switch spd {
             case .ratio(let mult):
                 Section {
-                    Stepper(
-                        spd.description,
-                        value: .init(
-                            get: { mult },
-                            set: { spd = .ratio($0.rounded(toPlaces: 2)) },
-                        ), step: 0.01)
+                    let value = Binding(
+                        get: { mult },
+                        set: { spd = .ratio($0.rounded(toPlaces: 2)) },
+                    )
+                    Stepper(spd.description, value: value, step: 0.01)
+                        .onSubmit {
+                            spd = .ratio(mult)
+                        }
                 } header: {
                     Text("Ratio")
                 } footer: {
@@ -56,12 +58,11 @@ struct SpeedPicker: View {
                 }
             case .clock(let freq):
                 Section {
-                    Stepper(
-                        spd.description,
-                        value: .init(
-                            get: { freq },
-                            set: { spd = .clock($0) },
-                        ), step: 1024)
+                    let value = Binding(
+                        get: { freq },
+                        set: { spd = .clock($0) },
+                    )
+                    Stepper(spd.description, value: value, step: 1024)
                 } header: {
                     Text("Clock")
                 } footer: {
@@ -69,12 +70,11 @@ struct SpeedPicker: View {
                 }
             case .frame(let rate):
                 Section {
-                    Stepper(
-                        spd.description,
-                        value: .init(
-                            get: { rate },
-                            set: { spd = .frame($0) },
-                        ), step: 1)
+                    let value = Binding(
+                        get: { rate },
+                        set: { spd = .frame($0) },
+                    )
+                    Stepper(spd.description, value: value, step: 1)
                 } header: {
                     Text("Frame")
                 } footer: {
