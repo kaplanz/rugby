@@ -156,12 +156,14 @@ pub fn header(data: &[u8]) -> Result<Header> {
 
 /// Calculates the header checksum.
 #[uniffi::export]
+#[must_use]
 pub fn hchk(data: &[u8]) -> u8 {
     dmg::cart::head::hchk(data)
 }
 
 /// Calculates the global checksum.
 #[uniffi::export]
+#[must_use]
 pub fn gchk(data: &[u8]) -> u16 {
     dmg::cart::head::gchk(data)
 }
@@ -179,7 +181,7 @@ impl From<dmg::cart::Header> for Header {
         Self {
             about,
             check,
-            board: board.into(),
+            board,
             memory: memory.into(),
             compat,
         }
@@ -225,8 +227,8 @@ pub mod parts {
     impl From<parts::Memory> for Memory {
         fn from(parts::Memory { romsz, ramsz }: parts::Memory) -> Self {
             Self {
-                romsz: romsz as u32,
-                ramsz: ramsz as u32,
+                romsz: u32::try_from(romsz).expect("ROM must fix in 32-bit value"),
+                ramsz: u32::try_from(ramsz).expect("RAM must fix in 32-bit value"),
             }
         }
     }
