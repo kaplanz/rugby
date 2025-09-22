@@ -75,13 +75,13 @@ private struct DPadInput: View {
     /// Pressed D-pad inputs.
     private var input: Set<RugbyKit.Button> {
         // Ensure user is touching the D-pad
-        guard let place = touch else { return [] }
+        guard let touch else { return [] }
 
         // Construct input values
         var input = Set<RugbyKit.Button>()
 
         // Determine x-axis
-        switch place.x {
+        switch touch.x {
         case 0...0.33:
             input.insert(RugbyKit.Button.left)
         case 0.66...1:
@@ -90,7 +90,7 @@ private struct DPadInput: View {
         }
 
         // Determine y-axis
-        switch place.y {
+        switch touch.y {
         case 0...0.33:
             input.insert(RugbyKit.Button.up)
         case 0.66...1:
