@@ -87,7 +87,7 @@ crates are used with the structure as follows:
 > rather than directly using `rugby-core`, as it better structured for end
 > users and includes useful supporting modules.
 
-### Components
+### Modules
 
 Main components of `rugby` are outlined below.
 
@@ -95,11 +95,11 @@ Main components of `rugby` are outlined below.
 - [`rugby-arch`](./arch): defines the architecture primitives for emulation.
 - [`rugby-core`](./core): contains the implementation of emulator cores.
 
-#### Interfaces
+#### Extras
 
 - [`rugby-cfg`](./extras/cfg): definition of app configuration options.
 - [`rugby-gbd`](./extras/gbd): provides an interactive prompt debugger.
-- [`rugby-pal`](./extras/pal): a collection of DMG palette presets.
+- [`rugby-pal`](./extras/pal): collection of DMG color palette presets.
 
 #### Frontends
 
@@ -107,6 +107,11 @@ Main components of `rugby` are outlined below.
   configuration and comprehensive debugging.
 - [`rugby-ios`](./apps/ios): a native iOS application built with [SwiftUI].
 - [`rugby-web`](./apps/web): an online web application powered by [Wasm].
+
+#### Bindings
+
+- [`rugby-swift`](./bind/swift): foreign function interface to Swift (UniFFI).
+- [`rugby-wasm`](./bind/wasm): cross-compilation with bindings to WebAssembly.
 
 #### Libraries
 
