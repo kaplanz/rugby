@@ -22,6 +22,7 @@ struct LicenseView: View {
                 .textSelection(.enabled)
         }
         .padding()
+        .navigationTitle(path)
     }
 }
 
