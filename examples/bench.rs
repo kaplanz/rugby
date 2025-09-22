@@ -3,7 +3,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use rugby::arch::Block;
-use rugby::core::dmg::{Cartridge, FREQ, GameBoy};
+use rugby::core::dmg::{Cartridge, CLOCK, GameBoy};
 
 #[allow(unused)]
 #[path = "../apps/cli/src/app/run/emu/perf.rs"]
@@ -42,7 +42,7 @@ fn main() {
         // Timestamp iteration start
         let instant = Instant::now();
         // Perform emulation work
-        for _ in 0..FREQ {
+        for _ in 0..CLOCK {
             emu.cycle();
         }
         // Compute elapsed time
@@ -51,9 +51,9 @@ fn main() {
         // Print iteration statistics
         println!("runtime: {runtime:>8.2?}, speedup: {speedup:>4.2}x");
         // Update profiler
-        prof.tick_by(FREQ);
+        prof.tick_by(CLOCK);
         if let Some(freq) = prof.report_delay() {
-            println!("average: {:>4.2}x", freq / f64::from(FREQ));
+            println!("average: {:>4.2}x", freq / f64::from(CLOCK));
         }
     }
 }
