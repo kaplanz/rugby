@@ -56,7 +56,7 @@ pub fn main(args: &Cli) -> Result<()> {
             gui.lcd.title(&format!(
                 "{title} ({speed:.1} FPS)",
                 title = util::title(&args.cfg.data.emu.cart),
-                speed = freq / f64::from(ppu::RATE)
+                speed = freq / f64::from(ppu::VIDEO)
             ));
         }
 
