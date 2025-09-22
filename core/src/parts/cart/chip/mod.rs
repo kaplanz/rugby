@@ -85,7 +85,7 @@ impl Chip {
             Board::Mbc1 { .. } => Ok(()),
             Board::Mbc3 { .. } => Ok(()),
             Board::Mbc5 { .. } => Ok(()),
-            kind => Err(Error::Unsupported(kind.clone()))
+            kind => Err(Error::Unsupported(kind.clone())),
         }
     }
 }
