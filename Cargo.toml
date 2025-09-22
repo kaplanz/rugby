@@ -64,25 +64,25 @@ license = "MIT OR Apache-2.0"
 [workspace.dependencies]
 advise = "0.1.0"
 anyhow = "1.0.99"
-bfmt = { version = "0.1.0", path = "crates/bfmt" }
-chex = { version = "0.1.0", path = "crates/chex" }
+bfmt = { path = "crates/bfmt" }
+chex = { path = "crates/chex" }
 clap = { version = "4.5.45", features = ["derive"] }
 constcat = "0.6.1"
 either = "1.15.0"
-hexd = { version = "0.1.0", path = "crates/hexd" }
+hexd = { path = "crates/hexd" }
 itertools = "0.14.0"
 log = "0.4.27"
 num = "0.4.3"
 parking_lot = "0.12.4"
 png = "0.17.16"
-rugby = { version = "0.1.0", path = "." }
-rugby-arch = { version = "0.1.0", path = "arch" }
-rugby-cfg = { version = "0.1.0", path = "extras/cfg" }
-rugby-core = { version = "0.1.0", path = "core" }
-rugby-gbd = { version = "0.1.0", path = "extras/gbd" }
-rugby-pal = { version = "0.1.0", path = "extras/pal" }
+rugby = { path = "." }
+rugby-arch = { path = "arch" }
+rugby-cfg = { path = "extras/cfg" }
+rugby-core = { path = "core" }
+rugby-gbd = { path = "extras/gbd" }
+rugby-pal = { path = "extras/pal" }
 serde = { version = "1.0.219", features = ["derive"] }
 thiserror = "2.0.14"
 toml = "0.9.5"
-orng = { version = "0.1.0", path = "crates/orng" }
+orng = { path = "crates/orng" }
 xdir = "0.1.0"
