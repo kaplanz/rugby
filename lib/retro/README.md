@@ -31,7 +31,7 @@ consult **libretro**'s [documentation][docs].
 - [x] Emulator
   - [ ] Audio
   - [x] Cartridge
-    - [ ] Save RAM to Disk
+    - [ ] Save RAM to disk
   - [x] Joypad
     - [x] Controller support
   - [x] Video
