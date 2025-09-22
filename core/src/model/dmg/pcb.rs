@@ -68,11 +68,11 @@ impl Block for Motherboard {
             self.soc.apu.cycle();
         }
         // CPU: 1 MiHz
-        if self.soc.cpu.ready() && self.clk % 4 == 0 {
+        if self.soc.cpu.ready() && self.clk.is_multiple_of(4) {
             self.soc.cpu.cycle();
         }
         // DMA: 1 MiHz
-        if self.soc.dma.ready() && self.clk % 4 == 0 {
+        if self.soc.dma.ready() && self.clk.is_multiple_of(4) {
             self.soc.dma.cycle();
         }
         // PPU: 4 MiHz
@@ -80,7 +80,7 @@ impl Block for Motherboard {
             self.soc.ppu.cycle();
         }
         // Serial: 8192 Hz
-        if self.soc.sio.ready() && self.clk % 512 == 0 {
+        if self.soc.sio.ready() && self.clk.is_multiple_of(512) {
             self.soc.sio.cycle();
         }
         // Timer: 4 MiHz
