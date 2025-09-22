@@ -181,7 +181,9 @@ private func main(cxn: Connect) {
         //
         // Ensures the thread doesn't exceed nominal frequency as
         // configured.
-        let _ = ctx.clock.sync()
+        if ctx.clock.sync() {
+            continue
+        }
 
         // Batch execution
         //
