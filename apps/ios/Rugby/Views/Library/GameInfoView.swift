@@ -247,7 +247,7 @@ private struct Section<Content: View>: View {
         SwiftUI.Section {
             content
         } header: {
-            if let title = title {
+            if let title {
                 Text(title)
                     .font(.title3)
                     .bold()
