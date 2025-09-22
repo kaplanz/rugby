@@ -47,6 +47,7 @@ struct EmulatorSettings: View {
                             } catch { err.log(error) }
                         }
                         .bold()
+                        .buttonStyle(.borderless)
                         .imageScale(.small)
                         .labelStyle(.iconOnly)
                     }
