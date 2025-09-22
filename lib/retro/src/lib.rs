@@ -22,7 +22,9 @@ use constcat::concat;
 use log::{error, info, warn};
 use parking_lot::Mutex;
 use rugby::arch::Block;
+use rugby::core::dmg::ppu::{AUDIO, VIDEO};
 use rugby::core::dmg::{Button, Cartridge, GameBoy, LCD};
+use rugby::emu::part::audio::Sample;
 use rugby::emu::part::joypad::State;
 use rugby::prelude::*;
 
@@ -182,7 +184,10 @@ const VERSION: &CStr = unsafe {
 const SYS_INFO: retro_system_info = retro_system_info {
     library_name: NAME.as_ptr(),
     library_version: VERSION.as_ptr(),
-    valid_extensions: ptr::null(),
+    valid_extensions: unsafe {
+        CStr::from_bytes_with_nul_unchecked(concat!("gb|gbc", '\0').as_bytes())
+    }
+    .as_ptr(),
     need_fullpath: false,
     block_extract: false,
 };
@@ -282,8 +287,8 @@ const AV_INFO: retro_system_av_info = retro_system_av_info {
         aspect_ratio: LCD.wd as float / LCD.ht as float,
     },
     timing: retro_system_timing {
-        fps: 4_194_304. / 70_224.,
-        sample_rate: 44.1e3, // FIXME
+        fps: 4_194_304. / (VIDEO as double),
+        sample_rate: 4_194_304. / (AUDIO as double),
     },
 };
 
@@ -663,60 +668,80 @@ pub extern "C" fn retro_run() {
     let emu = guard.as_deref_mut().expect("was not initialized");
 
     // Poll for user input
-    let poll = def::INPUT_POLL
-        .get()
-        .expect("`retro_set_input_poll` not initialized");
-    poll();
-
-    // Update input state
-    let keys = def::INPUT_STATE
-        .get()
-        .expect("`retro_set_input_state` not initialized");
-    for (key, btn) in [
-        (dev::RETRO_DEVICE_ID_JOYPAD_A, Button::A),
-        (dev::RETRO_DEVICE_ID_JOYPAD_B, Button::B),
-        (dev::RETRO_DEVICE_ID_JOYPAD_SELECT, Button::Select),
-        (dev::RETRO_DEVICE_ID_JOYPAD_START, Button::Start),
-        (dev::RETRO_DEVICE_ID_JOYPAD_LEFT, Button::Left),
-        (dev::RETRO_DEVICE_ID_JOYPAD_RIGHT, Button::Right),
-        (dev::RETRO_DEVICE_ID_JOYPAD_UP, Button::Up),
-        (dev::RETRO_DEVICE_ID_JOYPAD_DOWN, Button::Down),
-    ] {
-        // Query external key state
-        let state = match keys(0, RETRO_DEVICE_JOYPAD, 0, key) {
-            0 => State::Up,
-            _ => State::Dn,
-        };
-        // Update internally button
-        emu.inside_mut().joypad().recv(Some((btn, state).into()));
+    if let Some(poll) = def::INPUT_POLL.get() {
+        poll();
     }
 
+    // Update input state
+    if let Some(keys) = def::INPUT_STATE.get() {
+        for (key, btn) in [
+            (dev::RETRO_DEVICE_ID_JOYPAD_A, Button::A),
+            (dev::RETRO_DEVICE_ID_JOYPAD_B, Button::B),
+            (dev::RETRO_DEVICE_ID_JOYPAD_SELECT, Button::Select),
+            (dev::RETRO_DEVICE_ID_JOYPAD_START, Button::Start),
+            (dev::RETRO_DEVICE_ID_JOYPAD_LEFT, Button::Left),
+            (dev::RETRO_DEVICE_ID_JOYPAD_RIGHT, Button::Right),
+            (dev::RETRO_DEVICE_ID_JOYPAD_UP, Button::Up),
+            (dev::RETRO_DEVICE_ID_JOYPAD_DOWN, Button::Down),
+        ] {
+            // Query external key state
+            let state = match keys(0, RETRO_DEVICE_JOYPAD, 0, key) {
+                0 => State::Up,
+                _ => State::Dn,
+            };
+            // Update internally button
+            emu.inside_mut().joypad().recv(Some((btn, state).into()));
+        }
+    }
+
+    // Buffer audio samples
+    let mut audio = Vec::with_capacity(0x2000);
+
     // Emulate single frame
+    let mut cycle = 0;
     let frame = loop {
         // Tick emulator
         emu.cycle();
+        // Sample audio frames
+        if cycle % AUDIO == 0 {
+            let Sample { lt, rt } = emu.inside().audio().sample().mix();
+            audio.push(lt);
+            audio.push(rt);
+        }
         // Finish at vertical sync
         if emu.inside().video().vsync() {
             break emu.inside().video().frame();
         }
+        // Increment cycle count
+        cycle += 1;
     };
 
-    // Apply palette to frame
-    let frame: Box<[u32]> = frame
-        .iter()
-        .map(|&pix| rugby::extra::pal::MONO[pix as usize].into())
-        .collect();
+    // Play audio samples
+    if let Some(play) = def::AUDIO_SAMPLE_BATCH.get() {
+        // Convert audio samples
+        let audio = audio
+            .into_iter()
+            .map(|sample| (sample.clamp(-1., 1.) * i16::MAX as f32) as i16)
+            .collect::<Vec<_>>();
+        // Audio sample callback
+        play(audio.as_ptr(), audio.len() / 2);
+    }
 
-    // Draw completed frame
-    let draw = def::VIDEO_REFRESH
-        .get()
-        .expect("`retro_set_video_refresh` not initialized");
-    draw(
-        frame.as_ptr().cast::<void>(),
-        unsigned::from(LCD.wd),
-        unsigned::from(LCD.ht),
-        usize::from(LCD.wd) * std::mem::size_of_val(&frame[0]),
-    );
+    // Draw video frame
+    if let Some(draw) = def::VIDEO_REFRESH.get() {
+        // Apply palette to frame
+        let frame: Box<[u32]> = frame
+            .iter()
+            .map(|&pix| rugby::extra::pal::MONO[pix as usize].into())
+            .collect();
+        // Video frame callback
+        draw(
+            frame.as_ptr().cast::<void>(),
+            unsigned::from(LCD.wd),
+            unsigned::from(LCD.ht),
+            usize::from(LCD.wd) * std::mem::size_of_val(&frame[0]),
+        );
+    }
 }
 
 /// Returns the amount of data the implementation requires to serialize internal state (save states).
@@ -970,7 +995,7 @@ pub extern "C" fn retro_unload_game() {
     let mut guard = EMULATOR.lock();
     let emu = guard.as_deref_mut().expect("was not initialized");
 
-    // Insert game cartridge
+    // Eject game cartridge
     emu.eject()
         .inspect(|cart| info!("ejected game: {}", cart.title()));
 }

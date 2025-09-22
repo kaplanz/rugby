@@ -10,7 +10,7 @@
 
 ## Build
 
-Invoke `cargo build --release -pretro` from anywhere within the repository
+Invoke `cargo build --release -plibretro` from anywhere within the repository
 to build this frontend.
 
 ## Usage
@@ -29,7 +29,7 @@ consult **libretro**'s [documentation][docs].
 ## Progress
 
 - [x] Emulator
-  - [ ] Audio
+  - [x] Audio
   - [x] Cartridge
     - [ ] Save RAM to disk
   - [x] Joypad
