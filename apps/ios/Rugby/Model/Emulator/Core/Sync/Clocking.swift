@@ -33,6 +33,8 @@ struct Clocking {
     func sync() -> Bool {
         // Only synchronize if a target frequency is provided.
         guard let frq else { return false }
+        // Unconditionally synchronize when frequency is zero.
+        if frq == 0 { return true }
 
         // Take current timestamp
         let time = Date.now
