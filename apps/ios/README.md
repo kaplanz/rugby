@@ -15,21 +15,23 @@ This project must be opened and built using Xcode.
 ## Progress
 
 - [x] Emulator
-  - [ ] Audio
+  - [x] Audio
   - [x] Joypad
     - [x] On-screen touch buttons
     - [x] Game Controller API
   - [x] Video
-    - [ ] Custom palettes
-- [ ] Frontend
+    - [x] Custom palettes
+- [x] Frontend
   - [x] Game library
-    - [ ] Auto title image
     - [x] Upload ROM files
-    - [ ] Persistent storage
-    - [ ] Save RAM snapshots
+    - [x] Save RAM to disk
+    - [x] Screenshot icons
   - [x] App settings
     - [ ] Configuration file
-    - [x] Native UI control panel
+    - [x] Native control panel
+  - [ ] Features
+    - [ ] Network play
+    - [ ] Save states
 
 ## License
 

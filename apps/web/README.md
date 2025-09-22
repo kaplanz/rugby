@@ -69,11 +69,13 @@ There are also key bindings for the application:
     - [x] Usage panel
   - [x] Game library
     - [x] Upload ROM files
-    - [x] Persistent storage
-    - [ ] Save RAM snapshots
+    - [ ] Save RAM to disk
   - [x] App settings
     - [x] Play/pause emulator
     - [x] Change clock speed
+  - [ ] Features
+    - [ ] Network play
+    - [ ] Save states
 
 ## License
 

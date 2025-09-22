@@ -110,6 +110,8 @@ To list and get help with GBD, use the `help` command at the prompt or see its
       - [x] Manual pages
   - [x] Features
     - [x] Change clock speed
+    - [ ] Network play
+    - [ ] Save states
 - [x] Debugging
   - [ ] Dynamic TUI application
   - [x] Interactive debug prompt
