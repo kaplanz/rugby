@@ -48,6 +48,7 @@ struct SpeedPicker: View {
                         set: { spd = .ratio($0.rounded(toPlaces: 2)) },
                     )
                     Stepper(spd.description, value: value, step: 0.01)
+                    Slider(value: value, in: 0...3, step: 0.05)
                         .onSubmit {
                             spd = .ratio(mult)
                         }
@@ -63,6 +64,11 @@ struct SpeedPicker: View {
                         set: { spd = .clock($0) },
                     )
                     Stepper(spd.description, value: value, step: 1024)
+                    Slider(
+                        value: .init(
+                            get: { Float(value.wrappedValue) },
+                            set: { value.wrappedValue = .init($0) },
+                        ), in: 0...Float(3 * CLOCK), step: 1024)
                 } header: {
                     Text("Clock")
                 } footer: {
@@ -75,6 +81,11 @@ struct SpeedPicker: View {
                         set: { spd = .frame($0) },
                     )
                     Stepper(spd.description, value: value, step: 1)
+                    Slider(
+                        value: .init(
+                            get: { Float(value.wrappedValue) },
+                            set: { value.wrappedValue = .init($0) },
+                        ), in: 0...180, step: 1)
                 } header: {
                     Text("Frame")
                 } footer: {
