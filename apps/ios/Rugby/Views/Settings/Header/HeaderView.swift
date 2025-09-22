@@ -9,6 +9,8 @@ import SwiftUI
 import WebKit
 
 struct HeaderView: View {
+    @State private var openLicense = false
+
     var body: some View {
         // Header
         Section {
@@ -38,7 +40,13 @@ struct HeaderView: View {
                 Label("Website", systemImage: "globe")
             }
             // License
-            Menu {
+            Button {
+                openLicense.toggle()
+            } label: {
+                Label("License", systemImage: "doc.text")
+                    .foregroundStyle(.tint)
+            }
+            .confirmationDialog("Choose License", isPresented: $openLicense) {
                 NavigationLink {
                     LicenseView(path: "LICENSE-MIT")
                 } label: {
@@ -51,9 +59,6 @@ struct HeaderView: View {
                     Label("Apache-2.0", systemImage: "bird")
                         .foregroundStyle(.tint)
                 }
-            } label: {
-                Label("License", systemImage: "doc.text")
-                    .foregroundStyle(.tint)
             }
             // Credit
             NavigationLink {
