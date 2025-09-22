@@ -19,7 +19,7 @@ pub struct Scan {
 impl Scan {
     pub fn exec(mut self, ppu: &mut Ppu) -> Mode {
         // Scanning a single entry takes 2 dots
-        if ppu.etc.dot % 2 == 0 {
+        if ppu.etc.dot.is_multiple_of(2) {
             // Sprites should only be scanned when:
             //
             // 1. Objects are are enabled (TODO: verify this)

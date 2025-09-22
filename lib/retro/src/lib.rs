@@ -719,9 +719,10 @@ pub extern "C" fn retro_run() {
     // Play audio samples
     if let Some(play) = def::AUDIO_SAMPLE_BATCH.get() {
         // Convert audio samples
+        #[allow(clippy::cast_possible_truncation)]
         let audio = audio
             .into_iter()
-            .map(|sample| (sample.clamp(-1., 1.) * i16::MAX as f32) as i16)
+            .map(|sample| (sample.clamp(-1., 1.) * f32::from(i16::MAX)) as i16)
             .collect::<Vec<_>>();
         // Audio sample callback
         play(audio.as_ptr(), audio.len() / 2);

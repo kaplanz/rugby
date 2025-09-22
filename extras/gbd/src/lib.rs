@@ -262,7 +262,7 @@ impl Debugger {
     fn edge(&self) -> bool {
         // Pre-calculate machine cycle
         let (dx, ly) = self.state.ppu;
-        let mtick = self.cycle % 4 == 0;
+        let mtick = self.cycle.is_multiple_of(4);
         let dinsn = matches!(self.state.cpu, cpu::Stage::Done);
         let dxrst = dx == 0;
         let lyrst = ly == 0;

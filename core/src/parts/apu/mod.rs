@@ -266,19 +266,19 @@ impl Block for Apu {
             // Cycle channels
             //
             // Channel 1: 1 MiHz
-            if self.ch1.ready() && self.etc.div % 4 == 0 {
+            if self.ch1.ready() && self.etc.div.is_multiple_of(4) {
                 self.ch1.cycle();
             }
             // Channel 2: 1 MiHz
-            if self.ch2.ready() && self.etc.div % 4 == 0 {
+            if self.ch2.ready() && self.etc.div.is_multiple_of(4) {
                 self.ch2.cycle();
             }
             // Channel 3: 2 MiHz
-            if self.ch3.ready() && self.etc.div % 2 == 0 {
+            if self.ch3.ready() && self.etc.div.is_multiple_of(2) {
                 self.ch3.cycle();
             }
             // Channel 4: 1 MiHz
-            if self.ch4.ready() && self.etc.div % 4 == 0 {
+            if self.ch4.ready() && self.etc.div.is_multiple_of(4) {
                 self.ch4.cycle();
             }
         } else {

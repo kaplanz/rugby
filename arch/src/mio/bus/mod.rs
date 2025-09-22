@@ -111,7 +111,7 @@ impl Memory for Bus {
 }
 
 #[expect(clippy::items_after_statements)]
-#[expect(clippy::range_plus_one, clippy::range_minus_one)]
+#[expect(clippy::range_plus_one)]
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -81,10 +81,9 @@ impl Chip {
     #[expect(unused_variables)]
     pub fn check(head: &Header, rom: &[u8]) -> Result<()> {
         match &head.board {
-            Board::None { .. } => Ok(()),
-            Board::Mbc1 { .. } => Ok(()),
-            Board::Mbc3 { .. } => Ok(()),
-            Board::Mbc5 { .. } => Ok(()),
+            Board::None { .. } | Board::Mbc1 { .. } | Board::Mbc3 { .. } | Board::Mbc5 { .. } => {
+                Ok(())
+            }
             kind => Err(Error::Unsupported(kind.clone())),
         }
     }
