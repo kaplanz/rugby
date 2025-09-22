@@ -32,9 +32,7 @@ struct Clocking {
     /// Returns an indicator on whether a sync occurred.
     func sync() -> Bool {
         // Only synchronize if a target frequency is provided.
-        guard let frq = frq else {
-            return false
-        }
+        guard let frq else { return false }
 
         // Take current timestamp
         let time = Date.now
