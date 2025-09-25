@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "build:wasm": "wasm-pack build ../../bind/wasm",
     "check": "biome check --write .",
-    "clean": "rm -rf ./dist ./pkg",
+    "clean": "rm -rf ./dist",
     "dev": "vite",
     "fix": "biome lint --write .",
     "fmt": "biome format --write .",
