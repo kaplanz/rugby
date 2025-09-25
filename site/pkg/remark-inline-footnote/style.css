@@ -1,0 +1,53 @@
+:root {
+  counter-reset: footnote;
+}
+
+.footnote {
+  counter-increment: footnote;
+
+  > label::before {
+    content: counter(footnote);
+
+    vertical-align: super;
+
+    font-size: 75%;
+    line-height: 0;
+  }
+
+  > label {
+    cursor: pointer;
+  }
+
+  > input {
+    display: none;
+
+    &:not(:checked) + span {
+      display: none;
+    }
+  }
+
+  > span {
+    display: flex;
+    box-sizing: border-box;
+
+    font-size: 85%;
+
+    align-items: center;
+    float: inline-start;
+
+    padding: .75em 2em;
+    inline-size: 100%;
+
+    &::before {
+      content: counter(footnote);
+
+      align-self: stretch;
+
+      border-inline-end: .2em solid;
+      margin-inline-end: .5em;
+      padding-inline-end: .5em;
+
+      font-size: 1rem;
+    }
+  }
+}
