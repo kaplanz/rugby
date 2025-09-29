@@ -60,6 +60,13 @@ struct HeaderView: View {
                         .foregroundStyle(.tint)
                 }
             }
+            // Privacy
+            NavigationLink {
+                TextFile(named: "PRIVACY.md", kind: .markdown)
+            } label: {
+                Label("Privacy", systemImage: "hand.raised")
+                    .foregroundStyle(.tint)
+            }
             // Credits
             NavigationLink {
                 TextFile(named: "CREDITS.md", kind: .markdown)
