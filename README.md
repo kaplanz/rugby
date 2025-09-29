@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img width="128" height="128" src="./site/www/img/logo.png"/>
+  <img width="128" height="128" src="./docs/assets/img/icon.png"/>
   <p>Rugby</p>
 </h1>
 
