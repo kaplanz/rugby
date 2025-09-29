@@ -48,21 +48,21 @@ struct HeaderView: View {
             }
             .confirmationDialog("Choose License", isPresented: $openLicense) {
                 NavigationLink {
-                    LicenseView(path: "LICENSE-MIT")
+                    TextFile(named: "LICENSE-MIT")
                 } label: {
                     Label("MIT", systemImage: "building.columns")
                         .foregroundStyle(.tint)
                 }
                 NavigationLink {
-                    LicenseView(path: "LICENSE-APACHE")
+                    TextFile(named: "LICENSE-APACHE")
                 } label: {
                     Label("Apache-2.0", systemImage: "bird")
                         .foregroundStyle(.tint)
                 }
             }
-            // Credit
+            // Credits
             NavigationLink {
-                MarkdownView(path: "CREDITS.md")
+                TextFile(named: "CREDITS.md", kind: .markdown)
             } label: {
                 Label("Credits", systemImage: "person.2.shield")
                     .foregroundStyle(.tint)
