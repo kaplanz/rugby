@@ -1,3 +1,16 @@
+---js
+{
+  eleventyComputed: {
+    title: (data) => {
+      const title = "Rugby";
+      return (data.title)
+        ? `${data.title} | ${title}`
+        : title
+    },
+  },
+}
+---
+
 <!doctype html>
 <html lang="en-CA">
 
