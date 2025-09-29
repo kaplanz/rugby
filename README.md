@@ -198,6 +198,13 @@ conditions of their respective licenses:
   [MIT License][mooneye.license] (dated 06 Sep 2023). See the project
   [here][mooneye].
 
+## Privacy
+
+The project does not collect or transmit any data. Any data used by the project
+remains solely on your device.
+
+See the [Privacy Policy](./PRIVACY.md) for full details.
+
 ## License
 
 This project is dual-licensed under both [MIT License](./LICENSE-MIT) and
