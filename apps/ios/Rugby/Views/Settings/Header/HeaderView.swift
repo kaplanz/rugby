@@ -32,7 +32,7 @@ struct HeaderView: View {
             NavigationLink {
                 WebView(
                     url: URL(
-                        string: "https://git.zakhary.dev/rugby",
+                        string: "https://rugby.zakhary.dev",
                     ))
             } label: {
                 Label("Website", systemImage: "globe")

@@ -6,6 +6,7 @@ edition = "2024"
 description = """
 Cycle-accurate Game Boy emulation
 """
+homepage = { workspace = true }
 repository = { workspace = true }
 license = { workspace = true }
 keywords = ["gameboy", "emulator"]
@@ -59,6 +60,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 authors = ["Zakhary Kaplan <me@zakhary.dev>"]
+homepage = "https://rugby.zakhary.dev"
 repository = "https://github.com/kaplanz/rugby"
 license = "MIT OR Apache-2.0"
 
