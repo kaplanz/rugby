@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		960D043E2E8B29A3005949D7 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 960D043D2E8B29A3005949D7 /* MarkdownUI */; };
 		964989392E43AFC900AA1C84 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 964989382E43AFC900AA1C84 /* Atomics */; };
 		96AAAA362E4290E50062F554 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 96AAAA352E4290E50062F554 /* Collections */; };
 		96E2B0CB2E4BF6C4003F9028 /* ColorTokensKit in Frameworks */ = {isa = PBXBuildFile; productRef = 96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */; };
@@ -46,6 +47,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				96AAAA362E4290E50062F554 /* Collections in Frameworks */,
+				960D043E2E8B29A3005949D7 /* MarkdownUI in Frameworks */,
 				96EFDD102D4029A5009ED7D7 /* Algorithms in Frameworks */,
 				96E2B0CB2E4BF6C4003F9028 /* ColorTokensKit in Frameworks */,
 				96EFDD0D2D40299D009ED7D7 /* RugbyKit in Frameworks */,
@@ -99,6 +101,7 @@
 				964989382E43AFC900AA1C84 /* Atomics */,
 				96E2B0CA2E4BF6C4003F9028 /* ColorTokensKit */,
 				96FE21412E4E27C4006DDC41 /* SemVer */,
+				960D043D2E8B29A3005949D7 /* MarkdownUI */,
 			);
 			productName = Rugby;
 			productReference = 9695680B2D4028A700AA8A83 /* Rugby.app */;
@@ -135,6 +138,7 @@
 				96E2B0C92E4BF6C4003F9028 /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */,
 				96FE21402E4E27C4006DDC41 /* XCRemoteSwiftPackageReference "semver" */,
 				9618E5412E808E3C007BED14 /* XCLocalSwiftPackageReference "../../bind/swift/pkg" */,
+				960D043C2E8B29A3005949D7 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9695680C2D4028A700AA8A83 /* Products */;
@@ -386,6 +390,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		960D043C2E8B29A3005949D7 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
 		964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-atomics.git";
@@ -429,6 +441,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		960D043D2E8B29A3005949D7 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 960D043C2E8B29A3005949D7 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
 		964989382E43AFC900AA1C84 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 964989372E43AFC900AA1C84 /* XCRemoteSwiftPackageReference "swift-atomics" */;

@@ -62,12 +62,11 @@ struct HeaderView: View {
             }
             // Credit
             NavigationLink {
-                EmptyView()
+                MarkdownView(path: "CREDITS.md")
             } label: {
                 Label("Credits", systemImage: "person.2.shield")
                     .foregroundStyle(.tint)
             }
-            .disabled(true)
         } footer: {
             Text("Copyright &copy; \(Build.DATE.formatted(.dateTime.year())) Zakhary Kaplan")
         }
