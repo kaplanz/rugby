@@ -33,7 +33,7 @@ struct SettingsView: View {
                 NavigationLink {
                     PlaybackSettings()
                 } label: {
-                    SettingsLabel("Playback", color: .gray, systemImage: "memories")
+                    SettingsLabel("Playback", color: .gray, systemImage: "playpause.fill")
                 }
                 // Emulator
                 NavigationLink {
@@ -47,6 +47,8 @@ struct SettingsView: View {
                 } label: {
                     SettingsLabel("Controls", color: .pink, systemImage: "gamecontroller.fill")
                 }
+            } header: {
+                Label("General", systemImage: "gear")
             }
 
             Section {
@@ -54,14 +56,16 @@ struct SettingsView: View {
                 NavigationLink {
                     AudioSettings()
                 } label: {
-                    SettingsLabel("Audio", color: .orange, systemImage: "waveform")
+                    SettingsLabel("Audio", color: .orange, systemImage: "hifispeaker")
                 }
                 // Video
                 NavigationLink {
                     VideoSettings()
                 } label: {
-                    SettingsLabel("Video", color: .indigo, systemImage: "display")
+                    SettingsLabel("Video", color: .indigo, systemImage: "tv")
                 }
+            } header: {
+                Label("Media", systemImage: "tv.and.hifispeaker.fill")
             }
 
             // Danger Zone
