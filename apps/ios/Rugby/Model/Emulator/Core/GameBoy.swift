@@ -42,6 +42,8 @@ private final class Connect: @unchecked Sendable {
 
     /// Clock speed.
     let speed: Mutex<Speed?> = .init(nil)
+    /// Frame rate.
+    var perf: Double = .init()
 
     /// Cartridge slot.
     let media: Media = .init()
@@ -276,6 +278,8 @@ private func main(cxn: Connect) {
         if let freq = ctx.batch.reportDelay() {
             // Log performance
             log.notice("\(frequency(rate: freq))")
+            // Report upstream
+            cxn.perf = freq / Double(CLOCK)
         }
     }
 
@@ -362,6 +366,11 @@ final class GameBoy {
             // Launch emulation thread
             self.launch()
         }
+    }
+
+    /// Report the emulator's performance.
+    func report() -> Double {
+        cxn.perf
     }
 }
 
