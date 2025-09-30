@@ -45,6 +45,17 @@ export default async function(cfg) {
   // Provide default layout
   cfg.addGlobalData("layout", "main");
 
+  // Compute page breadcrumbs
+  cfg.addGlobalData("eleventyComputed", {
+    crumb: (data) => (data.page.url.match(/(^\/)|[^\/]+\/?/g) || []).reduce(
+      (root, page) => [...root, {
+        url: path.join(root.slice(-1)[0]?.url ?? "/", page),
+        txt: page,
+      }],
+      [],
+    ),
+  });
+
   // Customize Markdown rendering
   cfg.setLibrary("md", { render: markdown });
 
