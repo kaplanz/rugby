@@ -51,6 +51,19 @@ struct PlaybackSettings: View {
                     """
                 )
             }
+
+            // HUD
+            Section {
+                Toggle("Enable HUD", systemImage: "info.windshield", isOn: $cfg.hud)
+            } footer: {
+                Text(
+                    """
+                    When enabled, the heads-up display (HUD) will show the \
+                    frame rate during emulation.
+                    """
+                )
+            }
+
         }
         .navigationTitle("Playback")
     }
