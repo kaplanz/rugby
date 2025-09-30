@@ -33,6 +33,15 @@
 
 <body>
   <header>
+    <nav class="crumb">
+      <ul>
+        {% for item in crumb %}
+          <li>
+            <a href={{ item.url }}>{{ item.txt }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
   </header>
   <main>
     <nav>
