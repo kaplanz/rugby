@@ -2,6 +2,34 @@
 @import "remark-callouts/style";
 @import "remark-inline-footnotes/style";
 
+/* navigation */
+main > nav {
+  display: flex;
+  justify-content: center;
+
+  font-family: var(--mono);
+  font-weight: normal;
+
+  ul {
+    display: inline-flex;
+    gap: 1em;
+    list-style: none;
+
+    margin: 0;
+    padding: 0;
+
+    li {
+      &:hover {
+        font-weight: bold;
+      }
+
+      &[aria-current] a {
+        color: var(--accent);
+      }
+    }
+  }
+}
+
 /* rehype-autolink-headings */
 h1,
 h2,
