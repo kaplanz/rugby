@@ -105,6 +105,19 @@ class Config {
         }
     }
 
+    /// Heads-up display.
+    var hud: Bool {
+        get {
+            access(keyPath: \.hud)
+            return UserDefaults.standard.bool(forKey: "\(Self.root).hud")
+        }
+        set {
+            withMutation(keyPath: \.hud) {
+                UserDefaults.standard.set(newValue, forKey: "\(Self.root).hud")
+            }
+        }
+    }
+
     /// Emulation speed.
     var spd: Speedup = .init()
 
