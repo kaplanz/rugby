@@ -59,7 +59,7 @@ class Config {
         set {
             withMutation(keyPath: \.aud) {
                 UserDefaults.standard
-                    .setValue(
+                    .set(
                         newValue.converted(to: .hertz).value,
                         forKey: "\(Self.root).aud",
                     )
@@ -79,7 +79,7 @@ class Config {
         set {
             withMutation(keyPath: \.tex) {
                 if let newValue {
-                    UserDefaults.standard.setValue(
+                    UserDefaults.standard.set(
                         newValue.rawValue, forKey: "\(Self.root).tex")
                 } else {
                     UserDefaults.standard.removeObject(forKey: "\(Self.root).tex")
