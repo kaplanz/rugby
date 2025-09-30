@@ -94,4 +94,9 @@ final class Emulator {
             queue.append((input, state))
         }
     }
+
+    /// Report performance.
+    func report() -> Double {
+        core.report()
+    }
 }

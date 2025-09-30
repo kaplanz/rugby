@@ -44,6 +44,22 @@ struct EmulatorView: View {
             if geo.size.height > geo.size.width {
                 VStack {
                     ScreenView(frame: frame)
+                        .overlay(alignment: .topLeading) {
+                            if opt.data.hud {
+                                Text(
+                                    emu.report().formatted(
+                                        .percent.precision(
+                                            .significantDigits(3)
+                                        )
+                                    )
+                                )
+                                .monospaced()
+                                .font(.footnote)
+                                .padding(6)
+                                .glassEffect(in: .rect(cornerRadius: 8))
+                                .padding(16)
+                            }
+                        }
                         .id(frame)
                     Spacer()
                     JoypadView(emu.input(_:state:))
