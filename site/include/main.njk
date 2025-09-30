@@ -34,7 +34,20 @@
 <body>
   <header>
   </header>
-  <main>{{ content | safe }}</main>
+  <main>
+    <nav>
+      <ul>
+        {% for item in nav %}
+          <li {{ "aria-current=page" if page.url == item.url }}>
+            <a href="{{ item.url }}">{{ item.txt }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+    <article>
+      {{ content | safe }}
+    </article>
+  </main>
   <footer>
     <section>
       <span>
