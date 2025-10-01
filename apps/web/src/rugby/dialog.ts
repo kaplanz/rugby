@@ -3,7 +3,7 @@ import { customElement, property, query, state } from "lit/decorators.js";
 
 import { Cartridge } from "rugby-wasm";
 
-import type { Application } from "../app";
+import type { App } from "./rugby";
 
 import type { SlDialog, SlTabGroup } from "@shoelace-style/shoelace";
 
@@ -43,7 +43,7 @@ interface Game {
 export class Dialog extends LitElement {
   /** Application state. */
   @property()
-  app!: Application;
+  app!: App;
 
   /** Game library. */
   private lib: Array<Game> = [];
@@ -499,10 +499,6 @@ export class Dialog extends LitElement {
 
   static styles = [
     css`
-      :host {
-        font-family: "Cabin Variable";
-      }
-
       @media (prefers-color-scheme: light) {
         ${unsafeCSS(shoelaceLight)}
       }
