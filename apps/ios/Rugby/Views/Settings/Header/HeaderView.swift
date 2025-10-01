@@ -9,6 +9,8 @@ import SwiftUI
 import WebKit
 
 struct HeaderView: View {
+    @State private var showBuild = false
+
     var body: some View {
         // Header
         Section {
@@ -19,8 +21,15 @@ struct HeaderView: View {
                         .bold()
                         .font(.title)
                         .fontDesign(.rounded)
-                    Text("Version \(Build.VERSION.description)")
-                        .foregroundStyle(.secondary)
+                    Text(
+                        !showBuild
+                            ? "Version \(Build.VERSION.versionString(formattedWith: []))"
+                            : "Version \(Build.VERSION.versionString(formattedWith: .fullVersion))"
+                    )
+                    .foregroundStyle(.secondary)
+                    .onTapGesture {
+                        showBuild.toggle()
+                    }
                 }
             }
         }

@@ -10,10 +10,17 @@ import SemVer
 
 struct Build {
     /// Application name.
-    static let NAME = Bundle.main.infoDictionary?["CFBundleName"] as! String
-    /// Version number.
-    static let VERSION = Version(
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)!
+    static let NAME = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
+    /// Semantic version.
+    static var VERSION: Version {
+        var version = Version(
+            Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+        )!
+        version.metadata.append(contentsOf: ["build", NUMBER])
+        return version
+    }
+    /// Xcode build number.
+    static let NUMBER = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
     /// Compilation date.
     static var DATE: Date {
         let fmt = DateFormatter()
