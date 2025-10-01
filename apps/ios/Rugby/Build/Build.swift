@@ -15,5 +15,9 @@ struct Build {
     static let VERSION = Version(
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)!
     /// Compilation date.
-    static let DATE = Date.now
+    static var DATE: Date {
+        let fmt = DateFormatter()
+        fmt.dateFormat = "MMM dd yyyy HH:mm:ss"
+        return fmt.date(from: "\(__OBJC_DATE__) \(__OBJC_TIME__)")!
+    }
 }
