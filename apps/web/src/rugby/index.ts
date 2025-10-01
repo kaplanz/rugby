@@ -3,7 +3,7 @@ import { customElement, query, state } from "lit/decorators.js";
 
 import { Cartridge, demo } from "rugby-wasm";
 
-import { Application } from "../app";
+import { App } from "./rugby";
 import type { Dialog } from "./dialog";
 import type { Screen } from "./screen";
 import type { Stereo } from "./stereo";
@@ -21,7 +21,7 @@ import "./switch";
 export class GameBoy extends LitElement {
   /** Application state. */
   @state()
-  private app = new Application();
+  private app = new App();
 
   /** Audio speaker output. */
   @query("gb-stereo")
@@ -145,7 +145,7 @@ export class GameBoy extends LitElement {
 
       background-color: light-dark(#c5c0bd, #1c1a19);
       color: #204786;
-      font-family: "Cabin Variable", sans-serif;
+      font-family: "Cabin";
       font-size: min(7.40px, 148dvw / 90, 1dvh);
 
       gb-switch {
@@ -271,7 +271,7 @@ export class GameBoy extends LitElement {
           text-align: start;
 
           .brand {
-            font-family: "Pretendo", sans-serif;
+            font-family: "Pretendo";
             font-size: 2.5em;
           }
 

@@ -1,0 +1,8 @@
+/* Normal */
+@font-face {
+  font-family: "Orbitron";
+  font-optical-sizing: auto;
+  font-weight: 100 900;
+  font-style: normal;
+  src: url("fonts/Orbitron[wght].ttf") format("truetype");
+}

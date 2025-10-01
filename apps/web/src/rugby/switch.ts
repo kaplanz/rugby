@@ -1,13 +1,13 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
-import type { Application } from "../app";
+import type { App } from "./rugby";
 import type { Screen } from "./screen";
 
 @customElement("gb-switch")
 export class Stereo extends LitElement {
   @property()
-  app!: Application;
+  app!: App;
 
   @property()
   lcd!: Screen;
