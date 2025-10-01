@@ -66,26 +66,26 @@ license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
 advise = "0.1.0"
-anyhow = "1.0.99"
+anyhow = "1.0.100"
 bfmt = { path = "crates/bfmt" }
 chex = { path = "crates/chex" }
-clap = { version = "4.5.45", features = ["derive"] }
+clap = { version = "4.5.48", features = ["derive"] }
 constcat = "0.6.1"
 either = "1.15.0"
 hexd = { path = "crates/hexd" }
 itertools = "0.14.0"
-log = "0.4.27"
+log = "0.4.28"
 num = "0.4.3"
 parking_lot = "0.12.4"
-png = "0.17.16"
+png = "0.18.0"
 rugby = { path = "." }
 rugby-arch = { path = "arch" }
 rugby-cfg = { path = "extras/cfg" }
 rugby-core = { path = "core" }
 rugby-gbd = { path = "extras/gbd" }
 rugby-pal = { path = "extras/pal" }
-serde = { version = "1.0.219", features = ["derive"] }
-thiserror = "2.0.14"
-toml = "0.9.5"
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = "2.0.17"
+toml = "0.9.7"
 orng = { path = "crates/orng" }
 xdir = "0.1.0"

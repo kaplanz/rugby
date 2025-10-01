@@ -17,11 +17,11 @@ advise = { workspace = true }
 anyhow = { workspace = true }
 bfmt = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }
-clap-verbosity-flag = { version = "3.0.3", features = ["tracing"] }
-clap_complete = "4.5.57"
+clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
+clap_complete = "4.5.58"
 clap_mangen = "0.2.29"
 constcat = { workspace = true }
-ctrlc = "3.4.7"
+ctrlc = "3.5.0"
 derive_more = { version = "2.0.1", features = ["display"] }
 either = { workspace = true }
 log = { workspace = true }
@@ -32,11 +32,11 @@ prettydiff = { version = "0.8.1", optional = true }
 ringbuf = "0.4.8"
 rubato = "0.16.2"
 rugby = { workspace = true, features = ["serde", "cfg", "pal"] }
-rustyline = { version = "17.0.0", optional = true }
-serde_json = "1.0.142"
+rustyline = { version = "17.0.1", optional = true }
+serde_json = "1.0.145"
 supports-color = "3.0.2"
-sysexits = "0.9.1"
-tempfile = "3.20.0"
+sysexits = "0.10.0"
+tempfile = "3.23.0"
 thiserror = { workspace = true }
 tinyaudio = "1.1.0"
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
