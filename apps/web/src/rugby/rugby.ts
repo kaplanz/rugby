@@ -1,9 +1,9 @@
 import { GameBoy } from "rugby-wasm";
 
-import type { Screen } from "./rugby/screen";
-import type { Stereo } from "./rugby/stereo";
+import type { Screen } from "./screen";
+import type { Stereo } from "./stereo";
 
-import { SAMPLE } from "./rugby/stereo";
+import { SAMPLE } from "./stereo";
 
 /**
  * Clock frequency.
@@ -25,7 +25,7 @@ const DIV = 32;
 /**
  * Application state.
  */
-export class Application {
+export class App {
   /**
    * Application configuration.
    */

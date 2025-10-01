@@ -1,9 +1,11 @@
 {
   "name": "rugby",
+  "type": "module",
   "private": true,
   "version": "0.1.0",
-  "workspaces": ["../../bind/wasm/pkg"],
-  "type": "module",
+  "workspaces": [
+    "../../bind/wasm/pkg"
+  ],
   "scripts": {
     "build": "tsc && vite build",
     "build:wasm": "wasm-pack build ../../bind/wasm",
@@ -13,21 +15,18 @@
     "fix": "biome lint --write .",
     "fmt": "biome format --write .",
     "prebuild": "bun run build:wasm",
-    "predev": "bun run build:wasm",
+    "predev": "bun run prebuild",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@fontsource-variable/cabin": "^5.1.0",
-    "@fontsource-variable/orbitron": "^5.1.0",
     "@fortawesome/fontawesome-free": "^6.7.1",
     "@shoelace-style/shoelace": "^2.19.0",
     "lit": "^3.2.1",
-    "normalize.css": "^8.0.1",
     "rugby-wasm": "workspace:pkg",
     "vite-plugin-wasm": "^3.3.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "typescript": "^5.7.2",
     "vite": "^6.0.1",
     "wasm-pack": "^0.13.1"

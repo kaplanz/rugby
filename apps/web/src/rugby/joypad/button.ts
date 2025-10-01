@@ -53,7 +53,7 @@ export class Button extends LitElement {
     :host {
       color: #204786;
       display: block;
-      font-family: "Orbitron Variable", sans-serif;
+      font-family: "Orbitron";
       font-weight: 900;
     }
 

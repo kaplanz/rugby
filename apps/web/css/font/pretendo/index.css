@@ -1,0 +1,6 @@
+/* Normal */
+@font-face {
+  font-family: "Pretendo";
+  font-style: normal;
+  src: url("fonts/Pretendo.ttf") format("truetype");
+}
