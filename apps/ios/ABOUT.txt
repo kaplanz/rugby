@@ -1,0 +1,21 @@
+Welcome to the iOS port of Rugby, my Game Boy emulator core. This project has
+been in development for over five years, and it's exciting to be so close to
+release.
+
+GOALS
+• Cycle-accurate Game Boy emulation.
+• Support for DMG, SGB, and CGB models.
+
+FEATURES
+• Import any Game Boy ROM from your own collection.
+• All data, ROMs, and saves stored locally as regular files.
+• Sleek, modern interface that feels native on iOS.
+• Customizable colour palettes and optional shader effects.
+• Controller support through Apple's Game Controller framework.
+• Fully open source and permissively licensed.
+
+This is an early preview build and not yet feature-complete. By joining the
+TestFlight, you'll help identify bugs and provide feedback to make Rugby the
+best it can be.
+
+Thank you for testing!
