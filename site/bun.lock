@@ -410,11 +410,11 @@
 
     "rehype-stringify": ["rehype-stringify@10.0.1", "", { "dependencies": { "@types/hast": "^3.0.0", "hast-util-to-html": "^9.0.0", "unified": "^11.0.0" } }, "sha512-k9ecfXHmIPuFVI61B9DeLPN0qFHfawM6RsuX48hoqlaKSF61RskNjSm1lI8PhBEM0MRdLxVVm4WmTqJQccH9mA=="],
 
-    "remark-callouts": ["remark-callouts@git+https://git.zakhary.dev/remark-callouts#feea2e941ae71e4acc020311acd22f8af9f8b692", { "dependencies": { "@primer/octicons": "^19.12.0", "@types/mdast": "^4.0.4", "@types/unist": "^3.0.3", "unist-builder": "^4.0.0" } }, "feea2e941ae71e4acc020311acd22f8af9f8b692"],
+    "remark-callouts": ["remark-callouts@git+https://git.zakhary.dev/remark-callouts#535c81c456e3187b1d8d5a016df485741cd114e2", { "dependencies": { "@primer/octicons": "^19.12.0", "unist-builder": "^4.0.0" } }, "535c81c456e3187b1d8d5a016df485741cd114e2"],
 
     "remark-gfm": ["remark-gfm@4.0.1", "", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-gfm": "^3.0.0", "micromark-extension-gfm": "^3.0.0", "remark-parse": "^11.0.0", "remark-stringify": "^11.0.0", "unified": "^11.0.0" } }, "sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg=="],
 
-    "remark-inline-footnotes": ["remark-inline-footnotes@git+https://git.zakhary.dev/remark-inline-footnotes#e5e43474a2b98cac730598b3fd21b6ebae0b137c", { "dependencies": { "@types/mdast": "^4.0.4", "@types/unist": "^3.0.3", "unist-builder": "^4.0.0" } }, "e5e43474a2b98cac730598b3fd21b6ebae0b137c"],
+    "remark-inline-footnotes": ["remark-inline-footnotes@git+https://git.zakhary.dev/remark-inline-footnotes#96c44f153668227bec991e2a5922855378d9a33b", { "dependencies": { "unist-builder": "^4.0.0" } }, "96c44f153668227bec991e2a5922855378d9a33b"],
 
     "remark-parse": ["remark-parse@11.0.0", "", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-from-markdown": "^2.0.0", "micromark-util-types": "^2.0.0", "unified": "^11.0.0" } }, "sha512-FCxlKLNGknS5ba/1lmpYijMUzX2esxW5xQqjWxw2eHFfS2MSdaHVINFmhjo+qN1WhZhNimq0dZATN9pH0IDrpA=="],
 
