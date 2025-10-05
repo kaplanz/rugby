@@ -5,17 +5,17 @@ import rehypeExternalLinks from "rehype-external-links";
 import rehypeStringify from "rehype-stringify";
 import rehypeSlug from "rehype-slug";
 
-// import remarkCallouts from "remark-callouts";
+import remarkCallouts from "remark-callouts";
 import remarkGfm from "remark-gfm";
-// import remarkInlineFootnotes from "remark-inline-footnotes";
+import remarkInlineFootnotes from "remark-inline-footnotes";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 
 export const markdown = (src) => unified()
   .use(remarkParse, { fragment: true })
   .use(remarkGfm)
-  // .use(remarkCallouts)
-  // .use(remarkInlineFootnotes)
+  .use(remarkCallouts)
+  .use(remarkInlineFootnotes)
   .use(remarkRehype, { allowDangerousHtml: true })
   .use(rehypeExternalLinks, {
       target: "_blank",
