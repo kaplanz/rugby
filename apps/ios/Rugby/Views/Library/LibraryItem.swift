@@ -66,6 +66,7 @@ struct LibraryItem<V: View>: View {
                             withAnimation { game.star.toggle() }
                         }
                 }
+                .disabled(true)
                 Section {
                     Button("Delete", systemImage: "trash", role: .destructive) {
                         delete.toggle()
