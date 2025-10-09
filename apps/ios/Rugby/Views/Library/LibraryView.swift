@@ -35,22 +35,43 @@ struct LibraryView: View {
                 ],
                 spacing: 12,
             ) {
-                ForEach(games, id: \.self) { game in
-                    LibraryItem(game: game) {
-                        GameIcon(game: game)
-                            .overlay(alignment: .bottom) {
-                                Text(game.name)
-                                    .font(.footnote)
-                                    .bold()
-                                    .multilineTextAlignment(.center)
-                                    .lineLimit(2)
-                                    .minimumScaleFactor(0.5)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 4)
-                                    .glassEffect(in: .rect(cornerRadius: 8))
-                                    .padding(4)
-                            }
-                            .background(.clear, in: .rect(cornerRadius: 12))
+                if games.isEmpty {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(
+                            style: .init(
+                                lineWidth: 1.5,
+                                lineCap: .round,
+                                dash: [8, 6]
+                            )
+                        )
+                        .foregroundStyle(.foreground.tertiary)
+                        .aspectRatio(10 / 9, contentMode: .fit)
+                        .overlay {
+                            Image(systemName: "plus")
+                                .imageScale(.large)
+                                .foregroundStyle(.tint)
+                        }
+                        .onTapGesture {
+                            fileImport.toggle()
+                        }
+                } else {
+                    ForEach(games, id: \.self) { game in
+                        LibraryItem(game: game) {
+                            GameIcon(game: game)
+                                .overlay(alignment: .bottom) {
+                                    Text(game.name)
+                                        .font(.footnote)
+                                        .bold()
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.5)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 4)
+                                        .glassEffect(in: .rect(cornerRadius: 8))
+                                        .padding(4)
+                                }
+                                .background(.clear, in: .rect(cornerRadius: 12))
+                        }
                     }
                 }
             }
