@@ -21,8 +21,8 @@ struct WelcomeMsg: View {
             Item(
                 title: "Your Library",
                 about: """
-                    Games and saves are accessible as plain files on your \
-                    device, making it easy to import and export your library.
+                    Import, export, and manage your game ROMs and saves files \
+                    directly on your device. You remain in control of your data.
                     """
             ) {
                 Image(systemName: "books.vertical.fill")
@@ -75,8 +75,8 @@ struct WelcomeMsg: View {
             Item(
                 title: "Open Source",
                 about: """
-                    Open-source by design: explore the implementation, learn \
-                    how it works, and contribute to the project.
+                    Want to peek behind the curtain? The source code is \
+                    readily available and permissively licensed.
                     """
             ) {
                 Image(systemName: "chevron.left.slash.chevron.right")
