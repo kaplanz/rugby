@@ -28,7 +28,7 @@ pub enum Error {
     Internal(#[from] Box<dyn StdError>),
     /// Quit request.
     ///
-    /// Special error used to signal to the debugger that the uesr has requested
+    /// Special error used to signal to the debugger that the user has requested
     /// to quit the program.
     #[error("quit requested by user")]
     Quit,
