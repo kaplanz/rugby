@@ -79,9 +79,6 @@ struct LibraryView: View {
         }
         .navigationTitle("Library")
         .background(.background.secondary)
-        .refreshable {
-            do { try lib.reload() } catch { err.log(error) }
-        }
         .searchable(text: $query)
         .searchToolbarBehavior(.minimize)
         .overlay {
