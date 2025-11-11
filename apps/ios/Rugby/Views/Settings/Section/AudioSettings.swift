@@ -15,9 +15,32 @@ struct AudioSettings: View {
 
         Form {
             Section {
-                Stepper(value: $cfg.aud.value, in: 8000...96000, step: 100) {
+                // Enable
+                Toggle(isOn: $cfg.aud.enable) {
+                    Label {
+                        Text("Volume")
+                    } icon: {
+                        Image(
+                            systemName: "speaker.wave.3",
+                            variableValue: cfg.aud.enable ? cfg.aud.volume : 0,
+                        )
+                    }
+                }
+                // Volume
+                Slider(value: $cfg.aud.volume, in: 0...1)
+                    .disabled(!cfg.aud.enable)
+            } header: {
+                Label("Speaker", systemImage: "hifispeaker")
+            }
+            Section {
+            } header: {
+                Label("Mixing", systemImage: "hifireceiver")
+            }
+            .hidden()
+            Section {
+                Stepper(value: $cfg.aud.sample.value, in: 8000...96000, step: 100) {
                     Text(
-                        cfg.aud
+                        cfg.aud.sample
                             .converted(to: .kilohertz)
                             .formatted(
                                 .measurement(
@@ -28,15 +51,15 @@ struct AudioSettings: View {
                     )
                 }
                 Slider(
-                    value: $cfg.aud.value,
+                    value: $cfg.aud.sample.value,
                     in: 8000...96000,
                     step: 100,
                 )
                 .onSubmit {
-                    cfg.aud.value.round()
+                    cfg.aud.sample.value.round()
                 }
             } header: {
-                Label("Sample", systemImage: "dial.high")
+                Label("Sample Rate", systemImage: "waveform")
             } footer: {
                 Text(
                     """

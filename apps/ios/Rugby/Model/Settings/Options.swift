@@ -49,23 +49,64 @@ class Config {
         }
     }
 
-    /// Audio sample rate.
-    var aud: Measurement<UnitFrequency> {
-        get {
-            access(keyPath: \.aud)
-            let value = UserDefaults.standard.value(forKey: "\(Self.root).aud") as? Double
-            return .init(value: value ?? 48000, unit: .hertz)
-        }
-        set {
-            withMutation(keyPath: \.aud) {
-                UserDefaults.standard
-                    .set(
-                        newValue.converted(to: .hertz).value,
-                        forKey: "\(Self.root).aud",
+    /// Audio speaker.
+    var aud: Speaker = .init()
+
+    @Observable
+    class Speaker {
+        fileprivate static let root = "\(Config.root).aud"
+
+        /// Audio enabled.
+        var enable: Bool {
+            get {
+                access(keyPath: \.enable)
+                let value = UserDefaults.standard.value(forKey: "\(Self.root).enable") as? Bool
+                return value ?? true
+            }
+            set {
+                withMutation(keyPath: \.enable) {
+                    UserDefaults.standard.set(
+                        newValue,
+                        forKey: "\(Self.root).enable"
                     )
+                }
             }
         }
 
+        /// Audio volume.
+        var volume: Double {
+            get {
+                access(keyPath: \.volume)
+                let value = UserDefaults.standard.value(forKey: "\(Self.root).volume") as? Double
+                return value ?? 0.8
+            }
+            set {
+                withMutation(keyPath: \.enable) {
+                    UserDefaults.standard.set(
+                        newValue,
+                        forKey: "\(Self.root).volume"
+                    )
+                }
+            }
+        }
+
+        /// Audio sample rate.
+        var sample: Measurement<UnitFrequency> {
+            get {
+                access(keyPath: \.sample)
+                let value = UserDefaults.standard.value(forKey: "\(Self.root).sample") as? Double
+                return .init(value: value ?? 48000, unit: .hertz)
+            }
+            set {
+                withMutation(keyPath: \.sample) {
+                    UserDefaults.standard
+                        .set(
+                            newValue.converted(to: .hertz).value,
+                            forKey: "\(Self.root).sample",
+                        )
+                }
+            }
+        }
     }
 
     /// Video shader.

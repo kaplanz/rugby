@@ -68,7 +68,7 @@ extension RugbyApp {
     func enableAudio() {
         let session = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(.playback)
+            try session.setCategory(.playback, options: [.mixWithOthers])
             try session.setActive(true)
         } catch { err.log(error) }
     }
