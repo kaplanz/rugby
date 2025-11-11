@@ -6,28 +6,57 @@
 //
 
 import GameController
+import RugbyKit
 import SwiftUI
 
 struct ControlsSettings: View {
     @Environment(Options.self) private var opt
+    @Environment(Gamepad.self) private var pad
 
     var body: some View {
-        @Bindable var cfg = opt.data
-
         Form {
+            // Gamepad
             Section {
-                let controllers = GCController.controllers()
-                if controllers.isEmpty {
+                if pad.list.isEmpty {
                     Text("None")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(controllers, id: \.self) { gamepad in
+                    ForEach(pad.list, id: \.self) { gamepad in
                         HStack {
-                            Text(gamepad.vendorName ?? "Unknown")
+                            // About
+                            VStack(alignment: .leading) {
+                                // Name
+                                Text(gamepad.vendorName ?? "Unknown")
+                                HStack(alignment: .center, spacing: 4) {
+                                    // Product
+                                    Text(gamepad.productCategory)
+                                    // Battery
+                                    if let battery = gamepad.battery {
+                                        Text("-")
+                                        HStack(spacing: 2) {
+                                            Battery(battery: battery)
+                                                .font(.body)
+                                            Text(
+                                                battery.batteryLevel
+                                                    .formatted(
+                                                        .percent
+                                                            .precision(
+                                                                .fractionLength(0)
+                                                            )
+                                                    )
+                                            )
+                                        }
+                                    }
+                                }
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                            }
                             Spacer()
-                            if GCController.current == gamepad {
+                            // Current
+                            if pad.main == gamepad {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(.tint)
+                                    .bold()
                             }
                         }
                     }
@@ -42,6 +71,27 @@ struct ControlsSettings: View {
                     """
                 )
             }
+            // Mapping
+            if pad.main != nil {
+                Section {
+                    ForEach(RugbyKit.Button.allCases, id: \.self) { button in
+                        Label(
+                            String(describing: button).capitalized,
+                            systemImage: button.systemImage,
+                        )
+                        .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Label("Input Mapping", systemImage: "button.horizontal.top.press")
+                } footer: {
+                    Text(
+                        """
+                        Press a button to see the corresponding input within \
+                        the app.
+                        """
+                    )
+                }
+            }
         }
         .navigationTitle("Controls")
     }
@@ -50,4 +100,42 @@ struct ControlsSettings: View {
 #Preview {
     ControlsSettings()
         .environment(Options())
+}
+
+extension RugbyKit.Button {
+    public var systemImage: String {
+        switch self {
+        case .a:
+            "a.circle"
+        case .b:
+            "b.circle"
+        case .start:
+            "plus.diamond"
+        case .select:
+            "minus.diamond"
+        case .up:
+            "dpad.up.filled"
+        case .down:
+            "dpad.down.filled"
+        case .left:
+            "dpad.left.filled"
+        case .right:
+            "dpad.right.filled"
+        }
+    }
+}
+
+extension RugbyKit.Button: @retroactive CaseIterable {
+    public static var allCases: [Self] {
+        [
+            .a,
+            .b,
+            .start,
+            .select,
+            .up,
+            .down,
+            .left,
+            .right,
+        ]
+    }
 }
