@@ -20,6 +20,8 @@ struct RugbyApp: App {
     @State private var lib: Library = .init()
     /// App settings.
     @State private var opt: Options = .init()
+    /// Gamepad handle.
+    @State private var pad: Gamepad = .init()
 
     init() {
         // Initialize emulator
@@ -58,6 +60,7 @@ struct RugbyApp: App {
         .environment(err)
         .environment(lib)
         .environment(opt)
+        .environment(pad)
     }
 }
 

@@ -12,6 +12,7 @@ import SwiftUI
 struct MainView: View {
     @Environment(Runtime.self) private var app
     @Environment(Failure.self) private var err
+    @Environment(Gamepad.self) private var pad
 
     /// Settings page.
     @State private var showSettings = false
@@ -58,14 +59,15 @@ struct MainView: View {
                         }
                     }
 
-                    // Settings
                     ToolbarItemGroup {
-                        if !GCController.controllers().isEmpty {
+                        // Controls
+                        if pad.main != nil {
                             Button("Controls", systemImage: "gamecontroller.fill") {
                                 showControls.toggle()
                             }
                             .tint(.pink)
                         }
+                        // Settings
                         Button("Settings", systemImage: "gearshape.fill") {
                             showSettings.toggle()
                         }
