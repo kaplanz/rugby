@@ -19,7 +19,7 @@ pub fn gui(args: &Cli) -> Result<Frontend> {
     gui.lcd.title(util::title(&args.cfg.data.emu.cart));
     // Open debug windows
     #[cfg(feature = "gfx")]
-    if args.dbg.gfx {
+    if args.dbg.vram {
         gui.dbg.open().context("could not open debug windows")?;
     }
 

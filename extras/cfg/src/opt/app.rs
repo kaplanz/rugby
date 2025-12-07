@@ -34,7 +34,7 @@ pub struct Frontend {
         short, long,
         env = crate::env::LOG,
         value_name = "FILTER",
-        help_heading = "Logging",
+        help_heading = None,
     ))]
     pub log: Option<String>,
 

@@ -58,7 +58,7 @@ the alias `man`.
 
 When run, the program will load persistent configuration options from the first
 file found according to following precedence rules:
-1. Command-line option `--conf=<PATH>`.
+1. Command-line option `--config=<PATH>`.
 1. Environment variable `RUGBY_CONF`.
 1. Default path `$XDG_CONFIG_HOME/rugby/config.toml`.
 
@@ -67,7 +67,7 @@ following precedence: cli > env > file. This means these options may be
 overridden when running the program.
 
 Any relative paths specified in this file are resolved relative to this file's
-parent directory. Use `--conf` on the command-line to provide an alternate
+parent directory. Use `--config` on the command-line to provide an alternate
 location for this file.
 
 The default configuration could either be found [here](./rugby.toml), or
