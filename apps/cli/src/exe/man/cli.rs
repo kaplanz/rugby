@@ -5,7 +5,7 @@ use clap::Parser;
 use super::NAME;
 pub use crate::exe::r#gen::cli::Command;
 
-/// Show help information.
+/// Display docs for a command.
 #[derive(Debug, Parser)]
 #[command(name = NAME)]
 #[command(flatten_help = true)]

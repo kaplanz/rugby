@@ -1,9 +1,7 @@
 //! Image-based tests.
 
-use std::{
-    fmt::{Debug, Display},
-    io::Cursor,
-};
+use std::fmt::{Debug, Display};
+use std::io::Cursor;
 
 use rugby::core::dmg::ppu::Color;
 use thiserror::Error;

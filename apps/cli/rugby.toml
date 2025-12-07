@@ -16,7 +16,7 @@
 # overridden when running the program.
 #
 # Any relative paths specified in this file are resolved relative to this file's
-# parent directory. Use `--conf` on the command-line to provide an alternate
+# parent directory. Use `--config` on the command-line to provide an alternate
 # location for this file.
 
 #

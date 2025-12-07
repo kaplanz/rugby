@@ -65,7 +65,7 @@ pub fn main(args: &Cli) -> Result<()> {
     #[cfg(feature = "trace")]
     let mut trace = args
         .dbg
-        .trace
+        .tracer
         .as_ref()
         .map(app::dbg::trace::init)
         .transpose()
@@ -121,7 +121,7 @@ pub fn main(args: &Cli) -> Result<()> {
             //
             // This contains a graphical representation of the contents of VRAM.
             #[cfg(feature = "gfx")]
-            if args.dbg.gfx {
+            if args.dbg.vram {
                 app::data::debug::gfx::draw(dmg::dbg::ppu(&emu));
             }
         }
