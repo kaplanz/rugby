@@ -15,6 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 advise = { workspace = true }
+annotate-snippets = "0.12.10"
 anyhow = { workspace = true }
 bfmt = { workspace = true }
 clap = { workspace = true, features = ["cargo", "derive", "env", "wrap_help"] }

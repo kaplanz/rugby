@@ -7,7 +7,7 @@ use clap::{Args, Parser};
 use super::NAME;
 use crate::cli::Settings;
 
-/// Emulate provided ROM.
+/// Play ROM in emulator.
 #[derive(Debug, Parser)]
 #[command(name = NAME)]
 #[command(arg_required_else_help = true)]
@@ -15,7 +15,6 @@ use crate::cli::Settings;
 pub struct Cli {
     /// Runtime features.
     #[command(flatten)]
-    #[command(next_help_heading = "Features")]
     pub feat: Features,
 
     /// Configuration options.
@@ -25,12 +24,12 @@ pub struct Cli {
     /// Debugging options.
     #[cfg(feature = "debug")]
     #[command(flatten)]
-    #[command(next_help_heading = "Debug")]
     pub dbg: Debugger,
 }
 
 /// Runtime features.
 #[derive(Args, Debug)]
+#[command(next_help_heading = "Features")]
 pub struct Features {
     /// Exit after instantiation.
     ///
@@ -39,7 +38,7 @@ pub struct Features {
     #[arg(short = 'x', long)]
     pub exit: bool,
 
-    /// Run in headless mode (command-line only).
+    /// Run without video (command-line only).
     ///
     /// Starts without initializing or opening the UI. This is often useful when
     /// debugging to prevent the GUI from taking focus in your OS.
@@ -81,26 +80,28 @@ pub struct Link {
 
 /// Debugging options.
 #[derive(Args, Debug)]
+#[command(next_help_heading = "Debugging")]
 pub struct Debugger {
-    /// Interactive debugging.
+    /// Enable debugger.
     ///
     /// Enables the Game Boy Debugger (GBD), an interactive command-line
     /// debugger which accepts commands at a prompt to control the emulator.
     #[cfg(feature = "gbd")]
-    #[arg(short = 'i', long)]
-    pub gbd: bool,
+    #[arg(short = 'D', long = "debug")]
+    #[arg(visible_alias = "gbd")]
+    pub debug: bool,
 
-    /// Graphics debug windows.
+    /// Enable VRAM windows.
     ///
     /// Enables debug windows for visually rendering contents of VRAM.
     #[cfg(feature = "gfx")]
-    #[arg(long)]
-    pub gfx: bool,
+    #[arg(long = "debug-vram")]
+    pub vram: bool,
 
     /// Introspective tracing.
     #[cfg(feature = "trace")]
     #[command(flatten)]
-    pub trace: Option<trace::Trace>,
+    pub tracer: Option<trace::Trace>,
 }
 
 /// Introspective tracing.
@@ -112,38 +113,38 @@ pub mod trace {
 
     /// Introspective tracing.
     #[derive(Args, Debug)]
-    #[group(requires = "trace")]
+    #[group(requires = "tracer")]
     pub struct Trace {
-        /// Enable tracing with format.
+        /// Enable tracer.
         ///
         /// Enables tracing of emulated cycles using the specified format. For
         /// more details on these formats please see their corresponding
         /// projects.
-        #[arg(name = "trace")]
+        #[arg(name = "tracer")]
         #[arg(long)]
         #[arg(required = false)]
         #[arg(value_name = "FORMAT")]
         pub fmt: Format,
 
-        /// Path to output generated logfile.
+        /// Logfile to dump tracer output.
         ///
         /// An optional file for logging tracing output. If unspecified or "-",
         /// the standard output stream is used.
-        #[arg(name = "logfile")]
+        #[arg(name = "trace-file")]
         #[arg(long)]
-        #[arg(conflicts_with = "compare")]
+        #[arg(conflicts_with = "trace-diff")]
         #[arg(value_name = "PATH")]
         pub log: Option<PathBuf>,
 
-        /// Compare against existing logfile.
+        /// Logfile to diff tracer output.
         ///
         /// Instead of emitting trace logs, perform line-by-line comparison
         /// using the supplied tracing logfile. This will continue until the
         /// emulator either diverges from or reaches the end of the provided
         /// logfile.
-        #[arg(name = "compare")]
+        #[arg(name = "trace-diff")]
         #[arg(long)]
-        #[arg(conflicts_with = "logfile")]
+        #[arg(conflicts_with = "trace-file")]
         #[arg(value_name = "PATH")]
         pub cmp: Option<PathBuf>,
     }
