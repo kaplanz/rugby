@@ -17,7 +17,7 @@ pub use self::cli::Cli;
 /// Subcommand name.
 pub const NAME: &str = concat!(crate::NAME, "-help");
 
-/// [`Help`](crate::cli::Command::Help) entrypoint.
+/// [`Help`](crate::cli::Command::Man) entrypoint.
 #[expect(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
     // Initialize logger
@@ -28,10 +28,10 @@ pub fn main(args: Cli) -> Result<()> {
     // Build command
     let mut cmd = match args.cmd {
         None => crate::Cli::command(),
-        Some(cli::Command::Check) => crate::exe::check::Cli::command(),
+        Some(cli::Command::Chk) => crate::exe::chk::Cli::command(),
         Some(cli::Command::Run) => crate::exe::run::Cli::command(),
         Some(cli::Command::Gen) => crate::exe::r#gen::Cli::command(),
-        Some(cli::Command::Help) => crate::exe::help::Cli::command(),
+        Some(cli::Command::Man) => crate::exe::man::Cli::command(),
     }
     .flatten_help(true);
     cmd.build();
