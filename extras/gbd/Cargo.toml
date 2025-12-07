@@ -15,12 +15,12 @@ bfmt = { workspace = true }
 bytecount = { version = "0.6.9" }
 displaydoc = { version = "0.2.5" }
 hexd = { workspace = true }
-indexmap = { version = "2.11.4" }
+indexmap = { version = "2.12.1" }
 itertools = { workspace = true }
 log = { workspace = true }
 num = { workspace = true }
-pest = { version = "2.8.2" }
-pest_derive = { version = "2.8.2" }
+pest = { version = "2.8.4" }
+pest_derive = { version = "2.8.4" }
 png = { workspace = true }
 rugby-arch = { workspace = true }
 rugby-core = { workspace = true, features = ["debug"] }
