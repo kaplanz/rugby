@@ -1,18 +1,23 @@
 //! Image-based tests.
 
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    io::Cursor,
+};
 
 use rugby::core::dmg::ppu::Color;
 use thiserror::Error;
 
 /// Loads a PNG image from its raw binary data.
 pub fn png(data: &[u8]) -> Result<Vec<u8>, png::DecodingError> {
+    // Wrap data in a cursor to allow seeking
+    let data = Cursor::new(data);
     // Build a reader using a decoder
     let mut decoder = png::Decoder::new(data);
     decoder.set_transformations(png::Transformations::EXPAND);
     let mut reader = decoder.read_info()?;
     // Allocate the output buffer
-    let mut buf = vec![0; reader.output_buffer_size()];
+    let mut buf = vec![0; reader.output_buffer_size().expect("unknown buffer size")];
     // Read the next frame (an APNG might contain multiple frames)
     let info = reader.next_frame(&mut buf).unwrap();
     // Grab the bytes of the image
