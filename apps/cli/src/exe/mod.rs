@@ -1,6 +1,6 @@
 //! Application subcommands.
 
-pub mod check;
+pub mod chk;
 pub mod r#gen;
-pub mod help;
+pub mod man;
 pub mod run;

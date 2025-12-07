@@ -110,10 +110,10 @@ pub mod man {
         // Build command
         let mut cmd = match cmd {
             None => crate::Cli::command(),
-            Some(Subcommand::Check) => crate::exe::check::Cli::command(),
+            Some(Subcommand::Chk) => crate::exe::chk::Cli::command(),
             Some(Subcommand::Run) => crate::exe::run::Cli::command(),
             Some(Subcommand::Gen) => crate::exe::r#gen::Cli::command(),
-            Some(Subcommand::Help) => crate::exe::help::Cli::command(),
+            Some(Subcommand::Man) => crate::exe::man::Cli::command(),
         }
         .flatten_help(true);
         cmd.build();

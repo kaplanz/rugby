@@ -113,14 +113,17 @@ pub struct Cart {
     ///
     /// Verifies that both the header and global checksums match the data within
     /// the ROM.
-    #[cfg_attr(feature = "clap", arg(short, long, conflicts_with("force")))]
+    #[cfg_attr(
+        feature = "clap",
+        arg(short, long, conflicts_with("force"), help_heading = "Cartridge")
+    )]
     pub check: bool,
 
     /// Force cartridge construction.
     ///
     /// Causes the cartridge generation to always succeed, even if the ROM does
     /// not contain valid data.
-    #[cfg_attr(feature = "clap", arg(short, long))]
+    #[cfg_attr(feature = "clap", arg(short, long, help_heading = "Cartridge"))]
     pub force: bool,
 
     /// Cartridge RAM persistence.
@@ -130,7 +133,13 @@ pub struct Cart {
     /// with the same path and name as the ROM, but using the ".sav" extension.
     #[cfg_attr(
         feature = "clap",
-        arg(short = 'S', long, value_name = "WHEN", value_enum)
+        arg(
+            short = 'S',
+            long,
+            value_name = "WHEN",
+            value_enum,
+            help_heading = "Cartridge"
+        )
     )]
     pub save: Option<When>,
 }

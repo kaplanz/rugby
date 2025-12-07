@@ -5,7 +5,7 @@ use clap_complete::Shell;
 
 use super::NAME;
 
-/// Generate static files.
+/// Generate app support files.
 #[derive(Debug, Parser)]
 #[command(name = NAME)]
 #[command(arg_required_else_help = true)]
@@ -41,12 +41,17 @@ pub enum Document {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, ValueEnum)]
 #[non_exhaustive]
 pub enum Command {
-    /// Analyze provided ROM.
-    Check,
-    /// Emulate provided ROM.
+    /// Check header for ROM.
+    #[value(name = "check")]
+    #[value(alias = "c")]
+    Chk,
+    /// Play ROM in emulator.
+    #[value(alias = "r")]
     Run,
-    /// Generate static files.
+    /// Generate app support files.
     Gen,
-    /// Show help information.
-    Help,
+    /// Display docs for a command.
+    #[value(name = "help")]
+    #[value(aliases = ["h", "man"])]
+    Man,
 }
