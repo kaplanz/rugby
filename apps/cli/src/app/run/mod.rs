@@ -20,6 +20,12 @@ pub mod gui;
 /// be called from the main thread.
 #[expect(irrefutable_let_patterns)]
 pub fn main(args: &Cli) -> Result<()> {
+    // Health flag
+    //
+    // If the application is healthy, it should respond to the first
+    // termination request by lowering the flag.
+    let mut healthy = true;
+
     // Replace default panic hook
     //
     // Ensure all threads exit when any panic by modifying the panic hook to
@@ -37,9 +43,17 @@ pub fn main(args: &Cli) -> Result<()> {
     ctrlc::try_set_handler(move || {
         trace!("application interrupted");
         // Attempt graceful exit (with cleanup) on first signal
-        if app::running() {
+        if healthy {
             debug!("attempting graceful exit");
-            app::exit(Exit::Interrupt);
+            if app::running() {
+                // Signal app exit
+                app::exit(Exit::Interrupt);
+            } else {
+                // Already exiting, no-op
+                debug!("exit already in progress");
+            }
+            // Lower health flag
+            healthy = false;
         }
         // Abort application (without cleanup) if hanging
         else {
