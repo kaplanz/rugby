@@ -30,9 +30,9 @@ fn main() -> Exit {
 
     // Execute subcommand
     let out = match args.cmd {
-        Command::Check(cli) => {
+        Command::Chk(cli) => {
             // rugby check
-            exe::check::main(*cli)
+            exe::chk::main(*cli)
         }
         Command::Run(cli) => {
             // rugby run
@@ -42,9 +42,9 @@ fn main() -> Exit {
             // rugby gen
             exe::r#gen::main(*cli)
         }
-        Command::Help(cli) => {
+        Command::Man(cli) => {
             // rugby help
-            exe::help::main(*cli)
+            exe::man::main(*cli)
         }
     };
 

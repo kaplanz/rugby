@@ -15,7 +15,7 @@ pub use self::cli::Cli;
 /// Subcommand name.
 pub const NAME: &str = concat!(crate::NAME, "-check");
 
-/// [`Check`](crate::cli::Command::Check) entrypoint.
+/// [`Check`](crate::cli::Command::Chk) entrypoint.
 #[expect(clippy::needless_pass_by_value)]
 pub fn main(args: Cli) -> Result<()> {
     // Initialize logger
