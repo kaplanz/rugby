@@ -242,7 +242,7 @@ mod ctrl {
         Unknown = 1,
         /// Runtime error occurred.
         #[error("got runtime error")]
-        Error,
+        Runtime,
         /// Passed `--exit` flag.
         #[error("command-line flag")]
         CliFlag,
@@ -256,9 +256,9 @@ mod ctrl {
         /// Interrupt signal.
         #[error("interrupt by user")]
         Interrupt,
-        /// Tracecmp finished.
-        #[error("tracecmp finished")]
-        Tracecmp,
+        /// Tracelog finished.
+        #[error("tracelog finished")]
+        Tracelog,
     }
 
     /// Application exit flag.

@@ -142,7 +142,7 @@ pub fn main(args: &Cli) -> Result<()> {
                 // Exit on completion
                 Err(trace::Error::Finished) => {
                     info!("trace comparison successful");
-                    app::exit(app::Exit::Tracecmp);
+                    app::exit(app::Exit::Tracelog);
                     break;
                 }
                 res => res.context("failed to emit trace entry")?,

@@ -119,7 +119,7 @@ where
         // Handle thread errors
         if res.is_err() {
             // Trigger app exit
-            app::exit(Exit::Error);
+            app::exit(Exit::Runtime);
         }
         // Propagate result
         res
