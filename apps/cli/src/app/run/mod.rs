@@ -28,8 +28,8 @@ pub fn main(args: &Cli) -> Result<()> {
 
     // Replace default panic hook
     //
-    // Ensure all threads exit when any panic by modifying the panic hook to
-    // signal global application exit.
+    // Ensure all threads exit on panic by modifying the panic hook to signal
+    // global application exit.
     if let panic = std::panic::take_hook() {
         std::panic::set_hook(Box::new(move |info| {
             // Exit all threads
@@ -61,7 +61,7 @@ pub fn main(args: &Cli) -> Result<()> {
             process::abort();
         }
     })
-    .expect("unable to register signal handler");
+    .expect("unable to register signal handler"); // application error
 
     // Process exit flag
     if args.feat.exit {

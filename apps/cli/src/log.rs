@@ -41,8 +41,7 @@ pub fn init(filter: Option<&str>) -> Result<()> {
     // Set global reload handle
     RELOAD
         .set(Handle::new(reload))
-        // unable to set is an application error
-        .expect("unable to set logger handle");
+        .expect("unable to set logger handle"); // application error
     // Check if colors enabled
     let color = supports_color::on(supports_color::Stream::Stdout).is_some();
     // Install global logger
