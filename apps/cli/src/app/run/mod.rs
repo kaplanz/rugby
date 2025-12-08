@@ -41,13 +41,13 @@ pub fn main(args: &Cli) -> Result<()> {
 
     // Install signal handler
     ctrlc::try_set_handler(move || {
-        trace!("application interrupted");
+        trace!("received signal");
         // Attempt graceful exit (with cleanup) on first signal
         if healthy {
             debug!("attempting graceful exit");
             if app::running() {
                 // Signal app exit
-                app::exit(Exit::Interrupt);
+                app::exit(Exit::Signal);
             } else {
                 // Already exiting, no-op
                 debug!("exit already in progress");

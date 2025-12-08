@@ -253,9 +253,9 @@ mod ctrl {
         /// Application closed.
         #[error("app window closed")]
         Frontend,
-        /// Interrupt signal.
-        #[error("interrupt by user")]
-        Interrupt,
+        /// Termination signal.
+        #[error("killed via signal")]
+        Signal,
         /// Tracelog finished.
         #[error("tracelog finished")]
         Tracelog,
