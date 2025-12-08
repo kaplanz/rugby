@@ -240,23 +240,24 @@ mod ctrl {
         /// Unknown exit reason.
         #[error("unknown exit case")]
         Unknown = 1,
-        /// Runtime error occurred.
-        #[error("got runtime error")]
-        Runtime,
         /// Passed `--exit` flag.
         #[error("command-line flag")]
         CliFlag,
+        /// Termination signal.
+        #[error("killed via signal")]
+        Signal,
+        /// Runtime error occurred.
+        #[error("got runtime error")]
+        Runtime,
+        /// Application closed.
+        #[error("app window closed")]
+        Frontend,
         /// Quit via debugger.
         #[cfg(feature = "gbd")]
         #[error("quit via debugger")]
         Debugger,
-        /// Application closed.
-        #[error("app window closed")]
-        Frontend,
-        /// Termination signal.
-        #[error("killed via signal")]
-        Signal,
         /// Tracelog finished.
+        #[cfg(feature = "trace")]
         #[error("tracelog finished")]
         Tracelog,
     }
