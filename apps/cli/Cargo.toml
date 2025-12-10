@@ -24,7 +24,6 @@ clap_complete = "4.5.61"
 clap_mangen = "0.2.31"
 constcat = { workspace = true }
 ctrlc = { version = "3.5.1", features = ["termination"] }
-derive_more = { version = "2.1.0", features = ["display"] }
 either = { workspace = true }
 log = { workspace = true }
 minifb = "0.28.0"
