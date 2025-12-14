@@ -10,6 +10,12 @@ export default async function(cfg) {
     "./www": "/site/www",
   });
 
+  // Passthrough copy CSS
+  cfg.addPassthroughCopy({
+    "./node_modules/remark-callouts/style.css": "/site/www/css/remark-callouts.css",
+    "./node_modules/remark-inline-footnotes/style.css": "/site/www/css/remark-inline-footnotes.css",
+  });
+
   // Customize permalinks
   cfg.addGlobalData("permalink", () => {
     return (data) => {

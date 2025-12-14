@@ -1,6 +1,6 @@
 /* imports */
-@import "remark-callouts/style";
-@import "remark-inline-footnotes/style";
+@import "remark-callouts.css";
+@import "remark-inline-footnotes.css";
 
 /* navigation */
 main > nav {
