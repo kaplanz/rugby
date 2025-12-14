@@ -410,7 +410,7 @@
 
     "rehype-stringify": ["rehype-stringify@10.0.1", "", { "dependencies": { "@types/hast": "^3.0.0", "hast-util-to-html": "^9.0.0", "unified": "^11.0.0" } }, "sha512-k9ecfXHmIPuFVI61B9DeLPN0qFHfawM6RsuX48hoqlaKSF61RskNjSm1lI8PhBEM0MRdLxVVm4WmTqJQccH9mA=="],
 
-    "remark-callouts": ["remark-callouts@git+https://git.zakhary.dev/remark-callouts#535c81c456e3187b1d8d5a016df485741cd114e2", { "dependencies": { "@primer/octicons": "^19.12.0", "unist-builder": "^4.0.0" } }, "535c81c456e3187b1d8d5a016df485741cd114e2"],
+    "remark-callouts": ["remark-callouts@git+https://git.zakhary.dev/remark-callouts#1d60ac6353b0829e8db728c3448af28d6ad3569c", { "dependencies": { "@primer/octicons": "^19.12.0", "unist-builder": "^4.0.0" } }, "1d60ac6353b0829e8db728c3448af28d6ad3569c"],
 
     "remark-gfm": ["remark-gfm@4.0.1", "", { "dependencies": { "@types/mdast": "^4.0.0", "mdast-util-gfm": "^3.0.0", "micromark-extension-gfm": "^3.0.0", "remark-parse": "^11.0.0", "remark-stringify": "^11.0.0", "unified": "^11.0.0" } }, "sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg=="],
 
