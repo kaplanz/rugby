@@ -8,6 +8,7 @@ export default async function(cfg) {
   // Passthrough copy assets
   cfg.addPassthroughCopy({
     "./www": "/site/www",
+    "../LICENSE-*": "/",
   });
 
   // Passthrough copy CSS
