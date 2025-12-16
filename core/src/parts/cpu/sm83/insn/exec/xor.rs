@@ -41,7 +41,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             Ok(Some(Xor::Execute(op2).into()))
         }
         0xee => {
-            // Fetch n8
+            // Fetch n8 <- [PC++]
             let op2 = cpu.fetchbyte();
             // Proceed
             Ok(Some(Xor::Execute(op2).into()))
