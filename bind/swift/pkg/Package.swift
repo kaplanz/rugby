@@ -16,7 +16,7 @@ let package = Package(
         // making them visible to other packages.
         .library(
             name: "RugbyKit",
-            targets: ["RugbyKit"]
+            targets: ["RugbyKit"],
         ),
     ],
     targets: [
@@ -27,13 +27,15 @@ let package = Package(
         // dependencies.
         .target(
             name: "RugbyKit",
-            dependencies: ["rugbyFFI"]
+            dependencies: [
+                .target(name: "rugbyFFI"),
+            ],
         ),
         .binaryTarget(
             name: "rugbyFFI",
             // Swift packages importing this locally will not be able to import
             // the Rust core unless you use a relative path.
-            path: "RugbyKit.xcframework"
+            path: "./RugbyKit.xcframework"
         ),
     ]
 )
