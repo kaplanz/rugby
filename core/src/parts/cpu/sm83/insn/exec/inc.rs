@@ -11,7 +11,7 @@ pub enum Inc {
     #[default]
     Fetch,
     Execute(u8),
-    Done,
+    Delay,
 }
 
 impl Execute for Inc {
@@ -20,7 +20,7 @@ impl Execute for Inc {
         match self {
             Self::Fetch        => fetch(code, cpu),
             Self::Execute(op1) => execute(code, cpu, op1),
-            Self::Done         => done(code, cpu),
+            Self::Delay        => delay(code, cpu),
         }
     }
 }
@@ -104,7 +104,7 @@ fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
             // Write [HL]
             cpu.writebyte(res);
             // Proceed
-            Ok(Some(Inc::Done.into()))
+            Ok(Some(Inc::Delay.into()))
         }
         0x04 => {
             // Store B
@@ -152,7 +152,7 @@ fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
     }
 }
 
-fn done(_: u8, _: &mut Cpu) -> Return {
+fn delay(_: u8, _: &mut Cpu) -> Return {
     // Delay by 1 cycle
 
     // Finish
