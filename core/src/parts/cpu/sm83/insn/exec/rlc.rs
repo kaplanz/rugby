@@ -41,7 +41,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             Ok(Some(Rlc::Execute(op1).into()))
         }
         0x00..=0x07 => {
-            // Prepare op2
+            // Prepare op1
             let op1 = help::get_op8(cpu, code & 0x07);
             // Continue
             execute(code, cpu, op1)
