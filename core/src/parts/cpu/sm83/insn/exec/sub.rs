@@ -39,7 +39,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             Ok(Some(Sub::Execute(op2).into()))
         }
         0xd6 => {
-            // Fetch n8
+            // Fetch n8 <- [PC++]
             let op2 = cpu.fetchbyte();
             // Proceed
             Ok(Some(Sub::Execute(op2).into()))

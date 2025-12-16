@@ -24,8 +24,8 @@ impl Execute for Adc {
 }
 
 impl From<Adc> for Operation {
-    fn from(op: Adc) -> Self {
-        Self::Adc(op)
+    fn from(value: Adc) -> Self {
+        Self::Adc(value)
     }
 }
 
@@ -39,7 +39,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             Ok(Some(Adc::Execute(op2).into()))
         }
         0xce => {
-            // Fetch n8
+            // Fetch n8 <- [PC++]
             let op2 = cpu.fetchbyte();
             // Proceed
             Ok(Some(Adc::Execute(op2).into()))
