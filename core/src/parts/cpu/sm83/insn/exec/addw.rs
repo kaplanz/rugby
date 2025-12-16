@@ -30,8 +30,8 @@ impl Execute for Addw {
 }
 
 impl From<Addw> for Operation {
-    fn from(op: Addw) -> Self {
-        Self::Addw(op)
+    fn from(value: Addw) -> Self {
+        Self::Addw(value)
     }
 }
 

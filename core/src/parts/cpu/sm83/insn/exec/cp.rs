@@ -33,16 +33,19 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     match code {
         0xbe => {
+            // Read [HL]
             let op2 = cpu.readbyte();
             // Proceed
             Ok(Some(Cp::Execute(op2).into()))
         }
         0xfe => {
+            // Fetch n8 <- [PC++]
             let op2 = cpu.fetchbyte();
             // Proceed
             Ok(Some(Cp::Execute(op2).into()))
         }
         0xb8..=0xbf => {
+            // Prepare op2
             let op2 = help::get_op8(cpu, code & 0x07);
             // Continue
             execute(code, cpu, op2)
