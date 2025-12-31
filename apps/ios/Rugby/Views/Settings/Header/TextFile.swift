@@ -5,8 +5,8 @@
 //  Created by Zakhary Kaplan on 2024-06-21.
 //
 
-import MarkdownUI
 import SwiftUI
+import Textual
 
 extension TextFile {
     enum Kind {
@@ -46,7 +46,7 @@ struct TextFile: View {
                     }
                 case .markdown:
                     ScrollView(.vertical) {
-                        Markdown(text)
+                        StructuredText(markdown: text)
                     }
                 }
             } else {
