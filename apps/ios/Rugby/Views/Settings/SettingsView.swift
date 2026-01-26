@@ -176,13 +176,12 @@ private struct SettingsLabel: View {
         } icon: {
             Image(systemName: systemImage)
                 .resizable()
-                .foregroundStyle((colorScheme == .dark ? color : .white).gradient)
                 .scaledToFit()
                 .padding(4)
                 .frame(width: 28, height: 28)
+                .foregroundStyle((colorScheme == .dark ? color : .white).gradient)
                 .background {
-                    shape
-                        .fill((colorScheme == .dark ? .black : color).gradient)
+                    shape.fill((colorScheme == .dark ? .black : color).gradient)
                 }
                 .glassEffect(
                     colorScheme == .dark ? .regular : .identity,
