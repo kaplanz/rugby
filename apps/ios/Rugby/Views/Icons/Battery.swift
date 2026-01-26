@@ -36,9 +36,13 @@ struct Battery: View {
         }
     }
 
+    private var power: Bool {
+        battery.batteryState == .charging
+    }
+
     var body: some View {
         Image(systemName: image)
-            .symbolRenderingMode(.palette)
+            .symbolRenderingMode(power ? .multicolor : .palette)
             .foregroundStyle(color ?? .secondary, .secondary)
     }
 }
