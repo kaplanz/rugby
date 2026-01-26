@@ -14,6 +14,7 @@ struct AudioSettings: View {
         @Bindable var cfg = opt.data
 
         Form {
+            // Speaker
             Section {
                 // Enable
                 Toggle(isOn: $cfg.aud.enable) {
@@ -32,11 +33,12 @@ struct AudioSettings: View {
             } header: {
                 Label("Speaker", systemImage: "hifispeaker")
             }
+            // Mixing
             Section {
             } header: {
                 Label("Mixing", systemImage: "hifireceiver")
             }
-            .hidden()
+            // Sample
             Section {
                 Stepper(value: $cfg.aud.sample.value, in: 8000...96000, step: 100) {
                     Text(
