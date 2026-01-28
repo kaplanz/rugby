@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="{{ site.lang }}">
+
+<head>
+  <!-- Metadata -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <!-- Document -->
+  <title>
+    {%- if title and title != site.title -%}
+      {{ title }} | {{ site.title }}
+    {%- else -%}
+      {{ site.title }}
+    {%- endif -%}
+  </title>
+  <meta
+    name="description"
+    content="{{ site.about }}"
+  />
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.zakhary.dev/style/latest/main.css"/>
+  <link rel="stylesheet" type="text/css" href="/assets/css/style.css"/>
+  <style>{% getBundle "css" %}</style>
+  <style>{% include "pkg/markdown-it-inline-footnotes/style.css" %}</style>
+</head>
+
+<body>
+  <header>
+    {% include "widget/crumbs.njk" %}
+  </header>
+
+  <main>
+    {% include "widget/navbar.njk" %}
+    <article>
+      {{ content | safe }}
+    </article>
+  </main>
+  <footer>
+    <section>
+      <span>
+        <small>&copy; 2025 Zakhary Kaplan</small>
+        <small>&bull;</small>
+        <small><a href="/privacy">Privacy</a></small>
+      </span>
+    </section>
+  </footer>
+</body>
+
+</html>

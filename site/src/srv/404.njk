@@ -1,8 +1,11 @@
 ---
+layout: main
+title: "404"
 permalink: /404.html
+eleventyExcludeFromCollections: true
 ---
 
-<section class="error">
+<article class="error">
   <header>
     <h1>404</h1>
     <h2>Not Found</h2>
@@ -10,17 +13,15 @@ permalink: /404.html
   <section>
     This isn't the page you're looking for :(
   </section>
-</section>
+</article>
 
 <style>
-  article:has(> section.error) {
+  article.error {
     display: flex;
     flex-direction: column;
     flex: inherit;
-
     place-items: center;
     place-content: center;
-
     text-align: center;
 
     header {
