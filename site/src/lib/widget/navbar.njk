@@ -1,0 +1,40 @@
+<nav>
+  <ul>
+    {% for item in navbar %}
+      {% set pagePath = page.url | replace(".html", "/") %}
+      {% set isActive = (pagePath == item.path) or (page.url == "/index.html" and item.path == "/") %}
+      <li {% if isActive %}aria-current="page"{% endif %}>
+        <a href="{{ item.path }}">{{ item.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+
+<style>
+  main > nav {
+    display: flex;
+    justify-content: center;
+    font-family: var(--mono);
+    font-weight: 400;
+  }
+
+  main > nav ul {
+    display: inline-flex;
+    gap: 1em;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  main > nav li {
+    transition: font-weight .2s;
+
+    &:hover {
+      font-weight: 700;
+    }
+
+    &[aria-current] {
+      color: var(--accent);
+    }
+  }
+</style>
