@@ -260,7 +260,7 @@ Attribution of all included open-source software is listed in the project's
 
 <!-- Reference-style links -->
 [acid2]: https://webstandards.org/files/acid2/test.html
-[attrib]: /README.md#attribution
+[attrib]: /README.md#credits
 
 <!-- Badges -->
 [acid2.git.badge]:    https://img.shields.io/badge/acid2-origin-2188a7?logo=github
