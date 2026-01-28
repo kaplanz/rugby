@@ -2,28 +2,24 @@
   "name": "site",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "pkg/*"
+  ],
   "scripts": {
-    "dev": "bunx @11ty/eleventy --serve",
-    "build": "bunx @11ty/eleventy"
+    "build": "eleventy",
+    "build:demo": "bun --cwd=../apps/web run build",
+    "prebuild": "bun run build:demo",
+    "start": "eleventy --serve --quiet",
+    "dev": "eleventy --serve"
   },
   "dependencies": {
-    "rehype-autolink-headings": "^7.1.0",
-    "rehype-external-links": "^3.0.0",
-    "rehype-parse": "^9.0.1",
-    "rehype-slug": "^6.0.0",
-    "rehype-stringify": "^10.0.1",
-    "remark-callouts": "git+https://git.zakhary.dev/remark-callouts",
-    "remark-gfm": "^4.0.1",
-    "remark-inline-footnotes": "git+https://git.zakhary.dev/remark-inline-footnotes",
-    "remark-parse": "^11.0.0",
-    "remark-rehype": "^11.1.2",
-    "unified": "^11.0.5"
-  },
-  "devDependencies": {
-    "@11ty/eleventy": "^3.1.2",
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "@11ty/eleventy": "^3.0.0",
+    "htmlnano": "^3.0.0",
+    "lightningcss": "^1.30.2",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-deflist": "^3.0.0",
+    "markdown-it-github-alerts": "^1.0.0",
+    "markdown-it-inline-footnotes": "workspace:*"
   }
 }

@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "rugby",
@@ -14,7 +15,7 @@
         "@biomejs/biome": "^1.9.4",
         "typescript": "^5.7.2",
         "vite": "^6.0.1",
-        "wasm-pack": "^0.13.1",
+        "wasm-pack": "^0.14.0",
       },
     },
     "../../bind/wasm/pkg": {
@@ -271,7 +272,7 @@
 
     "vite-plugin-wasm": ["vite-plugin-wasm@3.5.0", "", { "peerDependencies": { "vite": "^2 || ^3 || ^4 || ^5 || ^6 || ^7" } }, "sha512-X5VWgCnqiQEGb+omhlBVsvTfxikKtoOgAzQ95+BZ8gQ+VfMHIjSHr0wyvXFQCa0eKQ0fKyaL0kWcEnYqBac4lQ=="],
 
-    "wasm-pack": ["wasm-pack@0.13.1", "", { "dependencies": { "binary-install": "^1.0.1" }, "bin": { "wasm-pack": "run.js" } }, "sha512-P9exD4YkjpDbw68xUhF3MDm/CC/3eTmmthyG5bHJ56kalxOTewOunxTke4SyF8MTXV6jUtNjXggPgrGmMtczGg=="],
+    "wasm-pack": ["wasm-pack@0.14.0", "", { "dependencies": { "binary-install": "^1.1.2" }, "bin": { "wasm-pack": "run.js" } }, "sha512-7uKj+483b6ETTnuWHK3zKNB3Ca3M159tPZ5shyXxI4j7i9Lk82rL2ck/L6E9O5VMWk9JgowdtTBOSfWmGBRFtw=="],
 
     "wrappy": ["wrappy@1.0.2", "", {}, "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ=="],
 

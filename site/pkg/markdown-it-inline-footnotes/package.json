@@ -1,0 +1,9 @@
+{
+  "name": "markdown-it-inline-footnotes",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "markdown-it-footnote": "^4.0.0"
+  }
+}

@@ -1,0 +1,35 @@
+{% set index = page.url and (
+  page.url.endsWith("/") or page.url.endsWith("/index.html")
+) %}
+{% set parts = (page.url or "")
+  | replace("//", "/")
+  | replace(".html", "")
+  | split("/")
+%}
+{% set crumbs = [] %}
+{% set path = "" %}
+{% for part in parts %}
+  {% if part %}
+    {% set path = path + "/" + part %}
+    {% set trailing = "/" if (not loop.last or index) else "" %}
+    {% set crumbs = (crumbs.push({url: path, txt: part + trailing}), crumbs) %}
+  {% endif %}
+{% endfor %}
+
+<nav class="crumb">
+  <ul>
+    <li>
+      <a href="/">/</a>
+    </li>
+    {% for crumb in crumbs %}
+      <li><a href="{{ crumb.url }}">{{ crumb.txt }}</a></li>
+    {% endfor %}
+  </ul>
+</nav>
+
+<style>
+  nav.crumb {
+    display: inline-flex;
+    gap: 1ch;
+  }
+</style>
