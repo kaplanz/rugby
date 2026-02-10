@@ -11,6 +11,7 @@ publish = false
 
 [dependencies]
 clap = { workspace = true, optional = true, features = ["env"] }
+merge = { workspace = true }
 rugby-core = { workspace = true }
 rugby-pal = { workspace = true }
 serde = { workspace = true, optional = true }
