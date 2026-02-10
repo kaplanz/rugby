@@ -15,9 +15,7 @@
 # the following precedence: cli > env > file. This means these options may be
 # overridden when running the program.
 #
-# Any relative paths specified in this file are resolved relative to this file's
-# parent directory. Use `--config` on the command-line to provide an alternate
-# location for this file.
+# Use `--config` to provide an alternate location for this configuration file.
 
 #
 ## Frontend options.
