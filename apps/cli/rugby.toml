@@ -54,8 +54,18 @@ speed = "actual"
 
 # Boot ROM image file.
 #
-# A filesystem path to a ROM image file.
-# rom = "path/to/dmg_boot.bin"
+# Path to the boot ROM image.
+#
+# Relative paths are resolved relative to the application's data directory
+# (`$XDG_DATA_HOME/rugby`), typically `~/.local/share/rugby/`. Absolute paths
+# are used as-is.
+#
+# Examples:
+#   rom = "dmg_boot.bin"           # ~/.local/share/rugby/dmg_boot.bin
+#   rom = "boot/dmg_boot.bin"      # ~/.local/share/rugby/boot/dmg_boot.bin
+#   rom = "/usr/share/rugby/boot/dmg_boot.bin"  # absolute path
+#
+# rom = "dmg_boot.bin"
 
 
 #
