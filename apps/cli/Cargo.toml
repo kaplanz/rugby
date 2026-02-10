@@ -26,6 +26,7 @@ constcat = { workspace = true }
 ctrlc = { version = "3.5.1", features = ["termination"] }
 either = { workspace = true }
 log = { workspace = true }
+merge = { workspace = true }
 minifb = "0.28.0"
 num_enum = "0.7.5"
 parking_lot = { workspace = true }

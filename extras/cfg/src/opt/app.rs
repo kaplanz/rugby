@@ -1,12 +1,11 @@
 //! Application configuration.
 
-use std::path::Path;
+use merge::Merge;
 
-use crate::Join;
 pub use crate::val::{Palette, Speed};
 
 /// Frontend options.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
     feature = "serde",
@@ -24,6 +23,7 @@ pub struct Frontend {
         arg(short, long = "audio", value_name = "RATE", default_value_t = 48_000)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "audio"))]
+    #[merge(strategy = merge::num::overwrite_zero)]
     #[expect(clippy::doc_markdown)]
     pub aux: u32,
 
@@ -36,6 +36,7 @@ pub struct Frontend {
         value_name = "FILTER",
         help_heading = None,
     ))]
+    #[merge(strategy = merge::option::overwrite_none)]
     pub log: Option<String>,
 
     /// 2-bit color palette.
@@ -47,6 +48,7 @@ pub struct Frontend {
         arg(short, long = "palette", value_name = "COLOR", value_enum)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "palette"))]
+    #[merge(strategy = merge::option::overwrite_none)]
     pub pal: Option<Palette>,
 
     /// Simulated clock speed.
@@ -59,15 +61,6 @@ pub struct Frontend {
         arg(value_parser = crate::val::SpeedValueParser)
     )]
     #[cfg_attr(feature = "serde", serde(rename = "speed"))]
+    #[merge(strategy = merge::option::overwrite_none)]
     pub spd: Option<Speed>,
-}
-
-impl Join for Frontend {
-    fn rebase(&mut self, _: &Path) {}
-
-    fn merge(&mut self, other: Self) {
-        self.log = self.log.take().or(other.log);
-        self.pal = self.pal.take().or(other.pal);
-        self.spd = self.spd.take().or(other.spd);
-    }
 }
