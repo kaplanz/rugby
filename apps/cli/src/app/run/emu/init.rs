@@ -7,6 +7,7 @@ use rugby::extra::cfg::{Config, opt};
 
 use super::save;
 use crate::app::init;
+use crate::dir;
 
 /// Builds an emulator instance.
 pub fn emu(cfg: &Config) -> Result<GameBoy> {
@@ -49,9 +50,12 @@ pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
     let Some(path) = &args.rom else {
         bail!("missing path to ROM image");
     };
+    // Rebase relative paths
+    let path = std::path::absolute(dir::data().join(path))
+        .context(format!("invalid path: `{}`", path.display()))?;
 
     // Read ROM file
-    let rom = init::util::load_exact::<0x0100>(path).context("unable to load ROM image")?;
+    let rom = init::util::load_exact::<0x0100>(&path).context("unable to load ROM image")?;
 
     // Initialize boot ROM
     let boot = Boot::from(rom);

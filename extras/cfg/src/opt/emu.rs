@@ -46,6 +46,12 @@ impl Join for Emulator {
 pub struct Boot {
     /// Boot ROM image file.
     ///
+    /// Path to the boot ROM image.
+    ///
+    /// Relative paths are resolved relative to the application's data directory
+    /// (`$XDG_DATA_HOME/rugby`), typically `~/.local/share/rugby/`. Absolute
+    /// paths are used as-is.
+    ///
     /// If the path to the image file is specified within the configuration, it
     /// can be selected by passing `-b/--boot` without specifying an argument.
     /// Otherwise, the path to the image file must be provided.
