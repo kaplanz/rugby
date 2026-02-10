@@ -1,12 +1,13 @@
 //! Emulation configuration.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use crate::Join;
+use merge::Merge;
+
 pub use crate::val::When;
 
 /// Emulator options.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
     feature = "serde",
@@ -23,20 +24,8 @@ pub struct Emulator {
     pub cart: Cart,
 }
 
-impl Join for Emulator {
-    fn rebase(&mut self, root: &Path) {
-        self.boot.rebase(root);
-        self.cart.rebase(root);
-    }
-
-    fn merge(&mut self, other: Self) {
-        self.boot.merge(other.boot);
-        self.cart.merge(other.cart);
-    }
-}
-
 /// Booting options.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
     feature = "serde",
@@ -64,6 +53,7 @@ pub struct Boot {
         value_name = "PATH",
         value_hint = clap::ValueHint::FilePath,
     ))]
+    #[merge(strategy = merge::option::overwrite_none)]
     pub rom: Option<PathBuf>,
 
     /// Skip running boot ROM.
@@ -80,21 +70,12 @@ pub struct Boot {
         )
     )]
     #[cfg_attr(feature = "serde", serde(skip))]
+    #[merge(strategy = merge::bool::overwrite_false)]
     pub skip: bool,
 }
 
-impl Join for Boot {
-    fn rebase(&mut self, root: &Path) {
-        self.rom = self.rom.take().map(|path| root.join(path));
-    }
-
-    fn merge(&mut self, other: Self) {
-        self.rom = self.rom.take().or(other.rom);
-    }
-}
-
 /// Cartridge options.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
     feature = "serde",
@@ -113,6 +94,7 @@ pub struct Cart {
         help_heading = None,
     ))]
     #[cfg_attr(feature = "serde", serde(skip))]
+    #[merge(strategy = merge::option::overwrite_none)]
     pub rom: Option<PathBuf>,
 
     /// Check cartridge integrity.
@@ -123,6 +105,7 @@ pub struct Cart {
         feature = "clap",
         arg(short, long, conflicts_with("force"), help_heading = "Cartridge")
     )]
+    #[merge(strategy = merge::bool::overwrite_false)]
     pub check: bool,
 
     /// Force cartridge construction.
@@ -130,6 +113,7 @@ pub struct Cart {
     /// Causes the cartridge generation to always succeed, even if the ROM does
     /// not contain valid data.
     #[cfg_attr(feature = "clap", arg(short, long, help_heading = "Cartridge"))]
+    #[merge(strategy = merge::bool::overwrite_false)]
     pub force: bool,
 
     /// Cartridge RAM persistence.
@@ -147,6 +131,7 @@ pub struct Cart {
             help_heading = "Cartridge"
         )
     )]
+    #[merge(strategy = merge::option::overwrite_none)]
     pub save: Option<When>,
 }
 
@@ -157,18 +142,5 @@ impl Cart {
     #[must_use]
     pub fn ram(&self) -> Option<PathBuf> {
         self.rom.as_ref().map(|path| path.with_extension("sav"))
-    }
-}
-
-impl Join for Cart {
-    fn rebase(&mut self, root: &Path) {
-        self.rom = self.rom.take().map(|path| root.join(path));
-    }
-
-    fn merge(&mut self, other: Self) {
-        self.rom = self.rom.take().or(other.rom);
-        self.check |= other.check;
-        self.force |= other.force;
-        self.save = self.save.take().or(other.save);
     }
 }

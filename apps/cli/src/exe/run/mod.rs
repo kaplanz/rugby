@@ -3,7 +3,7 @@
 use anyhow::Context as _;
 use constcat::concat;
 use log::trace;
-use rugby::extra::cfg::Join;
+use merge::Merge;
 
 use crate::err::Result;
 use crate::{app, cfg};
