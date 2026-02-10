@@ -1,7 +1,5 @@
 //! Emulate provided ROM.
 
-use std::path::Path;
-
 use anyhow::Context as _;
 use constcat::concat;
 use log::trace;
@@ -22,11 +20,7 @@ pub fn main(mut args: Cli) -> Result<()> {
     // Load configuration
     args.cfg.data.merge({
         // Parse config from file
-        let mut cfg = cfg::load(&args.cfg.path)?;
-        // Rebase paths to parent
-        cfg.rebase(args.cfg.path.parent().unwrap_or(Path::new("")));
-        // Merge with parsed args
-        cfg
+        cfg::load(&args.cfg.path)?
     });
     // Initialize logger
     crate::log::init(args.cfg.data.app.log.as_deref()).context("logger initialization failed")?;
