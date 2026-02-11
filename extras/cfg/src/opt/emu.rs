@@ -10,9 +10,18 @@ pub use crate::val::When;
 #[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(default, deny_unknown_fields)
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(default, deny_unknown_fields)
+)]
+#[cfg_attr(
+    all(feature = "facet", feature = "serde"),
+    expect(clippy::unsafe_derive_deserialize)
 )]
 pub struct Emulator {
     /// Booting options.
@@ -28,9 +37,18 @@ pub struct Emulator {
 #[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(default, deny_unknown_fields)
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(default, deny_unknown_fields)
+)]
+#[cfg_attr(
+    all(feature = "facet", feature = "serde"),
+    expect(clippy::unsafe_derive_deserialize)
 )]
 pub struct Boot {
     /// Boot ROM image file.
@@ -69,6 +87,7 @@ pub struct Boot {
             default_value_if("boot", clap::builder::ArgPredicate::IsPresent, "false"),
         )
     )]
+    #[cfg_attr(feature = "facet", facet(skip))]
     #[cfg_attr(feature = "serde", serde(skip))]
     #[merge(strategy = merge::bool::overwrite_false)]
     pub skip: bool,
@@ -78,9 +97,18 @@ pub struct Boot {
 #[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(default, deny_unknown_fields)
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(default, deny_unknown_fields)
+)]
+#[cfg_attr(
+    all(feature = "facet", feature = "serde"),
+    expect(clippy::unsafe_derive_deserialize)
 )]
 pub struct Cart {
     /// Cartridge ROM image file.
@@ -93,6 +121,7 @@ pub struct Cart {
         value_hint = clap::ValueHint::FilePath,
         help_heading = None,
     ))]
+    #[cfg_attr(feature = "facet", facet(skip))]
     #[cfg_attr(feature = "serde", serde(skip))]
     #[merge(strategy = merge::option::overwrite_none)]
     pub rom: Option<PathBuf>,

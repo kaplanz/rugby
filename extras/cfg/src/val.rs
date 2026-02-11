@@ -11,10 +11,16 @@ use thiserror::Error;
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(rename_all = "kebab-case")
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(rename_all = "kebab-case")
 )]
+#[repr(C)]
 pub enum When {
     /// Never enable.
     Never,
@@ -29,11 +35,17 @@ pub enum When {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(rename_all = "kebab-case")
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(rename_all = "kebab-case")
 )]
 #[non_exhaustive]
+#[repr(C)]
 pub enum Palette {
     /// Nostalgic autumn sunsets.
     AutumnChill,
@@ -98,10 +110,16 @@ impl From<Palette> for pal::Palette {
 /// Simulated clock frequency.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(rename_all = "kebab-case")
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(rename_all = "kebab-case")
 )]
+#[repr(C)]
 pub enum Speed {
     /// Actual hardware speed.
     ///
@@ -112,17 +130,20 @@ pub enum Speed {
     /// Speedup ratio.
     ///
     /// Multiple of the actual hardware speed. May be a floating point.
+    #[cfg_attr(feature = "facet", facet(rename = "x"))]
     #[cfg_attr(feature = "serde", serde(rename = "x"))]
     Ratio(f32),
     /// Clock frequency.
     ///
     /// Precise frequency (Hz) to clock the emulator. Must be an integer.
+    #[cfg_attr(feature = "facet", facet(rename = "hz"))]
     #[cfg_attr(feature = "serde", serde(rename = "hz"))]
     Clock(u32),
     /// Frame rate.
     ///
     /// Frequency that targets the supplied frame rate (FPS). Must be an
     /// integer.
+    #[cfg_attr(feature = "facet", facet(rename = "fps"))]
     #[cfg_attr(feature = "serde", serde(rename = "fps"))]
     Frame(u8),
     /// Maximum possible speed.

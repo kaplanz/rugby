@@ -31,6 +31,9 @@ default = []
 debug = [
   "rugby-core/debug",
 ]
+facet = [
+  "rugby-core/facet",
+]
 serde = [
   "rugby-core/serde"
 ]
@@ -72,6 +75,7 @@ chex = { path = "crates/chex" }
 clap = { version = "4.5.53", features = ["derive"] }
 constcat = "0.6.1"
 either = "1.15.0"
+facet = "0.43"
 hexd = { path = "crates/hexd" }
 itertools = "0.14.0"
 log = "0.4.29"
