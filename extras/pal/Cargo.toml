@@ -11,7 +11,12 @@ publish = false
 
 [dependencies]
 chex = { workspace = true }
+facet = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 
 [features]
+facet = [
+  "chex/facet",
+  "dep:facet",
+]
 serde = ["dep:serde"]
