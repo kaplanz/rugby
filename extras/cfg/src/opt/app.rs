@@ -8,9 +8,18 @@ pub use crate::val::{Palette, Speed};
 #[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(default, deny_unknown_fields)
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
     serde(default, deny_unknown_fields)
+)]
+#[cfg_attr(
+    all(feature = "facet", feature = "serde"),
+    expect(clippy::unsafe_derive_deserialize)
 )]
 pub struct Frontend {
     /// Audio sample rate.
@@ -22,6 +31,7 @@ pub struct Frontend {
         feature = "clap",
         arg(short, long = "audio", value_name = "RATE", default_value_t = 48_000)
     )]
+    #[cfg_attr(feature = "facet", facet(rename = "audio"))]
     #[cfg_attr(feature = "serde", serde(rename = "audio"))]
     #[merge(strategy = merge::num::overwrite_zero)]
     #[expect(clippy::doc_markdown)]
@@ -47,6 +57,7 @@ pub struct Frontend {
         feature = "clap",
         arg(short, long = "palette", value_name = "COLOR", value_enum)
     )]
+    #[cfg_attr(feature = "facet", facet(rename = "palette"))]
     #[cfg_attr(feature = "serde", serde(rename = "palette"))]
     #[merge(strategy = merge::option::overwrite_none)]
     pub pal: Option<Palette>,
@@ -60,6 +71,7 @@ pub struct Frontend {
         arg(short, long = "speed", value_name = "SPEED"),
         arg(value_parser = crate::val::SpeedValueParser)
     )]
+    #[cfg_attr(feature = "facet", facet(rename = "speed"))]
     #[cfg_attr(feature = "serde", serde(rename = "speed"))]
     #[merge(strategy = merge::option::overwrite_none)]
     pub spd: Option<Speed>,

@@ -51,6 +51,7 @@ mod names;
     PartialOrd,
     SerializeDisplay,
 )]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Color(u32);
 
 impl Color {

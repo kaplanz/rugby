@@ -14,9 +14,18 @@ pub use self::decl::*;
 /// Used by the DMG model; the 2-bit palette depth supports a total of 4 colors.
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(
+    feature = "facet",
+    derive(facet::Facet),
+    facet(default, deny_unknown_fields)
+)]
+#[cfg_attr(
     feature = "serde",
     derive(serde::Serialize, serde::Deserialize),
     serde(default, deny_unknown_fields)
+)]
+#[cfg_attr(
+    all(feature = "facet", feature = "serde"),
+    expect(clippy::unsafe_derive_deserialize)
 )]
 pub struct Palette([Color; 4]);
 
