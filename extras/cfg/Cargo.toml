@@ -11,6 +11,7 @@ publish = false
 
 [dependencies]
 clap = { workspace = true, optional = true, features = ["env"] }
+facet = { workspace = true, optional = true }
 merge = { workspace = true }
 rugby-core = { workspace = true }
 rugby-pal = { workspace = true }
@@ -25,6 +26,10 @@ default = [
   "toml",
 ]
 clap = ["dep:clap"]
+facet = [
+  "rugby-pal/facet",
+  "dep:facet",
+]
 serde = [
   "rugby-pal/serde",
   "dep:serde",

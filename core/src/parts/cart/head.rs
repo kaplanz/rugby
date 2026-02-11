@@ -58,7 +58,12 @@ pub fn gchk(rom: &[u8]) -> u16 {
 /// Information about the ROM and the cartridge containing it. Stored in the
 /// address range `[$0100, $0150)`.
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+#[cfg_attr(
+    all(feature = "facet", feature = "serde"),
+    expect(clippy::unsafe_derive_deserialize)
+)]
 pub struct Header {
     /// Game information.
     pub about: About,
@@ -251,7 +256,12 @@ pub mod parts {
 
     /// Game information.
     #[derive(Clone, Debug, Eq, PartialEq)]
+    #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+    #[cfg_attr(
+        all(feature = "facet", feature = "serde"),
+        expect(clippy::unsafe_derive_deserialize)
+    )]
     pub struct About {
         /// `[$0134..=$0143]`: Title.
         ///
@@ -294,7 +304,12 @@ pub mod parts {
 
     /// Data integrity.
     #[derive(Clone, Debug, Eq, PartialEq)]
+    #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+    #[cfg_attr(
+        all(feature = "facet", feature = "serde"),
+        expect(clippy::unsafe_derive_deserialize)
+    )]
     pub struct Check {
         /// `[$0104..=$0133]`: Nintendo logo.
         ///
@@ -328,7 +343,12 @@ pub mod parts {
 
     /// Memory hardware.
     #[derive(Clone, Debug, Eq, PartialEq)]
+    #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+    #[cfg_attr(
+        all(feature = "facet", feature = "serde"),
+        expect(clippy::unsafe_derive_deserialize)
+    )]
     pub struct Memory {
         /// `[$0148]`: ROM size.
         ///
@@ -350,7 +370,12 @@ pub mod parts {
 
     /// Model compatibility.
     #[derive(Clone, Debug, Eq, PartialEq)]
+    #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+    #[cfg_attr(
+        all(feature = "facet", feature = "serde"),
+        expect(clippy::unsafe_derive_deserialize)
+    )]
     pub struct Compat {
         /// `[$0143]`: DMG flag.
         ///
@@ -389,41 +414,59 @@ pub mod parts {
     /// [type]: https://gbdev.io/pandocs/The_Cartridge_Header.html#0147--cartridge-type
     #[derive(Clone, Debug, Eq, PartialEq)]
     #[cfg_attr(
+        feature = "facet",
+        derive(facet::Facet),
+        facet(tag = "chip", content = "spec")
+    )]
+    #[cfg_attr(
         feature = "serde",
         derive(serde::Deserialize, serde::Serialize),
         serde(tag = "chip", content = "spec")
     )]
+    #[repr(C)]
     pub enum Board {
+        #[cfg_attr(feature = "facet", facet(rename = "None"))]
         #[cfg_attr(feature = "serde", serde(rename = "None"))]
         None { exram: bool, power: bool },
+        #[cfg_attr(feature = "facet", facet(rename = "MBC1"))]
         #[cfg_attr(feature = "serde", serde(rename = "MBC1"))]
         Mbc1 { exram: bool, power: bool },
+        #[cfg_attr(feature = "facet", facet(rename = "MBC2"))]
         #[cfg_attr(feature = "serde", serde(rename = "MBC2"))]
         Mbc2 { power: bool },
+        #[cfg_attr(feature = "facet", facet(rename = "MBC3"))]
         #[cfg_attr(feature = "serde", serde(rename = "MBC3"))]
         Mbc3 {
             exram: bool,
             power: bool,
             clock: bool,
         },
+        #[cfg_attr(feature = "facet", facet(rename = "MBC5"))]
         #[cfg_attr(feature = "serde", serde(rename = "MBC5"))]
         Mbc5 {
             exram: bool,
             power: bool,
             motor: bool,
         },
+        #[cfg_attr(feature = "facet", facet(rename = "MBC6"))]
         #[cfg_attr(feature = "serde", serde(rename = "MBC6"))]
         Mbc6,
+        #[cfg_attr(feature = "facet", facet(rename = "MBC7"))]
         #[cfg_attr(feature = "serde", serde(rename = "MBC7"))]
         Mbc7,
+        #[cfg_attr(feature = "facet", facet(rename = "MMM01"))]
         #[cfg_attr(feature = "serde", serde(rename = "MMM01"))]
         Mmm01 { exram: bool, power: bool },
+        #[cfg_attr(feature = "facet", facet(rename = "M161"))]
         #[cfg_attr(feature = "serde", serde(rename = "M161"))]
         M161,
+        #[cfg_attr(feature = "facet", facet(rename = "HuC1"))]
         #[cfg_attr(feature = "serde", serde(rename = "HuC1"))]
         HuC1,
+        #[cfg_attr(feature = "facet", facet(rename = "HuC3"))]
         #[cfg_attr(feature = "serde", serde(rename = "HuC3"))]
         HuC3,
+        #[cfg_attr(feature = "facet", facet(rename = "Camera"))]
         #[cfg_attr(feature = "serde", serde(rename = "Camera"))]
         Camera,
     }
@@ -590,10 +633,16 @@ pub mod parts {
     /// Destination code.
     #[derive(Clone, Copy, Debug, Eq, PartialEq)]
     #[cfg_attr(
+        feature = "facet",
+        derive(facet::Facet),
+        facet(rename_all = "lowercase")
+    )]
+    #[cfg_attr(
         feature = "serde",
         derive(serde::Deserialize, serde::Serialize),
         serde(rename_all = "lowercase")
     )]
+    #[repr(C)]
     pub enum Region {
         /// Worldwide release.
         World,
