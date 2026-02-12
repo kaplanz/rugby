@@ -20,7 +20,7 @@ pub use self::decl::*;
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Serialize, serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(default, deny_unknown_fields)
 )]
 #[cfg_attr(
