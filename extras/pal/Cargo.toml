@@ -19,4 +19,7 @@ facet = [
   "chex/facet",
   "dep:facet",
 ]
-serde = ["dep:serde"]
+serde = [
+  "chex/serde",
+  "dep:serde",
+]
