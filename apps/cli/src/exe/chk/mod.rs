@@ -41,7 +41,7 @@ pub fn main(args: Cli) -> Result<()> {
         match args.fmt.unwrap_or_default() {
             cli::Format::Pretty => head.to_string(),
             cli::Format::Json =>
-                serde_json::to_string_pretty(&head).context("unable to render cartridge header")?,
+                facet_json::to_string_pretty(&head).context("unable to render cartridge header")?,
         }
     );
 
