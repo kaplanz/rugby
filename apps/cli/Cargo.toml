@@ -25,6 +25,7 @@ clap_mangen = "0.2.31"
 constcat = { workspace = true }
 ctrlc = { version = "3.5.1", features = ["termination"] }
 either = { workspace = true }
+facet-json = "0.43.2"
 log = { workspace = true }
 merge = { workspace = true }
 minifb = "0.28.0"
@@ -33,9 +34,8 @@ parking_lot = { workspace = true }
 prettydiff = { version = "0.9.0", optional = true }
 ringbuf = "0.4.8"
 rubato = "0.16.2"
-rugby = { workspace = true, features = ["serde", "cfg", "pal"] }
+rugby = { workspace = true, features = ["facet", "cfg", "pal"] }
 rustyline = { version = "17.0.2", optional = true }
-serde_json = "1.0.145"
 supports-color = "3.0.2"
 sysexits = "0.10.0"
 tempfile = "3.23.0"
