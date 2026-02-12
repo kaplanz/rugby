@@ -22,7 +22,6 @@ toml = { workspace = true, optional = true }
 [features]
 default = [
   "clap",
-  "serde",
   "toml",
 ]
 clap = ["dep:clap"]
