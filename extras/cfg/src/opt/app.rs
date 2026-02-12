@@ -14,7 +14,7 @@ pub use crate::val::{Palette, Speed};
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(default, deny_unknown_fields)
 )]
 #[cfg_attr(

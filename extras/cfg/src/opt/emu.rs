@@ -16,7 +16,7 @@ pub use crate::val::When;
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(default, deny_unknown_fields)
 )]
 #[cfg_attr(
@@ -43,7 +43,7 @@ pub struct Emulator {
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(default, deny_unknown_fields)
 )]
 #[cfg_attr(
@@ -103,7 +103,7 @@ pub struct Boot {
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(default, deny_unknown_fields)
 )]
 #[cfg_attr(
