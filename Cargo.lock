@@ -352,6 +352,7 @@ version = "0.1.0"
 dependencies = [
  "facet",
  "phf",
+ "serde",
  "serde_with",
  "thiserror 2.0.17",
 ]
