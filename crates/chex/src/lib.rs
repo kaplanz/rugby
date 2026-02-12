@@ -29,7 +29,6 @@ use std::fmt::Display;
 use std::num::ParseIntError;
 use std::str::FromStr;
 
-use serde_with::{DeserializeFromStr, SerializeDisplay};
 use thiserror::Error;
 
 mod names;
@@ -39,19 +38,12 @@ mod names;
 /// Stored internally in a `u32` as `0x00RRGGBB`.
 ///
 /// [24-bit]: https://en.wikipedia.org/wiki/List_of_monochrome_and_RGB_color_formats#24-bit_RGB
-#[derive(
-    Copy,
-    Clone,
-    Debug,
-    Default,
-    DeserializeFromStr,
-    Eq,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    SerializeDisplay,
-)]
+#[derive(Copy, Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde_with::DeserializeFromStr, serde_with::SerializeDisplay)
+)]
 pub struct Color(u32);
 
 impl Color {
