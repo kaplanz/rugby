@@ -17,7 +17,7 @@ use thiserror::Error;
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(rename_all = "kebab-case")
 )]
 #[repr(C)]
@@ -41,7 +41,7 @@ pub enum When {
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(rename_all = "kebab-case")
 )]
 #[non_exhaustive]
@@ -116,7 +116,7 @@ impl From<Palette> for pal::Palette {
 )]
 #[cfg_attr(
     feature = "serde",
-    derive(serde::Deserialize),
+    derive(serde::Deserialize, serde::Serialize),
     serde(rename_all = "kebab-case")
 )]
 #[repr(C)]
