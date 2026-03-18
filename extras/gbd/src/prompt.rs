@@ -3,8 +3,6 @@
 use std::error::Error as StdError;
 use std::fmt::Debug;
 
-use thiserror::Error;
-
 /// Behaviour for prompting a user for input.
 pub trait Prompt: Debug + Send {
     /// Present the prompt message and receive a debugger command from the user.
@@ -21,7 +19,8 @@ pub trait Prompt: Debug + Send {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by the debugger [prompt][Prompt].
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Generic internal error.

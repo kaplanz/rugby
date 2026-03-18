@@ -12,7 +12,7 @@ use super::pic::{self, Interrupt};
 /// See more details [here][regs].
 ///
 /// [regs]: https://gbdev.io/pandocs/Timer_and_Divider_Registers.html
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select {
     /// `[$FF04]`: Divider register.
     Div,
@@ -250,7 +250,7 @@ pub mod reg {
     ///
     /// In effect, this models the 1 M-cycle (4 T-cycle) delay between a reload
     /// being triggered and it occurring.
-    #[derive(Clone, Debug, Default, Eq, PartialEq)]
+    #[derive(Clone, Debug, Default, PartialEq, Eq)]
     pub(super) enum Reload {
         /// Timer is not amid a reload.
         #[default]

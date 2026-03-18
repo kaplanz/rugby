@@ -8,8 +8,6 @@
 
 use std::fmt::Debug;
 
-use thiserror::Error;
-
 use crate::Shared;
 use crate::reg::Register;
 
@@ -113,7 +111,8 @@ impl Memory for Vec<u8> {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by a [memory](Memory) operation.
-#[derive(Clone, Debug, Error, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Device is unavailable.

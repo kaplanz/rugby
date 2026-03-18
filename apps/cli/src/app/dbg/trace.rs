@@ -10,7 +10,6 @@ use cmp::Tracer as Tracecmp;
 use either::Either;
 use log::Tracer as Tracelog;
 use rugby::core::dmg::GameBoy;
-use thiserror::Error;
 
 use crate::exe::run::cli::trace::{Format, Trace};
 
@@ -74,7 +73,8 @@ impl Tracer {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by a tracelog operation.
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// I/O operation error.

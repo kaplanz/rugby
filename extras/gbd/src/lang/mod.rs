@@ -2,7 +2,6 @@ use std::collections::VecDeque;
 use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
 
-use displaydoc::Display;
 use orng::Orange;
 use rugby_core::dmg::{apu, cpu, pic, ppu, serial, timer};
 
@@ -101,8 +100,9 @@ pub enum Command {
 }
 
 /// Debugger keywords.
+#[derive(Clone, Debug)]
+#[derive(displaydoc::Display)]
 #[expect(clippy::doc_overindented_list_items)]
-#[derive(Clone, Debug, Display)]
 pub enum Keyword {
     /**
      * Game Boy Debugger.

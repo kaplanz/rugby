@@ -6,7 +6,6 @@ use std::{fs, io};
 
 pub use rugby::extra::cfg::Config;
 use rugby::extra::cfg::de;
-use thiserror::Error;
 
 use crate::dir;
 
@@ -45,7 +44,8 @@ pub fn load(path: &Path) -> Result<Config> {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by [loading](load) the configuration.
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Reading error.

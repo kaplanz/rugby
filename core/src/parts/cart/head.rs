@@ -14,7 +14,6 @@ use std::str::Utf8Error;
 
 use log::error;
 use parts::{About, Board, Check, Compat, Memory, Region};
-use thiserror::Error;
 
 /// Nintendo logo.
 ///
@@ -57,7 +56,7 @@ pub fn gchk(rom: &[u8]) -> u16 {
 ///
 /// Information about the ROM and the cartridge containing it. Stored in the
 /// address range `[$0100, $0150)`.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[cfg_attr(
@@ -255,7 +254,7 @@ pub mod parts {
     use super::Error;
 
     /// Game information.
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     #[cfg_attr(
@@ -303,7 +302,7 @@ pub mod parts {
     }
 
     /// Data integrity.
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     #[cfg_attr(
@@ -342,7 +341,7 @@ pub mod parts {
     }
 
     /// Memory hardware.
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     #[cfg_attr(
@@ -369,7 +368,7 @@ pub mod parts {
     }
 
     /// Model compatibility.
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "facet", derive(facet::Facet))]
     #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
     #[cfg_attr(
@@ -412,7 +411,7 @@ pub mod parts {
     /// See more details [here][type].
     ///
     /// [type]: https://gbdev.io/pandocs/The_Cartridge_Header.html#0147--cartridge-type
-    #[derive(Clone, Debug, Eq, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(
         feature = "facet",
         derive(facet::Facet),
@@ -631,7 +630,7 @@ pub mod parts {
     }
 
     /// Destination code.
-    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(
         feature = "facet",
         derive(facet::Facet),
@@ -769,7 +768,8 @@ pub mod parse {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by parsing a cartridge [header](Header).
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Missing header data.

@@ -16,7 +16,7 @@ use crate::api::part::serial::Serial as Api;
 /// See more details [here][serial].
 ///
 /// [serial]: https://gbdev.io/pandocs/Serial_Data_Transfer_(Link_Cable).html
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select {
     /// `[$FF01]`: Serial transfer data.
     ///

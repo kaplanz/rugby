@@ -35,7 +35,7 @@ impl GameBoy {
 /// Joypad inputs.
 ///
 /// Represents the 4 face buttons and directional inputs on the joypad.
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[wasm_bindgen]
 pub enum Button {
     /// Game button: A

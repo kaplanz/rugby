@@ -1,12 +1,12 @@
 //! Command-line interface.
 
-use clap::{Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 
 use super::NAME;
 
 /// Generate app support files.
-#[derive(Debug, Parser)]
+#[derive(Debug)]
+#[derive(clap::Parser)]
 #[command(name = NAME)]
 #[command(arg_required_else_help = true)]
 #[command(flatten_help = true)]
@@ -18,7 +18,8 @@ pub struct Cli {
 }
 
 /// Generated document.
-#[derive(Debug, Subcommand)]
+#[derive(Debug)]
+#[derive(clap::Subcommand)]
 #[command(disable_help_subcommand = true)]
 #[non_exhaustive]
 pub enum Document {
@@ -38,7 +39,8 @@ pub enum Document {
 }
 
 /// Execution mode.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, ValueEnum)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(clap::ValueEnum)]
 #[non_exhaustive]
 pub enum Command {
     /// Check header for ROM.

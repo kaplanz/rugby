@@ -36,8 +36,6 @@ use std::fmt::{self, Debug, Display, Formatter};
 use std::num;
 use std::str::FromStr;
 
-use thiserror::Error;
-
 /// byte size for 1 byte
 pub const B: u64 = 1;
 /// bytes size for 1 kilobyte
@@ -69,7 +67,8 @@ pub const EiB: u64 = 0x1000_0000_0000_0000;
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by converting between byte size representations.
-#[derive(Clone, Debug, Error, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Unknown unit suffix.
@@ -84,7 +83,7 @@ pub enum Error {
 }
 
 /// Byte size representation
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Unit {
     #[default]
     Byte,
@@ -170,7 +169,7 @@ impl FromStr for Unit {
 }
 
 /// Byte size representation
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Size(u64);
 
 impl From<u64> for Size {

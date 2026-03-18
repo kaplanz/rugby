@@ -4,14 +4,13 @@ use std::num::ParseIntError;
 use std::str::FromStr;
 
 use pest::Parser;
-use pest_derive::Parser;
-use thiserror::Error;
 
 use super::{Command, Keyword, Program, Select, Serial, Tick, Value};
 
 mod imp;
 
-#[derive(Debug, Parser)]
+#[derive(Debug)]
+#[derive(pest_derive::Parser)]
 #[grammar = "lang/parse.pest"]
 struct Language;
 
@@ -81,9 +80,10 @@ impl Display for Rule {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by parsing debugger commands.
-#[expect(clippy::large_enum_variant)]
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
+#[expect(clippy::large_enum_variant)]
 pub enum Error {
     /// Internal parsing error.
     ///

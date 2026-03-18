@@ -12,7 +12,8 @@ pub mod joypad;
 pub mod video;
 
 /// Game Boy (DMG) emulator model.
-#[derive(Debug, Default, uniffi::Object)]
+#[derive(Debug, Default)]
+#[derive(uniffi::Object)]
 #[uniffi::export(Debug)]
 pub struct GameBoy {
     /// Internal emulator model.
