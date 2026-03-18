@@ -465,24 +465,24 @@ impl Block for Control {
         self.nr52.take();
         self.nr51.take();
         self.nr50.take();
-        // Sound Channel 1 — Pulse with wavelength sweep
+        // Sound Channel 1 - Pulse with wavelength sweep
         self.nr10.take();
         self.nr11.take();
         self.nr12.take();
         self.nr13.take();
         self.nr14.take();
-        // Sound Channel 2 — Pulse
+        // Sound Channel 2 - Pulse
         self.nr21.take();
         self.nr22.take();
         self.nr23.take();
         self.nr24.take();
-        // Sound Channel 3 — Wave output
+        // Sound Channel 3 - Wave output
         self.nr30.take();
         self.nr31.take();
         self.nr32.take();
         self.nr33.take();
         self.nr34.take();
-        // Sound Channel 4 — Noise
+        // Sound Channel 4 - Noise
         self.nr41.take();
         self.nr42.take();
         self.nr43.take();
@@ -496,24 +496,24 @@ impl Mmio for Control {
         bus.map(0xff26..=0xff26, self.nr52.clone().into());
         bus.map(0xff25..=0xff25, self.nr51.clone().into());
         bus.map(0xff24..=0xff24, self.nr50.clone().into());
-        // Sound Channel 1 — Pulse with wavelength sweep
+        // Sound Channel 1 - Pulse with wavelength sweep
         bus.map(0xff10..=0xff10, self.nr10.clone().into());
         bus.map(0xff11..=0xff11, self.nr11.clone().into());
         bus.map(0xff12..=0xff12, self.nr12.clone().into());
         bus.map(0xff13..=0xff13, self.nr13.clone().into());
         bus.map(0xff14..=0xff14, self.nr14.clone().into());
-        // Sound Channel 2 — Pulse
+        // Sound Channel 2 - Pulse
         bus.map(0xff16..=0xff16, self.nr21.clone().into());
         bus.map(0xff17..=0xff17, self.nr22.clone().into());
         bus.map(0xff18..=0xff18, self.nr23.clone().into());
         bus.map(0xff19..=0xff19, self.nr24.clone().into());
-        // Sound Channel 3 — Wave output
+        // Sound Channel 3 - Wave output
         bus.map(0xff1a..=0xff1a, self.nr30.clone().into());
         bus.map(0xff1b..=0xff1b, self.nr31.clone().into());
         bus.map(0xff1c..=0xff1c, self.nr32.clone().into());
         bus.map(0xff1d..=0xff1d, self.nr33.clone().into());
         bus.map(0xff1e..=0xff1e, self.nr34.clone().into());
-        // Sound Channel 4 — Noise
+        // Sound Channel 4 - Noise
         bus.map(0xff20..=0xff20, self.nr41.clone().into());
         bus.map(0xff21..=0xff21, self.nr42.clone().into());
         bus.map(0xff22..=0xff22, self.nr43.clone().into());
