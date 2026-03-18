@@ -1,0 +1,12 @@
+# Controls how imports are structured in `use` statements. Imports will be
+# merged or split to the configured level of granularity.
+imports_granularity = "Module"
+
+# Item layout inside a imports block
+imports_layout = "HorizontalVertical"
+
+# Controls the strategy for how consecutive imports are grouped together.
+group_imports = "StdExternalCrate"
+
+# Merge multiple derives into a single one.
+merge_derives = false
