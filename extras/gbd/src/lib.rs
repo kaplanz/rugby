@@ -417,6 +417,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 /// An error caused by a debugger command.
 #[expect(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Requested breakpoint could not be found.
     #[error("breakpoint not found")]

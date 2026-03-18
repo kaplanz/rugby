@@ -114,6 +114,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by a [memory](Memory) operation.
 #[derive(Clone, Debug, Error, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum Error {
     /// Device is unavailable.
     #[error("device is unavailable")]
