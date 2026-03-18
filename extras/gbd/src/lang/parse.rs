@@ -83,6 +83,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 /// An error caused by parsing debugger commands.
 #[expect(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Internal parsing error.
     ///

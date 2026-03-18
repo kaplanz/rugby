@@ -770,6 +770,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by parsing a cartridge [header](Header).
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Missing header data.
     #[error("missing header data")]
