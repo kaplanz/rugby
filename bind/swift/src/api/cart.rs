@@ -47,7 +47,8 @@ impl GameBoy {
 /// Game cartridge.
 ///
 /// Models the hardware specified by the provided ROM.
-#[derive(Debug, uniffi::Object)]
+#[derive(Debug)]
+#[derive(uniffi::Object)]
 pub struct Cartridge {
     /// Internal cartridge model.
     inner: Mutex<dmg::Cartridge>,
@@ -128,7 +129,8 @@ use parts::{About, Board, Check, Compat, Memory};
 /// Cartridge header.
 ///
 /// See [`rugby::core::dmg::cart::Header`]
-#[derive(Clone, Debug, Eq, PartialEq, uniffi::Record)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(uniffi::Record)]
 pub struct Header {
     /// Game information.
     pub about: About,
@@ -218,7 +220,8 @@ pub mod parts {
     /// Memory hardware.
     ///
     /// See [`rugby::core::dmg::cart::head::parts::Memory`]
-    #[derive(Clone, Debug, Eq, PartialEq, uniffi::Record)]
+    #[derive(Clone, Debug, PartialEq, Eq)]
+    #[derive(uniffi::Record)]
     pub struct Memory {
         pub romsz: u32,
         pub ramsz: u32,

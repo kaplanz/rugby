@@ -7,7 +7,6 @@ use rugby_arch::mem::Memory;
 use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register as _};
 use rugby_arch::{Block, Shared};
-use thiserror::Error;
 
 /// Interrupt source.
 ///
@@ -22,7 +21,7 @@ use thiserror::Error;
 /// [sources]: https://gbdev.io/pandocs/Interrupt_Sources.html
 #[must_use]
 #[rustfmt::skip]
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Interrupt {
     /// Vertical blank.
     ///
@@ -130,7 +129,7 @@ impl From<Interrupt> for u8 {
 /// See more details [here][regs].
 ///
 /// [regs]: https://gbdev.io/pandocs/Interrupts.html
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select {
     /// `[$FF0F]`: Interrupt flag.
     ///
@@ -317,7 +316,8 @@ impl Line {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by an [interrupt](Interrupt).
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Unknown interrupt.

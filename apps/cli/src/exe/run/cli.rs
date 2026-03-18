@@ -2,13 +2,12 @@
 
 use std::net::SocketAddr;
 
-use clap::{Args, Parser};
-
 use super::NAME;
 use crate::cli::Settings;
 
 /// Play ROM in emulator.
-#[derive(Debug, Parser)]
+#[derive(Debug)]
+#[derive(clap::Parser)]
 #[command(name = NAME)]
 #[command(arg_required_else_help = true)]
 #[group(id = "Run")]
@@ -28,7 +27,8 @@ pub struct Cli {
 }
 
 /// Runtime features.
-#[derive(Args, Debug)]
+#[derive(Debug)]
+#[derive(clap::Args)]
 #[command(next_help_heading = "Features")]
 pub struct Features {
     /// Exit after instantiation.
@@ -57,7 +57,8 @@ pub struct Features {
 }
 
 /// Serial connection.
-#[derive(Args, Debug)]
+#[derive(Debug)]
+#[derive(clap::Args)]
 #[group(requires_all = ["host", "peer"])]
 pub struct Link {
     /// Link cable local address.
@@ -79,7 +80,8 @@ pub struct Link {
 }
 
 /// Debugging options.
-#[derive(Args, Debug)]
+#[derive(Debug)]
+#[derive(clap::Args)]
 #[command(next_help_heading = "Debugging")]
 pub struct Debugger {
     /// Enable debugger.
@@ -109,10 +111,9 @@ pub struct Debugger {
 pub mod trace {
     use std::path::PathBuf;
 
-    use clap::{Args, ValueEnum};
-
     /// Introspective tracing.
-    #[derive(Args, Debug)]
+    #[derive(Debug)]
+    #[derive(clap::Args)]
     #[group(requires = "tracer")]
     pub struct Trace {
         /// Enable tracer.
@@ -150,7 +151,8 @@ pub mod trace {
     }
 
     /// Tracing output format.
-    #[derive(Clone, Copy, Debug, ValueEnum)]
+    #[derive(Copy, Clone, Debug)]
+    #[derive(clap::ValueEnum)]
     #[non_exhaustive]
     pub enum Format {
         /// Tracing format used by Ben Smith's binjgb emulator.

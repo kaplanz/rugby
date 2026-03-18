@@ -1,7 +1,7 @@
 use super::{Error, Memory, Result};
 
 /// Read-only memory.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Rom<M: Memory>(M);
 
 impl<M: Memory> Rom<M> {

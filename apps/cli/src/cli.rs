@@ -2,8 +2,8 @@
 
 use std::path::PathBuf;
 
+use clap::ValueHint;
 use clap::builder::styling;
-use clap::{Args, Parser, ValueHint};
 use clap_verbosity_flag::Verbosity;
 
 use crate::cfg::Config;
@@ -13,7 +13,8 @@ use crate::{NAME, exe};
 ///
 /// Cycle-accurate emulation with support for custom palettes, configurable
 /// speed, interactive debugging, and more!
-#[derive(Debug, Parser)]
+#[derive(Debug)]
+#[derive(clap::Parser)]
 #[command(name = NAME, author, version, about, long_about)]
 #[command(arg_required_else_help = true)]
 pub struct Cli {
@@ -28,7 +29,8 @@ pub struct Cli {
 }
 
 /// Execution mode.
-#[derive(Debug, Parser)]
+#[derive(Debug)]
+#[derive(clap::Parser)]
 #[command(name = NAME)]
 #[command(disable_help_subcommand = true)]
 #[command(
@@ -63,7 +65,8 @@ pub enum Command {
 }
 
 /// Configuration options.
-#[derive(Args, Debug)]
+#[derive(Debug)]
+#[derive(clap::Args)]
 #[command(next_help_heading = "Settings")]
 pub struct Settings {
     /// Configuration file.

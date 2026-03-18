@@ -5,7 +5,6 @@ use std::str::FromStr;
 
 use rugby_core::dmg::{CLOCK, ppu};
 use rugby_pal as pal;
-use thiserror::Error;
 
 /// When to enable.
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -210,7 +209,8 @@ impl FromStr for Speed {
 }
 
 /// A type specifying categories of [`Color`] error.
-#[derive(Clone, Debug, Error)]
+#[derive(Clone, Debug)]
+#[derive(thiserror::Error)]
 pub enum ParseSpeedError {
     /// Parse string was empty.
     #[error("empty string")]

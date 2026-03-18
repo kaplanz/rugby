@@ -9,7 +9,7 @@ use crate::*;
 ///
 /// # See
 /// - [`RETRO_ENVIRONMENT_SET_PIXEL_FORMAT`]
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(i32)]
 #[rustfmt::skip]
 pub enum retro_pixel_format {
