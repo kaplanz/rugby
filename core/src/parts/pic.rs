@@ -318,6 +318,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by an [interrupt](Interrupt).
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Unknown interrupt.
     #[error("unknown interrupt")]
