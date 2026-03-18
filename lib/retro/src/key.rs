@@ -5,7 +5,7 @@ use super::int;
 /// Keyboard inputs.
 ///
 /// Keysyms used for ID in input state callback when polling `RETRO_KEYBOARD`.
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(i32)]
 #[rustfmt::skip]
 pub enum retro_key {
@@ -183,7 +183,7 @@ pub enum retro_key {
 }
 
 /// Keyboard modifiers.
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(i32)]
 #[rustfmt::skip]
 pub enum retro_mod {

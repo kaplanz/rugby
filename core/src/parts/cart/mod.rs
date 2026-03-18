@@ -14,7 +14,6 @@ use std::io;
 
 use rugby_arch::Block;
 use rugby_arch::mio::{Bus, Mmio};
-use thiserror::Error;
 
 use self::chip::Chip;
 use self::head::parts::Board;
@@ -149,7 +148,8 @@ impl Mmio for Cartridge {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by constructing a [cartridge](Cartridge).
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Bad cartridge header.

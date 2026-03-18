@@ -9,7 +9,6 @@ use num::{Bounded, Integer};
 use orng::Orange;
 use pest::iterators::Pair;
 use rugby_core::dmg::{apu, cpu, pic, ppu, serial, timer};
-use thiserror::Error;
 
 use super::{Command, Keyword, Result, Rule, Select, Serial, Tick, Value};
 
@@ -480,7 +479,8 @@ pub fn location(pair: Pair<Rule>) -> Result<Select> {
 ///
 /// Internal errors are always considered bugs, and should never happen due to
 /// poor user input.
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[error("{kind}: {location}")]
 pub struct Error {
     kind: ErrorKind,
@@ -497,7 +497,8 @@ impl From<ErrorKind> for Error {
 }
 
 /// A type specifying categories of parser errors.
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 pub enum ErrorKind {
     /// Expected pair, found none.
     #[error("expected pair, found none")]

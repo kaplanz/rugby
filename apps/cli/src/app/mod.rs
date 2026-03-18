@@ -230,11 +230,10 @@ pub mod data {
 mod ctrl {
     use std::sync::atomic::{AtomicU8, Ordering};
 
-    use num_enum::TryFromPrimitive;
-    use thiserror::Error;
-
     /// Exit condition.
-    #[derive(Debug, Error, TryFromPrimitive)]
+    #[derive(Debug)]
+    #[derive(num_enum::TryFromPrimitive)]
+    #[derive(thiserror::Error)]
     #[repr(u8)]
     pub enum Exit {
         /// Unknown exit reason.

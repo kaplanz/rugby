@@ -1,7 +1,7 @@
 use crate::api::part::video::Pixel;
 
 /// Color values.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub enum Color {
     /// Lightest
     #[default]

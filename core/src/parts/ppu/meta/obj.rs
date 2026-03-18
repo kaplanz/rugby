@@ -50,8 +50,8 @@ impl From<[u8; 4]> for Sprite {
 /// - `X` is the x-flip flag.
 /// - `Y` is the y-flip flag.
 /// - `Z` is the priority flag.
-#[expect(clippy::struct_excessive_bools)]
 #[derive(Clone, Debug)]
+#[expect(clippy::struct_excessive_bools)]
 pub struct Attributes {
     /// Priority flag.
     ///

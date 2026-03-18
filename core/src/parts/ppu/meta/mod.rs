@@ -14,7 +14,7 @@ pub use self::tile::{Row, Tile};
 ///
 /// The Game Boy has three different graphical layers that are used to display
 /// pixels within the 160x144 viewport.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Layer {
     /// The Background is a 256x256 grid of pixels (32x32 grid of
     /// [tiles](Tile)).
@@ -35,7 +35,7 @@ pub enum Layer {
 /// | \[7:6\] | \[5:4\] | \[3:2\] | \[1:0\] |
 /// |---------|---------|---------|---------|
 /// |  `C3`   |  `C2`   |  `C1`   |  `C0`   |
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Palette {
     /// Background/Window palette.
     BgWin,

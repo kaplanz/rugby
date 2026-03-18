@@ -4,7 +4,6 @@ use std::fmt::{Debug, Display};
 use std::io::Cursor;
 
 use rugby::core::dmg::ppu::Color;
-use thiserror::Error;
 
 /// Loads a PNG image from its raw binary data.
 pub fn png(data: &[u8]) -> Result<Vec<u8>, png::DecodingError> {
@@ -55,7 +54,7 @@ pub fn check(delta: usize, total: usize) -> Result<()> {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// Error for an image-based test.
-#[derive(Error)]
+#[derive(thiserror::Error)]
 #[error(
     "test failed with deltas: {:.2}% ({delta}/{total})",
     100. * (*.delta as f64) / (*.total as f64)

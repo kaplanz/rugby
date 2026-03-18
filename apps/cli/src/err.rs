@@ -6,7 +6,6 @@ use std::process::{ExitCode, Termination};
 
 use advise::Render;
 use clap::builder::styling::{AnsiColor, Style};
-use thiserror::Error;
 
 use crate::cfg;
 
@@ -14,7 +13,8 @@ use crate::cfg;
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// A top-level error from within the application.
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Application error.

@@ -6,7 +6,6 @@ use rugby::arch::Block;
 use rugby::arch::reg::Port;
 use rugby::core::dmg::cpu::Cpu;
 use rugby::core::dmg::{Cartridge, GameBoy};
-use thiserror::Error;
 
 /// Number of cycles after which the test is considered to have failed due to a
 /// timeout error.
@@ -61,7 +60,7 @@ fn check(emu: &GameBoy) -> Result<()> {
 type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// Failure conditions caused by a test.
-#[derive(Error)]
+#[derive(thiserror::Error)]
 enum Error {
     /// Test has explicitly failed.
     #[error("test failed")]

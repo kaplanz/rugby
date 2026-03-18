@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 type Runnable = Arc<Mutex<State>>;
 
 /// Internal state of a [`Clock`].
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 enum State {
     /// Causes the clock to run.
     #[default]

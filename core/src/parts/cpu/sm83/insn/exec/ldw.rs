@@ -6,8 +6,8 @@ pub const fn default() -> Operation {
     Operation::Ldw(Ldw::Fetch)
 }
 
-#[expect(unused)]
 #[derive(Clone, Debug, Default)]
+#[expect(unused)]
 pub enum Ldw {
     #[default]
     Fetch,
