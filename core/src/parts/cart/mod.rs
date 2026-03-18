@@ -150,6 +150,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by constructing a [cartridge](Cartridge).
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Bad cartridge header.
     #[error("bad cartridge header")]
