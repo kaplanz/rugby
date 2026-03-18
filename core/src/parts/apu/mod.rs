@@ -81,7 +81,7 @@ impl Block for Sequencer {
 /// See more details [here][regs].
 ///
 /// [regs]: https://gbdev.io/pandocs/Audio_Registers.html
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select {
     /// `[$FF26]`: Audio master control.
     Nr52,

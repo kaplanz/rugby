@@ -11,7 +11,6 @@ use log::debug;
 use rugby_arch::Block;
 use rugby_arch::reg::Port;
 use rugby_core::dmg::{GameBoy, cpu, ppu};
-use thiserror::Error;
 
 use self::lang::Program;
 use self::prompt::Prompt;
@@ -346,7 +345,7 @@ impl Breakpoint {
 }
 
 /// Debugger progress unit.
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub enum Tick {
     /// T-stage.
     ///
@@ -415,9 +414,10 @@ pub trait Filter: Debug {
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// An error caused by a debugger command.
-#[expect(clippy::large_enum_variant)]
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
+#[expect(clippy::large_enum_variant)]
 pub enum Error {
     /// Requested breakpoint could not be found.
     #[error("breakpoint not found")]

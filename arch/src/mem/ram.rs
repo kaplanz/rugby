@@ -1,7 +1,7 @@
 use super::{Memory, Result};
 
 /// Random-access memory.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Ram<M: Memory>(M);
 
 impl<M: Memory> Ram<M> {

@@ -1,12 +1,11 @@
 //! Command-line interface.
 
-use clap::Parser;
-
 use super::NAME;
 pub use crate::exe::r#gen::cli::Command;
 
 /// Display docs for a command.
-#[derive(Debug, Parser)]
+#[derive(Debug)]
+#[derive(clap::Parser)]
 #[command(name = NAME)]
 #[command(flatten_help = true)]
 #[group(id = "Help")]

@@ -3,7 +3,6 @@
 use std::fmt::{Debug, Display};
 
 use log::trace;
-use thiserror::Error;
 
 use self::exec::Operation;
 use super::{Cpu, Flag, Ime, Status};
@@ -143,7 +142,8 @@ mod help {
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// An error caused by an [instruction](Instruction).
-#[derive(Debug, Error)]
+#[derive(Debug)]
+#[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
     /// Illegal instruction.

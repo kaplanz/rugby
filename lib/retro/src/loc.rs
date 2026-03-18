@@ -14,7 +14,7 @@ pub const RETRO_REGION_PAL: unsigned = 1;
 /// # See
 ///
 /// - [`RETRO_ENVIRONMENT_GET_LANGUAGE`]
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(i32)]
 #[rustfmt::skip]
 pub enum retro_language {
