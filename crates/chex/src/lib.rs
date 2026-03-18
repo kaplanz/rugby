@@ -110,6 +110,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// A type specifying categories of [`Color`] error.
 #[derive(Clone, Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Parse string was empty.
     #[error("empty string")]

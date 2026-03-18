@@ -144,6 +144,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// An error caused by an [instruction](Instruction).
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     /// Illegal instruction.
     #[error("illegal instruction: {0:#04X}")]
