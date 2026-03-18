@@ -16,7 +16,7 @@ use crate::api::part::joypad::{Event, Input, Joypad as Api, State};
 ///
 /// Represents the 4 face buttons and directional inputs on the joypad.
 #[rustfmt::skip]
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Button {
     /// Game button: A
     A      = 0b0010_0001,
@@ -49,7 +49,7 @@ impl Button {
 impl Input for Button {}
 
 /// Joypad register mode.
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub enum Mode {
     /// Select none.
     #[default]

@@ -56,7 +56,7 @@ pub type Vram = Sram;
 pub type Oam = Ram<[u8; 0x00a0]>;
 
 /// Graphics register select.
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select {
     /// `[$FF40]`: LCD control ([LCDC]).
     ///
@@ -367,7 +367,7 @@ impl Mmio for Control {
 ///
 /// [lcdc]: https://gbdev.io/pandocs/LCDC.html
 #[rustfmt::skip]
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Lcdc {
     /// `LCDC[7]`: LCD enable.
     ///

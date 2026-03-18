@@ -15,7 +15,7 @@ pub trait Joypad {
 pub trait Input: Copy + Eq + Hash {}
 
 /// Jopypad event.
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Event<I>
 where
     I: Copy + Eq + Hash,
@@ -34,7 +34,7 @@ impl<I: Copy + Eq + Hash> From<(I, State)> for Event<I> {
 }
 
 /// Joypad button state.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum State {
     /// Button pressed.
     Dn,

@@ -30,7 +30,7 @@ pub type Hram = Ram<[u8; 0x007f]>;
 /// See more details [here][regs].
 ///
 /// [regs]: https://gbdev.io/pandocs/CPU_Registers_and_Flags.html
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select8 {
     /// Accumulator register.
     A,
@@ -55,7 +55,7 @@ pub enum Select8 {
 /// See more details [here][regs].
 ///
 /// [regs]: https://gbdev.io/pandocs/CPU_Registers_and_Flags.html
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Select16 {
     /// Joint AF register.
     AF,
@@ -463,7 +463,7 @@ impl Display for Control {
 }
 
 /// Aliased register.
-#[derive(Clone, Copy)]
+#[derive(Copy, Clone)]
 pub(crate) struct Alias<'a> {
     pub lo: &'a u8,
     pub hi: &'a u8,
@@ -533,7 +533,7 @@ impl Display for AliasMut<'_> {
 /// See more details [here][flag].
 ///
 /// [flag]: https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Flag {
     /// Zero flag.
     Z = 0b1000_0000,
@@ -559,7 +559,7 @@ impl Flag {
 }
 
 /// Processor running status.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub enum Status {
     /// Enabled; normal execution.
     #[default]
@@ -676,7 +676,7 @@ impl Stage {
 }
 
 /// Interrupt master enable.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 enum Ime {
     /// Prevent interrupts.
     #[default]

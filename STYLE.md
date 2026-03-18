@@ -218,6 +218,40 @@ cpu/
 - Multi-line explanatory comments precede the block they explain, separated by a
   blank line from the next block.
 
+#### Derives & attributes
+
+Each `#[derive]` is scoped to one crate. Std traits come first in their own
+`#[derive]`; each third-party crate gets a separate `#[derive]`, ordered
+alphabetically by crate name, with traits within each sorted alphabetically.
+
+```rust
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(thiserror::Error)]
+```
+
+Std trait order:
+
+| # | Trait        |
+|---|--------------|
+| 1 | `Copy`       |
+| 2 | `Clone`      |
+| 3 | `Debug`      |
+| 4 | `Default`    |
+| 5 | `PartialEq`  |
+| 6 | `Eq`         |
+| 7 | `PartialOrd` |
+| 8 | `Ord`        |
+| 9 | `Hash`       |
+
+Attributes on an item are stacked in this order:
+
+- `#[derive(...)]`, always first.
+- Structural / semantic attrs: `#[non_exhaustive]`, `#[repr(...)]`,
+  `#[error(...)]`, `#[cfg_attr(...)]`, etc.
+- Lint suppression, always last: `#[expect(...)]`, `#[allow(...)]`,
+  `#[rustfmt::skip]`.
+
 #### Unsafe / attributes
 
 - `#[expect(clippy::...)]` is used with an implicit justification via proximity
