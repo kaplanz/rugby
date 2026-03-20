@@ -1,7 +1,9 @@
-import { LitElement, css, html } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
 import type { Chiptune } from "rugby-wasm";
+
+import worklet from "./worklet.js?raw";
 
 export const SAMPLE = 96_000;
 
@@ -13,28 +15,32 @@ export class Stereo extends LitElement {
   /** Audio worklet node. */
   private node?: AudioWorkletNode;
 
+  get playing() {
+    return this.ctx.state === "running";
+  }
+
   async firstUpdated() {
-    // Load the audio worklet
-    await this.ctx.audioWorklet.addModule("/chiptune.js");
-    // Create an audio worklet node processor
+    const blob = new Blob([worklet], { type: "application/javascript" });
+    const url = URL.createObjectURL(blob);
+    await this.ctx.audioWorklet.addModule(url);
+    URL.revokeObjectURL(url);
     this.node = new AudioWorkletNode(this.ctx, "chiptune", {
       outputChannelCount: [2],
     });
-    // Connext the worklet as an audio output
     this.node.connect(this.ctx.destination);
-    // Forward worklet messages
     this.node.port.onmessage = (event) => {
       console.log(event.data);
     };
   }
 
   /**
-   * Ensures that the `AudioContext` is resumed after a user gesture.
+   * Toggles between suspended and running.
    */
-  private async resume() {
-    // Resume audio context if needed
-    if (this.ctx.state === "suspended") {
-      await this.ctx.resume();
+  toggle(): Promise<void> {
+    if (this.ctx.state !== "running") {
+      return this.ctx.resume();
+    } else {
+      return this.ctx.suspend();
     }
   }
 
@@ -42,7 +48,6 @@ export class Stereo extends LitElement {
    * Plays the given chiptune sample.
    */
   async play(sample: Chiptune) {
-    // Mix the chiptune into a sample
     const { vol, ch1, ch2, ch3, ch4 } = sample;
     const out = [ch1, ch2, ch3, ch4].reduce(
       (acc, itm) => {
@@ -52,14 +57,12 @@ export class Stereo extends LitElement {
       },
       { lt: 0, rt: 0 },
     );
-
-    // Forward sample to the processor
     this.node?.port.postMessage(out);
   }
 
   render() {
     return html`
-      <div @click=${this.resume}>
+      <div>
         <span></span>
         <span></span>
         <span></span>
@@ -83,8 +86,17 @@ export class Stereo extends LitElement {
     }
 
     span {
-      background-color: #5f5e61;
+      background: light-dark(
+        radial-gradient(ellipse 80% 30% at 50% 15%, #3c3a3e, #0c0b0d),
+        radial-gradient(ellipse 80% 30% at 50% 15%, #252428, #0c0b0d)
+      );
       border-radius: 1em;
+      box-shadow:
+        inset 0 3px 4px light-dark(#000000e6, #000000b3),
+        inset 0 -3px 4px light-dark(#000000e6, #000000b3),
+        inset 2px 0 3px light-dark(#00000099, #00000066),
+        inset -2px 0 3px light-dark(#00000099, #00000066),
+        0 1px 0 light-dark(#ffffff1a, #ffffff0f);
       height: 10em;
       width: 1em;
     }

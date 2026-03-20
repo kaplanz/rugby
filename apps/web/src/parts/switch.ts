@@ -1,7 +1,7 @@
-import { LitElement, css, html } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
-import type { App } from "./rugby";
+import type { App } from "../app";
 import type { Screen } from "./screen";
 
 @customElement("gb-switch")
@@ -36,7 +36,9 @@ export class Stereo extends LitElement {
         ?checked=${this.app.cfg.run}
       ></input>
       <label for="switch">
-        <span>&#x25c0;&#xfe0e; off &bullet; on &#x25b6;&#xfe0e;</span>
+        <span class="off">&#x25c0;&#xfe0e; off</span>
+        <span class="dot">&bullet;</span>
+        <span class="on">on &#x25b6;&#xfe0e;</span>
       </label>
       <div>
         <span></span>
@@ -66,6 +68,25 @@ export class Stereo extends LitElement {
       font-weight: 900;
       padding: .25em .75em;
       text-transform: uppercase;
+      transition: background-color .3s, filter .3s;
+
+      &:hover {
+        filter: brightness(110%);
+      }
+
+      &:active {
+        filter: brightness(80%);
+      }
+
+      .off, .on {
+        opacity: 0.45;
+        transition: opacity .3s;
+      }
+    }
+
+    input:not(:checked) ~ label .off,
+    input:checked ~ label .on {
+      opacity: 1;
     }
 
     div {
