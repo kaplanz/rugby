@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "vite";
 
@@ -16,6 +17,17 @@ export default defineConfig({
       "top-level-await": true,
     },
   },
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
   plugins: [wasm()],
-  publicDir: "www",
+  build: {
+    lib: {
+      entry: "src/lib.ts",
+      formats: ["es"],
+      fileName: "rugby",
+    },
+  },
 });

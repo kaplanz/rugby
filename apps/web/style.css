@@ -1,0 +1,12 @@
+html,
+body {
+  touch-action: manipulation;
+}
+
+body {
+  background: light-dark(#a2c8c8, #2f4f4f);
+}
+
+game-boy {
+  margin: 1em;
+}

@@ -1,11 +1,10 @@
-import { LitElement, css, html, unsafeCSS } from "lit";
+import type { SlDialog, SlTabGroup } from "@shoelace-style/shoelace";
+import { Code, FileUp, Link, Play, Trash2, X } from "lucide";
+import { css, html, LitElement, unsafeCSS } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 
 import { Cartridge } from "rugby-wasm";
-
-import type { App } from "./rugby";
-
-import type { SlDialog, SlTabGroup } from "@shoelace-style/shoelace";
+import type { App } from "../app";
 
 import "@shoelace-style/shoelace/dist/components/badge/badge";
 import "@shoelace-style/shoelace/dist/components/button/button";
@@ -18,9 +17,10 @@ import "@shoelace-style/shoelace/dist/components/tab-group/tab-group";
 import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel";
 import "@shoelace-style/shoelace/dist/components/tab/tab";
 
-import fontAwesome from "@fortawesome/fontawesome-free/css/all.min.css?raw";
 import shoelaceDark from "@shoelace-style/shoelace/dist/themes/dark.css?raw";
 import shoelaceLight from "@shoelace-style/shoelace/dist/themes/light.css?raw";
+
+import { icon } from "../util";
 
 /**
  * Library database name.
@@ -323,7 +323,6 @@ export class Dialog extends LitElement {
 
   render() {
     return html`
-      <button id="show" @click="${this.show}">&#x2139;&#xfe0e;</button>
       <sl-dialog
         @sl-show=${this.onShow.bind(this)}
         @sl-hide=${this.onHide.bind(this)}
@@ -355,13 +354,13 @@ export class Dialog extends LitElement {
             <footer>
               <nav>
                 <a href="https://github.com/kaplanz/rugby/tree/${
-                  // @ts-ignore
+                  // @ts-expect-error
                   BUILD.COMMIT
                 }" target=”_blank”>
-                  <i class="fa-brands fa-github"></i>
+                  ${icon(Code)}
                 </a>
-                <a href="https://zakhary.dev" target=”_blank”>
-                  <i class="fa-solid fa-link"></i>
+                <a href=”https://zakhary.dev” target=”_blank”>
+                  ${icon(Link)}
                 </a>
               <nav>
             </footer>
@@ -418,13 +417,14 @@ export class Dialog extends LitElement {
             <div class="menu">
               <sl-button @click=${() => this.rom.click()}>
                 <span>Upload</span>
-                <i slot="suffix" class="fa-solid fa-file-arrow-up"></i>
+                <span slot="suffix">${icon(FileUp)}</span>
                 <input
                   type="file"
                   accept=".gb,.gbc"
                   style="display: none;"
                   @change=${
                     // biome-ignore lint/style/noNonNullAssertion: none
+                    // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: none
                     () => this.database.upload(this.rom.files?.item(0)!)
                   }
                 />
@@ -435,7 +435,7 @@ export class Dialog extends LitElement {
                 @click=${this.database.drop.bind(this)}
               >
                 <span>Clear</span>
-                <i slot="suffix" class="fa-regular fa-trash-can"></i>
+                <span slot="suffix">${icon(Trash2)}</span>
               </sl-button>
             </div>
             <sl-divider></sl-divider>
@@ -448,7 +448,7 @@ export class Dialog extends LitElement {
                     outline
                     @click=${() => this.database.play(game.id)}
                   >
-                    <i class="fa-solid fa-play"></i>
+                    ${icon(Play)}
                   </sl-button>
                   <span>${game.name}</span>
                   <sl-button
@@ -456,7 +456,7 @@ export class Dialog extends LitElement {
                     outline
                     @click=${() => this.database.delete(game.id)}
                   >
-                    <i class="fa-solid fa-xmark"></i>
+                    ${icon(X)}
                   </sl-button>
                 </li>
               `,
@@ -505,33 +505,6 @@ export class Dialog extends LitElement {
 
       @media (prefers-color-scheme: dark) {
         ${unsafeCSS(shoelaceDark)}
-      }
-
-      #show {
-        position: absolute;
-        right: 0;
-        z-index: 1;
-
-        box-sizing: border-box;
-        height: 1.5em;
-        width: 1.5em;
-        margin: 1em;
-        padding: 0;
-
-        border-color: light-dark(#1c1a19, #5f5e61);
-        border-radius: 20px;
-        border-style: solid;
-        border-width: 2px;
-        box-shadow: 0 5px 15px -5px black;
-
-        background-color: light-dark(#c5c0bd, #1c1a19);
-        color: inherit;
-        cursor: pointer;
-        font-size: 1.3em;
-
-        &:active {
-          filter: brightness(60%);
-        }
       }
 
       sl-dialog {
@@ -680,6 +653,5 @@ export class Dialog extends LitElement {
         }
       }
     `,
-    unsafeCSS(fontAwesome),
   ];
 }
