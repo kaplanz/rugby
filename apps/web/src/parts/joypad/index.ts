@@ -1,4 +1,4 @@
-import { LitElement, css, html } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import { type GameBoy, Button as Kind } from "rugby-wasm";
@@ -128,7 +128,7 @@ export class Joypad extends LitElement {
       .btm {
         .menu {
           display: flex;
-          gap: 2em;
+          gap: 1.2em;
           transform: translateX(-2em);
 
           gb-button {

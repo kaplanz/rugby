@@ -19,16 +19,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.1",
-    "@shoelace-style/shoelace": "^2.19.0",
-    "lit": "^3.2.1",
+    "@shoelace-style/shoelace": "^2.20.1",
+    "lit": "^3.3.2",
+    "lucide": "^0.577.0",
     "rugby-wasm": "workspace:pkg",
-    "vite-plugin-wasm": "^3.3.0"
+    "vite-plugin-wasm": "^3.6.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.1",
+    "@biomejs/biome": "^2.4.8",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.1",
     "wasm-pack": "^0.14.0"
   }
 }
