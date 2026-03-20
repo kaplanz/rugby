@@ -3,8 +3,7 @@
   font-family: "Cabin";
   font-weight: 100 900;
   font-style: normal;
-  font-variation-settings:
-    "wdth" 100;
+  font-variation-settings: "wdth" 100;
   src: url("fonts/Cabin[wdth,wght].ttf") format("truetype");
 }
 
@@ -13,7 +12,6 @@
   font-family: "Cabin";
   font-weight: 100 900;
   font-style: italic;
-  font-variation-settings:
-    "wdth" 100;
+  font-variation-settings: "wdth" 100;
   src: url("fonts/Cabin-Italic[wdth,wght].ttf") format("truetype");
 }
