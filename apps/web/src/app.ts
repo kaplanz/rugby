@@ -1,9 +1,9 @@
 import { GameBoy } from "rugby-wasm";
 
-import type { Screen } from "./screen";
-import type { Stereo } from "./stereo";
+import type { Screen } from "./parts/screen";
+import type { Stereo } from "./parts/stereo";
 
-import { SAMPLE } from "./stereo";
+import { SAMPLE } from "./parts/stereo";
 
 /**
  * Clock frequency.

@@ -1,18 +1,31 @@
-import { LitElement, css, html } from "lit";
+import "@/assets/fonts/index.css";
+
+import noise from "@/assets/img/noise.png";
+
+import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
+import { css, html, LitElement, unsafeCSS } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
+
+import { Settings, Volume2, VolumeX } from "lucide";
 
 import { Cartridge, demo } from "rugby-wasm";
 
-import { App } from "./rugby";
-import type { Dialog } from "./dialog";
-import type { Screen } from "./screen";
-import type { Stereo } from "./stereo";
+setBasePath(
+  "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.0/cdn/",
+);
 
-import "./dialog";
-import "./joypad";
-import "./screen";
-import "./stereo";
-import "./switch";
+import type { Dialog } from "./parts/dialog";
+import { App } from "./app";
+import type { Screen } from "./parts/screen";
+import type { Stereo } from "./parts/stereo";
+
+import "./parts/dialog";
+import "./parts/joypad";
+import "./parts/screen";
+import "./parts/stereo";
+import "./parts/switch";
+
+import { icon } from "./util";
 
 /**
  * Game Boy emulator.
@@ -41,6 +54,11 @@ export class GameBoy extends LitElement {
   menu() {
     this.cfg.show();
   }
+
+  private toggleAudio = async () => {
+    await this.apu.toggle();
+    this.requestUpdate();
+  };
 
   constructor() {
     super();
@@ -82,6 +100,10 @@ export class GameBoy extends LitElement {
       <gb-dialog .app=${this.app}></gb-dialog>
       <main>
         <gb-switch .app=${this.app} .lcd=${this.lcd}></gb-switch>
+        <div id="controls">
+          <button id="menu" @click=${() => this.cfg.show()}>${icon(Settings)}</button>
+          <button id="audio" @click=${this.toggleAudio}>${this.apu?.playing ? icon(Volume2) : icon(VolumeX)}</button>
+        </div>
         <div class="top">
           <div class="shape"></div>
           <div class="frame">
@@ -116,7 +138,6 @@ export class GameBoy extends LitElement {
       -webkit-user-select: none;
 
       @media (hover: none) {
-        touch-action: none;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
       }
@@ -142,8 +163,12 @@ export class GameBoy extends LitElement {
       border-width: .5em;
       box-shadow: 0 10px 30px -10px black;
       box-sizing: border-box;
+      overflow: hidden;
 
       background-color: light-dark(#c5c0bd, #1c1a19);
+      background-image: url(${unsafeCSS(noise)});
+      background-blend-mode: soft-light;
+
       color: #204786;
       font-family: "Cabin";
       font-size: min(7.40px, 148dvw / 90, 1dvh);
@@ -153,6 +178,48 @@ export class GameBoy extends LitElement {
         position: absolute;
         top: 1.25em;
         z-index: 1;
+      }
+
+      #controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+
+        display: flex;
+        gap: .5em;
+        margin: .5em;
+
+        button {
+          padding: 0;
+          border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+          background: color-mix(in srgb, currentColor 6%, transparent);
+          color: light-dark(#204786, #7aa0dd);
+          cursor: pointer;
+          font-size: clamp(14px, 2dvh, 22px);
+          transition: background .3s, border-color .3s;
+
+          width: 1.75em;
+          height: 1.75em;
+
+          @media (hover: none) {
+            font-size: clamp(20px, 2dvh, 28px);
+          }
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+
+          &:hover {
+            background: color-mix(in srgb, currentColor 20%, transparent);
+            border-color: color-mix(in srgb, currentColor 70%, transparent);
+          }
+
+          &:active {
+            background: color-mix(in srgb, currentColor 40%, transparent);
+            border-color: color-mix(in srgb, currentColor 90%, transparent);
+          }
+        }
+
       }
 
       .top {

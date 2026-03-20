@@ -1,4 +1,4 @@
-import { LitElement, css, html } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
 const SIZE = { wd: 160, ht: 144 };
@@ -8,7 +8,8 @@ export class Screen extends LitElement {
   private ctx!: CanvasRenderingContext2D;
 
   firstUpdated() {
-    // biome-ignore lint: lint/style/noNonNullAssertion
+    // biome-ignore lint/style/noNonNullAssertion: none
+    // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: none
     this.ctx = this.shadowRoot?.querySelector("canvas")?.getContext("2d")!;
   }
 
