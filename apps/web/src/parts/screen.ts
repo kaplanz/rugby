@@ -39,7 +39,6 @@ export class Screen extends LitElement {
 
     // Display the image in the canvas
     this.ctx.putImageData(this.image, 0, 0);
-    this.requestUpdate(); // redraw canvas
   }
 
   render() {
