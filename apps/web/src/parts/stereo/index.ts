@@ -5,7 +5,7 @@ import type { Chiptune } from "rugby-wasm";
 
 import worklet from "./worklet.js?raw";
 
-export const SAMPLE = 96_000;
+export const SAMPLE = 44_100;
 
 @customElement("gb-stereo")
 export class Stereo extends LitElement {
