@@ -127,7 +127,7 @@ export default async function(cfg) {
   // Copy static assets
   cfg.addPassthroughCopy({ "src/www": "/" });
   // Copy web app demo
-  cfg.addPassthroughCopy({ "../apps/web/dist": "/demo" });
+  cfg.addPassthroughCopy({ "node_modules/rugby-web/dist": "/demo" });
 
   // HTML base plugin
   cfg.addPlugin(HtmlBasePlugin);
