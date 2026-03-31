@@ -7,10 +7,16 @@ const SIZE = { wd: 160, ht: 144 };
 export class Screen extends LitElement {
   private ctx!: CanvasRenderingContext2D;
 
+  /**
+   * Image frame buffer.
+   */
+  private image!: ImageData;
+
   firstUpdated() {
     // biome-ignore lint/style/noNonNullAssertion: none
     // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: none
     this.ctx = this.shadowRoot?.querySelector("canvas")?.getContext("2d")!;
+    this.image = this.ctx.createImageData(160, 144);
   }
 
   clear() {
@@ -21,21 +27,18 @@ export class Screen extends LitElement {
    * Redraws the screen using the frame.
    */
   redraw(frame: Uint8Array) {
-    // Create an image to draw to the canvas
-    const image = this.ctx.createImageData(160, 144);
-
     // Draw extracted frame data into the canvas
     for (let idx = 0; idx < 160 * 144; idx++) {
       // Don't use any color channels
-      image.data[4 * idx + 0] = 0;
-      image.data[4 * idx + 1] = 0;
-      image.data[4 * idx + 2] = 0;
+      this.image.data[4 * idx + 0] = 0;
+      this.image.data[4 * idx + 1] = 0;
+      this.image.data[4 * idx + 2] = 0;
       // Instead, just use alpha channel
-      image.data[4 * idx + 3] = 32 * (frame[idx] ?? 0);
+      this.image.data[4 * idx + 3] = 32 * (frame[idx] ?? 0);
     }
 
     // Display the image in the canvas
-    this.ctx.putImageData(image, 0, 0);
+    this.ctx.putImageData(this.image, 0, 0);
     this.requestUpdate(); // redraw canvas
   }
 
