@@ -16,7 +16,7 @@ export class Screen extends LitElement {
     // biome-ignore lint/style/noNonNullAssertion: none
     // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: none
     this.ctx = this.shadowRoot?.querySelector("canvas")?.getContext("2d")!;
-    this.image = this.ctx.createImageData(160, 144);
+    this.image = this.ctx.createImageData(SIZE.wd, SIZE.ht);
   }
 
   clear() {
@@ -28,7 +28,7 @@ export class Screen extends LitElement {
    */
   redraw(frame: Uint8Array) {
     // Draw extracted frame data into the canvas
-    for (let idx = 0; idx < 160 * 144; idx++) {
+    for (let idx = 0; idx < SIZE.wd * SIZE.ht; idx++) {
       // Don't use any color channels
       this.image.data[4 * idx + 0] = 0;
       this.image.data[4 * idx + 1] = 0;
