@@ -36,6 +36,8 @@ export class App {
     spd: 1.0,
     /** Clock thread handle. */
     tid: undefined as number | undefined,
+    /** Audio sample accumulator. */
+    acc: 0,
   };
 
   /**
@@ -90,13 +92,18 @@ export class App {
     for (let tick = 0; tick < (this.ctx.spd * FRQ) / DIV; tick++) {
       // Emulate a single cycle
       this.emu.cycle();
-      // Sample audio output
-      if (tick % Math.floor((this.ctx.spd * FRQ) / SAMPLE) === 0) {
+
+      // Advance fractional accumulator
+      this.ctx.acc += SAMPLE;
+      // Sample audio output on each accumulated period
+      if (this.ctx.acc >= this.ctx.spd * FRQ) {
+        this.ctx.acc -= this.ctx.spd * FRQ;
         // Fetch current sample
         const sample = this.emu.sample();
         // Play sample
         this.gui.apu?.play(sample);
       }
+
       // Redraw on vertical sync
       if (this.gui.lcd && this.emu.vsync()) {
         // Get next frame
