@@ -33,7 +33,7 @@ export class Stereo extends LitElement {
         id="switch"
         type="checkbox"
         @click=${this.enable.bind(this)}
-        ?checked=${this.app.cfg.run}
+        ?checked=${this.app.ctx.run}
       ></input>
       <label for="switch">
         <span class="off">&#x25c0;&#xfe0e; off</span>
