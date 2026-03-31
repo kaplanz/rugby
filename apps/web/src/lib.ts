@@ -111,7 +111,7 @@ export class GameBoy extends LitElement {
               <span>Dot Matrix with Stereo Sound</span>
             </div>
             <div class="power">
-              <div class="led" ?power="${this.app.cfg.run}"></div>
+              <div class="led" ?power="${this.app.ctx.run}"></div>
               <div class="txt">battery</div>
             </div>
             <gb-screen></gb-screen>
