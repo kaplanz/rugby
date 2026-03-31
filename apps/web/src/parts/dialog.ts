@@ -76,7 +76,7 @@ export class Dialog extends LitElement {
    */
   private onShow() {
     // Store emulator state
-    this.run = this.app.cfg.run;
+    this.run = this.app.ctx.run;
     // Pause the emulator
     this.app.play(false);
   }
@@ -482,7 +482,7 @@ export class Dialog extends LitElement {
               min="0"
               max="3"
               step=".1"
-              value=${this.app.cfg.spd}
+              value=${this.app.ctx.spd}
               @sl-change=${this.settings.spd.bind(this)}
             >
               <span slot="label">Speed</span>
