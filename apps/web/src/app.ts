@@ -54,31 +54,46 @@ export class App {
   draw: () => void = () => {};
 
   /**
-   * Play or pause emulation.
+   * Starts emulation.
    */
-  play(enable = true) {
-    this.ctx.run = enable;
+  start() {
+    // Update running state
+    this.ctx.run = true;
+    // Start emulation loop
+    this.ctx.tid ??= requestAnimationFrame(this.loop.bind(this));
+    // Redraw application
+    this.draw();
+  }
+
+  /**
+   * Stops emulation.
+   */
+  stop() {
+    // Update running state
+    this.ctx.run = false;
+    // Stop emulation loop
+    if (this.ctx.tid) {
+      cancelAnimationFrame(this.ctx.tid);
+      this.ctx.tid = undefined;
+    }
+    // Reset frame timestamp
+    this.ctx.prv = undefined;
+    // Redraw application
     this.draw();
   }
 
   /**
    * Change emulation speed.
    */
-  tick(speed = 0) {
-    // Stop loop
-    if (this.ctx.tid) {
-      cancelAnimationFrame(this.ctx.tid);
-      this.ctx.tid = undefined;
-    }
-    // Update speed
-    this.ctx.spd = speed;
-    // Start loop
-    if (this.ctx.spd)
-      this.ctx.tid = requestAnimationFrame(this.loop.bind(this));
+  speed(value: number) {
+    this.ctx.spd = value;
   }
 
   /**
-   * Runs one animation frame.
+   * Animates a single animation frame.
+   *
+   * This may execute several emulated cycles, depending on how much time has
+   * elapsed.
    */
   private loop(now: number) {
     // Schedule next frame

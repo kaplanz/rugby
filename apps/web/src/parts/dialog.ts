@@ -78,7 +78,7 @@ export class Dialog extends LitElement {
     // Store emulator state
     this.run = this.app.ctx.run;
     // Pause the emulator
-    this.app.play(false);
+    this.app.stop();
   }
 
   /** Hide the dialog. */
@@ -91,7 +91,7 @@ export class Dialog extends LitElement {
    */
   private onHide() {
     // Restore emulator state
-    this.app.play(this.run);
+    this.run ? this.app.start() : this.app.stop();
   }
 
   /**
@@ -265,7 +265,7 @@ export class Dialog extends LitElement {
      * */
     play: async (id: number) => {
       // Pause emulator
-      this.app.play(false);
+      this.app.stop();
       // Retrieve game data
       const game = await this.database.query(id);
       // Construct a cartridge
@@ -275,7 +275,7 @@ export class Dialog extends LitElement {
       this.app.emu.insert(cart);
       this.app.emu.reset();
       // Resume emulation
-      this.app.play();
+      this.app.start();
       // Hide the dialog
       this.hide();
     },
@@ -301,7 +301,7 @@ export class Dialog extends LitElement {
       const speed = Number((event.target as HTMLInputElement).value);
       console.log(`updated speed: ${speed}`);
       // Update emulator speed
-      this.app.tick(speed);
+      this.app.speed(speed);
     },
   };
 

@@ -23,8 +23,8 @@ export class Stereo extends LitElement {
       // Reset the emulator
       this.app.emu.reset();
     }
-    // Play/stop emulation
-    this.app.play(this.box.checked);
+    // Play/pause emulation
+    this.box.checked ? this.app.start() : this.app.stop();
   }
 
   render() {
