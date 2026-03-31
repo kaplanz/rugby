@@ -27,18 +27,15 @@ const DIV = 32;
  */
 export class App {
   /**
-   * Application configuration.
+   * Application context.
    */
-  cfg: {
+  ctx = {
     /** Running status. */
-    run: boolean;
-    /** Emulated clock speed. */
-    spd: number;
-    /** Clock thread handle. */
-    tid?: number;
-  } = {
     run: false,
+    /** Emulated clock speed. */
     spd: 1.0,
+    /** Clock thread handle. */
+    tid: undefined as number | undefined,
   };
 
   /**
@@ -65,7 +62,7 @@ export class App {
    * Play or pause emulation.
    */
   play(enable = true) {
-    this.cfg.run = enable;
+    this.ctx.run = enable;
     this.draw();
   }
 
@@ -74,12 +71,12 @@ export class App {
    */
   tick(speed = 0) {
     // Clear emulation thread
-    if (this.cfg.tid) clearInterval(this.cfg.tid);
+    if (this.ctx.tid) clearInterval(this.ctx.tid);
     // Update internal speed
-    this.cfg.spd = speed;
+    this.ctx.spd = speed;
     // Start emulation thread
-    if (this.cfg.spd)
-      this.cfg.tid = setInterval(this.cycle.bind(this), 1000 / DIV);
+    if (this.ctx.spd)
+      this.ctx.tid = setInterval(this.cycle.bind(this), 1000 / DIV);
   }
 
   /**
@@ -87,14 +84,14 @@ export class App {
    */
   private cycle() {
     // No-op if paused
-    if (!this.cfg.run) return;
+    if (!this.ctx.run) return;
 
     // Iterate pending cycles
-    for (let tick = 0; tick < (this.cfg.spd * FRQ) / DIV; tick++) {
+    for (let tick = 0; tick < (this.ctx.spd * FRQ) / DIV; tick++) {
       // Emulate a single cycle
       this.emu.cycle();
       // Sample audio output
-      if (tick % Math.floor((this.cfg.spd * FRQ) / SAMPLE) === 0) {
+      if (tick % Math.floor((this.ctx.spd * FRQ) / SAMPLE) === 0) {
         // Fetch current sample
         const sample = this.emu.sample();
         // Play sample
