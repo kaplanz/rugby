@@ -14,15 +14,6 @@ import { SAMPLE } from "./parts/stereo";
 export const FRQ = 4194304;
 
 /**
- * Clock divider.
- *
- * @remarks
- * As an optimization, we use a clock divider and simulate a batch of `DIV`
- * cycles at a frequency of `FRQ / DIV`.
- */
-const DIV = 32;
-
-/**
  * Application state.
  */
 export class App {
@@ -34,10 +25,12 @@ export class App {
     run: false,
     /** Emulated clock speed. */
     spd: 1.0,
-    /** Clock thread handle. */
+    /** Animation frame handle. */
     tid: undefined as number | undefined,
     /** Audio sample accumulator. */
     acc: 0,
+    /** Previous frame timestamp. */
+    prv: undefined as number | undefined,
   };
 
   /**
@@ -72,24 +65,38 @@ export class App {
    * Change emulation speed.
    */
   tick(speed = 0) {
-    // Clear emulation thread
-    if (this.ctx.tid) clearInterval(this.ctx.tid);
-    // Update internal speed
+    // Stop loop
+    if (this.ctx.tid) {
+      cancelAnimationFrame(this.ctx.tid);
+      this.ctx.tid = undefined;
+    }
+    // Update speed
     this.ctx.spd = speed;
-    // Start emulation thread
+    // Start loop
     if (this.ctx.spd)
-      this.ctx.tid = setInterval(this.cycle.bind(this), 1000 / DIV);
+      this.ctx.tid = requestAnimationFrame(this.loop.bind(this));
   }
 
   /**
-   * Emulates a single cycle.
+   * Runs one animation frame.
    */
-  private cycle() {
-    // No-op if paused
+  private loop(now: number) {
+    // Schedule next frame
+    this.ctx.tid = requestAnimationFrame(this.loop.bind(this));
+
+    // No-op if not running
     if (!this.ctx.run) return;
 
+    // Compute elapsed time
+    //
+    // Number of cycles to emulate depends on much time has elapsed since the
+    // last frame. Avoid runaway emulation by limiting to at most 100ms.
+    const delta = Math.min(now - (this.ctx.prv ?? now), 100) / 1000;
+    // Update timestamp
+    this.ctx.prv = now;
+
     // Iterate pending cycles
-    for (let tick = 0; tick < (this.ctx.spd * FRQ) / DIV; tick++) {
+    for (let tick = 0; tick < this.ctx.spd * FRQ * delta; tick++) {
       // Emulate a single cycle
       this.emu.cycle();
 
