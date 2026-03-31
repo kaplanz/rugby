@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "bind/wasm",
+    "site",
+    "site/pkg/*"
+  ]
+}
