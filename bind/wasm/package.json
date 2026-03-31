@@ -1,0 +1,14 @@
+{
+  "name": "rugby-wasm",
+  "type": "module",
+  "private": true,
+  "main": "pkg/rugby.js",
+  "types": "pkg/rugby.d.ts",
+  "scripts": {
+    "prepare": "bun run build",
+    "build": "wasm-pack build"
+  },
+  "devDependencies": {
+    "wasm-pack": "^0.14.0"
+  }
+}

@@ -2,13 +2,10 @@
   "name": "site",
   "type": "module",
   "private": true,
-  "workspaces": [
-    "pkg/*"
-  ],
   "scripts": {
+    "prebuild": "bun run -Frugby-web build",
+    "predev": "bun run prebuild",
     "build": "eleventy",
-    "build:demo": "bun --cwd=../apps/web run build",
-    "prebuild": "bun run build:demo",
     "start": "eleventy --serve --quiet",
     "dev": "eleventy --serve"
   },
@@ -20,6 +17,7 @@
     "markdown-it-anchor": "^9.2.0",
     "markdown-it-deflist": "^3.0.0",
     "markdown-it-github-alerts": "^1.0.0",
-    "markdown-it-inline-footnotes": "workspace:*"
+    "markdown-it-inline-footnotes": "workspace:*",
+    "rugby-web": "workspace:*"
   }
 }
