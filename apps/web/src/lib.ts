@@ -80,19 +80,17 @@ export class GameBoy extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    // Start emulation loop
-    this.app.tick(1.0);
     // Insert a game cartridge
     this.app.emu.insert(new Cartridge(demo()));
     // Enable emulation.
-    this.app.play();
+    this.app.start();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
     // Clear emulation loop
-    this.app.tick();
+    this.app.stop();
   }
 
   render() {
