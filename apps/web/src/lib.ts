@@ -136,6 +136,8 @@ export class GameBoy extends LitElement {
       aspect-ratio: 90 / 148;
       inline-size: 100%;
       max-inline-size: 450px;
+
+      place-self: center;
     }
 
     main {
