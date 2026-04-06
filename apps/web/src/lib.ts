@@ -131,6 +131,10 @@ export class GameBoy extends LitElement {
   static styles = css`
     :host {
       display: block;
+      inline-size: 100%;
+      max-inline-size: 450px;
+      aspect-ratio: 90 / 148;
+      container-type: size;
 
       user-select: none;
       -webkit-user-select: none;
@@ -147,18 +151,16 @@ export class GameBoy extends LitElement {
       justify-content: space-between;
       position: relative;
 
-      aspect-ratio: 90 / 148;
-      height: min(740px, 148dvw / .9, 100dvh);
-      max-width: min(450px, 100dvw);
+      block-size: 100cqb;
+      inline-size: 100cqi;
 
-      margin: auto;
-      padding: 4em;
+      padding: 4cqb;
 
       border-color: light-dark(#1c1a19, #5f5e61);
-      border-radius: 2.5em;
-      border-bottom-right-radius: 15em;
+      border-radius: 2.5cqb;
+      border-bottom-right-radius: 15cqb;
       border-style: solid;
-      border-width: .5em;
+      border-width: .5cqb;
       box-shadow: 0 10px 30px -10px black;
       box-sizing: border-box;
       overflow: hidden;
@@ -169,12 +171,12 @@ export class GameBoy extends LitElement {
 
       color: #204786;
       font-family: "Cabin";
-      font-size: min(7.40px, 148dvw / 90, 1dvh);
+      font-size: min(7.40px, 1cqb);
 
       gb-switch {
-        left: 6em;
+        left: 6cqb;
         position: absolute;
-        top: 1.25em;
+        top: 1.25cqb;
         z-index: 1;
       }
 
@@ -185,8 +187,8 @@ export class GameBoy extends LitElement {
         z-index: 1;
 
         display: flex;
-        gap: .5em;
-        margin: .5em;
+        gap: .5cqb;
+        margin: 1cqb;
 
         button {
           padding: 0;
@@ -194,15 +196,12 @@ export class GameBoy extends LitElement {
           background: color-mix(in srgb, currentColor 6%, transparent);
           color: light-dark(#204786, #7aa0dd);
           cursor: pointer;
-          font-size: clamp(14px, 2dvh, 22px);
+          font-size: 3cqb;
           transition: background .3s, border-color .3s;
 
-          width: 1.75em;
-          height: 1.75em;
+          width: 5cqb;
+          height: 5cqb;
 
-          @media (hover: none) {
-            font-size: clamp(20px, 2dvh, 28px);
-          }
           border-radius: 50%;
           display: grid;
           place-items: center;
@@ -225,66 +224,66 @@ export class GameBoy extends LitElement {
 
         .shape {
           background-color: light-dark(#928f8d, #5f5e61);
-          height: .75em;
-          left: -4em;
+          height: .75cqb;
+          left: -4cqb;
           position: absolute;
           top: 0;
-          width: calc(100% + 8em);
+          width: calc(100% + 8cqb);
 
           &:before,
           &:after {
             background-color: inherit;
             content: "";
             display: block;
-            height: 4em;
+            height: 4cqb;
             position: absolute;
-            top: -4em;
-            width: .75em;
+            top: -4cqb;
+            width: .75cqb;
           }
 
           &:before {
-            left: 4em;
+            left: 4cqb;
           }
 
           &:after {
-            right: 4em;
+            right: 4cqb;
           }
         }
 
         .frame {
           background-color: #585862;
-          border: .2em solid light-dark(#1c1a19, #5f5e61);
-          border-radius: 2em;
-          border-bottom-right-radius: 8em;
+          border: .2cqb solid light-dark(#1c1a19, #5f5e61);
+          border-radius: 2cqb;
+          border-bottom-right-radius: 8cqb;
           color: #c5c0bd;
           font-weight: 100;
-          letter-spacing: .15em;
-          margin-top: 3em;
+          letter-spacing: .15cqb;
+          margin-top: 3cqb;
           padding: 7.5% 18%;
           position: relative;
           text-transform: uppercase;
 
           .label {
             display: flex;
-            gap: .5em;
+            gap: .5cqb;
             left: 0;
-            margin: 0 2em;
+            margin: 0 2cqb;
             place-content: space-between;
             position: absolute;
             right: 0;
-            top: 1.25em;
+            top: 1.25cqb;
 
             span {
-              font-size: 1.4em;
+              font-size: 1.4cqb;
             }
 
             &:before,
             &:after {
-              border-bottom: .45em solid #204786;
-              border-top: .45em solid #9a2257;
+              border-bottom: .45cqb solid #204786;
+              border-top: .45cqb solid #9a2257;
               content: "";
               display: inline-block;
-              height: .6em;
+              height: .6cqb;
             }
 
             &:before {
@@ -301,31 +300,31 @@ export class GameBoy extends LitElement {
           .power {
             display: flex;
             flex-direction: column;
-            font-size: .9em;
-            gap: 1.6em;
+            font-size: .9cqb;
+            gap: 1.6cqb;
             position: absolute;
-            left: 2em;
+            left: 2cqb;
             top: 36%;
 
             .txt {
-              font-size: 1.4em;
+              font-size: 1.4cqb;
             }
 
             .led {
               aspect-ratio: 1;
               background-color: black;
-              border: .25em solid black;
+              border: .25cqb solid black;
               border-radius: 50%;
               box-sizing: border-box;
               display: block;
-              left: 1em;
+              left: 1cqb;
               position: relative;
-              width: 1.8em;
+              width: 1.8cqb;
 
               &[power] {
                 background-color: red;
-                box-shadow: 0 0 3em .5em red;
-                filter: blur(.2em);
+                box-shadow: 0 0 3cqb .5cqb red;
+                filter: blur(.2cqb);
               }
             }
           }
@@ -337,11 +336,11 @@ export class GameBoy extends LitElement {
 
           .brand {
             font-family: "Pretendo";
-            font-size: 2.5em;
+            font-size: 2.5cqb;
           }
 
           .model {
-            font-size: 4.5em;
+            font-size: 4.5cqb;
             font-style: italic;
             font-weight: 600;
             text-transform: uppercase;
@@ -360,7 +359,7 @@ export class GameBoy extends LitElement {
         position: relative;
 
         gb-joypad {
-          margin-bottom: 9em;
+          margin-bottom: 9cqb;
         }
 
         gb-stereo {
