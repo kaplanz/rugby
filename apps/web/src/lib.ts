@@ -130,11 +130,12 @@ export class GameBoy extends LitElement {
 
   static styles = css`
     :host {
+      container-type: size;
       display: block;
+
+      aspect-ratio: 90 / 148;
       inline-size: 100%;
       max-inline-size: 450px;
-      aspect-ratio: 90 / 148;
-      container-type: size;
 
       user-select: none;
       -webkit-user-select: none;
