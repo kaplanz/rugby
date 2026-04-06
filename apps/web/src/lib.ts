@@ -136,14 +136,6 @@ export class GameBoy extends LitElement {
       aspect-ratio: 90 / 148;
       inline-size: 100%;
       max-inline-size: 450px;
-
-      user-select: none;
-      -webkit-user-select: none;
-
-      @media (hover: none) {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-      }
     }
 
     main {
@@ -173,6 +165,16 @@ export class GameBoy extends LitElement {
       color: #204786;
       font-family: "Cabin";
       font-size: min(7.40px, 1cqb);
+
+      touch-action: manipulation;
+
+      user-select: none;
+      -webkit-user-select: none;
+
+      @media (hover: none) {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+      }
 
       gb-switch {
         left: 6cqb;
