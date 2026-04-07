@@ -107,7 +107,7 @@ impl Ord for Entry {
 
 impl PartialEq for Entry {
     fn eq(&self, other: &Self) -> bool {
-        Rc::ptr_eq(&self.entry, &other.entry)
+        self.range == other.range && Rc::ptr_eq(&self.entry, &other.entry)
     }
 }
 
