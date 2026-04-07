@@ -59,14 +59,14 @@ impl Block for Sequencer {
     fn ready(&self) -> bool {
         // Check for falling edge
         let next = self.div.load() & Self::MASK != 0;
-        !self.bit && next
+        self.bit && !next
     }
 
     fn cycle(&mut self) {
         // Fetch current clock bit
         let next = self.div.load() & Self::MASK != 0;
         // Check for falling edge
-        if !self.bit && next {
+        if self.bit && !next {
             // Only tick the internal clock value on the falling edge of the
             // timer's divider.
             self.clk = self.clk.wrapping_add(1);
