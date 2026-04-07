@@ -56,7 +56,7 @@ behaviours.
 #### Results
 
 ```
-23 passed; 22 failed;
+26 passed; 19 failed;
 ```
 
 <details>
@@ -77,12 +77,12 @@ behaviours.
   |  ✅  | `cpu_instrs/individual/10-bit ops.gb`               |
   |  ✅  | `cpu_instrs/individual/11-op a,(hl).gb`             |
   |  ❌  | `dmg_sound/dmg_sound.gb`                            |
-  |  ❌  | `dmg_sound/rom_singles/01-registers.gb`             |
+  |  ✅  | `dmg_sound/rom_singles/01-registers.gb`             |
   |  ❌  | `dmg_sound/rom_singles/02-len ctr.gb`               |
   |  ❌  | `dmg_sound/rom_singles/03-trigger.gb`               |
-  |  ❌  | `dmg_sound/rom_singles/04-sweep.gb`                 |
+  |  ✅  | `dmg_sound/rom_singles/04-sweep.gb`                 |
   |  ❌  | `dmg_sound/rom_singles/05-sweep details.gb`         |
-  |  ❌  | `dmg_sound/rom_singles/06-overflow on trigger.gb`   |
+  |  ✅  | `dmg_sound/rom_singles/06-overflow on trigger.gb`   |
   |  ❌  | `dmg_sound/rom_singles/07-len sweep period sync.gb` |
   |  ❌  | `dmg_sound/rom_singles/08-len ctr during power.gb`  |
   |  ❌  | `dmg_sound/rom_singles/09-wave read while on.gb`    |
