@@ -171,7 +171,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-30 passed; 39 failed;
+32 passed; 37 failed;
 ```
 
 <details>
@@ -218,13 +218,13 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/ppu/hblank_ly_scx_timing-GS.gb`         |
   |  ✅  | `acceptance/ppu/intr_1_2_timing-GS.gb`              |
   |  ❌  | `acceptance/ppu/intr_2_0_timing.gb`                 |
-  |  ❌  | `acceptance/ppu/intr_2_mode0_timing.gb`             |
+  |  ✅  | `acceptance/ppu/intr_2_mode0_timing.gb`             |
   |  ❌  | `acceptance/ppu/intr_2_mode0_timing_sprites.gb`     |
   |  ❌  | `acceptance/ppu/intr_2_mode3_timing.gb`             |
   |  ❌  | `acceptance/ppu/intr_2_oam_ok_timing.gb`            |
   |  ❌  | `acceptance/ppu/lcdon_timing-GS.gb`                 |
   |  ❌  | `acceptance/ppu/lcdon_write_timing-GS.gb`           |
-  |  ❌  | `acceptance/ppu/stat_irq_blocking.gb`               |
+  |  ✅  | `acceptance/ppu/stat_irq_blocking.gb`               |
   |  ❌  | `acceptance/ppu/stat_lyc_onoff.gb`                  |
   |  ❌  | `acceptance/ppu/vblank_stat_intr-GS.gb`             |
   |  ❌  | `acceptance/push_timing.gb`                         |
