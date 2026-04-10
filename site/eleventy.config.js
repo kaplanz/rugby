@@ -8,6 +8,7 @@ import markdownItDeflist from "markdown-it-deflist";
 import markdownItAnchor from "markdown-it-anchor";
 import markdownItGithubAlerts from "markdown-it-github-alerts";
 import markdownItInlineFootnotes from "markdown-it-inline-footnotes";
+import { tasklist as markdownItTasklist } from "@mdit/plugin-tasklist";
 
 // transforms
 import { transform } from "lightningcss";
@@ -150,6 +151,7 @@ export default async function(cfg) {
     md.use(markdownItDeflist)
       .use(markdownItGithubAlerts)
       .use(markdownItInlineFootnotes)
+      .use(markdownItTasklist)
       .use(markdownItAnchor, {
         permalink: markdownItAnchor.permalink.headerLink({
           safariReaderFix: true,
