@@ -28,6 +28,7 @@
       "name": "site",
       "dependencies": {
         "@11ty/eleventy": "^3.0.0",
+        "@mdit/plugin-tasklist": "^0.23.2",
         "htmlnano": "^3.0.0",
         "lightningcss": "^1.30.2",
         "markdown-it": "^14.1.0",
@@ -105,6 +106,8 @@
     "@lit/react": ["@lit/react@1.0.8", "", { "peerDependencies": { "@types/react": "17 || 18 || 19" } }, "sha512-p2+YcF+JE67SRX3mMlJ1TKCSTsgyOVdAwd/nxp3NuV1+Cb6MWALbN6nT7Ld4tpmYofcE5kcaSY1YBB9erY+6fw=="],
 
     "@lit/reactive-element": ["@lit/reactive-element@2.1.2", "", { "dependencies": { "@lit-labs/ssr-dom-shim": "^1.5.0" } }, "sha512-pbCDiVMnne1lYUIaYNN5wrwQXDtHaYtg7YEFPeW+hws6U47WeFvISGUWekPGKWOP1ygrs0ef0o1VJMk1exos5A=="],
+
+    "@mdit/plugin-tasklist": ["@mdit/plugin-tasklist@0.23.2", "", { "dependencies": { "@types/markdown-it": "^14.1.2" }, "peerDependencies": { "markdown-it": "^14.1.0" }, "optionalPeers": ["markdown-it"] }, "sha512-9vpH3ZG2JmB3SqYfXmRXk9mI5Q6U+KO30quNH1PN5lp5gQtW4kceWhfAPeQtSMemNV4KuCyns+6PRX8zD9Sajw=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.2", "", { "dependencies": { "@tybys/wasm-util": "^0.10.1" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-sNXv5oLJ7ob93xkZ1XnxisYhGYXfaG9f65/ZgYuAu3qt7b3NadcOEhLvx28hv31PgX8SZJRYrAIPQilQmFpLVw=="],
 
