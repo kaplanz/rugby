@@ -11,7 +11,7 @@ publish = false
 
 [dependencies]
 bfmt = { workspace = true }
-bitfield-struct = "0.12.1"
+bitfield-struct = "0.13.0"
 facet = { workspace = true, optional = true }
 hexd = { workspace = true }
 itertools = { workspace = true, optional = true }
