@@ -2,9 +2,11 @@
 
 use ringbuf::HeapRb as Ring;
 use ringbuf::traits::{Consumer, Observer, Producer};
+use rubato::audioadapter_buffers::direct::SequentialSliceOfVecs;
 use rubato::{
+    Async,
+    FixedAsync,
     Resampler,
-    SincFixedIn,
     SincInterpolationParameters,
     SincInterpolationType,
     WindowFunction,
@@ -29,7 +31,7 @@ pub struct Stream {
     /// Sample buffer output.
     obuf: Ring<Sample>,
     /// Sample rate converter.
-    sinc: SincFixedIn<f32>,
+    sinc: Async<f32>,
     /// Working buffer input.
     iwrk: Vec<Vec<f32>>,
     /// Working buffer output.
@@ -61,12 +63,13 @@ impl Stream {
         };
 
         // Create the resampler with appropriate parameters
-        let sinc = SincFixedIn::<f32>::new(
+        let sinc = Async::<f32>::new_sinc(
             f64::from(ofrq) / f64::from(ifrq),
             1.0,
-            params,
+            &params,
             ilen / 4,
             NCHAN,
+            FixedAsync::Input,
         )
         .unwrap();
 
@@ -140,9 +143,12 @@ impl Stream {
         // Only process if we filled the buffer completely
         if count == self.need {
             // Perform resampling
+            let ibuf = SequentialSliceOfVecs::new(&self.iwrk, NCHAN, self.need).unwrap();
+            let olen = self.owrk[0].len();
+            let mut obuf = SequentialSliceOfVecs::new_mut(&mut self.owrk, NCHAN, olen).unwrap();
             let (_, count) = self
                 .sinc
-                .process_into_buffer(&self.iwrk, &mut self.owrk, None)
+                .process_into_buffer(&ibuf, &mut obuf, None)
                 .unwrap();
 
             // Transfer resampled data to output buffer
