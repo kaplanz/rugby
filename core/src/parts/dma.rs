@@ -36,19 +36,25 @@ impl Block for Dma {
             Mode::Req(src) => {
                 // Initiate transfer
                 trace!("started: 0xfe00 <- {src:#04x}00");
-                Mode::On { hi: src, lo: 0x00 }
+                Mode::On { hi: src, lo: 0xff }
             }
-            Mode::On { hi, lo } => {
+            Mode::On { hi, lo: 0xff } => {
+                // Start delay
+                Mode::On { hi, lo: 0x00 }
+            }
+            Mode::On { hi, mut lo } => {
                 // Free system buses
-                self.noc.ebus.borrow_mut().free();
-                self.noc.vbus.borrow_mut().free();
+                if lo > 0x00 {
+                    self.noc.ebus.borrow_mut().free();
+                    self.noc.vbus.borrow_mut().free();
+                }
                 // Transfer single byte
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
                 self.mem.write(lo as u16, data).unwrap();
                 trace!("copied: $fe{lo:02x} <- ${addr:04x}, data: {data:#04x}");
                 // Increment transfer index
-                let lo = lo.saturating_add(1);
+                lo += 1;
                 if usize::from(lo) < self.mem.borrow().inner().len() {
                     // Lock system buses
                     self.noc.ebus.borrow_mut().busy();
