@@ -151,6 +151,8 @@ pub struct Internal {
     buf: Frame,
     /// Cycle count.
     dot: u16,
+    /// STAT interrupt.
+    int: bool,
     /// Window line.
     ywin: u8,
     /// Graphics mode.
@@ -168,6 +170,7 @@ impl Default for Internal {
         Self {
             buf: vec![Color::default(); LCD.depth()].into_boxed_slice(),
             dot: u16::default(),
+            int: bool::default(),
             ywin: u8::default(),
             mode: Mode::default(),
         }
