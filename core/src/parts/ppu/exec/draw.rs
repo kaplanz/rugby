@@ -37,7 +37,7 @@ impl Draw {
             self.pipe.lx += 1;
         }
 
-        // Determine next mode
+        // Transition state machine
         if u16::from(self.pipe.lx) < LCD.wd {
             // Continue to next pixel
             Mode::Draw(self)
