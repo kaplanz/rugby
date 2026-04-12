@@ -67,7 +67,7 @@ impl Scan {
         // <https://raw.githubusercontent.com/ISSOtm/pandocs/rendering-internals/src/Rendering_Internals.md>
         self.addr += 2;
 
-        // Determine next mode
+        // Transition state machine
         if ppu.etc.dot + 1 < 80 {
             Mode::Scan(self)
         } else {
