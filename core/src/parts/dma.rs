@@ -68,7 +68,7 @@ impl Block for Dma {
                 }
             }
         };
-        // Determine next mode
+        // Transition state machine
         self.reg.borrow_mut().mode = mode;
     }
 

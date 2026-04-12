@@ -13,7 +13,7 @@ impl HBlank {
     pub const DOTS: u16 = 456;
 
     pub fn exec(self, ppu: &mut Ppu) -> Mode {
-        // Determine next mode
+        // Transition state machine
         if ppu.etc.dot + 1 < Self::DOTS {
             // Continue vblank
             Mode::HBlank(self)
@@ -22,7 +22,7 @@ impl HBlank {
             let ly = ppu.reg.ly.load() + 1;
             ppu.reg.ly.store(ly);
 
-            // Determine next scanline type
+            // Determine scanline type
             if u16::from(ly) < LCD.ht {
                 // Begin next scanline
                 Mode::Scan(self.into())
