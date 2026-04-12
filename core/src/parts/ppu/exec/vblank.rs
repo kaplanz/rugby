@@ -13,7 +13,7 @@ impl VBlank {
     pub const LAST: u16 = LCD.ht + 10;
 
     pub fn exec(self, ppu: &mut Ppu) -> Mode {
-        // Determine next mode
+        // Transition state machine
         if ppu.etc.dot + 1 < HBlank::DOTS {
             // Continue vblank
             Mode::VBlank(self)
@@ -22,7 +22,7 @@ impl VBlank {
             let ly = ppu.reg.ly.load() + 1;
             ppu.reg.ly.store(ly);
 
-            // Determine next mode
+            // Determine scanline type
             if u16::from(ly) < Self::LAST {
                 // Continue vblank
                 Mode::VBlank(self)
