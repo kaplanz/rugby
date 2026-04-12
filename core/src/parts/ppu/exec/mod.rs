@@ -105,7 +105,7 @@ impl Mode {
         ppu.etc.dot += 1;
         ppu.etc.dot %= HBlank::DOTS;
 
-        // Return next state
+        // Transition state machine
         next
     }
 }
