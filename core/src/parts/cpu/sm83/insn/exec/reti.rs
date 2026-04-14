@@ -65,8 +65,12 @@ fn jump(_: u8, cpu: &mut Cpu, pc: u16) -> Return {
 }
 
 fn done(_: u8, cpu: &mut Cpu) -> Return {
-    // Enable interrupts
-    cpu.etc.ime = Ime::WillEnable;
+    // Enable interrupts.
+    //
+    // RETI enables IME at the end of the instruction itself, unlike EI which
+    // defers by one instruction. To disable interrupts in RETI we use
+    // `Enabled` to ensure a pending interrupt isn't missed for a cycle.
+    cpu.etc.ime = Ime::Enabled;
 
     // Finish
     Ok(None)
