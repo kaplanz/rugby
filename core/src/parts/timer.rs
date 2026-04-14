@@ -314,9 +314,12 @@ pub mod reg {
         }
 
         fn store(&mut self, value: Self::Value) {
-            // Ignore stores to TIMA right before a reload occurs
+            // Ignore stores to TIMA during an active reload.
+            //
+            // A write during a pending reload must not cancel it. Only the
+            // register write is suppressed when the reload is executing, so
+            // the reload state is left untouched here.
             if self.rel != Reload::Now {
-                self.rel = Reload::None;
                 self.reg.store(value);
             }
         }
