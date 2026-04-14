@@ -11,5 +11,5 @@ publish = false
 
 [dependencies]
 indexmap = "2.14.0"
-rand = "0.10.0"
+rand = "0.10.1"
 thiserror = { workspace = true }
