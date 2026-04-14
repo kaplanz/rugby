@@ -171,7 +171,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-32 passed; 37 failed;
+33 passed; 36 failed;
 ```
 
 <details>
@@ -231,7 +231,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ✅  | `acceptance/rapid_di_ei.gb`                         |
   |  ❌  | `acceptance/ret_cc_timing.gb`                       |
   |  ❌  | `acceptance/ret_timing.gb`                          |
-  |  ❌  | `acceptance/reti_intr_timing.gb`                    |
+  |  ✅  | `acceptance/reti_intr_timing.gb`                    |
   |  ❌  | `acceptance/reti_timing.gb`                         |
   |  ❌  | `acceptance/rst_timing.gb`                          |
   |  ❌  | `acceptance/serial/boot_sclk_align-dmgABCmgb.gb`    |
