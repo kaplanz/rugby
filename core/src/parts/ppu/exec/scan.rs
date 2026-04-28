@@ -40,20 +40,11 @@ impl Scan {
                 // Parse sprite from bytes
                 let obj = Sprite::from(obj);
 
-                // Record sprites to be rendered that:
-                //
-                // 1. Are not hidden (x-coordinate is zero)
-                let not_hidden = obj.xpos != 0;
-                // 2. Are visible this scanline
-                let is_visible = {
-                    let ypos = obj.ypos;
-                    let size = [8, 16][usize::from(ppu.lcdc(Lcdc::ObjSize))];
-                    let line = ppu.reg.ly.load().saturating_add(16);
-                    (ypos..ypos.saturating_add(size)).contains(&line)
-                };
-                //
-                // When all conditions are met, push scanned sprite
-                if not_hidden && is_visible {
+                // Record sprites to be rendered that are visible this scanline
+                let ypos = obj.ypos;
+                let size = [8, 16][usize::from(ppu.lcdc(Lcdc::ObjSize))];
+                let line = ppu.reg.ly.load().saturating_add(16);
+                if (ypos..ypos.saturating_add(size)).contains(&line) {
                     trace!("scanned sprite: {obj:?}");
                     self.objs.push(obj);
                 }
