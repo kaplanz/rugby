@@ -66,7 +66,7 @@ impl Timer {
     ///
     /// [gbedg]: https://github.com/Hacktix/GBEDG/blob/master/timers/index.md#timer-operation
     fn andres(&self) -> bool {
-        let ena = self.reg.tac.borrow().enable();
+        let ena = self.reg.tac.borrow().ena();
         let sel = self.reg.tac.borrow().select();
         let div = self.reg.div.borrow().div();
         ena && (sel & div != 0)
@@ -185,6 +185,7 @@ impl Mmio for Control {
 
 /// Timer register models.
 pub mod reg {
+    use bitfield_struct::bitfield;
     use log::debug;
     use rugby_arch::mem::Memory;
     use rugby_arch::reg::Register;
@@ -328,21 +329,36 @@ pub mod reg {
     /// Timer modulo.
     pub type Tma = u8;
 
-    /// Timer control.
-    #[derive(Debug, Default)]
-    pub struct Tac(u8);
+    /// `TAC`: Timer control register.
+    ///
+    /// | Bit | Name         | Use |
+    /// |-----|--------------|-----|
+    /// | 7-3 | Unused.      | -   |
+    /// |   2 | Timer enable | R/W |
+    /// | 1-0 | Clock select | R/W |
+    ///
+    /// See more details [here][tac].
+    ///
+    /// [tac]: https://gbdev.io/pandocs/Timer_and_Divider_Registers.html#ff07--tac-timer-control
+    #[bitfield(u8, order = msb)]
+    #[derive(PartialEq, Eq)]
+    pub struct Tac {
+        /// `TAC[7:3]`: Unused.
+        #[bits(5)]
+        __: u8,
+        /// `TAC[2]`: Timer enable.
+        #[bits(1)]
+        pub ena: bool,
+        /// `TAC[1:0]`: Clock select.
+        #[bits(2)]
+        pub clk: u8,
+    }
 
     impl Tac {
-        /// Gets the enable bit.
-        #[must_use]
-        pub fn enable(&self) -> bool {
-            self.0.load() & 0b100 != 0
-        }
-
         /// Gets the clock select rate.
         #[must_use]
         pub fn select(&self) -> u16 {
-            match self.0.load() & 0b011 {
+            match self.clk() {
                 0b01 => 1 << 3,
                 0b10 => 1 << 5,
                 0b11 => 1 << 7,
@@ -367,11 +383,12 @@ pub mod reg {
         type Value = u8;
 
         fn load(&self) -> Self::Value {
-            0b1111_1000 | self.0.load()
+            // unused bits 7:3 always read as 1
+            self.into_bits() | 0xf8
         }
 
         fn store(&mut self, value: Self::Value) {
-            self.0.store(value & 0b111);
+            *self = Self::from_bits(value & 0b111);
         }
     }
 }
