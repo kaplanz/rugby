@@ -4,7 +4,7 @@ use rugby_arch::{Block, Shared};
 
 use super::mem::Bank;
 use super::noc::Mmap;
-use super::{apu, cpu, dma, joypad, pic, ppu, serial, timer};
+use super::{apu, cpu, dma, joypad, pic, ppu, sio, timer};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
@@ -22,7 +22,7 @@ pub struct Chip {
     /// Picture processing unit
     pub ppu: ppu::Ppu,
     /// Serial communications port.
-    pub sio: serial::Serial,
+    pub sio: sio::Serial,
     /// Hardware timer.
     pub tma: timer::Timer,
 }
@@ -121,9 +121,9 @@ impl Chip {
             int: pic.line.clone(),
         };
         // Serial communications port
-        let sio = serial::Serial {
-            reg: serial::Control::default(),
-            etc: serial::Internal::default(),
+        let sio = sio::Serial {
+            reg: sio::Control::default(),
+            etc: sio::Internal::default(),
             int: pic.line.clone(),
         };
 
