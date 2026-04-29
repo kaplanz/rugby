@@ -1,7 +1,7 @@
 use rugby_arch::Block;
 
 use super::meta::{Layer, Meta, Row};
-use super::{Fifo, Lcdc, Ppu, Step};
+use super::{Fifo, Ppu, Step};
 
 /// Background fetcher.
 #[derive(Clone, Debug)]
@@ -53,16 +53,17 @@ pub(super) mod exec {
     use rugby_arch::mem::Memory;
     use rugby_arch::reg::Register;
 
-    use super::{Fetcher, Layer, Lcdc, Meta, Ppu, Row, Step};
+    use super::{Fetcher, Layer, Meta, Ppu, Row, Step};
 
     /// Executes fetch tile step.
     pub fn fetch(ppu: &Ppu, fetch: &mut Fetcher) -> Step {
         // Determine which tile map to use
-        let tmap = [0x1800, 0x1c00][usize::from(ppu.lcdc(match fetch.layer {
-            Layer::Background => Lcdc::BgMap,
-            Layer::Window => Lcdc::WinMap,
+        let lcdc = ppu.reg.lcdc.borrow();
+        let tmap = [0x1800, 0x1c00][usize::from(match fetch.layer {
+            Layer::Background => lcdc.bg_map(),
+            Layer::Window => lcdc.win_map(),
             Layer::Sprite => unreachable!(),
-        }))];
+        })];
         // Calculate the offset from the pixel coordinates
         let toff = {
             let row: u8;
