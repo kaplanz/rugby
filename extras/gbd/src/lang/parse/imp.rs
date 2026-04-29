@@ -8,7 +8,7 @@ use num::traits::{WrappingAdd, WrappingSub};
 use num::{Bounded, Integer};
 use orng::Orange;
 use pest::iterators::Pair;
-use rugby_core::dmg::{apu, cpu, pic, ppu, sio, timer};
+use rugby_core::dmg::{apu, cpu, pic, ppu, sio, tma};
 
 use super::{Command, Keyword, Result, Rule, Select, Serial, Tick, Value};
 
@@ -462,10 +462,10 @@ pub fn location(pair: Pair<Rule>) -> Result<Select> {
         Rule::Timer => {
             let reg = pair.into_inner().next().exception()?;
             Select::Timer(match reg.as_rule() {
-                Rule::Div  => timer::Select::Div,
-                Rule::Tima => timer::Select::Tima,
-                Rule::Tma  => timer::Select::Tma,
-                Rule::Tac  => timer::Select::Tac,
+                Rule::Div  => tma::Select::Div,
+                Rule::Tima => tma::Select::Tima,
+                Rule::Tma  => tma::Select::Tma,
+                Rule::Tac  => tma::Select::Tac,
                 rule => return rule.exception(),
             })
         }

@@ -41,8 +41,8 @@ pub enum Interrupt {
     ///
     /// Requested by the [timer] whenever the [TIMA] register overflows.
     ///
-    /// [tima]:  super::timer::Control::tima
-    /// [timer]: super::timer
+    /// [tima]:  super::tma::Control::tima
+    /// [timer]: super::tma
     Timer   = 0b0000_0100,
     /// Serial transfer.
     ///
