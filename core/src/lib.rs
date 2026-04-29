@@ -12,6 +12,7 @@
 #![allow(clippy::unusual_byte_groupings)]
 
 mod model;
+mod rev;
 
 pub mod cart;
 pub mod chip;
@@ -23,3 +24,4 @@ pub mod api {
 }
 
 pub use crate::model::dmg;
+pub use crate::rev::Revision;

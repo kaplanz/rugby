@@ -15,7 +15,7 @@ fn emulate(rom: &[u8], img: &[u8]) -> Result<()> {
     // Instantiate a cartridge
     let cart = Cartridge::new(rom).unwrap();
     // Create an emulator instance
-    let mut emu = GameBoy::new();
+    let mut emu: GameBoy = GameBoy::new();
     // Load the cartridge
     emu.insert(cart);
 
