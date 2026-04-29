@@ -6,7 +6,7 @@ use self::hblank::HBlank;
 use self::scan::Scan;
 use self::vblank::VBlank;
 use super::super::ppu;
-use crate::dmg::pic::Interrupt;
+use crate::chip::pic::Interrupt;
 
 pub mod draw;
 pub mod hblank;

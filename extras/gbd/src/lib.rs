@@ -10,7 +10,8 @@ use indexmap::IndexMap;
 use log::debug;
 use rugby_arch::Block;
 use rugby_arch::reg::Port;
-use rugby_core::dmg::{GameBoy, cpu, ppu};
+use rugby_core::chip::{cpu, ppu};
+use rugby_core::dmg::GameBoy;
 
 use self::lang::Program;
 use self::prompt::Prompt;

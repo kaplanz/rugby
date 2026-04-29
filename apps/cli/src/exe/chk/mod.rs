@@ -3,7 +3,7 @@
 use anyhow::{Context, anyhow};
 use constcat::concat;
 use log::trace;
-use rugby::core::dmg::cart;
+use rugby::core::cart;
 
 use crate::app::{init, save};
 use crate::err::Result;

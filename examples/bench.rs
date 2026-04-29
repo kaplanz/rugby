@@ -3,7 +3,8 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use rugby::arch::Block;
-use rugby::core::dmg::{CLOCK, Cartridge, GameBoy};
+use rugby::core::cart::Cartridge;
+use rugby::core::dmg::{CLOCK, GameBoy};
 
 #[allow(unused)]
 #[path = "../apps/cli/src/app/run/emu/perf.rs"]

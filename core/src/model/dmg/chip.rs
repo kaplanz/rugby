@@ -1,10 +1,9 @@
-//! System-on-chip.
+//! Sharp LR35902.
 
 use rugby_arch::{Block, Shared};
 
-use super::mem::Bank;
-use super::noc::Mmap;
-use super::{apu, cpu, dma, joy, pic, ppu, sio, tma};
+use super::mmap::{Bank, Mmap};
+pub use crate::chip::{apu, cpu, dma, joy, pic, ppu, sio, tma};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
