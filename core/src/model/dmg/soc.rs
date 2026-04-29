@@ -4,7 +4,7 @@ use rugby_arch::{Block, Shared};
 
 use super::mem::Bank;
 use super::noc::Mmap;
-use super::{apu, cpu, dma, joypad, pic, ppu, sio, timer};
+use super::{apu, cpu, dma, joy, pic, ppu, sio, timer};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
@@ -16,7 +16,7 @@ pub struct Chip {
     /// Direct memory access unit.
     pub dma: dma::Dma,
     /// Joypad controller.
-    pub joy: joypad::Joypad,
+    pub joy: joy::Joypad,
     /// Interrupt controller.
     pub pic: pic::Pic,
     /// Picture processing unit
@@ -103,8 +103,8 @@ impl Chip {
             noc: noc.clone(),
         };
         // Joypad controller
-        let joy = joypad::Joypad {
-            reg: Shared::new(joypad::Control::default()),
+        let joy = joy::Joypad {
+            reg: Shared::new(joy::Control::default()),
             int: pic.line.clone(),
         };
         // Picture processing unit

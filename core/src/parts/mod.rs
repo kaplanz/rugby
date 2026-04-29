@@ -9,7 +9,7 @@ pub mod boot;
 pub mod cart;
 pub mod cpu;
 pub mod dma;
-pub mod joypad;
+pub mod joy;
 pub mod pic;
 pub mod ppu;
 pub mod sio;

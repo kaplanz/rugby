@@ -56,10 +56,10 @@ pub enum Interrupt {
     /// transition from high to low. (Occurs when a [button] in the selected
     /// [mode] is pressed.)
     ///
-    /// [button]:  super::joypad::Button
-    /// [control]: super::joypad::Control
-    /// [joypad]:  super::joypad
-    /// [mode]:    super::joypad::Mode
+    /// [button]:  super::joy::Button
+    /// [control]: super::joy::Control
+    /// [joypad]:  super::joy
+    /// [mode]:    super::joy::Mode
     Joypad  = 0b0001_0000,
 }
 
