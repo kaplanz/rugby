@@ -13,7 +13,8 @@ use std::fmt::Display;
 use std::str::Utf8Error;
 
 use log::error;
-use parts::{About, Board, Check, Compat, Memory, Region};
+
+use self::parts::{About, Board, Check, Compat, Memory, Region};
 
 /// Nintendo logo.
 ///
