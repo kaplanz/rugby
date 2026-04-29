@@ -12,7 +12,7 @@ use self::cpu::Cpu;
 use self::joypad::Joypad;
 use self::pcb::Motherboard;
 use self::ppu::Ppu;
-use self::serial::Serial;
+use self::sio::Serial;
 use crate::api::core::{self, Core};
 use crate::api::part::proc::Processor;
 
@@ -30,7 +30,7 @@ pub use self::joypad::Button;
 pub use self::noc::Mmap;
 pub use self::soc::Chip;
 pub use crate::parts::cpu::sm83 as cpu;
-pub use crate::parts::{apu, boot, cart, dma, joypad, pic, ppu, serial, timer};
+pub use crate::parts::{apu, boot, cart, dma, joypad, pic, ppu, sio, timer};
 
 /// Clock frequency.
 ///
