@@ -9,7 +9,7 @@ use rugby_arch::reg::Port;
 
 use self::apu::Apu;
 use self::cpu::Cpu;
-use self::joypad::Joypad;
+use self::joy::Joypad;
 use self::pcb::Motherboard;
 use self::ppu::Ppu;
 use self::sio::Serial;
@@ -26,11 +26,11 @@ pub mod pcb;
 
 pub use self::boot::Boot;
 pub use self::cart::Cartridge;
-pub use self::joypad::Button;
+pub use self::joy::Button;
 pub use self::noc::Mmap;
 pub use self::soc::Chip;
 pub use crate::parts::cpu::sm83 as cpu;
-pub use crate::parts::{apu, boot, cart, dma, joypad, pic, ppu, sio, timer};
+pub use crate::parts::{apu, boot, cart, dma, joy, pic, ppu, sio, timer};
 
 /// Clock frequency.
 ///
