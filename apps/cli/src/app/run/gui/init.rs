@@ -1,7 +1,7 @@
 //! Graphics assembly.
 
 use anyhow::{Context as _, Result};
-use rugby::core::dmg::LCD;
+use rugby::core::chip::ppu::LCD;
 use rugby::extra::pal::Palette;
 
 use super::util;

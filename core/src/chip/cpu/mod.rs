@@ -1,4 +1,8 @@
-//! SM83 processor core.
+//! Processor core.
+//!
+//! Implements the SM83, a custom Sharp processor used in the Game Boy family.
+//! It is architecturally similar to the Intel 8080 and Zilog Z80, though it
+//! is not binary-compatible with either.
 
 use std::fmt::{Debug, Display};
 
@@ -10,8 +14,8 @@ use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
 use crate::api::part::proc::Processor;
-use crate::dmg::mem::Sram;
-use crate::dmg::pic;
+use crate::chip::pic;
+use crate::dmg::mmap::Sram;
 
 pub mod insn;
 pub mod reg;

@@ -1,6 +1,6 @@
 //! Error types.
 
-use rugby::core::dmg;
+use rugby::core::cart;
 
 /// A convenient type alias for [`Result`](std::result::Result).
 pub type Result<T, E = Error> = std::result::Result<T, E>;
@@ -15,7 +15,7 @@ pub enum Error {
     /// Input error.
     Ioput(#[from] std::io::Error),
     /// Header error.
-    Header(#[from] dmg::cart::head::Error),
+    Header(#[from] cart::head::Error),
     /// Cartridge error.
-    Cartridge(#[from] dmg::cart::Error),
+    Cartridge(#[from] cart::Error),
 }

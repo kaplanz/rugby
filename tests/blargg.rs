@@ -1,7 +1,8 @@
 use std::fmt::{Debug, Display};
 
 use rugby::arch::Block;
-use rugby::core::dmg::{Cartridge, GameBoy};
+use rugby::core::cart::Cartridge;
+use rugby::core::dmg::GameBoy;
 
 /// Number of cycles after which the test is considered to have failed due to a
 /// timeout error.

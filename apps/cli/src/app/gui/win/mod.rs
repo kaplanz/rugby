@@ -1,6 +1,6 @@
 //! Video frontend.
 
-use rugby::core::dmg;
+use rugby::core::chip::ppu;
 
 mod imp;
 
@@ -14,7 +14,7 @@ impl Attributes for Main {
     const NAME: &str = crate::NAME;
 
     const SIZE: Extent = Extent {
-        wd: dmg::LCD.wd as usize,
-        ht: dmg::LCD.ht as usize,
+        wd: ppu::LCD.wd as usize,
+        ht: ppu::LCD.ht as usize,
     };
 }

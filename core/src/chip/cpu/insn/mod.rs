@@ -6,7 +6,7 @@ use log::trace;
 
 use self::exec::Operation;
 use super::{Cpu, Ime, Status};
-use crate::parts::pic::Interrupt;
+use crate::chip::pic::Interrupt;
 
 mod exec;
 mod table;

@@ -4,7 +4,7 @@ use anyhow::Result;
 use log::debug;
 use rugby::app::joypad::Joypad;
 use rugby::app::video::Video;
-use rugby::core::dmg::ppu;
+use rugby::core::chip::ppu;
 
 use crate::app::{self, Exit};
 use crate::exe::run::Cli;
@@ -56,7 +56,7 @@ pub fn main(args: &Cli) -> Result<()> {
             gui.lcd.title(&format!(
                 "{title} ({speed:.1} FPS)",
                 title = util::title(&args.cfg.data.emu.cart),
-                speed = freq / f64::from(ppu::VIDEO)
+                speed = freq / f64::from(ppu::FRAME)
             ));
         }
 

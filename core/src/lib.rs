@@ -12,7 +12,9 @@
 #![allow(clippy::unusual_byte_groupings)]
 
 mod model;
-mod parts;
+
+pub mod cart;
+pub mod chip;
 
 /// Emulator API.
 pub mod api {

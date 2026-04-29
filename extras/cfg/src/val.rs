@@ -3,7 +3,8 @@
 use std::num::{ParseFloatError, ParseIntError};
 use std::str::FromStr;
 
-use rugby_core::dmg::{CLOCK, ppu};
+use rugby_core::chip::ppu;
+use rugby_core::dmg::CLOCK;
 use rugby_pal as pal;
 
 /// When to enable.
@@ -163,7 +164,7 @@ impl Speed {
             #[expect(clippy::cast_precision_loss)]
             #[expect(clippy::cast_sign_loss)]
             Speed::Ratio(mult) => Some((CLOCK as f32 * mult) as u32),
-            Speed::Frame(rate) => Some(u32::from(rate) * ppu::VIDEO),
+            Speed::Frame(rate) => Some(u32::from(rate) * ppu::FRAME),
             Speed::Turbo       => None,
         }
     }

@@ -1,4 +1,4 @@
-//! Parts interfaces.
+//! Part interfaces.
 
 pub mod audio;
 pub mod joypad;

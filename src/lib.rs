@@ -7,7 +7,8 @@
 //!
 //! ```
 //! use rugby::arch::Block; // for `Block::cycle`
-//! use rugby::core::dmg::{Cartridge, GameBoy};
+//! use rugby::core::dmg::GameBoy;
+//! use rugby::core::cart::Cartridge;
 //! use rugby::prelude::*;
 //!
 //! // Instantiate a cartridge from ROM bytes
@@ -16,7 +17,7 @@
 //! let cart = Cartridge::new(rom).unwrap();
 //!
 //! // Create an emulator instance
-//! let mut emu = GameBoy::new();
+//! let mut emu: GameBoy = GameBoy::new();
 //! // Load the cartridge into the emulator
 //! emu.insert(cart);
 //!

@@ -1,6 +1,6 @@
 //! Joypad API.
 
-use rugby::core::dmg::Button;
+use rugby::core::dmg::chip::joy::Button;
 use rugby::emu::part::joypad::State;
 use rugby::prelude::*;
 

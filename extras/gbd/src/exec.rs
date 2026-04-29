@@ -12,7 +12,7 @@ use rugby_arch::reg::Port;
 use rugby_core::api::part::proc::Processor as _;
 use rugby_core::api::part::serial::Serial as _;
 use rugby_core::api::part::video::Video as _;
-use rugby_core::dmg::LCD;
+use rugby_core::chip::ppu::LCD;
 
 use super::lang::{Keyword, Select, Serial, Value};
 use super::{Debugger, Error, GameBoy, Result, Tick};

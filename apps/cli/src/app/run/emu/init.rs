@@ -2,7 +2,9 @@
 
 use anyhow::{Context, Result, bail, ensure};
 use log::{debug, info, warn};
-use rugby::core::dmg::{Boot, Cartridge, GameBoy};
+use rugby::core::cart::Cartridge;
+use rugby::core::dmg::GameBoy;
+use rugby::core::dmg::boot::Boot;
 use rugby::extra::cfg::{Config, opt};
 
 use super::save;

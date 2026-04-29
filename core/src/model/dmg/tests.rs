@@ -1,9 +1,13 @@
 use rugby_arch::mem::Memory;
+use rugby_arch::reg::Port;
 
-use self::cart::chip::Mbc;
-use self::pic::Pic;
-use self::tma::Timer;
+use self::boot::Boot;
+use self::chip::pic::Pic;
+use self::chip::ppu::Ppu;
+use self::chip::tma::Timer;
 use super::*;
+use crate::cart::Cartridge;
+use crate::cart::chip::Mbc;
 
 /// Sample boot ROM.
 const BOOT: &[u8; 0x0100] = include_bytes!("../../../../roms/boot/sameboy/dmg_boot.bin");

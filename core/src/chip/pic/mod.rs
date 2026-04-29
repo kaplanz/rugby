@@ -1,4 +1,4 @@
-//! Interrupt handling.
+//! Interrupt controller.
 
 use std::fmt::Display;
 
