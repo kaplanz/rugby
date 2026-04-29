@@ -83,7 +83,6 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 #[derive(Debug)]
 #[derive(thiserror::Error)]
 #[non_exhaustive]
-#[expect(clippy::large_enum_variant)]
 pub enum Error {
     /// Internal parsing error.
     ///
