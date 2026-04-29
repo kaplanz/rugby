@@ -46,6 +46,7 @@ fn boot_disable_works() {
 }
 
 #[test]
+#[expect(clippy::too_many_lines)]
 fn bus_all_works() {
     let mut emu = setup();
     let bus = &mut emu.main.soc.cpu;
