@@ -3,7 +3,8 @@
 use anyhow::Result;
 use minifb::Key;
 use rugby::app;
-use rugby::core::dmg::{self, Button};
+use rugby::core::chip::ppu;
+use rugby::core::dmg::chip::joy::Button;
 use rugby::emu::part::joypad::Event;
 use rugby::emu::part::video::Frame;
 use rugby::extra::pal::Palette;
@@ -69,7 +70,7 @@ impl app::joypad::Joypad for Frontend {
 }
 
 impl app::video::Video for Frontend {
-    type Pixel = dmg::ppu::Color;
+    type Pixel = ppu::Color;
 
     fn draw(&mut self, frame: Frame<Self::Pixel>) {
         // Translate pixels

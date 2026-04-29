@@ -6,7 +6,8 @@ use std::time::{Duration, Instant};
 use anyhow::{Context as _, Result};
 use log::{debug, info};
 use rugby::arch::Block;
-use rugby::core::dmg::{self, ppu};
+use rugby::core::chip::{cpu, ppu};
+use rugby::core::dmg;
 use rugby::emu::part::audio::Audio;
 use rugby::emu::part::joypad::Joypad;
 use rugby::emu::part::video::Video;
@@ -134,7 +135,7 @@ pub fn main(args: &Cli) -> Result<()> {
         if let Some(trace) = trace.as_mut()
             && matches!(
                 emu.main.soc.cpu.stage(),
-                dmg::cpu::Stage::Fetch | dmg::cpu::Stage::Done
+                cpu::Stage::Fetch | cpu::Stage::Done
             )
             && ctx.total % 4 == 0
         {
@@ -208,6 +209,6 @@ fn frequency(freq: f64) -> String {
         "frequency: {freq:>10.6} MHz, speedup: {pace:>4.2}x, frames: {rate:>6.2} FPS",
         freq = freq / 1e6,
         pace = freq / f64::from(dmg::CLOCK),
-        rate = freq / f64::from(ppu::VIDEO)
+        rate = freq / f64::from(ppu::FRAME)
     )
 }

@@ -22,8 +22,10 @@ use constcat::concat;
 use log::{error, info, warn};
 use parking_lot::Mutex;
 use rugby::arch::Block;
-use rugby::core::dmg::ppu::{AUDIO, VIDEO};
-use rugby::core::dmg::{Button, Cartridge, GameBoy, LCD};
+use rugby::core::cart::Cartridge;
+use rugby::core::chip::ppu::{self as ppu, LCD};
+use rugby::core::dmg::GameBoy;
+use rugby::core::dmg::chip::joy::Button;
 use rugby::emu::part::audio::Sample;
 use rugby::emu::part::joypad::State;
 use rugby::prelude::*;
@@ -61,6 +63,13 @@ use self::loc::*;
 use self::mem::*;
 #[allow(unused_imports)]
 use self::pix::*;
+
+/// Audio sample divider.
+///
+/// As an optimization, audio can be linearly downsampled by this value to
+/// decrease the amount of calls to the audio subsystem, hereby improving
+/// performance.
+const AUDIO: u32 = 32;
 
 /// Shim for accessing the emulation core.
 #[derive(Debug, Default)]
@@ -287,7 +296,7 @@ const AV_INFO: retro_system_av_info = retro_system_av_info {
         aspect_ratio: LCD.wd as float / LCD.ht as float,
     },
     timing: retro_system_timing {
-        fps: 4_194_304. / (VIDEO as double),
+        fps: 4_194_304. / (ppu::FRAME as double),
         sample_rate: 4_194_304. / (AUDIO as double),
     },
 };
