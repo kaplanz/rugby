@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
 
 use orng::Orange;
-use rugby_core::dmg::{apu, cpu, pic, ppu, sio, timer};
+use rugby_core::dmg::{apu, cpu, pic, ppu, sio, tma};
 
 use super::Tick;
 
@@ -439,7 +439,7 @@ pub enum Select {
     Pic(pic::Select),
     Ppu(ppu::Select),
     Serial(sio::Select),
-    Timer(timer::Select),
+    Timer(tma::Select),
 }
 
 #[derive(Clone, Debug)]

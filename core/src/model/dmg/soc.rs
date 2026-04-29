@@ -4,7 +4,7 @@ use rugby_arch::{Block, Shared};
 
 use super::mem::Bank;
 use super::noc::Mmap;
-use super::{apu, cpu, dma, joy, pic, ppu, sio, timer};
+use super::{apu, cpu, dma, joy, pic, ppu, sio, tma};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
@@ -24,7 +24,7 @@ pub struct Chip {
     /// Serial communications port.
     pub sio: sio::Serial,
     /// Hardware timer.
-    pub tma: timer::Timer,
+    pub tma: tma::Timer,
 }
 
 impl Chip {
@@ -40,9 +40,9 @@ impl Chip {
         // Interrupt controller
         let pic = pic::Pic::default();
         // Hardware timer
-        let tma = timer::Timer {
-            reg: timer::Control::default(),
-            etc: timer::Internal::default(),
+        let tma = tma::Timer {
+            reg: tma::Control::default(),
+            etc: tma::Internal::default(),
             int: pic.line.clone(),
         };
 
