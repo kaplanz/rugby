@@ -3,9 +3,8 @@
 use log::warn;
 use rugby_arch::Block;
 
-use super::mem::Bank;
-use super::noc::Mmap;
-use super::soc::Chip;
+use super::chip::Chip;
+use super::mmap::{Bank, Mmap};
 use crate::api::part::proc::Processor;
 
 /// DMG-CPU-01 PCB.

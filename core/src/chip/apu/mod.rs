@@ -1,4 +1,4 @@
-//! Audio model.
+//! Audio processor.
 
 use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};

@@ -1,7 +1,7 @@
 use rugby_arch::reg::Register;
 
 use super::{Cpu, Error, Execute, Ime, Operation, Return};
-use crate::parts::pic::Interrupt;
+use crate::chip::pic::Interrupt;
 
 #[derive(Clone, Debug, Default)]
 pub enum Int {

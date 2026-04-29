@@ -1,18 +1,70 @@
-//! Network-on-chip.
+//! Memory map.
 
 use rugby_arch::Shared;
+use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};
 
+use super::chip::apu::Wave;
+use super::chip::cpu::{Hram, Wram};
+use super::chip::ppu::{Oam, Vram};
 use super::pcb::Motherboard;
+
+/// Sharp LH5164N (64K SRAM).
+pub type Sram = Ram<[u8; 0x2000]>;
+
+/// Memory bank.
+///
+/// |     Address     |  Size  | Name | Description   |
+/// |:---------------:|--------|------|---------------|
+/// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
+/// | `$C000..=$DFFF` |  8 KiB | WRAM | Work RAM      |
+/// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
+/// | `$FF30..=$FF3F` |   16 B | WAVE | Wave RAM      |
+/// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
+#[derive(Clone, Debug)]
+pub struct Bank {
+    /// Video RAM.
+    pub vram: Shared<Vram>,
+    /// Work RAM.
+    pub wram: Shared<Wram>,
+    /// Object memory.
+    pub oam: Shared<Oam>,
+    /// Wave memory.
+    pub wave: Shared<Wave>,
+    /// High RAM.
+    pub hram: Shared<Hram>,
+}
+
+#[rustfmt::skip]
+impl Default for Bank {
+    fn default() -> Self {
+        Self {
+            vram: Shared::new(Vram::from([u8::default(); 0x2000])),
+            wram: Shared::new(Wram::from([u8::default(); 0x2000])),
+            oam:  Shared::new( Oam::from([u8::default(); 0x00a0])),
+            wave: Shared::new(Wave::from([u8::default(); 0x0010])),
+            hram: Shared::new(Hram::from([u8::default(); 0x007f])),
+        }
+    }
+}
+
+impl Bank {
+    /// Constructs a new `Bank`.
+    #[must_use]
+    #[rustfmt::skip]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
 /// Memory-mapped I/O.
 ///
 /// The Game Boy's memory architecture is divided across three distinct buses:
 /// - [Internal](Self::ibus): Embedded within the Sharp LR35902. Usable only by
-///   the [CPU](super::cpu).
+///   the [CPU](super::chip::cpu).
 /// - [External](Self::ebus): Accessible to on-board components.
 /// - [Graphics](Self::vbus): Connected only to VRAM, controlled by the
-///   [PPU](super::ppu).
+///   [PPU](super::chip::ppu).
 ///
 /// # Memory Map
 ///

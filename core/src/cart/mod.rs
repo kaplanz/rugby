@@ -1,4 +1,4 @@
-//! Game ROM cartridge.
+//! Game cartridge.
 //!
 //! Encoded within the ROM is a [header] describing the physical cartridge
 //! hardware upon which the ROM resides.
@@ -25,8 +25,8 @@ pub use self::head::Header;
 
 /// Game cartridge.
 ///
-/// Parses a [`Header`] from the ROM, then initializes the memory bank
-/// controller ([`chip`]).
+/// Parses a [`Header`] from the ROM, then initializes the appropriate
+/// memory bank controller.
 #[derive(Clone, Debug)]
 pub struct Cartridge {
     /// Cartridge header.

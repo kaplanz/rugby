@@ -1,5 +1,6 @@
 use rugby::arch::Block;
-use rugby::core::dmg::{Cartridge, GameBoy};
+use rugby::core::cart::Cartridge;
+use rugby::core::dmg::GameBoy;
 use rugby::prelude::*;
 
 mod common;

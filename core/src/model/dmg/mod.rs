@@ -7,38 +7,30 @@ use rugby_arch::Block;
 use rugby_arch::mio::Mmio;
 use rugby_arch::reg::Port;
 
-use self::apu::Apu;
-use self::cpu::Cpu;
-use self::joy::Joypad;
+use self::chip::apu::Apu;
+use self::chip::cpu::Cpu;
+use self::chip::joy::Joypad;
+use self::chip::ppu::Ppu;
+use self::chip::sio::Serial;
 use self::pcb::Motherboard;
-use self::ppu::Ppu;
-use self::sio::Serial;
 use crate::api::core::{self, Core};
 use crate::api::part::proc::Processor;
 
-mod noc;
-mod soc;
-
+pub mod chip;
 #[cfg(feature = "debug")]
 pub mod dbg;
-pub mod mem;
+pub mod mmap;
 pub mod pcb;
 
-pub use self::boot::Boot;
-pub use self::cart::Cartridge;
-pub use self::joy::Button;
-pub use self::noc::Mmap;
-pub use self::soc::Chip;
-pub use crate::parts::cpu::sm83 as cpu;
-pub use crate::parts::{apu, boot, cart, dma, joy, pic, ppu, sio, tma};
+pub mod boot;
+
+use crate::cart::Cartridge;
 
 /// Clock frequency.
 ///
 /// Crystal oscillator frequency of 4 KiHz.
 #[expect(clippy::doc_markdown)]
 pub const CLOCK: u32 = 4_194_304;
-
-pub use self::ppu::LCD;
 
 /// Game Boy handheld game console.
 #[derive(Debug, Default)]
@@ -68,7 +60,7 @@ impl GameBoy {
 
     /// Constructs a new `GameBoy`, initialized with the provided boot ROM.
     #[must_use]
-    pub fn with(boot: Boot) -> Self {
+    pub fn with(boot: boot::Boot) -> Self {
         let mut this = Self::default();
 
         // Initialize boot ROM
@@ -82,7 +74,7 @@ impl GameBoy {
     /// Simulate the bootup sequence.
     ///
     /// This prepares the `GameBoy` to run the contents of a game cartridge.
-    /// When no [boot ROM](Boot) is installed, this must be called before
+    /// When no [boot ROM](boot::Boot) is installed, this must be called before
     /// cartridge execution.
     #[rustfmt::skip]
     pub fn boot(&mut self) {

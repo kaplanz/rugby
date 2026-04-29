@@ -4,8 +4,9 @@ use std::fmt::{Debug, Display};
 
 use rugby::arch::Block;
 use rugby::arch::reg::Port;
-use rugby::core::dmg::cpu::Cpu;
-use rugby::core::dmg::{Cartridge, GameBoy};
+use rugby::core::cart::Cartridge;
+use rugby::core::dmg::GameBoy;
+use rugby::core::dmg::chip::cpu::Cpu;
 
 /// Number of cycles after which the test is considered to have failed due to a
 /// timeout error.

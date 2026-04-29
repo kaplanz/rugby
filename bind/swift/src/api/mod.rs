@@ -44,7 +44,7 @@ impl GameBoy {
     /// Use [`Self::reset`] for a soft reset.
     #[uniffi::constructor]
     pub fn with(boot: &[u8]) -> Result<Self> {
-        let boot = dmg::Boot::from(<[_; _]>::try_from(boot).unwrap());
+        let boot = dmg::boot::Boot::from(<[_; _]>::try_from(boot).unwrap());
         Ok(Self {
             inner: dmg::GameBoy::with(boot).into(),
         })

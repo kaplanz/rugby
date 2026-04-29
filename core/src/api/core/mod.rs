@@ -1,4 +1,4 @@
-//! Model interface.
+//! Core interface.
 
 use rugby_arch::Block;
 

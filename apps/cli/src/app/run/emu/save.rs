@@ -5,7 +5,7 @@ use std::io::Read;
 
 use anyhow::{Context, Result};
 use log::{debug, error, info, trace};
-use rugby::core::dmg::Cartridge;
+use rugby::core::cart::Cartridge;
 use rugby::extra::cfg::opt;
 use rugby::extra::cfg::opt::emu::When;
 

@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
 
 use orng::Orange;
-use rugby_core::dmg::{apu, cpu, pic, ppu, sio, tma};
+use rugby_core::chip::{apu, cpu, pic, ppu, sio, tma};
 
 use super::Tick;
 

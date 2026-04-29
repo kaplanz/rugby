@@ -3,7 +3,7 @@
 use std::fmt::{Debug, Display};
 use std::io::Cursor;
 
-use rugby::core::dmg::ppu::Color;
+use rugby::core::chip::ppu::Color;
 
 /// Loads a PNG image from its raw binary data.
 pub fn png(data: &[u8]) -> Result<Vec<u8>, png::DecodingError> {

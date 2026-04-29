@@ -4,7 +4,7 @@ use std::io;
 use std::sync::Arc;
 
 use parking_lot::Mutex;
-use rugby::core::dmg;
+use rugby::core::cart;
 
 use super::GameBoy;
 use crate::Result;
@@ -51,7 +51,7 @@ impl GameBoy {
 #[derive(uniffi::Object)]
 pub struct Cartridge {
     /// Internal cartridge model.
-    inner: Mutex<dmg::Cartridge>,
+    inner: Mutex<cart::Cartridge>,
 }
 
 /// Checks a if ROM has can reasonably be constructed.
@@ -63,7 +63,7 @@ pub struct Cartridge {
 /// checksums.)
 #[uniffi::export]
 pub fn check(data: &[u8]) -> Result<()> {
-    dmg::Cartridge::check(data).map_err(Into::into)
+    cart::Cartridge::check(data).map_err(Into::into)
 }
 
 #[uniffi::export]
@@ -77,7 +77,7 @@ impl Cartridge {
     #[uniffi::constructor]
     pub fn new(data: &[u8]) -> Result<Self> {
         // Construct internal game cartridge
-        dmg::Cartridge::new(data)
+        cart::Cartridge::new(data)
             .map(|cart| Self {
                 // Build external model from game
                 inner: Mutex::new(cart),
@@ -128,7 +128,7 @@ use parts::{About, Board, Check, Compat, Memory};
 
 /// Cartridge header.
 ///
-/// See [`rugby::core::dmg::cart::Header`]
+/// See [`rugby::core::cart::Header`]
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[derive(uniffi::Record)]
 pub struct Header {
@@ -151,34 +151,32 @@ pub struct Header {
 /// Returns an error if the ROM contained invalid header bytes.
 #[uniffi::export]
 pub fn header(data: &[u8]) -> Result<Header> {
-    dmg::cart::Header::new(data)
-        .map(Into::into)
-        .map_err(Into::into)
+    cart::Header::new(data).map(Into::into).map_err(Into::into)
 }
 
 /// Calculates the header checksum.
 #[uniffi::export]
 #[must_use]
 pub fn hchk(data: &[u8]) -> u8 {
-    dmg::cart::head::hchk(data)
+    cart::head::hchk(data)
 }
 
 /// Calculates the global checksum.
 #[uniffi::export]
 #[must_use]
 pub fn gchk(data: &[u8]) -> u16 {
-    dmg::cart::head::gchk(data)
+    cart::head::gchk(data)
 }
 
-impl From<dmg::cart::Header> for Header {
+impl From<cart::Header> for Header {
     fn from(
-        dmg::cart::Header {
+        cart::Header {
             about,
             check,
             board,
             memory,
             compat,
-        }: dmg::cart::Header,
+        }: cart::Header,
     ) -> Self {
         Self {
             about,
@@ -193,11 +191,11 @@ impl From<dmg::cart::Header> for Header {
 /// Header fields.
 pub mod parts {
     pub use parts::About;
-    use rugby::core::dmg::cart::head::parts;
+    use rugby::core::cart::head::parts;
 
     /// Game information.
     ///
-    /// See [`rugby::core::dmg::cart::head::parts::About`]
+    /// See [`rugby::core::cart::head::parts::About`]
     #[uniffi::remote(Record)]
     pub struct About {
         pub title: Option<String>,
@@ -209,7 +207,7 @@ pub mod parts {
 
     /// Data integrity.
     ///
-    /// See [`rugby::core::dmg::cart::head::parts::Check`]
+    /// See [`rugby::core::cart::head::parts::Check`]
     #[uniffi::remote(Record)]
     pub struct Check {
         pub logo: bool,
@@ -219,7 +217,7 @@ pub mod parts {
 
     /// Memory hardware.
     ///
-    /// See [`rugby::core::dmg::cart::head::parts::Memory`]
+    /// See [`rugby::core::cart::head::parts::Memory`]
     #[derive(Clone, Debug, PartialEq, Eq)]
     #[derive(uniffi::Record)]
     pub struct Memory {
@@ -240,7 +238,7 @@ pub mod parts {
 
     /// Model compatibility.
     ///
-    /// See [`rugby::core::dmg::cart::head::parts::Compat`]
+    /// See [`rugby::core::cart::head::parts::Compat`]
     #[uniffi::remote(Record)]
     pub struct Compat {
         pub dmg: bool,
@@ -252,7 +250,7 @@ pub mod parts {
 
     /// Mapper hardware.
     ///
-    /// See [`rugby::core::dmg::cart::head::parts::Board`]
+    /// See [`rugby::core::cart::head::parts::Board`]
     #[uniffi::remote(Enum)]
     pub enum Board {
         None {
@@ -292,7 +290,7 @@ pub mod parts {
 
     /// Destination code.
     ///
-    /// See [`rugby::core::dmg::cart::head::parts::Region`]
+    /// See [`rugby::core::cart::head::parts::Region`]
     #[uniffi::remote(Enum)]
     pub enum Region {
         World,

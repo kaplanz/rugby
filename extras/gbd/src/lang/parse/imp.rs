@@ -8,7 +8,7 @@ use num::traits::{WrappingAdd, WrappingSub};
 use num::{Bounded, Integer};
 use orng::Orange;
 use pest::iterators::Pair;
-use rugby_core::dmg::{apu, cpu, pic, ppu, sio, tma};
+use rugby_core::chip::{apu, cpu, pic, ppu, sio, tma};
 
 use super::{Command, Keyword, Result, Rule, Select, Serial, Tick, Value};
 

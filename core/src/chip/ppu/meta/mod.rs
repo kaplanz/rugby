@@ -6,7 +6,7 @@ mod pixel;
 mod tile;
 
 pub use self::color::Color;
-pub use self::obj::{Attributes, Sprite};
+pub use self::obj::Sprite;
 pub use self::pixel::{Meta, Pixel};
 pub use self::tile::{Row, Tile};
 

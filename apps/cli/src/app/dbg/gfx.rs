@@ -1,7 +1,7 @@
 //! Graphics debug windows.
 
 use anyhow::{Context, Result};
-use rugby::core::dmg::ppu;
+use rugby::core::chip::ppu;
 
 use crate::app::gui::Frontend;
 use crate::app::gui::win::{Attributes, Extent, Window};

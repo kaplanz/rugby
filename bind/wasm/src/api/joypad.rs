@@ -17,7 +17,7 @@ impl GameBoy {
         self.0
             .inside_mut()
             .joypad()
-            .recv(Some((dmg::Button::from(key), State::Dn).into()));
+            .recv(Some((dmg::chip::joy::Button::from(key), State::Dn).into()));
     }
 
     /// Releases a button.
@@ -28,7 +28,7 @@ impl GameBoy {
         self.0
             .inside_mut()
             .joypad()
-            .recv(Some((dmg::Button::from(key), State::Up).into()));
+            .recv(Some((dmg::chip::joy::Button::from(key), State::Up).into()));
     }
 }
 
@@ -57,17 +57,17 @@ pub enum Button {
 }
 
 #[rustfmt::skip]
-impl From<Button> for dmg::Button {
+impl From<Button> for dmg::chip::joy::Button {
     fn from(value: Button) -> Self {
         match value {
-            Button::A      => dmg::Button::A,
-            Button::B      => dmg::Button::B,
-            Button::Select => dmg::Button::Select,
-            Button::Start  => dmg::Button::Start,
-            Button::Right  => dmg::Button::Right,
-            Button::Left   => dmg::Button::Left,
-            Button::Up     => dmg::Button::Up,
-            Button::Down   => dmg::Button::Down,
+            Button::A      => dmg::chip::joy::Button::A,
+            Button::B      => dmg::chip::joy::Button::B,
+            Button::Select => dmg::chip::joy::Button::Select,
+            Button::Start  => dmg::chip::joy::Button::Start,
+            Button::Right  => dmg::chip::joy::Button::Right,
+            Button::Left   => dmg::chip::joy::Button::Left,
+            Button::Up     => dmg::chip::joy::Button::Up,
+            Button::Down   => dmg::chip::joy::Button::Down,
         }
     }
 }
