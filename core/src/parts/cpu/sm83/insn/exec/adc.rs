@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
+use super::{Cpu, Error, Execute, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Adc(Adc::Fetch)
@@ -57,19 +57,16 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
 fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
     // Execute ADC
     let acc = cpu.reg.a.load();
-    let flags = &cpu.reg.f.load();
-    let cin = Flag::C.get(flags) as u8;
+    let cin = cpu.reg.f.c() as u8;
     let (res, carry0) = acc.overflowing_add(op2);
     let (res, carry1) = res.overflowing_add(cin);
     cpu.reg.a.store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, res == 0);
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, 0x0f < (acc & 0x0f) + (op2 & 0x0f) + cin);
-    Flag::C.set(flags, carry0 | carry1);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(res == 0);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(0x0f < (acc & 0x0f) + (op2 & 0x0f) + cin);
+    cpu.reg.f.set_c(carry0 | carry1);
 
     // Finish
     Ok(None)
