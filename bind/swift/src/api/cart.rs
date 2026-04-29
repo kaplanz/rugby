@@ -124,7 +124,7 @@ unsafe impl Send for Cartridge {}
 // internal reference-counting pointers.
 unsafe impl Sync for Cartridge {}
 
-use parts::{About, Board, Check, Compat, Memory};
+use self::parts::{About, Board, Check, Compat, Memory};
 
 /// Cartridge header.
 ///

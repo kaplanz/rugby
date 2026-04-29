@@ -5,7 +5,7 @@ use rugby::prelude::*;
 
 mod common;
 
-use common::image::{self, Result};
+use self::common::image::{self, Result};
 
 /// Number of cycles after which the test is ready to be checked.
 const TIMEOUT: usize = 1_000_000;
