@@ -155,7 +155,7 @@ pub mod data {
         #[cfg(feature = "gfx")]
         pub mod gfx {
             use parking_lot::Mutex;
-            use rugby::core::dmg::ppu;
+            use rugby::core::chip::ppu;
 
             /// Debug graphics.
             static FRAME: Mutex<Option<ppu::dbg::Debug>> = Mutex::new(None);
@@ -179,7 +179,7 @@ pub mod data {
     /// Input state.
     pub mod input {
         use parking_lot::Mutex;
-        use rugby::core::dmg::Button;
+        use rugby::core::dmg::chip::joy::Button;
         use rugby::emu::part::joypad::Event;
 
         /// Input queue.
@@ -205,7 +205,7 @@ pub mod data {
     /// Video state.
     pub mod video {
         use parking_lot::Mutex;
-        use rugby::core::dmg::ppu::Frame;
+        use rugby::core::chip::ppu::Frame;
 
         /// Video framebuffer.
         static FRAME: Mutex<Option<Frame>> = Mutex::new(None);

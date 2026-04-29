@@ -1,4 +1,4 @@
-//! Player input device.
+//! Joypad controller.
 
 use std::collections::HashSet;
 use std::ops::BitOr;

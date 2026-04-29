@@ -1,4 +1,4 @@
-//! Graphics model.
+//! Video processor.
 
 use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};
@@ -9,7 +9,7 @@ use self::exec::hblank::HBlank;
 use self::exec::vblank::VBlank;
 use super::{dma, pic};
 use crate::api::part::video::{self, Aspect, Video as Api};
-use crate::dmg::mem::Sram;
+use crate::dmg::mmap::Sram;
 
 mod blk;
 mod exec;
@@ -21,20 +21,18 @@ pub mod reg;
 
 pub use self::exec::Mode;
 pub use self::meta::Color;
-pub use self::reg::{Lcdc, Pal, Stat};
-
-/// Audio sample divider.
-///
-/// As an optimization, audio can be linearly downsampled by this value to
-/// decrease the amount of calls to the audio subsystem, hereby improving
-/// performance.
-pub const AUDIO: u32 = 32;
 
 /// Frame frame rate.
 ///
 /// Video frame refresh occurs every 70,224 clock cycles. When running at the
 /// full 4 MiHz, this equates to a frequency of ~59.7275 Hz.
-pub const VIDEO: u32 = 70224;
+pub const FRAME: u32 = {
+    let rows = VBlank::LAST as u32;
+    let dots = HBlank::DOTS as u32;
+    // 154 scanlines × 456 cycles per scanline
+    rows * dots
+};
+const _: () = assert!(FRAME == 70_224);
 
 /// Display resolution.
 pub const LCD: Aspect = Aspect { wd: 160, ht: 144 };

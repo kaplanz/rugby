@@ -7,7 +7,7 @@ use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
 pub use super::ppu::Oam;
-use crate::dmg::Mmap;
+use crate::dmg::mmap::Mmap;
 
 /// Direct memory access unit.
 #[derive(Debug)]

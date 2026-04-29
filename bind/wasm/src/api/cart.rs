@@ -1,6 +1,6 @@
 //! Cartridge API.
 
-use rugby::core::dmg;
+use rugby::core::cart;
 use wasm_bindgen::prelude::*;
 
 use super::GameBoy;
@@ -29,7 +29,7 @@ impl GameBoy {
 /// Models the hardware specified by the provided ROM.
 #[derive(Debug)]
 #[wasm_bindgen]
-pub struct Cartridge(dmg::Cartridge);
+pub struct Cartridge(cart::Cartridge);
 
 #[wasm_bindgen]
 impl Cartridge {
@@ -41,6 +41,6 @@ impl Cartridge {
     /// either be due to invalid header bytes or an unsupported cartridge type.
     #[wasm_bindgen(constructor)]
     pub fn new(rom: &[u8]) -> Result<Cartridge, JsError> {
-        Ok(Self(dmg::Cartridge::new(rom)?))
+        Ok(Self(cart::Cartridge::new(rom)?))
     }
 }
