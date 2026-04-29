@@ -14,6 +14,7 @@ use crate::dmg::mem::Sram;
 use crate::dmg::pic;
 
 pub mod insn;
+pub mod reg;
 
 /// Work RAM.
 ///
@@ -236,7 +237,7 @@ impl Port<u16> for Cpu {
 
     fn load(&self, reg: Self::Select) -> u16 {
         match reg {
-            Select16::AF => self.reg.af().load(),
+            Select16::AF => u16::from_le_bytes([self.reg.f.load(), self.reg.a]),
             Select16::BC => self.reg.bc().load(),
             Select16::DE => self.reg.de().load(),
             Select16::HL => self.reg.hl().load(),
@@ -247,7 +248,11 @@ impl Port<u16> for Cpu {
 
     fn store(&mut self, reg: Self::Select, value: u16) {
         match reg {
-            Select16::AF => self.reg.af_mut().store(value),
+            Select16::AF => {
+                let [lo, hi] = value.to_le_bytes();
+                self.reg.a = hi;
+                self.reg.f.store(lo);
+            }
             Select16::BC => self.reg.bc_mut().store(value),
             Select16::DE => self.reg.de_mut().store(value),
             Select16::HL => self.reg.hl_mut().store(value),
@@ -331,44 +336,28 @@ pub struct Bank {
 #[derive(Debug, Default)]
 pub struct Control {
     /// Accumulator register.
-    pub a: u8,
+    pub a: reg::A,
     /// Flags register.
-    pub f: u8,
+    pub f: reg::F,
     /// General register B.
-    pub b: u8,
+    pub b: reg::B,
     /// General register C.
-    pub c: u8,
+    pub c: reg::C,
     /// General register D.
-    pub d: u8,
+    pub d: reg::D,
     /// General register E.
-    pub e: u8,
+    pub e: reg::E,
     /// Address (HI) byte.
-    pub h: u8,
+    pub h: reg::H,
     /// Address (LO) byte.
-    pub l: u8,
+    pub l: reg::L,
     /// Stack pointer.
-    pub sp: u16,
+    pub sp: reg::Sp,
     /// Program counter.
-    pub pc: u16,
+    pub pc: reg::Pc,
 }
 
 impl Control {
-    /// Joint AF register.
-    pub(crate) fn af(&'_ self) -> Alias<'_> {
-        Alias {
-            hi: &self.a,
-            lo: &self.f,
-        }
-    }
-
-    /// Joint mutable AF register.
-    pub(crate) fn af_mut(&'_ mut self) -> AliasMut<'_> {
-        AliasMut {
-            hi: &mut self.a,
-            lo: &mut self.f,
-        }
-    }
-
     /// Joint BC register.
     pub(crate) fn bc(&'_ self) -> Alias<'_> {
         Alias {
@@ -518,43 +507,6 @@ impl Debug for AliasMut<'_> {
 impl Display for AliasMut<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         Display::fmt(&self.load(), f)
-    }
-}
-
-/// Processor flags.
-///
-/// | Bit | Name | Explanation         |
-/// |-----|------|---------------------|
-/// |   7 | Z    | Zero flag.          |
-/// |   6 | N    | Subtraction flag.   |
-/// |   5 | H    | Half-carry flag.    |
-/// |   4 | C    | Carry flag.         |
-///
-/// See more details [here][flag].
-///
-/// [flag]: https://gbdev.io/pandocs/CPU_Registers_and_Flags.html#the-flags-register-lower-8-bits-of-af-register
-#[derive(Copy, Clone, Debug)]
-pub enum Flag {
-    /// Zero flag.
-    Z = 0b1000_0000,
-    /// Subtraction flag.
-    N = 0b0100_0000,
-    /// Half-carry flag.
-    H = 0b0010_0000,
-    /// Carry flag.
-    C = 0b0001_0000,
-}
-
-impl Flag {
-    /// Gets the value of the corresponding bit to the flag.
-    #[must_use]
-    pub fn get(self, value: &u8) -> bool {
-        value & self as u8 != 0
-    }
-
-    /// Sets the value of the corresponding bit from the flag.
-    pub fn set(self, value: &mut u8, enable: bool) {
-        *value ^= (*value & self as u8) ^ (!u8::from(enable).wrapping_sub(1) & self as u8);
     }
 }
 

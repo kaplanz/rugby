@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Daa(Daa::Execute)
@@ -34,10 +34,9 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     }
 
     // Execute DAA
-    let flags = &cpu.reg.f.load();
-    let didsub = Flag::N.get(flags);
-    let hcarry = Flag::H.get(flags);
-    let mut carry = Flag::C.get(flags);
+    let didsub = cpu.reg.f.n();
+    let hcarry = cpu.reg.f.h();
+    let mut carry = cpu.reg.f.c();
     let mut adj = 0i8;
     let acc = cpu.reg.a.load();
     if hcarry || (!didsub && (acc & 0x0f) > 0x09) {
@@ -52,11 +51,9 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     cpu.reg.a.store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, res == 0);
-    Flag::H.set(flags, false);
-    Flag::C.set(flags, carry);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(res == 0);
+    cpu.reg.f.set_h(false);
+    cpu.reg.f.set_c(carry);
 
     // Finish
     Ok(None)

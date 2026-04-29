@@ -5,7 +5,7 @@ use std::fmt::{Debug, Display};
 use log::trace;
 
 use self::exec::Operation;
-use super::{Cpu, Flag, Ime, Status};
+use super::{Cpu, Ime, Status};
 use crate::parts::pic::Interrupt;
 
 mod exec;
