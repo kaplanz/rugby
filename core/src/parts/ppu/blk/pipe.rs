@@ -4,9 +4,9 @@ use log::trace;
 use rugby_arch::Block;
 use rugby_arch::reg::Register;
 
+use super::Ppu;
 use super::fetch::{self, Step};
 use super::meta::{Color, Layer, Pixel, Sprite};
-use super::{Lcdc, Ppu};
 
 /// Pixel pipeline.
 #[derive(Clone, Debug, Default)]
@@ -29,7 +29,7 @@ impl Pipeline {
     /// Performs a fetch for the next pixels to the appropriate FIFO.
     pub fn fetch(&mut self, ppu: &mut Ppu, objs: &[Sprite]) {
         // Search for sprites
-        if self.ipr.is_empty() && !self.obj.fifo.is_full() && ppu.lcdc(Lcdc::ObjEnable) {
+        if self.ipr.is_empty() && !self.obj.fifo.is_full() && ppu.reg.lcdc.borrow().obj_enable() {
             self.ipr.extend(
                 objs.iter()
                     .enumerate()
@@ -74,7 +74,7 @@ impl Pipeline {
         // 2. The window border has been reached
         let window_reached = self.ready && {
             // 1. The window is enabled
-            let win_enabled = ppu.lcdc(Lcdc::WinEnable);
+            let win_enabled = ppu.reg.lcdc.borrow().win_enable();
             // 2. Fetcher is still at the background
             let fetch_at_bg = self.bgw.layer == Layer::Background;
             // 3. Y-coordinate is below the window
@@ -120,7 +120,7 @@ impl Pipeline {
         let mut bgwin = self.bgw.fifo.pop()?;
 
         // Overwrite if the background/window is disabled
-        if !ppu.lcdc(Lcdc::BgWinEnable) {
+        if !ppu.reg.lcdc.borrow().bg_win_enable() {
             bgwin.col = Color::C0;
         }
 
