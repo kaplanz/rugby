@@ -48,7 +48,7 @@ pub enum Interrupt {
     ///
     /// Requested by the [serial] interface upon completion of a transfer.
     ///
-    /// [serial]: super::serial
+    /// [serial]: super::sio
     Serial  = 0b0000_1000,
     /// Joypad input.
     ///
