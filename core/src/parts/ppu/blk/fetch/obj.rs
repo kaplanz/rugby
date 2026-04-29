@@ -1,7 +1,7 @@
 use rugby_arch::Block;
 
 use super::meta::{Layer, Row, Sprite};
-use super::{Fifo, Lcdc, Ppu, Step};
+use super::{Fifo, Ppu, Step};
 
 /// Sprite fetcher.
 #[derive(Clone, Debug)]
@@ -50,14 +50,14 @@ pub(super) mod exec {
     use log::trace;
     use rugby_arch::reg::Register;
 
-    use super::{Fetcher, Lcdc, Ppu, Row, Sprite, Step};
+    use super::{Fetcher, Ppu, Row, Sprite, Step};
 
     /// Executes fetch tile step.
     pub fn fetch(ppu: &Ppu, obj: &Sprite) -> Step {
         // Read the tile number from the tilemap
         let tnum = {
             // Check if the sprite is tall
-            if ppu.lcdc(Lcdc::ObjSize) {
+            if ppu.reg.lcdc.borrow().obj_size() {
                 // Tall (8x16) sprites span two tiles; must check if flipped
                 let upper = {
                     let ypos = obj.ypos;

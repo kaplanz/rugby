@@ -66,23 +66,23 @@ impl Ppu {
     /// Color a pixel using the current palette.
     pub(in super::super) fn color(&self, pixel: &Pixel) -> Color {
         // Load palette data
-        let pal = match pixel.meta.pal() {
-            Palette::BgWin => self.reg.bgp.load(),
-            Palette::Obp0 => self.reg.obp0.load(),
-            Palette::Obp1 => self.reg.obp1.load(),
+        let pal = *match pixel.meta.pal() {
+            Palette::BgWin => self.reg.bgp.borrow(),
+            Palette::Obp0 => self.reg.obp0.borrow(),
+            Palette::Obp1 => self.reg.obp1.borrow(),
         };
-        // Assign colors using palette
-        #[expect(clippy::identity_op)]
+        // Assign colours using palette
         let col = Color::from(match pixel.col {
-            Color::C0 => (0b0000_0011 & pal) >> 0,
-            Color::C1 => (0b0000_1100 & pal) >> 2,
-            Color::C2 => (0b0011_0000 & pal) >> 4,
-            Color::C3 => (0b1100_0000 & pal) >> 6,
+            Color::C0 => pal.c0(),
+            Color::C1 => pal.c1(),
+            Color::C2 => pal.c2(),
+            Color::C3 => pal.c3(),
         });
         trace!(
             "transformed: {old:?} -> {col:?}, using: {reg:?} = {pal:#010b}",
             old = pixel.col,
             reg = pixel.meta.pal(),
+            pal = pal.into_bits(),
         );
         col
     }
