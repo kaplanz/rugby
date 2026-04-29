@@ -61,13 +61,12 @@ fn push0(code: u8, cpu: &mut Cpu) -> Return {
 fn push1(code: u8, cpu: &mut Cpu) -> Return {
     // Load LSB
     let lsb = match code {
-        0xc5 => &cpu.reg.c,
-        0xd5 => &cpu.reg.e,
-        0xe5 => &cpu.reg.l,
-        0xf5 => &cpu.reg.f,
+        0xc5 => cpu.reg.c.load(),
+        0xd5 => cpu.reg.e.load(),
+        0xe5 => cpu.reg.l.load(),
+        0xf5 => cpu.reg.f.load(),
         code => return Err(Error::Opcode(code)),
-    }
-    .load();
+    };
 
     // Push LSB
     cpu.pushbyte(lsb);
