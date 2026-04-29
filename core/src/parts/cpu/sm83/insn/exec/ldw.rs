@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Ldw(Ldw::Fetch)
@@ -141,12 +141,10 @@ fn add(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
     cpu.reg.hl_mut().store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, false);
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, 0x000f < (sp & 0x000f) + (e16 & 0x000f));
-    Flag::C.set(flags, 0x00ff < (sp & 0x00ff) + (e16 & 0x00ff));
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(false);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(0x000f < (sp & 0x000f) + (e16 & 0x000f));
+    cpu.reg.f.set_c(0x00ff < (sp & 0x00ff) + (e16 & 0x00ff));
 
     // Proceed
     Ok(Some(Ldw::Delay.into()))

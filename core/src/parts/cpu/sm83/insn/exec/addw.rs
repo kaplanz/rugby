@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Addw(Addw::Fetch)
@@ -76,11 +76,9 @@ fn execute(_: u8, cpu: &mut Cpu, op1: u16, op2: u16) -> Return {
     cpu.reg.hl_mut().store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, 0x0fff < (op1 & 0x0fff) + (op2 & 0x0fff));
-    Flag::C.set(flags, carry);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(0x0fff < (op1 & 0x0fff) + (op2 & 0x0fff));
+    cpu.reg.f.set_c(carry);
 
     // Finish
     Ok(None)
@@ -109,12 +107,10 @@ fn execute_0xe8(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
     cpu.reg.sp.store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, false);
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, 0x000f < (op1 & 0x000f) + (op2 & 0x000f));
-    Flag::C.set(flags, 0x00ff < (op1 & 0x00ff) + (op2 & 0x00ff));
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(false);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(0x000f < (op1 & 0x000f) + (op2 & 0x000f));
+    cpu.reg.f.set_c(0x00ff < (op1 & 0x00ff) + (op2 & 0x00ff));
 
     // Finish
     Ok(None)

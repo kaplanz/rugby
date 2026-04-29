@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Ret(Ret::Check)
@@ -37,13 +37,12 @@ impl From<Ret> for Operation {
 
 fn check(code: u8, cpu: &mut Cpu) -> Return {
     // Evaluate condition
-    let flags = &cpu.reg.f.load();
     #[rustfmt::skip]
     let cond = match code {
-        0xc0 => !Flag::Z.get(flags),
-        0xc8 =>  Flag::Z.get(flags),
-        0xd0 => !Flag::C.get(flags),
-        0xd8 =>  Flag::C.get(flags),
+        0xc0 => !cpu.reg.f.z(),
+        0xc8 =>  cpu.reg.f.z(),
+        0xd0 => !cpu.reg.f.c(),
+        0xd8 =>  cpu.reg.f.c(),
         0xc9 => {
             // Continue
             return pop0(code, cpu);

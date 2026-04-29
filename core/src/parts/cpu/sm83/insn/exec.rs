@@ -15,7 +15,7 @@
 
 #![allow(clippy::unnecessary_wraps)]
 
-use super::{Cpu, Error, Execute, Flag, Ime, Result, Status, help};
+use super::{Cpu, Error, Execute, Ime, Result, Status, help};
 
 type Return = Result<Option<Operation>>;
 

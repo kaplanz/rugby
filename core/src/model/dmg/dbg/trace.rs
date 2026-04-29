@@ -4,7 +4,6 @@ use rugby_arch::Block;
 use rugby_arch::reg::Register;
 
 use super::GameBoy;
-use super::cpu::Flag;
 
 /// Collect a trace with formatting matching [binjgb].
 ///
@@ -16,10 +15,11 @@ pub fn binjgb(emu: &GameBoy) -> String {
     [
         format!("A:{:02X}", cpu.reg.a),
         format!("F:{}", {
-            [Flag::Z, Flag::N, Flag::H, Flag::C]
-                .map(|flag| {
-                    if flag.get(&cpu.reg.f) {
-                        format!("{flag:?}")
+            let f = cpu.reg.f;
+            [("Z", f.z()), ("N", f.n()), ("H", f.h()), ("C", f.c())]
+                .map(|(name, set)| {
+                    if set {
+                        name.to_string()
                     } else {
                         "-".to_string()
                     }

@@ -33,20 +33,16 @@ impl From<Pop> for Operation {
 
 fn pop1(code: u8, cpu: &mut Cpu) -> Return {
     // Pop LSB <- [SP++]
-    let mut lsb = cpu.popbyte();
-    if code == 0xf1 {
-        lsb &= 0xf0; // pop1 4 bits of F cannot be changed
-    }
+    let lsb = cpu.popbyte();
 
     // Store LSB
     match code {
-        0xc1 => &mut cpu.reg.c,
-        0xd1 => &mut cpu.reg.e,
-        0xe1 => &mut cpu.reg.l,
-        0xf1 => &mut cpu.reg.f,
+        0xc1 => cpu.reg.c.store(lsb),
+        0xd1 => cpu.reg.e.store(lsb),
+        0xe1 => cpu.reg.l.store(lsb),
+        0xf1 => cpu.reg.f.store(lsb),
         code => return Err(Error::Opcode(code)),
     }
-    .store(lsb);
 
     // Proceed
     Ok(Some(Pop::Pop0.into()))

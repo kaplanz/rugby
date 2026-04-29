@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
+use super::{Cpu, Error, Execute, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Sub(Sub::Fetch)
@@ -61,12 +61,10 @@ fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
     cpu.reg.a.store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, res == 0);
-    Flag::N.set(flags, true);
-    Flag::H.set(flags, (op2 & 0x0f) > (acc & 0x0f));
-    Flag::C.set(flags, carry);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(res == 0);
+    cpu.reg.f.set_n(true);
+    cpu.reg.f.set_h((op2 & 0x0f) > (acc & 0x0f));
+    cpu.reg.f.set_c(carry);
 
     // Finish
     Ok(None)

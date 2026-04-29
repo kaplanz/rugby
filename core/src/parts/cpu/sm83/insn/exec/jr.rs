@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Jr(Jr::Fetch)
@@ -46,13 +46,12 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
 
 fn check(code: u8, cpu: &mut Cpu, e8: u8) -> Return {
     // Evaluate condition
-    let flags = &cpu.reg.f.load();
     #[rustfmt::skip]
     let cond = match code {
-        0x20 => !Flag::Z.get(flags),
-        0x28 =>  Flag::Z.get(flags),
-        0x30 => !Flag::C.get(flags),
-        0x38 =>  Flag::C.get(flags),
+        0x20 => !cpu.reg.f.z(),
+        0x28 =>  cpu.reg.f.z(),
+        0x30 => !cpu.reg.f.c(),
+        0x38 =>  cpu.reg.f.c(),
         0x18 => true,
         code => return Err(Error::Opcode(code)),
     };

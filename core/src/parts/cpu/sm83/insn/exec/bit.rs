@@ -1,6 +1,4 @@
-use rugby_arch::reg::Register;
-
-use super::{Cpu, Error, Execute, Flag, Operation, Return, help};
+use super::{Cpu, Error, Execute, Operation, Return, help};
 
 pub const fn default() -> Operation {
     Operation::Bit(Bit::Fetch)
@@ -54,11 +52,9 @@ fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
     let res = (0b1 << op1) & op2;
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, res == 0);
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, true);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(res == 0);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(true);
 
     // Finish
     Ok(None)
