@@ -1,5 +1,7 @@
 //! Environment callbacks.
 
+#![allow(clippy::decimal_bitwise_operands)]
+
 use super::unsigned;
 // documentation uses
 #[allow(unused_imports)]
