@@ -18,7 +18,7 @@
 //! // Create an emulator instance
 //! let mut emu = GameBoy::new();
 //! // Load the cartridge into the emulator
-//! emu.load(cart);
+//! emu.insert(cart);
 //!
 //! // Run the emulator
 //! loop {
