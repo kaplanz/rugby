@@ -24,13 +24,16 @@ pub mod dbg;
 pub mod mem;
 pub mod pcb;
 
+pub mod boot;
+
 pub use self::boot::Boot;
-pub use self::cart::Cartridge;
 pub use self::joy::Button;
 pub use self::noc::Mmap;
 pub use self::soc::Chip;
-pub use crate::parts::cpu::sm83 as cpu;
-pub use crate::parts::{apu, boot, cart, dma, joy, pic, ppu, sio, tma};
+pub use crate::cart::Cartridge;
+pub use crate::cart::Header;
+pub use crate::chip::cpu::sm83 as cpu;
+pub use crate::chip::{apu, dma, joy, pic, ppu, sio, tma};
 
 /// Clock frequency.
 ///

@@ -1,6 +1,6 @@
 use rugby_arch::mem::Memory;
 
-use self::cart::chip::Mbc;
+use crate::cart::chip::Mbc;
 use self::pic::Pic;
 use self::tma::Timer;
 use super::*;

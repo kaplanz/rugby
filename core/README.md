@@ -7,6 +7,27 @@ be used through the top-level [`rugby`](/) crate.
 Currently, only the original Game Boy (DMG) is supported, although future
 support for the Game Boy Color (CGB) is planned.
 
+## Organization
+
+```
+src/
+├── api/        # public interface
+│   ├── core/   # emulator core
+│   └── part/   # component access
+├── cart/       # game cartridge
+├── chip/       # on-chip silicon
+│   ├── apu/    # audio processing unit
+│   ├── cpu/    # central processing unit
+│   ├── dma/    # direct memory access
+│   ├── joy/    # joypad controller
+│   ├── pic/    # programmable interrupt controller
+│   ├── ppu/    # picture processing unit
+│   ├── sio/    # serial interface
+│   └── tma/    # hardware timer
+└── model/      # console models
+    └── dmg/    # Game Boy (DMG-01)
+```
+
 ## Progress
 
 - [x] Implementation

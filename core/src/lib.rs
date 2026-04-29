@@ -11,8 +11,10 @@
 #![allow(clippy::unreadable_literal)]
 #![allow(clippy::unusual_byte_groupings)]
 
+mod chip;
 mod model;
-mod parts;
+
+pub mod cart;
 
 /// Emulator API.
 pub mod api {
