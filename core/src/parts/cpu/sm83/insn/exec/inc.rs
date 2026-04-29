@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Inc(Inc::Fetch)
@@ -92,11 +92,9 @@ fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
     let res = op1.wrapping_add(1);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, res == 0);
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, res & 0x0f == 0);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(res == 0);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(res & 0x0f == 0);
 
     // Check opcode
     match code {
