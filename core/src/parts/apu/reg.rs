@@ -19,7 +19,7 @@ pub struct Nr52 {
     /// except NR521. Turning the APU off, however, does not affect [Wave
     /// RAM](Wave), which can always be read/written, nor the [DIV-APU] counter.
     ///
-    /// [lcdc.7]: super::ppu::Lcdc::Enable
+    /// [lcdc.7]: super::ppu::reg::Lcdc::enable
     #[bits(1)]
     pub enable: bool,
     /// `NR52[6:4]`: Padding.

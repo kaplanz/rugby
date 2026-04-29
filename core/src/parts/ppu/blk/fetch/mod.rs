@@ -1,8 +1,8 @@
 use rugby_arch::reg::Register;
 
+use super::Ppu;
 use super::fifo::Fifo;
 use super::meta::{self, Layer};
-use super::{Lcdc, Ppu};
 
 mod bgw;
 mod obj;
@@ -30,7 +30,7 @@ impl Ppu {
     pub(crate) fn base(&self, layer: Layer) -> u16 {
         match layer {
             Layer::Background | Layer::Window => {
-                if self.lcdc(Lcdc::BgWinData) {
+                if self.reg.lcdc.borrow().bg_win_data() {
                     0x0000
                 } else {
                     0x1000
@@ -46,7 +46,7 @@ impl Ppu {
         let base = self.base(layer);
         let tnum = match layer {
             Layer::Background | Layer::Window => {
-                if self.lcdc(Lcdc::BgWinData) {
+                if self.reg.lcdc.borrow().bg_win_data() {
                     u16::from(tnum)
                 } else {
                     tnum as i8 as u16

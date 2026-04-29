@@ -5,7 +5,7 @@ use rugby_arch::reg::Register;
 use super::hblank::HBlank;
 use super::ppu::meta::Sprite;
 use super::vblank::VBlank;
-use super::{Lcdc, Mode, Ppu};
+use super::{Mode, Ppu};
 
 /// Mode 2: Scan OAM.
 #[derive(Clone, Debug, Default)]
@@ -23,7 +23,7 @@ impl Scan {
             // Sprites should only be scanned when:
             //
             // 1. Objects are are enabled (TODO: verify this)
-            let objs_enabled = ppu.lcdc(Lcdc::ObjEnable);
+            let objs_enabled = ppu.reg.lcdc.borrow().obj_enable();
             // 2. Fewer than 10 sprites have been found
             let not_at_limit = self.objs.len() < 10;
             //
@@ -42,7 +42,7 @@ impl Scan {
 
                 // Record sprites to be rendered that are visible this scanline
                 let ypos = obj.ypos;
-                let size = [8, 16][usize::from(ppu.lcdc(Lcdc::ObjSize))];
+                let size = [8, 16][usize::from(ppu.reg.lcdc.borrow().obj_size())];
                 let line = ppu.reg.ly.load().saturating_add(16);
                 if (ypos..ypos.saturating_add(size)).contains(&line) {
                     trace!("scanned sprite: {obj:?}");

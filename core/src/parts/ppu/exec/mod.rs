@@ -1,4 +1,4 @@
-use ppu::{LCD, Lcdc, Ppu};
+use ppu::{LCD, Ppu};
 use rugby_arch::reg::Register;
 
 use self::draw::Draw;
@@ -59,40 +59,25 @@ impl Mode {
             Mode::VBlank(vblank) => vblank.exec(ppu),
         };
 
-        // Compute STAT register
+        // Update STAT register
         let ly = ppu.reg.ly.load();
         let lyc = ppu.reg.lyc.load();
-        let stat = {
-            let mut stat = ppu.reg.stat.load();
-            // Mode bits [1:0]
-            stat ^= (0x03 & stat) ^ next.value();
-            // LYC=LY bit [2]
-            stat ^= (0x04 & stat) ^ (u8::from(ly == lyc) << 2);
-            stat
-        };
-        // Update STAT register
-        ppu.reg.stat.store(stat);
+        ppu.reg.stat.borrow_mut().set_mode(next.value());
+        ppu.reg.stat.borrow_mut().set_lyc(ly == lyc);
 
         // Compute STAT interrupt
-        let int = {
-            // Mode bits [5:3]
-            #[rustfmt::skip]
-            let mode = match next {
-                // Mode 0
-                Mode::HBlank(_) => 1 << 3,
-                // Mode 1
-                Mode::VBlank(_) => 1 << 4,
-                // Mode 3
-                Mode::Draw(_)   => 0,
-                // Mode 2
-                Mode::Scan(_)   => 1 << 5,
-            };
-            // LYC=LY bit [6]
-            let line = u8::from(lyc == ly) << 6;
-
-            // Combine activation sources
-            ((mode | line) & stat) != 0
-        };
+        let stat = *ppu.reg.stat.borrow();
+        #[rustfmt::skip]
+        let int = (match next {
+            // Mode 0
+            Mode::HBlank(_) => stat.hblank_int(),
+            // Mode 1
+            Mode::VBlank(_) => stat.vblank_int(),
+            // Mode 3
+            Mode::Draw(_)   => false,
+            // Mode 2
+            Mode::Scan(_)   => stat.oam_int(),
+        }) || (ly == lyc && stat.lyc_int());
         // Trigger STAT interrupt
         if int && !ppu.etc.int {
             // Only trigger on rising edge

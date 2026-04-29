@@ -17,9 +17,11 @@ mod exec;
 #[cfg(feature = "debug")]
 pub mod dbg;
 pub mod meta;
+pub mod reg;
 
 pub use self::exec::Mode;
 pub use self::meta::Color;
+pub use self::reg::{Lcdc, Pal, Stat};
 
 /// Audio sample divider.
 ///
@@ -189,12 +191,6 @@ impl Ppu {
     pub fn mode(&self) -> &Mode {
         &self.etc.mode
     }
-
-    /// Gets a configured state option.
-    #[must_use]
-    pub fn lcdc(&self, opt: Lcdc) -> bool {
-        opt.get(self.reg.lcdc.load())
-    }
 }
 
 impl Api for Ppu {
@@ -226,7 +222,7 @@ impl Api for Ppu {
 
 impl Block for Ppu {
     fn ready(&self) -> bool {
-        self.lcdc(Lcdc::Enable)
+        self.reg.lcdc.borrow().enable()
     }
 
     fn cycle(&mut self) {
@@ -318,9 +314,9 @@ pub struct Bank {
 #[derive(Debug, Default)]
 pub struct Control {
     /// LCD control
-    pub lcdc: Shared<u8>,
+    pub lcdc: Shared<reg::Lcdc>,
     /// LCD status
-    pub stat: Shared<u8>,
+    pub stat: Shared<reg::Stat>,
     /// Viewport Y position
     pub scy:  Shared<u8>,
     /// Viewport X position
@@ -332,11 +328,11 @@ pub struct Control {
     /// OAM DMA source address
     pub dma:  Shared<dma::Control>,
     /// BG palette data
-    pub bgp:  Shared<u8>,
+    pub bgp:  Shared<reg::Pal>,
     /// OBJ palette 0 data
-    pub obp0: Shared<u8>,
+    pub obp0: Shared<reg::Pal>,
     /// OBJ palette 1 data
-    pub obp1: Shared<u8>,
+    pub obp1: Shared<reg::Pal>,
     /// Window Y position
     pub wy:   Shared<u8>,
     /// Window X position
@@ -361,77 +357,5 @@ impl Mmio for Control {
         bus.map(0xff49..=0xff49, self.obp1.clone().into());
         bus.map(0xff4a..=0xff4a, self.wy.clone().into());
         bus.map(0xff4b..=0xff4b, self.wx.clone().into());
-    }
-}
-
-/// Graphics control register.
-///
-/// See more details [here][lcdc].
-///
-/// [lcdc]: https://gbdev.io/pandocs/LCDC.html
-#[rustfmt::skip]
-#[derive(Copy, Clone, Debug)]
-pub enum Lcdc {
-    /// `LCDC[7]`: LCD enable.
-    ///
-    /// Controls whether the LCD is on and the PPU is active. Setting it turns
-    /// both off, which grants immediate and full access to VRAM, OAM, etc.
-    Enable      = 0b1000_0000,
-    /// `LCDC[6]`: Window tile map area.
-    ///
-    /// Controls which background map the [window] uses for rendering. When
-    /// clear the `$9800` tilemap is used, otherwise the `$9C00` one is used.
-    ///
-    /// See also `LCDC[3]`.
-    ///
-    /// [window]: meta::Layer::Window
-    WinMap      = 0b0100_0000,
-    /// `LCDC[5]`: Window enable.
-    ///
-    /// Controls whether the [window] shall be displayed or not. This bit is
-    /// overridden on DMG when `LCDC[0]` is clear.
-    ///
-    /// [window]: meta::Layer::Window
-    WinEnable   = 0b0010_0000,
-    /// `LCDC[4]`: Background-Window tile data area.
-    ///
-    /// Controls which [addressing mode] the [background]/[window] use to pick
-    /// tiles.
-    ///
-    /// [addressing mode]: https://gbdev.io/pandocs/Tile_Data.html#vram-tile-data
-    /// [background]:      meta::Layer::Background
-    /// [window]:          meta::Layer::Window
-    BgWinData   = 0b0001_0000,
-    /// `LCDC[3]`: Background tile map area.
-    ///
-    /// Controls which background map the [background] uses for rendering. When
-    /// clear the `$9800` tilemap is used, otherwise the `$9C00` one is used.
-    ///
-    /// See also `LCDC[6]`.
-    ///
-    /// [background]: meta::Layer::Background
-    BgMap       = 0b0000_1000,
-    /// `LCDC[2]`: Object size.
-    ///
-    /// Controls the size of all objects (either 1x1 or 1x2 tiles stacked
-    /// vertically).
-    ObjSize     = 0b0000_0100,
-    /// `LCDC[1]`: Object enable.
-    ///
-    /// Controls whether objects are displayed or not.
-    ObjEnable   = 0b0000_0010,
-    /// `LCDC[0]`: Background-Window enable.
-    ///
-    /// When cleared, both background and window become blank (white), and
-    /// `LCDC[5]` (window enable) is ignored. Only objects may still be
-    /// displayed if enabled with `LCDC[1]` (object enable).
-    BgWinEnable = 0b0000_0001,
-}
-
-impl Lcdc {
-    /// Gets the value of the corresponding bit to the flag.
-    #[must_use]
-    fn get(self, value: u8) -> bool {
-        value & self as u8 != 0
     }
 }
