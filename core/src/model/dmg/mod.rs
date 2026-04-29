@@ -2,6 +2,8 @@
 //!
 //! [Game Boy]: https://en.wikipedia.org/wiki/Game_Boy
 
+use std::marker::PhantomData;
+
 use log::warn;
 use rugby_arch::Block;
 use rugby_arch::mio::Mmio;
@@ -15,6 +17,7 @@ use self::chip::sio::Serial;
 use self::pcb::Motherboard;
 use crate::api::core::{self, Core};
 use crate::api::part::proc::Processor;
+use crate::rev::Revision;
 
 pub mod chip;
 #[cfg(feature = "debug")]
@@ -23,6 +26,7 @@ pub mod mmap;
 pub mod pcb;
 
 pub mod boot;
+pub mod rev;
 
 use crate::cart::Cartridge;
 
@@ -34,7 +38,7 @@ pub const CLOCK: u32 = 4_194_304;
 
 /// Game Boy handheld game console.
 #[derive(Debug, Default)]
-pub struct GameBoy {
+pub struct GameBoy<R: Revision = rev::C> {
     /// Boot ROM.
     boot: Option<boot::Chip>,
     /// Game cartridge.
@@ -44,9 +48,11 @@ pub struct GameBoy {
     pub main: Motherboard,
     #[cfg(not(feature = "debug"))]
     main: Motherboard,
+    /// Revision marker.
+    _rev: PhantomData<R>,
 }
 
-impl GameBoy {
+impl<R: Revision> GameBoy<R> {
     /// Constructs a new `GameBoy`.
     #[must_use]
     pub fn new() -> Self {
@@ -129,7 +135,7 @@ impl GameBoy {
     }
 }
 
-impl Block for GameBoy {
+impl<R: Revision> Block for GameBoy<R> {
     fn ready(&self) -> bool {
         self.main.ready()
     }
@@ -146,9 +152,9 @@ impl Block for GameBoy {
     }
 }
 
-impl Core for GameBoy {}
+impl<R: Revision> Core for GameBoy<R> {}
 
-impl core::has::Audio for GameBoy {
+impl<R: Revision> core::has::Audio for GameBoy<R> {
     type Audio = Apu;
 
     fn audio(&self) -> &Self::Audio {
@@ -160,7 +166,7 @@ impl core::has::Audio for GameBoy {
     }
 }
 
-impl core::has::Processor for GameBoy {
+impl<R: Revision> core::has::Processor for GameBoy<R> {
     type Proc = Cpu;
 
     fn proc(&self) -> &Self::Proc {
@@ -172,7 +178,7 @@ impl core::has::Processor for GameBoy {
     }
 }
 
-impl core::has::Joypad for GameBoy {
+impl<R: Revision> core::has::Joypad for GameBoy<R> {
     type Joypad = Joypad;
 
     fn joypad(&self) -> &Self::Joypad {
@@ -184,7 +190,7 @@ impl core::has::Joypad for GameBoy {
     }
 }
 
-impl core::has::Serial for GameBoy {
+impl<R: Revision> core::has::Serial for GameBoy<R> {
     type Serial = Serial;
 
     fn serial(&self) -> &Self::Serial {
@@ -196,7 +202,7 @@ impl core::has::Serial for GameBoy {
     }
 }
 
-impl core::has::Video for GameBoy {
+impl<R: Revision> core::has::Video for GameBoy<R> {
     type Video = Ppu;
 
     fn video(&self) -> &Self::Video {
