@@ -69,7 +69,7 @@ impl Serial {
     pub fn tick(&mut self) {
         // Only tick if transferring on external clock
         let sc = self.reg.sc.borrow();
-        if sc.ena && !sc.clk {
+        if sc.ena() && !sc.clk() {
             drop(sc); // release borrow on `self`
 
             // Perform a cycle
@@ -112,9 +112,8 @@ impl Api for Serial {
 impl Block for Serial {
     fn ready(&self) -> bool {
         // Only enable if transferring on internal clock
-        let ena = self.reg.sc.borrow().ena;
-        let clk = self.reg.sc.borrow().clk;
-        ena && clk
+        let sc = self.reg.sc.borrow();
+        sc.ena() && sc.clk()
     }
 
     fn cycle(&mut self) {
@@ -137,7 +136,7 @@ impl Block for Serial {
             let tx = std::mem::take(&mut self.etc.ip);
             self.etc.tx.push_back(tx);
             // Mark as complete
-            sc.ena = false;
+            sc.set_ena(false);
             debug!("finished tx: {tx:#04x}");
             // Request an interrupt
             self.int.raise(Interrupt::Serial);
@@ -204,6 +203,7 @@ impl Mmio for Control {
 
 /// Serial register models.
 pub mod reg {
+    use bitfield_struct::bitfield;
     use log::{debug, warn};
     use rugby_arch::mem::Memory;
     use rugby_arch::reg::Register;
@@ -211,12 +211,50 @@ pub mod reg {
     /// Serial data.
     pub type Sb = u8;
 
+    /// `SC`: Serial control register.
+    ///
+    /// | Bit | Name                | Use |
+    /// |-----|---------------------|-----|
+    /// |   7 | Transfer start flag | R/W |
+    /// | 6-1 | Unused.             | -   |
+    /// |   0 | Shift clock.        | R/W |
+    ///
+    /// See more details [here][sc].
+    ///
+    /// [sc]: https://gbdev.io/pandocs/Serial_Data_Transfer_(Link_Cable).html
+    #[bitfield(u8, order = msb)]
+    #[derive(PartialEq, Eq)]
+    struct ScBits {
+        /// `SC[7]`: Transfer enable.
+        #[bits(1)]
+        ena: bool,
+        /// `SC[6:1]`: Unused.
+        #[bits(6)]
+        __: u8,
+        /// `SC[0]`: Shift clock select.
+        #[bits(1)]
+        clk: bool,
+    }
+
     /// Serial control.
     #[derive(Debug, Default)]
     pub struct Sc {
-        pub(super) ena: bool,
-        pub(super) clk: bool,
+        reg: ScBits,
         pub(super) bit: u8,
+    }
+
+    impl Sc {
+        pub(super) fn ena(&self) -> bool {
+            self.reg.ena()
+        }
+
+        pub(super) fn clk(&self) -> bool {
+            self.reg.clk()
+        }
+
+        pub(super) fn set_ena(&mut self, v: bool) {
+            self.reg.set_ena(v);
+        }
     }
 
     impl Memory for Sc {
@@ -234,16 +272,15 @@ pub mod reg {
         type Value = u8;
 
         fn load(&self) -> Self::Value {
-            (u8::from(self.ena) << 7) | 0x7e | u8::from(self.clk)
+            // unused bits 6:1 always read as 1
+            self.reg.into_bits() | 0x7e
         }
 
         fn store(&mut self, value: Self::Value) {
             if self.bit != 0 {
                 warn!("interrupted serial transfer");
             }
-            // Store individual bits
-            self.ena = value & 0x80 != 0;
-            self.clk = value & 0x01 != 0;
+            self.reg = ScBits::from_bits(value);
             // Reset transfer sequence bit
             self.bit = 0b1000_0000;
             debug!("started tx");
