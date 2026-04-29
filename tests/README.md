@@ -171,7 +171,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-33 passed; 36 failed;
+34 passed; 35 failed;
 ```
 
 <details>
@@ -187,7 +187,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/boot_div-dmgABCmgb.gb`                  |
   |  ❌  | `acceptance/boot_hwio-dmg0.gb`                      |
   |  ❌  | `acceptance/boot_hwio-dmgABCmgb.gb`                 |
-  |  ❌  | `acceptance/boot_regs-dmg0.gb`                      |
+  |  ✅  | `acceptance/boot_regs-dmg0.gb`                      |
   |  ✅  | `acceptance/boot_regs-dmgABC.gb`                    |
   |  ❌  | `acceptance/call_cc_timing.gb`                      |
   |  ❌  | `acceptance/call_cc_timing2.gb`                     |
