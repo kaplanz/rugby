@@ -4,20 +4,22 @@ use std::fmt::{Debug, Display};
 
 use rugby::arch::Block;
 use rugby::arch::reg::Port;
+use rugby::core::Revision;
 use rugby::core::cart::Cartridge;
-use rugby::core::dmg::GameBoy;
 use rugby::core::dmg::chip::cpu::Cpu;
+use rugby::core::dmg::{GameBoy, rev};
 
 /// Number of cycles after which the test is considered to have failed due to a
 /// timeout error.
 const TIMEOUT: usize = 10_000_000;
 
 /// Perform integration test emulation.
-fn emulate(rom: &[u8]) -> Result<()> {
+fn emulate<R: Revision>(mut emu: GameBoy<R>, rom: &[u8]) -> Result<()>
+where
+    GameBoy<R>: Block,
+{
     // Instantiate a cartridge
     let cart = Cartridge::new(rom).unwrap();
-    // Create an emulator instance
-    let mut emu = GameBoy::new();
     // Load the cartridge
     emu.insert(cart);
 
@@ -37,7 +39,7 @@ fn emulate(rom: &[u8]) -> Result<()> {
 }
 
 /// Check for test results.
-fn check(emu: &GameBoy) -> Result<()> {
+fn check<R: Revision>(emu: &GameBoy<R>) -> Result<()> {
     type Select = <Cpu as Port<u16>>::Select;
     // Extract register values
     let cpu = &emu.main.soc.cpu;
@@ -85,10 +87,30 @@ macro_rules! test {
         $(
             #[test]
             fn $test() -> Result<()> {
-                emulate(include_bytes!($path))
+                emulate(GameBoy::<rev::A>::new(), include_bytes!($path))
             }
         )*
     };
+    ($rev:ty; $($test:ident = $path:tt;)*) => {
+        $(
+            #[test]
+            fn $test() -> Result<()> {
+                emulate(GameBoy::<$rev>::new(), include_bytes!($path))
+            }
+        )*
+    };
+}
+
+test! { rev::Zero;
+    acceptance_boot_div_dmg0  = "../roms/test/mooneye/acceptance/boot_div-dmg0.gb";
+    acceptance_boot_hwio_dmg0 = "../roms/test/mooneye/acceptance/boot_hwio-dmg0.gb";
+    acceptance_boot_regs_dmg0 = "../roms/test/mooneye/acceptance/boot_regs-dmg0.gb";
+}
+
+test! { rev::A;
+    acceptance_boot_div_dmgABCmgb               = "../roms/test/mooneye/acceptance/boot_div-dmgABCmgb.gb";
+    acceptance_boot_hwio_dmgABCmgb              = "../roms/test/mooneye/acceptance/boot_hwio-dmgABCmgb.gb";
+    acceptance_boot_regs_dmgABC                 = "../roms/test/mooneye/acceptance/boot_regs-dmgABC.gb";
 }
 
 test! {
@@ -96,12 +118,6 @@ test! {
     acceptance_bits_mem_oam                     = "../roms/test/mooneye/acceptance/bits/mem_oam.gb";
     acceptance_bits_reg_f                       = "../roms/test/mooneye/acceptance/bits/reg_f.gb";
     acceptance_bits_unused_hwio_GS              = "../roms/test/mooneye/acceptance/bits/unused_hwio-GS.gb";
-    acceptance_boot_div_dmg0                    = "../roms/test/mooneye/acceptance/boot_div-dmg0.gb";
-    acceptance_boot_div_dmgABCmgb               = "../roms/test/mooneye/acceptance/boot_div-dmgABCmgb.gb";
-    acceptance_boot_hwio_dmg0                   = "../roms/test/mooneye/acceptance/boot_hwio-dmg0.gb";
-    acceptance_boot_hwio_dmgABCmgb              = "../roms/test/mooneye/acceptance/boot_hwio-dmgABCmgb.gb";
-    acceptance_boot_regs_dmg0                   = "../roms/test/mooneye/acceptance/boot_regs-dmg0.gb";
-    acceptance_boot_regs_dmgABC                 = "../roms/test/mooneye/acceptance/boot_regs-dmgABC.gb";
     acceptance_call_cc_timing                   = "../roms/test/mooneye/acceptance/call_cc_timing.gb";
     acceptance_call_cc_timing2                  = "../roms/test/mooneye/acceptance/call_cc_timing2.gb";
     acceptance_call_timing                      = "../roms/test/mooneye/acceptance/call_timing.gb";
