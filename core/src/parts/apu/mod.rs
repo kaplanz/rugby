@@ -5,7 +5,7 @@ use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
-use super::timer;
+use super::tma;
 use crate::api::part::audio::{Audio as Api, Chiptune, Sample};
 
 mod reg;
@@ -29,8 +29,11 @@ pub type Wave = Ram<[u8; 0x0010]>;
 /// # Note
 ///
 /// Also referred to as the frame sequencer, this determines how often each
-/// channel's features should be clocked. It is driven by [timer], specifically
-/// the falling edge of the [divider register](timer::reg::Div)'s bit 4.
+/// channel's features should be clocked. It is driven by the [timer],
+/// specifically the falling edge of the [divider register](tma::reg::Div)'s
+/// bit 4.
+///
+/// [timer]: super::tma
 #[derive(Debug)]
 pub struct Sequencer {
     /// `DIV[4]` last measured value.
@@ -45,7 +48,9 @@ pub struct Sequencer {
     /// Clock driver.
     ///
     /// Uses `DIV[4]` from the [timer].
-    pub div: Shared<timer::reg::Div>,
+    ///
+    /// [timer]: super::tma
+    pub div: Shared<tma::reg::Div>,
 }
 
 impl Sequencer {
