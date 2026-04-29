@@ -144,7 +144,10 @@ fn bus_all_works() {
             <Ppu as Port<u8>>::Select::Wx,
         ])
         .map(|(_, reg)| emu.main.soc.ppu.load(reg))
-        .for_each(|byte| assert_eq!(byte, 0x0c));
+        .zip([
+            0x0c, 0x8c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
+        ])
+        .for_each(|(found, expected)| assert_eq!(found, expected));
     // Boot ROM disable
     (0xff50..=0xff50).for_each(|addr| bus.write(addr, 0x0d));
     if let Some(boot) = &emu.boot {
