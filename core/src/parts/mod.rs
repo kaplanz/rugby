@@ -13,4 +13,4 @@ pub mod joy;
 pub mod pic;
 pub mod ppu;
 pub mod sio;
-pub mod timer;
+pub mod tma;

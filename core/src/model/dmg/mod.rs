@@ -30,7 +30,7 @@ pub use self::joy::Button;
 pub use self::noc::Mmap;
 pub use self::soc::Chip;
 pub use crate::parts::cpu::sm83 as cpu;
-pub use crate::parts::{apu, boot, cart, dma, joy, pic, ppu, sio, timer};
+pub use crate::parts::{apu, boot, cart, dma, joy, pic, ppu, sio, tma};
 
 /// Clock frequency.
 ///
