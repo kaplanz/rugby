@@ -24,7 +24,7 @@ fn main() {
     // Instantiate a cartridge
     let cart = Cartridge::new(GAME).unwrap();
     // Create an emulator instance
-    let mut emu = GameBoy::new();
+    let mut emu: GameBoy = GameBoy::new();
     // Load the cartridge
     emu.insert(cart);
 
