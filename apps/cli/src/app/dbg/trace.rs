@@ -6,11 +6,11 @@ use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
 use anyhow::{Context, bail};
-use cmp::Tracer as Tracecmp;
 use either::Either;
-use log::Tracer as Tracelog;
 use rugby::core::dmg::GameBoy;
 
+use self::cmp::Tracer as Tracecmp;
+use self::log::Tracer as Tracelog;
 use crate::exe::run::cli::trace::{Format, Trace};
 
 /// Builds a tracing instance.
