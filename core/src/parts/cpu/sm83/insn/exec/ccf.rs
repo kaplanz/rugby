@@ -1,6 +1,4 @@
-use rugby_arch::reg::Register;
-
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Ccf(Ccf::Execute)
@@ -34,12 +32,10 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     }
 
     // Execute CCF
-    let flags = &mut cpu.reg.f.load();
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, false);
-    let carry = Flag::C.get(flags);
-    Flag::C.set(flags, !carry);
-    cpu.reg.f.store(*flags);
+    let c = cpu.reg.f.c();
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(false);
+    cpu.reg.f.set_c(!c);
 
     // Finish
     Ok(None)

@@ -1,6 +1,6 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Flag, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return};
 
 pub const fn default() -> Operation {
     Operation::Rrca(Rrca::Execute)
@@ -40,12 +40,10 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     cpu.reg.a.store(res);
 
     // Set flags
-    let flags = &mut cpu.reg.f.load();
-    Flag::Z.set(flags, false);
-    Flag::N.set(flags, false);
-    Flag::H.set(flags, false);
-    Flag::C.set(flags, carry);
-    cpu.reg.f.store(*flags);
+    cpu.reg.f.set_z(false);
+    cpu.reg.f.set_n(false);
+    cpu.reg.f.set_h(false);
+    cpu.reg.f.set_c(carry);
 
     // Finish
     Ok(None)
