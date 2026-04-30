@@ -32,7 +32,7 @@ impl Frontend {
     /// Constructs a new `Graphics`.
     pub fn new(args: &Cli) -> Result<Self> {
         Ok(Self {
-            pal: args.cfg.data.app.pal.clone().unwrap_or_default().into(),
+            pal: args.cfg.data.video.pal.clone().unwrap_or_default().into(),
             lcd: Window::open()?,
             #[cfg(feature = "gfx")]
             dbg: Gfx::default(),

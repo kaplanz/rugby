@@ -10,20 +10,20 @@ Configurable fields are arranged hierarchically as such:
 
 ```
 .
-├── app: object
-│  ├── aux: uint
-│  ├── log: string
-│  ├── pal: enum
-│  └── spd: enum
-└── emu: object
-   ├── boot: object
-   │  ├── rom:  path
-   │  └── skip: bool
-   └── cart: object
-      ├── rom:   path
-      ├── check: bool
-      ├── force: bool
-      └── save:  enum
+├── log:   string
+├── audio: object
+│  └── rate: uint
+├── video: object
+│  └── palette: enum
+├── input: object
+├── cable: object
+├── boot:  object
+│  └── rom:  path
+└── cart:  object
+   ├── rom:   path
+   ├── check: bool
+   ├── force: bool
+   └── save:  enum
 ```
 
 ## Options
@@ -32,21 +32,19 @@ Configurable fields are arranged hierarchically as such:
 
 The following is a table of supported configurable fields:
 
-| Field            | Description                   | Flag           | Type     | Clap  | Serde | Notes  |
-|------------------|-------------------------------|----------------|----------|:-----:|:-----:|--------|
-| `app.aux`        | Audio sample rate.            | `--audio`      | `uint`   |   ✓   |   ✓   | [^aux] |
-| `app.log`        | Logging filter.               | `-l/--log`     | `string` |   ✓   |   ✓   | [^log] |
-| `app.pal`        | 2-bit color palette.          | `-p/--palette` | `enum`   |   ✓   |   ✓   | [^pal] |
-| `app.spd`        | Simulated clock speed.        | `-s/--speed`   | `enum`   |   ✓   |   ✓   |        |
-| `emu.boot.rom`   | Boot ROM image file.          | `-b/--boot`    | `path`   |   ✓   |   ✓   |        |
-| `emu.boot.skip`  | Skip running boot ROM.        | `--no-boot`    | `bool`   |   ✓   |       |        |
-| `emu.cart.rom`   | Cartridge ROM image file.     |                | `path`   |   ✓   |       |        |
-| `emu.cart.check` | Check cartridge integrity.    | `-c/--check`   | `bool`   |   ✓   |   ✓   |        |
-| `emu.cart.force` | Force cartridge construction. | `-f/--force`   | `bool`   |   ✓   |   ✓   |        |
-| `emu.cart.save`  | Cartridge RAM persistence.    | `-S/--save`    | `enum`   |   ✓   |   ✓   | [^sav] |
+| Field        | Description                   | Flag            | Type     | Clap  | Serde | Notes  |
+|--------------|-------------------------------|-----------------|----------|:-----:|:-----:|--------|
+| `log`        | Logging filter.               | `-l/--log`      | `string` |   ✓   |   ✓   | [^log] |
+| `audio.rate` | Audio sample rate.            | `--sample-rate` | `uint`   |   ✓   |   ✓   | [^aux] |
+| `video.pal`  | 2-bit color palette.          | `-p/--palette`  | `enum`   |   ✓   |   ✓   | [^pal] |
+| `boot.rom`   | Boot ROM image file.          | `-b/--boot`     | `path`   |   ✓   |   ✓   |        |
+| `cart.rom`   | Cartridge ROM image file.     |                 | `path`   |   ✓   |       |        |
+| `cart.check` | Check cartridge integrity.    | `-c/--check`    | `bool`   |   ✓   |   ✓   |        |
+| `cart.force` | Force cartridge construction. | `-f/--force`    | `bool`   |   ✓   |   ✓   |        |
+| `cart.save`  | Cartridge RAM persistence.    | `-S/--save`     | `enum`   |   ✓   |   ✓   | [^sav] |
 
 [^aux]: Unless you have a specific use case, there is no reason to change the
-    default value of 48 Khz.
+    default value of 48 KHz.
 [^log]: Must be a valid log filter as parsed by the frontend. See filter
     directives using [`tracing`][filter] as an example.
 [^pal]: Only applicable on the DMG model. On CGB, the palette will be ignored.
@@ -91,6 +89,6 @@ For information regarding licensure, please see the project's [README][license].
 <!-- Reference-style links -->
 [filter]:   https://tracing.rs/tracing_subscriber/filter/struct.envfilter#directives
 [license]:  /README.md#license
-[src.pal]:  ./src/val.rs#L33
-[src.spd]:  ./src/val.rs#L102
-[src.when]: ./src/val.rs#L14
+[src.pal]:  ./src/group/video.rs#L21
+[src.spd]:  ./src/types/speed.rs#L22
+[src.when]: ./src/types/mod.rs#L22
