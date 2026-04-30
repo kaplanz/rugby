@@ -17,20 +17,25 @@
 #
 # Use `--config` to provide an alternate location for this configuration file.
 
-#
-## Frontend options.
-#
-[app]
-
-# Audio sample rate.
-#
-# Sample rate to use for audio output.
-audio = 48000
-
 # Logging level.
 #
 # A comma-separated list of logging directives.
 log = "warn"
+
+###
+## Audio options.
+#
+[audio]
+
+# Audio sample rate.
+#
+# Sample rate to use for audio output.
+rate = 48000
+
+###
+## Video options.
+#
+[video]
 
 # 2-bit color palette.
 #
@@ -38,19 +43,20 @@ log = "warn"
 # palette = { custom = ["#222", "#666", "#aaa", "#ddd"] }
 palette = "mono"
 
-# Simulated clock speed.
+###
+## Input options.
 #
-# Value must be a named preset or customized as follows:
-# speed.x   = 1.5
-# speed.hz  = 6291456
-# speed.fps = 90
-speed = "actual"
+[input]
 
+###
+## Cable options.
+#
+[cable]
 
+###
+## Boot ROM options.
 #
-## Booting options.
-#
-[emu.boot]
+[boot]
 
 # Boot ROM image file.
 #
@@ -67,11 +73,10 @@ speed = "actual"
 #
 # rom = "dmg_boot.bin"
 
-
-#
+###
 ## Cartridge options.
 #
-[emu.cart]
+[cart]
 
 # Check cartridge integrity.
 #

@@ -1,6 +1,6 @@
 //! Command-line interface.
 
-use rugby::extra::cfg::opt::emu::Cart;
+use rugby::extra::cfg::Cart;
 
 use super::NAME;
 

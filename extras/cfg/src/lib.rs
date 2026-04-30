@@ -1,17 +1,35 @@
-//! Emulator configuration.
+//! Configuration schema for `rugby`.
+//!
+//! This crate defines [`Config`], a common configuration schema for emulator
+//! frontends.
+//!
+//! # Features
+//!
+//! - [`clap`]: Parse CLI arguments and environment variables.
+//! - [`toml`]: Load configuration from a TOML document.
+//!
+//! # Layering
+//!
+//! To layer configuration from different sources, call [`Config::merge`] to
+//! perform a layered merge. A merge is always performed right onto left,
+//! meaning the left's values are overwritten by the right's, if present.
 
 #![warn(clippy::pedantic)]
 
-use ::merge::Merge;
-
-use crate::opt::{Emulator, Frontend};
-
-mod val;
+use merge::Merge;
 
 pub mod env;
-pub mod opt;
+pub mod fmt;
+pub mod group;
+pub mod types;
 
-/// Configuration object.
+pub use self::group::{Audio, Boot, Cable, Cart, Input, Palette, Video};
+
+/// Emulator configuration.
+///
+/// Aggregates configuration sections and options into a single object. Designed
+/// for layered use by [merging](Self::merge) configuration objects from
+/// different sources.
 #[derive(Debug, Default, Merge)]
 #[cfg_attr(feature = "clap", derive(clap::Args))]
 #[cfg_attr(
@@ -29,29 +47,52 @@ pub mod opt;
     expect(clippy::unsafe_derive_deserialize)
 )]
 pub struct Config {
-    /// Frontend options.
+    /// Logging filter.
+    ///
+    /// A comma-separated list of logging directives.
+    #[cfg_attr(feature = "clap", arg(
+        short, long,
+        env = crate::env::LOG,
+        value_name = "FILTER",
+        help_heading = None,
+    ))]
+    #[merge(strategy = merge::option::overwrite_none)]
+    pub log: Option<String>,
+
+    /// Simulated clock speed.
+    ///
+    /// Select from a list of possible speeds to simulate the emulator's clock.
+    #[cfg_attr(
+        feature = "clap",
+        arg(short, long = "speed", value_name = "SPEED"),
+        arg(value_parser = crate::types::speed::ValueParser)
+    )]
+    #[cfg_attr(feature = "facet", facet(skip))]
+    #[cfg_attr(feature = "serde", serde(skip))]
+    #[merge(strategy = merge::option::overwrite_none)]
+    pub spd: Option<types::speed::Speed>,
+
+    /// Audio options.
     #[cfg_attr(feature = "clap", command(flatten))]
-    pub app: Frontend,
+    pub audio: group::Audio,
 
-    /// Emulator options.
+    /// Video options.
     #[cfg_attr(feature = "clap", command(flatten))]
-    pub emu: Emulator,
-}
+    pub video: group::Video,
 
-/// Deserializing configuration.
-#[cfg(feature = "toml")]
-pub mod de {
-    use std::str::FromStr;
+    /// Input options.
+    #[cfg_attr(feature = "clap", command(flatten))]
+    pub input: group::Input,
 
-    pub use toml::de::Error;
+    /// Cable options.
+    #[cfg_attr(feature = "clap", command(flatten))]
+    pub cable: group::Cable,
 
-    use crate::Config;
+    /// Boot ROM options.
+    #[cfg_attr(feature = "clap", command(flatten))]
+    pub boot: group::Boot,
 
-    impl FromStr for Config {
-        type Err = Error;
-
-        fn from_str(s: &str) -> Result<Self, Self::Err> {
-            toml::from_str(s)
-        }
-    }
+    /// Cartridge options.
+    #[cfg_attr(feature = "clap", command(flatten))]
+    pub cart: group::Cart,
 }

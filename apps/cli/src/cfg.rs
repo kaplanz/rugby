@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::{fs, io};
 
 pub use rugby::extra::cfg::Config;
-use rugby::extra::cfg::de;
+use rugby::extra::cfg::fmt::toml;
 
 use crate::dir;
 
@@ -53,5 +53,5 @@ pub enum Error {
     Read(#[from] io::Error),
     /// Parsing error.
     #[error("parsing configuration failed")]
-    Parse(#[from] de::Error),
+    Parse(#[from] toml::Error),
 }

@@ -23,7 +23,7 @@ pub fn main(mut args: Cli) -> Result<()> {
         cfg::load(&args.cfg.path)?
     });
     // Initialize logger
-    crate::log::init(args.cfg.data.app.log.as_deref()).context("logger initialization failed")?;
+    crate::log::init(args.cfg.data.log.as_deref()).context("logger initialization failed")?;
     // Log arguments
     trace!("{args:#?}");
 

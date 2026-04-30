@@ -1,4 +1,4 @@
-//! Environment variables.
+//! Environment variable names.
 
 /// Configuration file.
 pub const CFG: &str = "RUGBY_CFG";
