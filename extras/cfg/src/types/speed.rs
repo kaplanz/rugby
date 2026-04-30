@@ -1,111 +1,10 @@
-//! Configurable values.
+//! Clock speed values.
 
 use std::num::{ParseFloatError, ParseIntError};
 use std::str::FromStr;
 
 use rugby_core::chip::ppu;
 use rugby_core::dmg::CLOCK;
-use rugby_pal as pal;
-
-/// When to enable.
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(
-    feature = "facet",
-    derive(facet::Facet),
-    facet(rename_all = "kebab-case")
-)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize, serde::Serialize),
-    serde(rename_all = "kebab-case")
-)]
-#[repr(C)]
-pub enum When {
-    /// Never enable.
-    Never,
-    /// Smartly enable.
-    #[default]
-    Auto,
-    /// Always enable.
-    Always,
-}
-
-/// Emulator palette selection.
-#[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(
-    feature = "facet",
-    derive(facet::Facet),
-    facet(rename_all = "kebab-case")
-)]
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize, serde::Serialize),
-    serde(rename_all = "kebab-case")
-)]
-#[non_exhaustive]
-#[repr(C)]
-pub enum Palette {
-    /// Nostalgic autumn sunsets.
-    AutumnChill,
-    /// Aquatic blues.
-    BlkAqu,
-    /// Winter snowstorm blues.
-    BlueDream,
-    /// Combining cool and warm tones.
-    Coldfire,
-    /// Soft and pastel coral hues.
-    Coral,
-    /// Cold metallic darks with warm dated plastic lights.
-    Demichrome,
-    /// Greens and warm browns with an earthy feel.
-    Earth,
-    /// Creamsicle inspired orange.
-    IceCream,
-    /// Old-school dot-matrix display.
-    Legacy,
-    /// Misty forest greens.
-    Mist,
-    /// Simple blacks and whites.
-    #[default]
-    Mono,
-    /// William Morris's rural palette.
-    Morris,
-    /// Waterfront at dawn.
-    PurpleDawn,
-    /// Rusty red and brown hues.
-    Rustic,
-    /// Deep and passionate purples.
-    VelvetCherry,
-    /// Whatever colors you want!
-    #[cfg_attr(feature = "clap", value(skip))]
-    Custom(pal::Palette),
-}
-
-#[rustfmt::skip]
-impl From<Palette> for pal::Palette {
-    fn from(value: Palette) -> Self {
-        match value {
-            Palette::AutumnChill  => pal::AUTUMN_CHILL,
-            Palette::BlkAqu       => pal::BLK_AQU,
-            Palette::BlueDream    => pal::BLUE_DREAM,
-            Palette::Coldfire     => pal::COLDFIRE,
-            Palette::Coral        => pal::CORAL,
-            Palette::Demichrome   => pal::DEMICHROME,
-            Palette::Earth        => pal::EARTH,
-            Palette::IceCream     => pal::ICE_CREAM,
-            Palette::Legacy       => pal::LEGACY,
-            Palette::Mist         => pal::MIST,
-            Palette::Mono         => pal::MONO,
-            Palette::Morris       => pal::MORRIS,
-            Palette::PurpleDawn   => pal::PURPLE_DAWN,
-            Palette::Rustic       => pal::RUSTIC,
-            Palette::VelvetCherry => pal::VELVET_CHERRY,
-            Palette::Custom(pal)  => pal,
-        }
-    }
-}
 
 /// Simulated clock frequency.
 #[derive(Clone, Debug, Default)]
@@ -171,48 +70,31 @@ impl Speed {
 }
 
 impl FromStr for Speed {
-    type Err = ParseSpeedError;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // Ensure string is non-empty
         if s.is_empty() {
             Err(Self::Err::Empty)
-        }
-        // Match on unit variants
-        //
-        // Actual speed
-        else if s == "actual" {
+        } else if s == "actual" {
             Ok(Speed::Actual)
-        }
-        // Maximum speed
-        else if s == "turbo" {
+        } else if s == "turbo" {
             Ok(Speed::Turbo)
-        }
-        // Try parsing with suffix
-        //
-        // Speedup ratio
-        else if let Some(mult) = s.strip_suffix('x') {
+        } else if let Some(mult) = s.strip_suffix('x') {
             mult.parse().map(Speed::Ratio).map_err(Into::into)
-        }
-        // Clock frequency
-        else if let Some(freq) = s.strip_suffix("hz") {
+        } else if let Some(freq) = s.strip_suffix("hz") {
             freq.parse().map(Speed::Clock).map_err(Into::into)
-        }
-        // Frame rate
-        else if let Some(rate) = s.strip_suffix("fps") {
+        } else if let Some(rate) = s.strip_suffix("fps") {
             rate.parse().map(Speed::Frame).map_err(Into::into)
-        }
-        // Otherwise, unknown format
-        else {
+        } else {
             Err(Self::Err::Unknown)
         }
     }
 }
 
-/// A type specifying categories of [`Color`] error.
+/// A type specifying categories of [`Speed`] parse error.
 #[derive(Clone, Debug)]
 #[derive(thiserror::Error)]
-pub enum ParseSpeedError {
+pub enum ParseError {
     /// Parse string was empty.
     #[error("empty string")]
     Empty,
@@ -228,7 +110,7 @@ pub enum ParseSpeedError {
 }
 
 #[cfg(feature = "clap")]
-pub use self::imp::SpeedValueParser;
+pub(crate) use self::imp::ValueParser;
 
 #[cfg(feature = "clap")]
 mod imp {
@@ -241,9 +123,9 @@ mod imp {
     use super::Speed;
 
     #[derive(Clone)]
-    pub struct SpeedValueParser;
+    pub struct ValueParser;
 
-    impl TypedValueParser for SpeedValueParser {
+    impl TypedValueParser for ValueParser {
         type Value = Speed;
 
         fn parse_ref(

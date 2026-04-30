@@ -5,7 +5,7 @@ use log::{debug, info, warn};
 use rugby::core::cart::Cartridge;
 use rugby::core::dmg::GameBoy;
 use rugby::core::dmg::boot::Boot;
-use rugby::extra::cfg::{Config, opt};
+use rugby::extra::cfg::{self, Config};
 
 use super::save;
 use crate::app::init;
@@ -14,15 +14,15 @@ use crate::dir;
 /// Builds an emulator instance.
 pub fn emu(cfg: &Config) -> Result<GameBoy> {
     // Load cart ROM
-    let mut cart = self::cart(&cfg.emu.cart)
+    let mut cart = self::cart(&cfg.cart)
         .context("invalid cartridge")?
         .inspect(|cart| debug!("cartridge header:\n{}", cart.header()));
     // Load cart RAM
     if let Some(cart) = cart.as_mut() {
-        save::load(&cfg.emu.cart, cart).context("error flashing save RAM")?;
+        save::load(&cfg.cart, cart).context("error flashing save RAM")?;
     }
     // Load boot ROM
-    let boot = self::boot(&cfg.emu.boot).context("invalid boot ROM")?;
+    let boot = self::boot(&cfg.boot).context("invalid boot ROM")?;
 
     // Instantiate emulator
     let mut emu = boot.map_or_else(GameBoy::new, GameBoy::with);
@@ -32,7 +32,7 @@ pub fn emu(cfg: &Config) -> Result<GameBoy> {
     } else {
         // Handle missing cartridge
         ensure!(
-            cfg.emu.cart.force,
+            cfg.cart.force,
             "missing cartridge; did not specify `--force`"
         );
         warn!("missing cartridge");
@@ -43,7 +43,7 @@ pub fn emu(cfg: &Config) -> Result<GameBoy> {
 }
 
 /// Builds a boot ROM instance.
-pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
+pub fn boot(args: &cfg::Boot) -> Result<Option<Boot>> {
     // Allow none if skipped
     if args.skip || args.rom.is_none() {
         return Ok(None);
@@ -68,7 +68,7 @@ pub fn boot(args: &opt::emu::Boot) -> Result<Option<Boot>> {
 }
 
 /// Builds a cartridge instance.
-pub fn cart(args: &opt::emu::Cart) -> Result<Option<Cartridge>> {
+pub fn cart(args: &cfg::Cart) -> Result<Option<Cartridge>> {
     // Allow none if forced
     if args.force && args.rom.is_none() {
         return Ok(None);
