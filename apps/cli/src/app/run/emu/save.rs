@@ -6,11 +6,11 @@ use std::io::Read;
 use anyhow::{Context, Result};
 use log::{debug, error, info, trace};
 use rugby::core::cart::Cartridge;
-use rugby::extra::cfg::opt;
-use rugby::extra::cfg::opt::emu::When;
+use rugby::extra::cfg;
+use rugby::extra::cfg::types::When;
 
 /// Loads the cartridge RAM from a save file.
-pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
+pub fn load(args: &cfg::Cart, cart: &mut Cartridge) -> Result<()> {
     let Some(path) = args.ram() else {
         return Ok(());
     };
@@ -59,7 +59,7 @@ pub fn load(args: &opt::emu::Cart, cart: &mut Cartridge) -> Result<()> {
 }
 
 /// Dumps the cartridge RAM to a save file.
-pub fn dump(args: &opt::emu::Cart, cart: &Cartridge) -> Result<()> {
+pub fn dump(args: &cfg::Cart, cart: &Cartridge) -> Result<()> {
     let Some(path) = args.ram() else {
         return Ok(());
     };

@@ -33,13 +33,12 @@ pub fn main(args: &Cli) -> Result<()> {
     let ifrq = args
         .cfg
         .data
-        .app
         .spd
         .clone()
         .unwrap_or_default()
         .freq()
         .unwrap_or(dmg::CLOCK);
-    let ofrq = args.cfg.data.app.aux;
+    let ofrq = args.cfg.data.audio.rate;
 
     // Initialize audio system
     app::data::audio::init(ifrq, ofrq);

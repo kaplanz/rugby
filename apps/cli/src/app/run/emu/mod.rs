@@ -61,7 +61,7 @@ pub fn main(args: &Cli) -> Result<()> {
     // Instantiate context
     let mut ctx = Context::default();
     // Prepare clocking
-    ctx.clock.frq = args.cfg.data.app.spd.clone().unwrap_or_default().freq();
+    ctx.clock.frq = args.cfg.data.spd.clone().unwrap_or_default().freq();
     // Initialize tracing
     #[cfg(feature = "trace")]
     let mut trace = args
