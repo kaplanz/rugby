@@ -21,6 +21,7 @@ use merge::Merge;
     all(feature = "facet", feature = "serde"),
     expect(clippy::unsafe_derive_deserialize)
 )]
+#[cfg_attr(feature = "clap", command(next_help_heading = "Boot"))]
 pub struct Boot {
     /// Boot ROM image file.
     ///
@@ -44,22 +45,4 @@ pub struct Boot {
     ))]
     #[merge(strategy = merge::option::overwrite_none)]
     pub rom: Option<PathBuf>,
-
-    /// Skip running boot ROM.
-    ///
-    /// Negates `-b/--boot`.
-    #[cfg_attr(
-        feature = "clap",
-        arg(
-            hide = true,
-            long = "no-boot",
-            overrides_with = "boot",
-            default_value_t = true,
-            default_value_if("boot", clap::builder::ArgPredicate::IsPresent, "false"),
-        )
-    )]
-    #[cfg_attr(feature = "facet", facet(skip))]
-    #[cfg_attr(feature = "serde", serde(skip))]
-    #[merge(strategy = merge::bool::overwrite_false)]
-    pub skip: bool,
 }

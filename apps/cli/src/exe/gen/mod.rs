@@ -22,7 +22,7 @@ pub fn main(args: Cli) -> Result<()> {
     trace!("{args:#?}");
 
     // Execute subcommand
-    match args.document {
+    match args.doc {
         cli::Document::Cfg => cfg::exec(),
         cli::Document::Cmp { shell } => cmp::exec(shell),
         cli::Document::Man { cmd } => man::exec(cmd),

@@ -20,6 +20,7 @@ use rugby_pal as pal;
     all(feature = "facet", feature = "serde"),
     expect(clippy::unsafe_derive_deserialize)
 )]
+#[cfg_attr(feature = "clap", command(next_help_heading = "Video"))]
 pub struct Video {
     /// 2-bit color palette.
     ///
@@ -27,7 +28,13 @@ pub struct Video {
     /// Custom values can be defined in the configuration file.
     #[cfg_attr(
         feature = "clap",
-        arg(short = 'p', long = "palette", value_name = "COLOR", value_enum)
+        arg(
+            short = 'p',
+            long = "palette",
+            visible_alias = "pal",
+            value_name = "COLOR",
+            value_enum
+        )
     )]
     #[cfg_attr(feature = "facet", facet(rename = "palette"))]
     #[cfg_attr(feature = "serde", serde(rename = "palette"))]
