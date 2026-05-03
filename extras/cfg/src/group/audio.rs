@@ -19,6 +19,7 @@ use merge::Merge;
     all(feature = "facet", feature = "serde"),
     expect(clippy::unsafe_derive_deserialize)
 )]
+#[cfg_attr(feature = "clap", command(next_help_heading = "Audio"))]
 pub struct Audio {
     /// Audio sample rate.
     ///
@@ -27,12 +28,7 @@ pub struct Audio {
     /// use case, there is no reason to change the default value.
     #[cfg_attr(
         feature = "clap",
-        arg(
-            short = 'a',
-            long = "audio",
-            value_name = "RATE",
-            default_value_t = 48_000
-        )
+        arg(long = "sample-rate", value_name = "RATE", default_value_t = 48_000)
     )]
     #[merge(strategy = merge::num::overwrite_zero)]
     #[expect(clippy::doc_markdown)]

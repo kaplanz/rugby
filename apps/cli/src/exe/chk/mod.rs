@@ -24,7 +24,7 @@ pub fn main(args: Cli) -> Result<()> {
     trace!("{args:#?}");
 
     // Extract cartridge path
-    let Some(path) = &args.cart.rom else {
+    let Some(path) = &args.cli.rom else {
         return Err(anyhow!("missing path to ROM image").into());
     };
 
@@ -51,9 +51,11 @@ pub fn main(args: Cli) -> Result<()> {
     }
 
     // Check cart ROM
-    let mut cart = init::cart(&args.cart)?.context("try again with a valid ROM")?;
+    let mut cart =
+        init::cart(args.cli.rom.as_ref(), &args.cfg)?.context("try again with a valid ROM")?;
     // Check cart RAM
-    save::ram::load(&args.cart, &mut cart).context("error flashing save RAM")?;
+    save::ram::load(args.cli.rom.as_ref(), &args.cfg, &mut cart)
+        .context("error flashing save RAM")?;
 
     Ok(())
 }

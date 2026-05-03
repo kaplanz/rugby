@@ -24,15 +24,14 @@ pub const LATENCY: usize = 100;
 /// Audio main.
 pub fn main(args: &Cli) -> Result<()> {
     // No-op if muted
-    if args.feat.mute {
+    if args.cli.mute {
         debug!("playback disabled");
         return Ok(());
     }
 
     // Define sample rates
     let ifrq = args
-        .cfg
-        .data
+        .cli
         .spd
         .clone()
         .unwrap_or_default()

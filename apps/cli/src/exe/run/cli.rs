@@ -1,6 +1,8 @@
 //! Command-line interface.
 
-use std::net::SocketAddr;
+use std::path::PathBuf;
+
+use rugby::extra::cfg::types::speed;
 
 use super::NAME;
 use crate::cli::Settings;
@@ -10,15 +12,15 @@ use crate::cli::Settings;
 #[derive(clap::Parser)]
 #[command(name = NAME)]
 #[command(arg_required_else_help = true)]
-#[group(id = "Run")]
+#[group(id = "run::Cli")]
 pub struct Cli {
-    /// Runtime features.
-    #[command(flatten)]
-    pub feat: Features,
-
     /// Configuration options.
     #[command(flatten)]
     pub cfg: Settings,
+
+    /// Runtime options.
+    #[command(flatten)]
+    pub cli: Opt,
 
     /// Debugging options.
     #[cfg(feature = "debug")]
@@ -26,63 +28,84 @@ pub struct Cli {
     pub dbg: Debugger,
 }
 
-/// Runtime features.
+/// Runtime options.
 #[derive(Debug)]
 #[derive(clap::Args)]
-#[command(next_help_heading = "Features")]
-pub struct Features {
+pub struct Opt {
+    /// Boot ROM options.
+    #[command(flatten)]
+    pub boot: Boot,
+
+    /// Cartridge options.
+    #[command(flatten)]
+    pub cart: Cart,
+
+    /// Simulated clock speed.
+    ///
+    /// Select from a list of possible speeds to simulate the emulator's clock.
+    #[arg(short = 's', long = "speed", value_name = "SPEED")]
+    #[arg(value_parser = speed::ValueParser)]
+    #[arg(help_heading = None)]
+    pub spd: Option<speed::Speed>,
+
     /// Exit after instantiation.
     ///
     /// Instead of entering the main emulation loop, exit immediately after
     /// emulator instantiation is complete.
-    #[arg(short = 'x', long)]
+    #[arg(short = 'x', long, help_heading = None)]
     pub exit: bool,
 
     /// Run without video (command-line only).
     ///
     /// Starts without initializing or opening the UI. This is often useful when
     /// debugging to prevent the GUI from taking focus in your OS.
-    #[arg(short = 'H', long)]
+    #[arg(short = 'H', long, help_heading = "Video", display_order = 0)]
     pub headless: bool,
 
     /// Run without audio.
     ///
     /// Starts with the audio subsystem disabled.
-    #[arg(short = 'M', long)]
+    #[arg(short = 'M', long, help_heading = "Audio", display_order = 0)]
     pub mute: bool,
-
-    /// Serial connection.
-    #[command(flatten)]
-    pub link: Option<Link>,
 }
 
-/// Serial connection.
+/// Boot ROM options.
 #[derive(Debug)]
 #[derive(clap::Args)]
-#[group(requires_all = ["host", "peer"])]
-pub struct Link {
-    /// Link cable local address.
+#[group(id = "run::Boot")]
+#[command(next_help_heading = "Boot")]
+pub struct Boot {
+    /// Skip running boot ROM.
     ///
-    /// Binds a local UDP socket to the specified address for serial
-    /// communications.
-    #[arg(long)]
-    #[arg(value_name = "ADDR")]
-    #[arg(required = false)]
-    pub host: SocketAddr,
+    /// Negates `-b/--boot`.
+    #[arg(long = "no-boot")]
+    #[arg(overrides_with = "boot")]
+    #[arg(default_value_t = true)]
+    #[arg(default_value_if("boot", clap::builder::ArgPredicate::IsPresent, "false"))]
+    pub skip: bool,
+}
 
-    /// Link cable peer address.
+/// Cartridge options.
+#[derive(Debug)]
+#[derive(clap::Args)]
+#[group(id = "run::Cart")]
+#[command(next_help_heading = "Cart")]
+pub struct Cart {
+    /// Cartridge ROM image file.
     ///
-    /// Opens a UDP socket at the specified address for serial communications.
-    #[arg(long)]
-    #[arg(value_name = "ADDR")]
-    #[arg(required = false)]
-    pub peer: SocketAddr,
+    /// A cartridge will be constructed from the data specified in this file.
+    /// The cartridge header specifies precisely what hardware will be
+    /// instantiated.
+    #[arg(required_unless_present("force"))]
+    #[arg(value_hint = clap::ValueHint::FilePath)]
+    #[arg(help_heading = None)]
+    pub rom: Option<PathBuf>,
 }
 
 /// Debugging options.
 #[derive(Debug)]
 #[derive(clap::Args)]
-#[command(next_help_heading = "Debugging")]
+#[command(next_help_heading = "Debug")]
 pub struct Debugger {
     /// Enable debugger.
     ///

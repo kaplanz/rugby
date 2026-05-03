@@ -16,7 +16,7 @@ pub fn gui(args: &Cli) -> Result<Frontend> {
     // Initialize main window
     let pal = Palette::from(args.cfg.data.video.pal.clone().unwrap_or_default());
     gui.lcd.redraw(&vec![pal[0].into(); LCD.depth()])?;
-    gui.lcd.title(util::title(&args.cfg.data.cart));
+    gui.lcd.title(util::title(args.cli.cart.rom.as_deref()));
     // Open debug windows
     #[cfg(feature = "gfx")]
     if args.dbg.vram {
