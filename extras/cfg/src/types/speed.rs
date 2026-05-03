@@ -110,7 +110,7 @@ pub enum ParseError {
 }
 
 #[cfg(feature = "clap")]
-pub(crate) use self::imp::ValueParser;
+pub use self::imp::ValueParser;
 
 #[cfg(feature = "clap")]
 mod imp {
