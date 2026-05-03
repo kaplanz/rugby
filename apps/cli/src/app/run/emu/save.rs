@@ -2,6 +2,7 @@
 
 use std::fs::File;
 use std::io::Read;
+use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use log::{debug, error, info, trace};
@@ -10,8 +11,8 @@ use rugby::extra::cfg;
 use rugby::extra::cfg::types::When;
 
 /// Loads the cartridge RAM from a save file.
-pub fn load(args: &cfg::Cart, cart: &mut Cartridge) -> Result<()> {
-    let Some(path) = args.ram() else {
+pub fn load(rom: Option<&PathBuf>, args: &cfg::Cart, cart: &mut Cartridge) -> Result<()> {
+    let Some(path) = rom.map(|p| p.with_extension("sav")) else {
         return Ok(());
     };
     match args.save.unwrap_or_default() {
@@ -59,8 +60,8 @@ pub fn load(args: &cfg::Cart, cart: &mut Cartridge) -> Result<()> {
 }
 
 /// Dumps the cartridge RAM to a save file.
-pub fn dump(args: &cfg::Cart, cart: &Cartridge) -> Result<()> {
-    let Some(path) = args.ram() else {
+pub fn dump(rom: Option<&PathBuf>, args: &cfg::Cart, cart: &Cartridge) -> Result<()> {
+    let Some(path) = rom.map(|p| p.with_extension("sav")) else {
         return Ok(());
     };
     match args.save.unwrap_or_default() {

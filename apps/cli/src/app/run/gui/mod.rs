@@ -14,7 +14,7 @@ mod init;
 /// Frontend main.
 pub fn main(args: &Cli) -> Result<()> {
     // No-op if headless
-    if args.feat.headless {
+    if args.cli.headless {
         debug!("graphics disabled");
         return Ok(());
     }
@@ -55,7 +55,7 @@ pub fn main(args: &Cli) -> Result<()> {
             // Update window title
             gui.lcd.title(&format!(
                 "{title} ({speed:.1} FPS)",
-                title = util::title(&args.cfg.data.cart),
+                title = util::title(args.cli.cart.rom.as_deref()),
                 speed = freq / f64::from(ppu::FRAME)
             ));
         }
@@ -75,13 +75,9 @@ mod util {
     use std::ffi::OsStr;
     use std::path::Path;
 
-    use rugby::extra::cfg::Cart;
-
     /// Resolves the application title.
-    pub fn title(args: &Cart) -> &str {
-        args.rom
-            .as_deref()
-            .and_then(Path::file_stem)
+    pub fn title(rom: Option<&Path>) -> &str {
+        rom.and_then(Path::file_stem)
             .and_then(OsStr::to_str)
             .unwrap_or(crate::NAME)
     }
