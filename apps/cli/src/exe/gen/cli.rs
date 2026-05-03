@@ -10,11 +10,11 @@ use super::NAME;
 #[command(name = NAME)]
 #[command(arg_required_else_help = true)]
 #[command(flatten_help = true)]
-#[group(id = "Gen")]
+#[group(id = "gen::Cli")]
 pub struct Cli {
     /// Document type.
     #[command(subcommand)]
-    pub document: Document,
+    pub doc: Document,
 }
 
 /// Generated document.

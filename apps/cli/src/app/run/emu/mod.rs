@@ -57,11 +57,11 @@ impl Default for Context {
 /// Emulator main.
 pub fn main(args: &Cli) -> Result<()> {
     // Instantiate emulator
-    let mut emu = init::emu(&args.cfg.data)?;
+    let mut emu = init::emu(args)?;
     // Instantiate context
     let mut ctx = Context::default();
     // Prepare clocking
-    ctx.clock.frq = args.cfg.data.spd.clone().unwrap_or_default().freq();
+    ctx.clock.frq = args.cli.spd.clone().unwrap_or_default().freq();
     // Initialize tracing
     #[cfg(feature = "trace")]
     let mut trace = args
@@ -107,7 +107,7 @@ pub fn main(args: &Cli) -> Result<()> {
         //
         // Audio is sampled each cycle in order to ensure the audio system
         // remain busy, otherwise, audible "pops" will sound.
-        if !args.feat.mute {
+        if !args.cli.mute {
             app::data::audio::push(emu.inside().audio().sample().mix());
         }
 
@@ -115,7 +115,7 @@ pub fn main(args: &Cli) -> Result<()> {
         //
         // Video is sampled only once per vsync, then the emulator indicates it
         // has completed drawing the frame.
-        if !args.feat.headless && emu.inside().video().vsync() {
+        if !args.cli.headless && emu.inside().video().vsync() {
             // Render video frame
             app::data::video::draw(emu.inside().video().frame().into());
             // Render debug frame
@@ -189,7 +189,7 @@ pub fn main(args: &Cli) -> Result<()> {
     info!("{}", self::frequency(mean));
 
     // Destroy emulator
-    drop::emu(emu, &args.cfg.data).context("shutdown sequence failed")?;
+    drop::emu(emu, args).context("shutdown sequence failed")?;
 
     Ok(())
 }

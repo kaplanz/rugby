@@ -59,19 +59,6 @@ pub struct Config {
     #[merge(strategy = merge::option::overwrite_none)]
     pub log: Option<String>,
 
-    /// Simulated clock speed.
-    ///
-    /// Select from a list of possible speeds to simulate the emulator's clock.
-    #[cfg_attr(
-        feature = "clap",
-        arg(short, long = "speed", value_name = "SPEED"),
-        arg(value_parser = crate::types::speed::ValueParser)
-    )]
-    #[cfg_attr(feature = "facet", facet(skip))]
-    #[cfg_attr(feature = "serde", serde(skip))]
-    #[merge(strategy = merge::option::overwrite_none)]
-    pub spd: Option<types::speed::Speed>,
-
     /// Audio options.
     #[cfg_attr(feature = "clap", command(flatten))]
     pub audio: group::Audio,

@@ -64,7 +64,7 @@ pub fn main(args: &Cli) -> Result<()> {
     .expect("unable to register signal handler"); // application error
 
     // Process exit flag
-    if args.feat.exit {
+    if args.cli.exit {
         // At this point calling `exit` doesn't do anything, as no threads
         // will be polling it yet.
         //
