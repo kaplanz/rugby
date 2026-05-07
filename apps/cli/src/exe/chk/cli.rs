@@ -5,7 +5,7 @@ use rugby::extra::cfg;
 use super::NAME;
 use crate::exe::run::cli;
 
-/// Check header for ROM.
+/// Check a cartridge ROM and report errors.
 #[derive(Debug)]
 #[derive(clap::Parser)]
 #[command(name = NAME)]
