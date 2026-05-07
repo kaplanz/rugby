@@ -317,7 +317,7 @@ impl Display for Size {
 impl FromStr for Size {
     type Err = Error;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (base, unit) = s.trim().split_once(' ').ok_or(Error::Size)?;
         let unit: Unit = unit.parse()?;
         let value: f64 = base.parse()?;
