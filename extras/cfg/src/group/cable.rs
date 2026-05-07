@@ -1,4 +1,4 @@
-//! Link cable configuration.
+//! Cable options.
 
 use std::net::SocketAddr;
 
