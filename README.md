@@ -7,9 +7,13 @@
   A cycle accurate emulator of the original 1989 Nintendo Game Boy.
 </p>
 
-[![dependencies][dep.badge]][dep.hyper]
-[![cli frontend][cli.badge]](./apps/cli)
-[![web frontend][web.badge]](./apps/web)
+[![dependencies][dep.badge]][dep.hyper] [![cli frontend][cli.badge]](/apps/cli)
+[![web frontend][web.badge]](/apps/web)
+
+[dep.badge]: https://deps.rs/repo/github/kaplanz/rugby/status.svg
+[dep.hyper]: https://deps.rs/repo/github/kaplanz/rugby
+[cli.badge]: https://img.shields.io/badge/frontend-cli-blue
+[web.badge]: https://img.shields.io/badge/frontend-web-orange
 
 > [!IMPORTANT]
 >
@@ -32,16 +36,16 @@ different accuracy/performance margins.
 ## Organization
 
 In accordance with the preference for modularity outlined above, the project is
-partitioned into the [core](./core), the [debugger](./extras/gbd), and various
-emulator [frontends](./apps). Useful supporting [crates](./crates) are
+partitioned into the [core](/core), the [debugger](/extras/gbd), and various
+emulator [frontends](/apps). Useful supporting [crates](/crates) are
 independently available as well. Also packaged in this repository are several
-open-source [ROMs](./roms). These are used internally for testing and to demo
+open-source [ROMs](/roms). These are used internally for testing and to demo
 project functionality.
 
 ### Workspace
 
 Cargo — Rust's package manager — allows for a workspace of several crates to be
-specified within its [manifest](./Cargo.toml). Within this project, workspace
+specified within its [manifest](/Cargo.toml). Within this project, workspace
 crates are used with the structure as follows:
 
 ```
@@ -92,32 +96,35 @@ crates are used with the structure as follows:
 Main components of `rugby` are outlined below.
 
 - [`rugby`](./): is the high-level library that provides the public API.
-- [`rugby-arch`](./arch): defines the architecture primitives for emulation.
-- [`rugby-core`](./core): contains the implementation of emulator cores.
+- [`rugby-arch`](/arch): defines the architecture primitives for emulation.
+- [`rugby-core`](/core): contains the implementation of emulator cores.
 
 #### Extras
 
-- [`rugby-cfg`](./extras/cfg): definition of app configuration options.
-- [`rugby-gbd`](./extras/gbd): provides an interactive prompt debugger.
-- [`rugby-pal`](./extras/pal): collection of DMG color palette presets.
+- [`rugby-cfg`](/extras/cfg): definition of app configuration options.
+- [`rugby-gbd`](/extras/gbd): provides an interactive prompt debugger.
+- [`rugby-pal`](/extras/pal): collection of DMG color palette presets.
 
 #### Frontends
 
-- [`rugby-cli`](./apps/cli): a command-line interface application with rich
+- [`rugby-cli`](/apps/cli): a command-line interface application with rich
   configuration and comprehensive debugging.
-- [`rugby-ios`](./apps/ios): a native iOS application built with [SwiftUI].
-- [`rugby-web`](./apps/web): an online web application powered by [Wasm].
+- [`rugby-ios`](/apps/ios): a native iOS application built with [SwiftUI].
+- [`rugby-web`](/apps/web): an online web application powered by [Wasm].
+
+[swiftui]: https://developer.apple.com/xcode/swiftui/
+[wasm]:    https://webassembly.org
 
 #### Bindings
 
-- [`rugby-swift`](./bind/swift): foreign function interface to Swift (UniFFI).
-- [`rugby-wasm`](./bind/wasm): cross-compilation with bindings to WebAssembly.
+- [`rugby-swift`](/bind/swift): foreign function interface to Swift (UniFFI).
+- [`rugby-wasm`](/bind/wasm): cross-compilation with bindings to WebAssembly.
 
 #### Libraries
 
-- [`libretro`](./lib/retro): implementation of the libretro API.
+- [`libretro`](/lib/retro): implementation of the libretro API.
 
-## [Testing]
+## [Testing](/tests/README.md)
 
 Rigorous integration testing is provided to validate the implementation and
 prevent regressions in future versions.
@@ -127,39 +134,18 @@ prevent regressions in future versions.
 This project would not have been possible without the people, projects, and
 resources that contributed to my learning and make development so fun and easy.
 
-See the [Credit Roll](./CREDITS.md) for a full list.
+See the [Credit Roll](/CREDITS.md) for a full list.
 
 ## Privacy
 
 The project does not collect or transmit any data. Any data used by the project
 remains solely on your device.
 
-See the [Privacy Policy](./PRIVACY.md) for full details.
+See the [Privacy Policy](/PRIVACY.md) for full details.
 
 ## License
 
-This project is dual-licensed under both [MIT License](./LICENSE-MIT) and
-[Apache License 2.0](./LICENSE-APACHE). You have permission to use this code
-under the conditions of either license pursuant to the rights granted by the
-chosen license.
-
-<!--
-  Reference-style links
--->
-
-<!-- Badges -->
-[cli.badge]: https://img.shields.io/badge/frontend-cli-blue
-[dep.badge]: https://deps.rs/repo/github/kaplanz/rugby/status.svg
-[dep.hyper]: https://deps.rs/repo/github/kaplanz/rugby
-[web.badge]: https://img.shields.io/badge/frontend-web-orange
-
-<!-- Organization -->
-[swiftui]: https://developer.apple.com/xcode/swiftui/
-[wasm]:    https://webassembly.org
-
-<!-- Testing -->
-[testing]:       ./tests/README.md
-[test.acid2]:    ./tests/README.md#acid2
-[test.blargg]:   ./tests/README.md#blargg
-[test.mealybug]: ./tests/README.md#mealybug
-[test.mooneye]:  ./tests/README.md#mooneye
+This project is dual-licensed under both [MIT License](/LICENSE-MIT) and [Apache
+License 2.0](/LICENSE-APACHE). You have permission to use this code under the
+conditions of either license pursuant to the rights granted by the chosen
+license.

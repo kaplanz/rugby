@@ -5,8 +5,13 @@ highlighting key areas of focus used within accurate emulator development.
 
 ![][dmg.pcb][^rev6]
 
+[dmg.pcb]: https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/DMG-CPU-06.jpg
+
 [^rev6]: "Game Boy (Rev 6) Motherboard" by [Joonas Javanainen][gekkio] is
     licensed under [CC BY 4.0][cc-by-4].
+
+[cc-by-4]: https://creativecommons.org/licenses/by/4.0/
+[gekkio]:  https://github.com/Gekkio/gb-schematics
 
 ## Notation
 
@@ -60,6 +65,8 @@ At a high level, the motherboard contains the following ASICs:
 
 [^ascii]: ASCII diagram is based upon the detailed [schematic][dmg.sch] by
     [Joonas Javanainen][gekkio] licensed under [CC BY 4.0][cc-by-4].
+
+[dmg.sch]: https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/schematic/DMG-CPU-06.pdf
 
 ### Memory Map
 
@@ -139,7 +146,11 @@ E-Bus (in this instance mapping to Echo RAM).
 #### Conflicts
 
 Multiple devices attempting concurrent access to the same bus is called a [bus
-conflict][conflict]. In the Game Boy, the devices with bus access are:
+conflict][conflict].
+
+[conflict]: https://en.wikipedia.org/wiki/Bus_contention
+
+In the Game Boy, the devices with bus access are:
 
 - CPU: Addressable access to the entire [memory map](#memory-map).
 - DMA: Priority access to OAM and both E-Bus and V-Bus.
@@ -153,8 +164,8 @@ bus.
 The most common way to cause a bus conflict is with a DMA. While a DMA is
 occurring, it has priority access to the OAM and the target address bus. In the
 event that the CPU performs a memory access that would use the same bus as the
-DMA's target, the CPU will always "lose" the access to the DMA.[^dma] The
-result is that the CPU will read the same value that happens to be copied in the
+DMA's target, the CPU will always "lose" the access to the DMA.[^dma] The result
+is that the CPU will read the same value that happens to be copied in the
 corresponding DMA cycle. A consequence of this is that even CPU instruction
 fetches can fail in this way, causing execution on the DMA's data.
 
@@ -163,10 +174,3 @@ the CPU always has exclusive access to (via the I-Bus), to execute until the DMA
 is complete.
 
 [^dma]: See the discussion at Gekkio/mooneye-gb#39.
-
-<!-- Reference-style links -->
-[cc-by-4]:  https://creativecommons.org/licenses/by/4.0/
-[conflict]: https://en.wikipedia.org/wiki/Bus_contention
-[dmg.pcb]:  https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/DMG-CPU-06.jpg
-[dmg.sch]:  https://github.com/Gekkio/gb-schematics/blob/main/DMG-CPU-06/schematic/DMG-CPU-06.pdf
-[gekkio]:   https://github.com/Gekkio/gb-schematics
