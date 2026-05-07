@@ -1,5 +1,8 @@
 //! Command-line interface.
 
+use std::path::Path;
+
+use clap::ValueEnum;
 use clap_complete::Shell;
 
 use super::NAME;
@@ -27,9 +30,20 @@ pub enum Document {
     #[command(disable_help_flag = true)]
     Cfg,
     /// Shell completions.
-    #[command(arg_required_else_help = true)]
     #[command(disable_help_flag = true)]
-    Cmp { shell: Shell },
+    Cmp {
+        #[arg(env = "SHELL")]
+        #[arg(value_parser = |s: &str| {
+            Shell::from_str(s, false).or_else(|_| {
+                Path::new(s)
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .and_then(|name| Shell::from_str(name, false).ok())
+                    .ok_or_else(|| format!("unknown shell: {s}"))
+            })
+        })]
+        shell: Shell,
+    },
     /// Manual pages.
     #[command(disable_help_flag = true)]
     Man {
