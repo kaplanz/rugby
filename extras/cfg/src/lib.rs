@@ -82,4 +82,8 @@ pub struct Config {
     /// Cartridge options.
     #[cfg_attr(feature = "clap", command(flatten))]
     pub cart: group::Cart,
+
+    /// Hardware model options.
+    #[cfg_attr(feature = "clap", command(flatten))]
+    pub model: group::Model,
 }

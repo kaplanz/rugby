@@ -96,3 +96,16 @@ force = false
 # persistent RAM. When enabled, RAM will be loaded and saved from a file with
 # the same path and name as the ROM, but using the ".sav" extension.
 save = "auto"
+
+###
+## Hardware model options.
+#
+[model.dmg]
+
+# DMG-CPU silicon revision.
+#
+# Selects the silicon revision of the DMG-CPU chip.
+#
+# Supported values: "0", "A", "B", "C"
+#
+rev = "C"

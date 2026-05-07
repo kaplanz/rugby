@@ -1,5 +1,6 @@
 //! Common field value types.
 
+pub mod model;
 pub mod speed;
 
 /// Specifies when an option should be active.
