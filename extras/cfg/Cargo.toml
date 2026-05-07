@@ -13,6 +13,7 @@ publish = false
 clap = { workspace = true, optional = true, features = ["env"] }
 facet = { workspace = true, optional = true }
 merge = { workspace = true }
+parse-display = { workspace = true }
 rugby-core = { workspace = true }
 rugby-pal = { workspace = true }
 serde = { workspace = true, optional = true }
