@@ -122,13 +122,6 @@ Main components of `rugby` are outlined below.
 Rigorous integration testing is provided to validate the implementation and
 prevent regressions in future versions.
 
-|   Suite                   | Passed | Failed |
-| ------------------------- | ------ | ------ |
-| [Acid2][test.acid2]       |     17 |      0 |
-| [Blargg][test.blargg]     |     23 |     22 |
-| [Mealybug][test.mealybug] |      0 |     24 |
-| [Mooneye][test.mooneye]   |     30 |     39 |
-
 ## Credits
 
 This project would not have been possible without the people, projects, and
