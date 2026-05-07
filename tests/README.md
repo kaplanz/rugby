@@ -9,8 +9,15 @@ Outlined below is current testing results for various integration test suites.
 [![acid2 origin][acid2.git.badge]][acid2.git.hyper]
 [![acid2 source][acid2.src.badge]][acid2.src.hyper]
 
+[acid2.git.badge]: https://img.shields.io/badge/acid2-origin-2188a7?logo=github
+[acid2.git.hyper]: https://github.com/mattcurrie/dmg-acid2
+[acid2.src.badge]: https://img.shields.io/badge/acid2-source-a72145?logo=rust
+[acid2.src.hyper]: ./acid2.rs
+
 A clever re-imagining of the [Web Standards Project's Acid2][acid2] rendering
 test for the Game Boy's PPU.
+
+[acid2]: https://webstandards.org/files/acid2/test.html
 
 #### Results
 
@@ -49,6 +56,11 @@ test for the Game Boy's PPU.
 
 [![blargg origin][blargg.git.badge]][blargg.git.hyper]
 [![blargg source][blargg.src.badge]][blargg.src.hyper]
+
+[blargg.git.badge]: https://img.shields.io/badge/blargg-origin-2188a7?logo=github
+[blargg.git.hyper]: https://github.com/retrio/gb-test-roms
+[blargg.src.badge]: https://img.shields.io/badge/blargg-source-a72145?logo=rust
+[blargg.src.hyper]: ./blargg.rs
 
 Shay Green's classic suite of Game Boy testing ROMs, checking a wide variety of
 behaviours.
@@ -119,6 +131,11 @@ behaviours.
 [![mealybug origin][mealybug.git.badge]][mealybug.git.hyper]
 [![mealybug source][mealybug.src.badge]][mealybug.src.hyper]
 
+[mealybug.git.badge]: https://img.shields.io/badge/mealybug-origin-2188a7?logo=github
+[mealybug.git.hyper]: https://github.com/mattcurrie/mealybug-tearoom-tests
+[mealybug.src.badge]: https://img.shields.io/badge/mealybug-source-a72145?logo=rust
+[mealybug.src.hyper]: ./mealybug.rs
+
 Correctness tests focusing on runtime changes made to the PPU.
 
 #### Results
@@ -165,6 +182,11 @@ Correctness tests focusing on runtime changes made to the PPU.
 
 [![mooneye origin][mooneye.git.badge]][mooneye.git.hyper]
 [![mooneye source][mooneye.src.badge]][mooneye.src.hyper]
+
+[mooneye.git.badge]: https://img.shields.io/badge/mooneye-origin-2188a7?logo=github
+[mooneye.git.hyper]: https://github.com/Gekkio/mooneye-test-suite
+[mooneye.src.badge]: https://img.shields.io/badge/mooneye-source-a72145?logo=rust
+[mooneye.src.hyper]: ./mooneye.rs
 
 Detailed tests on precise characteristics easily verifiable on actual hardware.
 
@@ -256,26 +278,4 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 ## Attribution
 
 Attribution of all included open-source software is listed in the project's
-[README][attrib].
-
-<!-- Reference-style links -->
-[acid2]: https://webstandards.org/files/acid2/test.html
-[attrib]: /README.md#credits
-
-<!-- Badges -->
-[acid2.git.badge]:    https://img.shields.io/badge/acid2-origin-2188a7?logo=github
-[acid2.git.hyper]:    https://github.com/mattcurrie/dmg-acid2
-[acid2.src.badge]:    https://img.shields.io/badge/acid2-source-a72145?logo=rust
-[acid2.src.hyper]:    ./acid2.rs
-[blargg.git.badge]:   https://img.shields.io/badge/blargg-origin-2188a7?logo=github
-[blargg.git.hyper]:   https://github.com/retrio/gb-test-roms
-[blargg.src.badge]:   https://img.shields.io/badge/blargg-source-a72145?logo=rust
-[blargg.src.hyper]:   ./blargg.rs
-[mealybug.git.badge]: https://img.shields.io/badge/mealybug-origin-2188a7?logo=github
-[mealybug.git.hyper]: https://github.com/mattcurrie/mealybug-tearoom-tests
-[mealybug.src.badge]: https://img.shields.io/badge/mealybug-source-a72145?logo=rust
-[mealybug.src.hyper]: ./mealybug.rs
-[mooneye.git.badge]:  https://img.shields.io/badge/mooneye-origin-2188a7?logo=github
-[mooneye.git.hyper]:  https://github.com/Gekkio/mooneye-test-suite
-[mooneye.src.badge]:  https://img.shields.io/badge/mooneye-source-a72145?logo=rust
-[mooneye.src.hyper]:  ./mooneye.rs
+[README](/README.md#credits).

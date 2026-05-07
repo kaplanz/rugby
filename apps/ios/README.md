@@ -2,6 +2,8 @@
 
 [![supports iOS][ios.badge]](#)
 
+[ios.badge]: https://img.shields.io/badge/Made_for-iOS-white?logo=apple&labelColor=black
+
 ## Build
 
 This project must be opened and built using Xcode.
@@ -35,10 +37,5 @@ This project must be opened and built using Xcode.
 
 ## License
 
-For information regarding licensure, please see the project's [README][license].
-
-<!-- Reference-style links -->
-[license]: /README.md#license
-
-<!-- Badges -->
-[ios.badge]: https://img.shields.io/badge/Made_for-iOS-white?logo=apple&labelColor=black
+For information regarding licensure, please see the project's
+[README](/README.md#license).

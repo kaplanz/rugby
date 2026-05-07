@@ -2,6 +2,8 @@
 
 Homepage website for Rugby. Built with [Eleventy][11ty].
 
+[11ty]: https://www.11ty.dev
+
 > [!NOTE]
 >
 > The site renders all markdown files from the parent directory (the repository
@@ -10,6 +12,8 @@ Homepage website for Rugby. Built with [Eleventy][11ty].
 ## Usage
 
 Requires [Bun][bun] to be installed.
+
+[bun]: https://bun.sh
 
 ```sh
 bun install        # install dependencies
@@ -40,12 +44,5 @@ bun run dev        # start local dev server at localhost:8080
 
 ## License
 
-For information regarding licensure, please see the project's [README][license].
-
-<!--
-  Reference-style links
--->
-
-[11ty]:    https://www.11ty.dev
-[bun]:     https://bun.sh
-[license]: /README.md#license
+For information regarding licensure, please see the project's
+[README](/README.md#license).
