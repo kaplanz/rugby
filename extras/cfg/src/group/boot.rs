@@ -1,4 +1,4 @@
-//! Boot configuration.
+//! Boot ROM options.
 
 use std::path::PathBuf;
 

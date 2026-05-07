@@ -1,4 +1,4 @@
-//! Input configuration.
+//! Input options.
 
 use merge::Merge;
 

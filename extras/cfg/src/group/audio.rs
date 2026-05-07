@@ -1,4 +1,4 @@
-//! Audio configuration.
+//! Audio options.
 
 use merge::Merge;
 

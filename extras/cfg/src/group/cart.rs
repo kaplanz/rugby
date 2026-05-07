@@ -1,4 +1,4 @@
-//! Cartridge configuration.
+//! Cartridge options.
 
 use merge::Merge;
 

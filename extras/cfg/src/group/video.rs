@@ -1,4 +1,4 @@
-//! Video configuration.
+//! Video options.
 
 use merge::Merge;
 use rugby_pal as pal;

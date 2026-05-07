@@ -1,4 +1,4 @@
-//! Model configuration.
+//! Hardware model options.
 
 use merge::Merge;
 
