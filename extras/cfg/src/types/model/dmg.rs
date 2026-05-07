@@ -1,4 +1,4 @@
-//! DMG platform.
+//! DMG options.
 
 use std::fmt::Display;
 use std::str::FromStr;

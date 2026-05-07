@@ -102,7 +102,7 @@ save = "auto"
 #
 [model.dmg]
 
-# DMG-CPU silicon revision.
+# DMG-CPU revision.
 #
 # Selects the silicon revision of the DMG-CPU chip.
 #
