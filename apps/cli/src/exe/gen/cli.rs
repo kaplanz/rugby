@@ -4,7 +4,7 @@ use clap_complete::Shell;
 
 use super::NAME;
 
-/// Generate app support files.
+/// Generate application support files.
 #[derive(Debug)]
 #[derive(clap::Parser)]
 #[command(name = NAME)]
@@ -50,7 +50,7 @@ pub enum Command {
     /// Play ROM in emulator.
     #[value(alias = "r")]
     Run,
-    /// Generate app support files.
+    /// Generate application support files.
     Gen,
     /// Display docs for a command.
     #[value(name = "help")]
