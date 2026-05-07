@@ -9,7 +9,7 @@ use clap_verbosity_flag::Verbosity;
 use crate::cfg::Config;
 use crate::{NAME, exe};
 
-/// Emulate the Nintendo Game Boy.
+/// A cycle-accurate Game Boy emulator.
 ///
 /// Cycle-accurate emulation with support for custom palettes, configurable
 /// speed, interactive debugging, and more!
@@ -45,16 +45,16 @@ pub struct Cli {
 )]
 #[non_exhaustive]
 pub enum Command {
-    /// Check header for ROM.
+    /// Check a cartridge ROM and report errors.
     #[command(name = "check")]
     #[command(visible_alias = "c")]
     Chk(Box<exe::chk::Cli>),
 
-    /// Play ROM in emulator.
+    /// Run a cartridge ROM in the emulator.
     #[command(visible_alias = "r")]
     Run(Box<exe::run::Cli>),
 
-    /// Generate app support files.
+    /// Generate application support files.
     Gen(Box<exe::r#gen::Cli>),
 
     /// Display docs for a command.

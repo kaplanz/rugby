@@ -7,7 +7,7 @@ use rugby::extra::cfg::types::speed;
 use super::NAME;
 use crate::cli::Settings;
 
-/// Play ROM in emulator.
+/// Run a cartridge ROM in the emulator.
 #[derive(Debug)]
 #[derive(clap::Parser)]
 #[command(name = NAME)]
