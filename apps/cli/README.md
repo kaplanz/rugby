@@ -4,6 +4,10 @@
 [![supports macOS][mac.badge]](#)
 [![supports Windows][win.badge]](#)
 
+[nix.badge]: https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=000
+[mac.badge]: https://img.shields.io/badge/macOS-000?logo=apple&logoColor=fff
+[win.badge]: https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=fff
+
 This frontend provides a command-line interface (CLI) to quickly launch an
 emulator session right from your terminal. It has first-class support for all
 main features, including a full interactive debugger.
@@ -79,7 +83,7 @@ rugby gen cfg
 
 > [!NOTE]
 >
-> Configuration options are [documented][cfg.doc] in the `rugby-cfg` crate.
+> Configuration options are [documented](/extras/cfg/README.md) in the `rugby-cfg` crate.
 
 ### Debugging
 
@@ -89,7 +93,7 @@ be run to control and monitor execution of the console. While running with GBD
 enabled, CTRL-C could be used to interrupt emulation and present the prompt.
 
 To list and get help with GBD, use the `help` command at the prompt or see its
-[documentation][gbd.doc].
+[documentation](/extras/gbd/README.md).
 
 ## Progress
 
@@ -122,14 +126,5 @@ To list and get help with GBD, use the `help` command at the prompt or see its
 
 ## License
 
-For information regarding licensure, please see the project's [README][license].
-
-<!-- Reference-style links -->
-[cfg.doc]: /extras/cfg/README.md
-[gbd.doc]: /extras/gbd/README.md
-[license]: /README.md#license
-
-<!-- Badges -->
-[mac.badge]: https://img.shields.io/badge/macOS-000?logo=apple&logoColor=fff
-[nix.badge]: https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=000
-[win.badge]: https://img.shields.io/badge/Windows-0078D4?logo=windows&logoColor=fff
+For information regarding licensure, please see the project's
+[README](/README.md#license).
