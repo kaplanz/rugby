@@ -51,6 +51,8 @@ The following is a table of supported configurable fields:
     default value of 48 KHz.
 [^log]: Must be a valid log filter as parsed by the frontend. See filter
     directives using [`tracing`][filter] as an example.
+
+[filter]: https://tracing.rs/tracing_subscriber/filter/struct.envfilter#directives
 [^pal]: Only applicable on the DMG model. On CGB, the palette will be ignored.
 [^rev]: Selects the DMG-CPU silicon revision, which affects post-boot register
     state when no boot ROM is loaded.
@@ -76,28 +78,21 @@ These may be combined into an `object`, which is simply a collection of fields.
 
 All enumerated types are described below:
 
-- `palette`: color palette selection, see [variants][src.pal]; can be customized
-  as an array of 4 colors (parsed in hex).
-- `speed`: simulated clock frequency, see [variants][src.spd]; can be specified
-  as:
+- `palette`: color palette selection, see [variants](./src/group/video.rs#L21);
+  can be customized as an array of 4 colors (parsed in hex).
+- `speed`: simulated clock frequency, see [variants](./src/types/speed.rs#L22);
+  can be specified as:
   - `actual`: actual hardware speed
   - `<mult>x`: speedup ratio; e.g. `x = 1.5`
   - `<freq>hz`: clock frequency; e.g. `hz = 6291456`
   - `<rate>fps`: frame rate; e.g. `fps = 90`
   - `turbo`: maximum possible speed
-- `dmg.rev`: DMG-CPU revision, [variants][src.rev] are `0`, `A`, `B`, and `C`
-  (default).
-- `when`: choice of when to enable an option, [variants][src.when] are: `never`,
-  `auto`, and `always`.
+- `dmg.rev`: DMG-CPU revision, [variants](./src/types/model/dmg.rs#L46) `0`,
+  `A`, `B`, and `C` (default).
+- `when`: choice of when to enable an option,
+  [variants](./src/types/mod.rs#L22) are: `never`, `auto`, and `always`.
 
 ## License
 
-For information regarding licensure, please see the project's [README][license].
-
-<!-- Reference-style links -->
-[filter]:   https://tracing.rs/tracing_subscriber/filter/struct.envfilter#directives
-[license]:  /README.md#license
-[src.pal]:  ./src/group/video.rs#L21
-[src.rev]:  ./src/types/model/dmg.rs#L46
-[src.spd]:  ./src/types/speed.rs#L22
-[src.when]: ./src/types/mod.rs#L22
+For information regarding licensure, please see the project's
+[README](/README.md#license).

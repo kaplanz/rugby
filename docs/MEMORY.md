@@ -82,5 +82,4 @@ graph TD
 
 [^sono]: Adapted from private communications with [Sono]. Used with permission.
 
-<!-- Reference-style links -->
 [sono]: https://github.com/SonoSooS
