@@ -45,7 +45,7 @@ The following is a table of supported configurable fields:
 | `cart.check`    | Check cartridge integrity.    | `-c/--check`    | `bool`   |   ✓   |   ✓   |        |
 | `cart.force`    | Force cartridge construction. | `-f/--force`    | `bool`   |   ✓   |   ✓   |        |
 | `cart.save`     | Cartridge RAM persistence.    | `-S/--save`     | `enum`   |   ✓   |   ✓   | [^sav] |
-| `model.dmg.rev` | DMG-CPU silicon revision.     |                 | `enum`   |       |   ✓   | [^rev] |
+| `model.dmg.rev` | DMG-CPU revision.             |                 | `enum`   |       |   ✓   | [^rev] |
 
 [^aux]: Unless you have a specific use case, there is no reason to change the
     default value of 48 KHz.
