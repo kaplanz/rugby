@@ -19,11 +19,14 @@ Configurable fields are arranged hierarchically as such:
 ├── cable: object
 ├── boot:  object
 │  └── rom:  path
-└── cart:  object
-   ├── rom:   path
-   ├── check: bool
-   ├── force: bool
-   └── save:  enum
+├── cart:  object
+│  ├── rom:   path
+│  ├── check: bool
+│  ├── force: bool
+│  └── save:  enum
+└── model: object
+   └── dmg: object
+      └── rev: enum
 ```
 
 ## Options
@@ -32,22 +35,25 @@ Configurable fields are arranged hierarchically as such:
 
 The following is a table of supported configurable fields:
 
-| Field        | Description                   | Flag            | Type     | Clap  | Serde | Notes  |
-|--------------|-------------------------------|-----------------|----------|:-----:|:-----:|--------|
-| `log`        | Logging filter.               | `-l/--log`      | `string` |   ✓   |   ✓   | [^log] |
-| `audio.rate` | Audio sample rate.            | `--sample-rate` | `uint`   |   ✓   |   ✓   | [^aux] |
-| `video.pal`  | 2-bit color palette.          | `-p/--palette`  | `enum`   |   ✓   |   ✓   | [^pal] |
-| `boot.rom`   | Boot ROM image file.          | `-b/--boot`     | `path`   |   ✓   |   ✓   |        |
-| `cart.rom`   | Cartridge ROM image file.     |                 | `path`   |   ✓   |       |        |
-| `cart.check` | Check cartridge integrity.    | `-c/--check`    | `bool`   |   ✓   |   ✓   |        |
-| `cart.force` | Force cartridge construction. | `-f/--force`    | `bool`   |   ✓   |   ✓   |        |
-| `cart.save`  | Cartridge RAM persistence.    | `-S/--save`     | `enum`   |   ✓   |   ✓   | [^sav] |
+| Field           | Description                   | Flag            | Type     | Clap  | Serde | Notes  |
+|-----------------|-------------------------------|-----------------|----------|:-----:|:-----:|--------|
+| `log`           | Logging filter.               | `-l/--log`      | `string` |   ✓   |   ✓   | [^log] |
+| `audio.rate`    | Audio sample rate.            | `--sample-rate` | `uint`   |   ✓   |   ✓   | [^aux] |
+| `video.pal`     | 2-bit color palette.          | `-p/--palette`  | `enum`   |   ✓   |   ✓   | [^pal] |
+| `boot.rom`      | Boot ROM image file.          | `-b/--boot`     | `path`   |   ✓   |   ✓   |        |
+| `cart.rom`      | Cartridge ROM image file.     |                 | `path`   |   ✓   |       |        |
+| `cart.check`    | Check cartridge integrity.    | `-c/--check`    | `bool`   |   ✓   |   ✓   |        |
+| `cart.force`    | Force cartridge construction. | `-f/--force`    | `bool`   |   ✓   |   ✓   |        |
+| `cart.save`     | Cartridge RAM persistence.    | `-S/--save`     | `enum`   |   ✓   |   ✓   | [^sav] |
+| `model.dmg.rev` | DMG-CPU silicon revision.     |                 | `enum`   |       |   ✓   | [^rev] |
 
 [^aux]: Unless you have a specific use case, there is no reason to change the
     default value of 48 KHz.
 [^log]: Must be a valid log filter as parsed by the frontend. See filter
     directives using [`tracing`][filter] as an example.
 [^pal]: Only applicable on the DMG model. On CGB, the palette will be ignored.
+[^rev]: Selects the DMG-CPU silicon revision, which affects post-boot register
+    state when no boot ROM is loaded.
 [^sav]: Specifies when the cartridge RAM should be loaded/saved to disk.
 
 ### Types
@@ -79,6 +85,8 @@ All enumerated types are described below:
   - `<freq>hz`: clock frequency; e.g. `hz = 6291456`
   - `<rate>fps`: frame rate; e.g. `fps = 90`
   - `turbo`: maximum possible speed
+- `dmg.rev`: DMG-CPU revision, [variants][src.rev] are `0`, `A`, `B`, and `C`
+  (default).
 - `when`: choice of when to enable an option, [variants][src.when] are: `never`,
   `auto`, and `always`.
 
@@ -90,5 +98,6 @@ For information regarding licensure, please see the project's [README][license].
 [filter]:   https://tracing.rs/tracing_subscriber/filter/struct.envfilter#directives
 [license]:  /README.md#license
 [src.pal]:  ./src/group/video.rs#L21
+[src.rev]:  ./src/types/model/dmg.rs#L46
 [src.spd]:  ./src/types/speed.rs#L22
 [src.when]: ./src/types/mod.rs#L22
