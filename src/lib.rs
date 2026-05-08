@@ -32,12 +32,16 @@
 
 #![warn(clippy::pedantic)]
 
+mod sys;
+
 pub mod app;
 
 #[doc(inline)]
 pub use rugby_arch as arch;
 #[doc(inline)]
 pub use rugby_core as core;
+
+pub use self::sys::GameBoy;
 
 /// Extra features.
 pub mod extra {
