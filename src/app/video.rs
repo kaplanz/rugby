@@ -1,6 +1,6 @@
 //! Video API.
 
-use crate::emu::part::video::{Frame, Pixel};
+use crate::emu::video::{Frame, Pixel};
 
 /// Video interface.
 pub trait Video {

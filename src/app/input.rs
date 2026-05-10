@@ -1,6 +1,6 @@
 //! Input API.
 
-use crate::emu::part::input::{Button, Event};
+use crate::emu::input::{Button, Event};
 
 /// Input interface.
 pub trait Input {

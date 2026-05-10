@@ -1,7 +1,7 @@
 //! Joypad API.
 
 use rugby::core::dmg;
-use rugby::emu::part::input::State;
+use rugby::emu::input::State;
 use rugby::prelude::*;
 use wasm_bindgen::prelude::*;
 

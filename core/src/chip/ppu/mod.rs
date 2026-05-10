@@ -8,7 +8,7 @@ use rugby_arch::{Block, Shared};
 use self::exec::hblank::HBlank;
 use self::exec::vblank::VBlank;
 use super::{dma, pic};
-use crate::api::part::video::{self, Aspect, Video as Api};
+use crate::api::video::{self, Aspect, Video as Api};
 use crate::dmg::mmap::Sram;
 
 mod blk;

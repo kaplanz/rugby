@@ -1,6 +1,6 @@
 //! Audio API.
 
-use crate::emu::part::audio::Sample;
+use crate::emu::audio::Sample;
 
 /// Audio interface.
 pub trait Audio {

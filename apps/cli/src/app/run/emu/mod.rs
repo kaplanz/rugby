@@ -8,9 +8,9 @@ use log::{debug, info};
 use rugby::arch::Block;
 use rugby::core::chip::{cpu, ppu};
 use rugby::core::dmg;
-use rugby::emu::part::audio::Audio;
-use rugby::emu::part::input::Input;
-use rugby::emu::part::video::Video;
+use rugby::emu::audio::Audio;
+use rugby::emu::input::Input;
+use rugby::emu::video::Video;
 use rugby::prelude::Core;
 
 use crate::app;

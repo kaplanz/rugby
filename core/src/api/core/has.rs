@@ -1,11 +1,11 @@
 //! Component support.
 
-use crate::api::part;
+use crate::api;
 
 /// Audio support.
 pub trait Audio {
     /// Audio interface.
-    type Audio: part::audio::Audio;
+    type Audio: api::audio::Audio;
 
     /// Borrows the core's audio.
     #[must_use]
@@ -19,7 +19,7 @@ pub trait Audio {
 /// Input support.
 pub trait Input {
     /// Input interface.
-    type Input: part::input::Input;
+    type Input: api::input::Input;
 
     /// Borrows the core's input.
     #[must_use]
@@ -30,24 +30,10 @@ pub trait Input {
     fn input_mut(&mut self) -> &mut Self::Input;
 }
 
-/// Processor support.
-pub trait Processor {
-    /// Compute interface.
-    type Proc: part::proc::Processor;
-
-    /// Borrows the core's processor.
-    #[must_use]
-    fn proc(&self) -> &Self::Proc;
-
-    /// Mutably borrows the core's processor.
-    #[must_use]
-    fn proc_mut(&mut self) -> &mut Self::Proc;
-}
-
 /// Cable support.
 pub trait Cable {
     /// Cable interface.
-    type Cable: part::cable::Cable;
+    type Cable: api::cable::Cable;
 
     /// Borrows the core's cable.
     #[must_use]
@@ -61,7 +47,7 @@ pub trait Cable {
 /// Video support.
 pub trait Video {
     /// Video interface.
-    type Video: part::video::Video;
+    type Video: api::video::Video;
 
     /// Borrows the core's video.
     #[must_use]

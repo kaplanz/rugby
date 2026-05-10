@@ -32,22 +32,6 @@ impl<'a, C: Core + has::Input> InsideMut<'a, C> {
     }
 }
 
-impl<'a, C: Core + has::Processor> Inside<'a, C> {
-    /// Borrow the core's processor.
-    #[must_use]
-    pub fn proc(self) -> &'a C::Proc {
-        self.0.proc()
-    }
-}
-
-impl<'a, C: Core + has::Processor> InsideMut<'a, C> {
-    /// Mutably borrow the core's processor.
-    #[must_use]
-    pub fn proc(self) -> &'a mut C::Proc {
-        self.0.proc_mut()
-    }
-}
-
 impl<'a, C: Core + has::Cable> Inside<'a, C> {
     /// Borrow the core's cable.
     #[must_use]
