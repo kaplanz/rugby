@@ -96,7 +96,7 @@ pub mod data {
 
         use log::debug;
         use parking_lot::Mutex;
-        use rugby::emu::part::audio::Sample;
+        use rugby::emu::audio::Sample;
 
         use crate::app::run::aux::Stream;
 
@@ -180,7 +180,7 @@ pub mod data {
     pub mod input {
         use parking_lot::Mutex;
         use rugby::core::dmg::chip::joy::Button;
-        use rugby::emu::part::input::Event;
+        use rugby::emu::input::Event;
 
         /// Input queue.
         static INPUT: Mutex<Vec<Event<Button>>> = Mutex::new(Vec::new());
