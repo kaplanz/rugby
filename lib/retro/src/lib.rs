@@ -699,7 +699,7 @@ pub extern "C" fn retro_run() {
                 _ => State::Dn,
             };
             // Update internally button
-            emu.inside_mut().input().recv(Some((btn, state).into()));
+            emu.recv(Some((btn, state).into()));
         }
     }
 
@@ -713,13 +713,13 @@ pub extern "C" fn retro_run() {
         emu.cycle();
         // Sample audio frames
         if cycle % AUDIO == 0 {
-            let Sample { lt, rt } = emu.inside().audio().sample().mix();
+            let Sample { lt, rt } = emu.sample().mix();
             audio.push(lt);
             audio.push(rt);
         }
         // Finish at vertical sync
-        if emu.inside().video().vsync() {
-            break emu.inside().video().frame();
+        if emu.vsync() {
+            break emu.frame();
         }
         // Increment cycle count
         cycle += 1;

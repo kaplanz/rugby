@@ -13,7 +13,7 @@ impl GameBoy {
     /// exactly once every 70,224 cycles.
     #[must_use]
     pub fn vsync(&self) -> bool {
-        self.0.inside().video().vsync()
+        self.0.vsync()
     }
 
     /// Gets the current frame state.
@@ -35,8 +35,6 @@ impl GameBoy {
     pub fn frame(&self) -> js_sys::Uint8Array {
         js_sys::Uint8Array::from(
             self.0
-                .inside()
-                .video()
                 .frame()
                 .iter()
                 .map(|&pix| pix as u8)
