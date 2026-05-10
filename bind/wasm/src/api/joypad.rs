@@ -15,8 +15,6 @@ impl GameBoy {
     /// this is a no-op.
     pub fn press(&mut self, key: Button) {
         self.0
-            .inside_mut()
-            .input()
             .recv(Some((dmg::chip::joy::Button::from(key), State::Dn).into()));
     }
 
@@ -26,8 +24,6 @@ impl GameBoy {
     /// pressed, this is a no-op.
     pub fn release(&mut self, key: Button) {
         self.0
-            .inside_mut()
-            .input()
             .recv(Some((dmg::chip::joy::Button::from(key), State::Up).into()));
     }
 }

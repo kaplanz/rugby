@@ -11,7 +11,6 @@ use rugby::core::dmg;
 use rugby::emu::audio::Audio;
 use rugby::emu::input::Input;
 use rugby::emu::video::Video;
-use rugby::prelude::Core;
 
 use crate::app;
 #[cfg(feature = "trace")]
@@ -108,16 +107,16 @@ pub fn main(args: &Cli) -> Result<()> {
         // Audio is sampled each cycle in order to ensure the audio system
         // remain busy, otherwise, audible "pops" will sound.
         if !args.cli.mute {
-            app::data::audio::push(emu.inside().audio().sample().mix());
+            app::data::audio::push(emu.sample().mix());
         }
 
         // Sample video
         //
         // Video is sampled only once per vsync, then the emulator indicates it
         // has completed drawing the frame.
-        if !args.cli.headless && emu.inside().video().vsync() {
+        if !args.cli.headless && emu.vsync() {
             // Render video frame
-            app::data::video::draw(emu.inside().video().frame().into());
+            app::data::video::draw(emu.frame().into());
             // Render debug frame
             //
             // This contains a graphical representation of the contents of VRAM.
@@ -159,7 +158,7 @@ pub fn main(args: &Cli) -> Result<()> {
             // noticeable to users. This improves overall emulation efficiency.
             let keys = app::data::input::take();
             if !keys.is_empty() {
-                emu.inside_mut().input().recv(keys);
+                emu.recv(keys);
             }
 
             // Report performance

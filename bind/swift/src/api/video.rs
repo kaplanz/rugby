@@ -12,7 +12,7 @@ impl GameBoy {
     /// exactly once every 70,224 cycles.
     #[uniffi::method]
     pub fn vsync(&self) -> bool {
-        self.inner.read().inside().video().vsync()
+        self.inner.read().vsync()
     }
 
     /// Gets the current frame state.
@@ -34,8 +34,6 @@ impl GameBoy {
     pub fn frame(&self) -> Vec<u8> {
         self.inner
             .read()
-            .inside()
-            .video()
             .frame()
             .iter()
             .map(|&pix| pix as u8)

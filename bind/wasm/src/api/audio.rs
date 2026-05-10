@@ -10,7 +10,7 @@ use super::GameBoy;
 impl GameBoy {
     #[must_use]
     pub fn sample(&self) -> Chiptune {
-        self.0.inside().audio().sample().into()
+        self.0.sample().into()
     }
 }
 

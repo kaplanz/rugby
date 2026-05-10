@@ -21,7 +21,7 @@ impl GameBoy {
         //
         // I understand this implementation may be considered a crime in some
         // jurisdictions.
-        let Sample { lt, rt } = self.inner.read().inside().audio().sample().mix();
+        let Sample { lt, rt } = self.inner.read().sample().mix();
         // Convert `f32`s to little-endian bytes
         let lt = lt.to_le_bytes();
         let rt = rt.to_le_bytes();
