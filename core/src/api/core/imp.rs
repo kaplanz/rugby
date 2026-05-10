@@ -16,19 +16,19 @@ impl<'a, C: Core + has::Audio> InsideMut<'a, C> {
     }
 }
 
-impl<'a, C: Core + has::Joypad> Inside<'a, C> {
-    /// Borrow the core's joypad.
+impl<'a, C: Core + has::Input> Inside<'a, C> {
+    /// Borrow the core's input.
     #[must_use]
-    pub fn joypad(self) -> &'a C::Joypad {
-        self.0.joypad()
+    pub fn input(self) -> &'a C::Input {
+        self.0.input()
     }
 }
 
-impl<'a, C: Core + has::Joypad> InsideMut<'a, C> {
-    /// Mutably borrow the core's joypad.
+impl<'a, C: Core + has::Input> InsideMut<'a, C> {
+    /// Mutably borrow the core's input.
     #[must_use]
-    pub fn joypad(self) -> &'a mut C::Joypad {
-        self.0.joypad_mut()
+    pub fn input(self) -> &'a mut C::Input {
+        self.0.input_mut()
     }
 }
 
@@ -48,19 +48,19 @@ impl<'a, C: Core + has::Processor> InsideMut<'a, C> {
     }
 }
 
-impl<'a, C: Core + has::Serial> Inside<'a, C> {
-    /// Borrow the core's serial.
+impl<'a, C: Core + has::Cable> Inside<'a, C> {
+    /// Borrow the core's cable.
     #[must_use]
-    pub fn serial(self) -> &'a C::Serial {
-        self.0.serial()
+    pub fn cable(self) -> &'a C::Cable {
+        self.0.cable()
     }
 }
 
-impl<'a, C: Core + has::Serial> InsideMut<'a, C> {
-    /// Mutably borrow the core's serial.
+impl<'a, C: Core + has::Cable> InsideMut<'a, C> {
+    /// Mutably borrow the core's cable.
     #[must_use]
-    pub fn serial(self) -> &'a mut C::Serial {
-        self.0.serial_mut()
+    pub fn cable(self) -> &'a mut C::Cable {
+        self.0.cable_mut()
     }
 }
 
