@@ -1,20 +1,20 @@
-//! Joypad API.
+//! Input API.
 
 use std::hash::Hash;
 
-/// Joypad interface.
-pub trait Joypad {
+/// Input interface.
+pub trait Input {
     /// User input.
-    type Button: Input;
+    type Button: Button;
 
     /// Receives user input events, forwarding to the core.
     fn recv(&mut self, events: impl IntoIterator<Item = Event<Self::Button>>);
 }
 
-/// Joypad input.
-pub trait Input: Copy + Eq + Hash {}
+/// Input button marker.
+pub trait Button: Copy + Eq + Hash {}
 
-/// Jopypad event.
+/// Input event.
 #[derive(Copy, Clone, Debug)]
 pub struct Event<I>
 where
@@ -33,7 +33,7 @@ impl<I: Copy + Eq + Hash> From<(I, State)> for Event<I> {
     }
 }
 
-/// Joypad button state.
+/// Input button state.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum State {
     /// Button pressed.

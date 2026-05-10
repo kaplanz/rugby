@@ -1,9 +1,9 @@
-//! Serial API.
+//! Cable API.
 
 use std::io::{BufRead, Write};
 
-/// Serial interface.
-pub trait Serial {
+/// Cable interface.
+pub trait Cable {
     /// Gets the external serial receiver.
     ///
     /// Reading from the receiver yields data produced by the core.

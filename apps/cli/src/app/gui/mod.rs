@@ -5,7 +5,7 @@ use minifb::Key;
 use rugby::app;
 use rugby::core::chip::ppu;
 use rugby::core::dmg::chip::joy::Button;
-use rugby::emu::part::joypad::Event;
+use rugby::emu::part::input::Event;
 use rugby::emu::part::video::Frame;
 use rugby::extra::pal::Palette;
 
@@ -45,7 +45,7 @@ impl Frontend {
     }
 }
 
-impl app::joypad::Joypad for Frontend {
+impl app::input::Input for Frontend {
     type Button = Button;
 
     #[rustfmt::skip]

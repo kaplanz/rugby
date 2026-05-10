@@ -1,7 +1,7 @@
 //! Joypad API.
 
 use rugby::core::dmg::chip::joy::Button;
-use rugby::emu::part::joypad::State;
+use rugby::emu::part::input::State;
 use rugby::prelude::*;
 
 use super::GameBoy;
@@ -17,7 +17,7 @@ impl GameBoy {
         self.inner
             .write()
             .inside_mut()
-            .joypad()
+            .input()
             .recv(Some((key, State::Dn).into()));
     }
 
@@ -30,7 +30,7 @@ impl GameBoy {
         self.inner
             .write()
             .inside_mut()
-            .joypad()
+            .input()
             .recv(Some((key, State::Up).into()));
     }
 }

@@ -10,7 +10,7 @@ use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
 use super::pic::{self, Interrupt};
-use crate::api::part::joypad::{Event, Input, Joypad as Api, State};
+use crate::api::part::input::{Event, Input as Api, State};
 
 /// Joypad inputs.
 ///
@@ -46,7 +46,7 @@ impl Button {
     }
 }
 
-impl Input for Button {}
+impl crate::api::part::input::Button for Button {}
 
 /// Joypad register mode.
 #[derive(Copy, Clone, Debug, Default)]
