@@ -1,7 +1,7 @@
 //! Part interfaces.
 
 pub mod audio;
-pub mod joypad;
+pub mod cable;
+pub mod input;
 pub mod proc;
-pub mod serial;
 pub mod video;

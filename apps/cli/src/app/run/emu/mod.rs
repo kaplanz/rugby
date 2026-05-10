@@ -9,7 +9,7 @@ use rugby::arch::Block;
 use rugby::core::chip::{cpu, ppu};
 use rugby::core::dmg;
 use rugby::emu::part::audio::Audio;
-use rugby::emu::part::joypad::Joypad;
+use rugby::emu::part::input::Input;
 use rugby::emu::part::video::Video;
 use rugby::prelude::Core;
 
@@ -159,7 +159,7 @@ pub fn main(args: &Cli) -> Result<()> {
             // noticeable to users. This improves overall emulation efficiency.
             let keys = app::data::input::take();
             if !keys.is_empty() {
-                emu.inside_mut().joypad().recv(keys);
+                emu.inside_mut().input().recv(keys);
             }
 
             // Report performance

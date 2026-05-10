@@ -220,26 +220,26 @@ impl<R: Revision> core::has::Processor for GameBoy<R> {
     }
 }
 
-impl<R: Revision> core::has::Joypad for GameBoy<R> {
-    type Joypad = Joypad;
+impl<R: Revision> core::has::Input for GameBoy<R> {
+    type Input = Joypad;
 
-    fn joypad(&self) -> &Self::Joypad {
+    fn input(&self) -> &Self::Input {
         &self.main.soc.joy
     }
 
-    fn joypad_mut(&mut self) -> &mut Self::Joypad {
+    fn input_mut(&mut self) -> &mut Self::Input {
         &mut self.main.soc.joy
     }
 }
 
-impl<R: Revision> core::has::Serial for GameBoy<R> {
-    type Serial = Serial;
+impl<R: Revision> core::has::Cable for GameBoy<R> {
+    type Cable = Serial;
 
-    fn serial(&self) -> &Self::Serial {
+    fn cable(&self) -> &Self::Cable {
         &self.main.soc.sio
     }
 
-    fn serial_mut(&mut self) -> &mut Self::Serial {
+    fn cable_mut(&mut self) -> &mut Self::Cable {
         &mut self.main.soc.sio
     }
 }

@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 use log::debug;
-use rugby::app::joypad::Joypad;
+use rugby::app::input::Input;
 use rugby::app::video::Video;
 use rugby::core::chip::ppu;
 

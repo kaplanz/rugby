@@ -27,7 +27,7 @@ use rugby::core::chip::ppu::{self as ppu, LCD};
 use rugby::core::dmg::GameBoy;
 use rugby::core::dmg::chip::joy::Button;
 use rugby::emu::part::audio::Sample;
-use rugby::emu::part::joypad::State;
+use rugby::emu::part::input::State;
 use rugby::prelude::*;
 
 pub mod def;
@@ -699,7 +699,7 @@ pub extern "C" fn retro_run() {
                 _ => State::Dn,
             };
             // Update internally button
-            emu.inside_mut().joypad().recv(Some((btn, state).into()));
+            emu.inside_mut().input().recv(Some((btn, state).into()));
         }
     }
 

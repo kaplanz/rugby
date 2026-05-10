@@ -9,7 +9,7 @@ use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
 use super::pic::{self, Interrupt};
-use crate::api::part::serial::Serial as Api;
+use crate::api::part::cable::Cable as Api;
 
 /// Serial register select.
 ///

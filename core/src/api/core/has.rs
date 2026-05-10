@@ -16,18 +16,18 @@ pub trait Audio {
     fn audio_mut(&mut self) -> &mut Self::Audio;
 }
 
-/// Joypad support.
-pub trait Joypad {
-    /// Joypad interface.
-    type Joypad: part::joypad::Joypad;
+/// Input support.
+pub trait Input {
+    /// Input interface.
+    type Input: part::input::Input;
 
-    /// Borrows the core's joypad.
+    /// Borrows the core's input.
     #[must_use]
-    fn joypad(&self) -> &Self::Joypad;
+    fn input(&self) -> &Self::Input;
 
-    /// Mutably borrows the core's joypad.
+    /// Mutably borrows the core's input.
     #[must_use]
-    fn joypad_mut(&mut self) -> &mut Self::Joypad;
+    fn input_mut(&mut self) -> &mut Self::Input;
 }
 
 /// Processor support.
@@ -44,18 +44,18 @@ pub trait Processor {
     fn proc_mut(&mut self) -> &mut Self::Proc;
 }
 
-/// Serial support.
-pub trait Serial {
-    /// Serial interface.
-    type Serial: part::serial::Serial;
+/// Cable support.
+pub trait Cable {
+    /// Cable interface.
+    type Cable: part::cable::Cable;
 
-    /// Borrows the core's serial.
+    /// Borrows the core's cable.
     #[must_use]
-    fn serial(&self) -> &Self::Serial;
+    fn cable(&self) -> &Self::Cable;
 
-    /// Mutably borrows the core's serial.
+    /// Mutably borrows the core's cable.
     #[must_use]
-    fn serial_mut(&mut self) -> &mut Self::Serial;
+    fn cable_mut(&mut self) -> &mut Self::Cable;
 }
 
 /// Video support.
