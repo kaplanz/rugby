@@ -2,6 +2,7 @@
 //!
 //! [Game Boy]: https://en.wikipedia.org/wiki/Game_Boy
 
+use std::io::{BufRead, Write};
 use std::marker::PhantomData;
 
 use log::warn;
@@ -15,7 +16,11 @@ use self::chip::joy::Joypad;
 use self::chip::ppu::Ppu;
 use self::chip::sio::Serial;
 use self::pcb::Motherboard;
+use crate::api::audio::{Audio, Chiptune};
+use crate::api::cable::Cable;
 use crate::api::core::{self, Core};
+use crate::api::input::{Event, Input};
+use crate::api::video::{Aspect, Video};
 use crate::rev::Revision;
 
 pub mod chip;
@@ -240,6 +245,56 @@ impl<R: Revision> core::has::Video for GameBoy<R> {
 
     fn video_mut(&mut self) -> &mut Self::Video {
         &mut self.main.soc.ppu
+    }
+}
+
+impl<R: Revision> Audio for GameBoy<R>
+where
+    GameBoy<R>: Instance,
+{
+    fn sample(&self) -> Chiptune {
+        self.main.soc.apu.sample()
+    }
+}
+
+impl<R: Revision> Cable for GameBoy<R>
+where
+    GameBoy<R>: Instance,
+{
+    fn rx(&mut self) -> &mut dyn BufRead {
+        self.main.soc.sio.rx()
+    }
+
+    fn tx(&mut self) -> &mut dyn Write {
+        self.main.soc.sio.tx()
+    }
+}
+
+impl<R: Revision> Input for GameBoy<R>
+where
+    GameBoy<R>: Instance,
+{
+    type Button = <Joypad as Input>::Button;
+
+    fn recv(&mut self, events: impl IntoIterator<Item = Event<Self::Button>>) {
+        self.main.soc.joy.recv(events);
+    }
+}
+
+impl<R: Revision> Video for GameBoy<R>
+where
+    GameBoy<R>: Instance,
+{
+    const SIZE: Aspect = Ppu::SIZE;
+
+    type Pixel = <Ppu as Video>::Pixel;
+
+    fn vsync(&self) -> bool {
+        self.main.soc.ppu.vsync()
+    }
+
+    fn frame(&self) -> &[Self::Pixel] {
+        self.main.soc.ppu.frame()
     }
 }
 
