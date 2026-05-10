@@ -5,8 +5,8 @@ use minifb::Key;
 use rugby::app;
 use rugby::core::chip::ppu;
 use rugby::core::dmg::chip::joy::Button;
-use rugby::emu::part::input::Event;
-use rugby::emu::part::video::Frame;
+use rugby::emu::input::Event;
+use rugby::emu::video::Frame;
 use rugby::extra::pal::Palette;
 
 use self::win::{Main, Window};

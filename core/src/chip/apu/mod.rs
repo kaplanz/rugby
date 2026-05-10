@@ -6,7 +6,7 @@ use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
 use super::tma;
-use crate::api::part::audio::{Audio as Api, Chiptune, Sample};
+use crate::api::audio::{Audio as Api, Chiptune, Sample};
 
 mod reg;
 

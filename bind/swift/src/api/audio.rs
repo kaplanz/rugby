@@ -1,6 +1,6 @@
 //! Audio API.
 
-use rugby::emu::part::audio::{Chiptune, Sample};
+use rugby::emu::audio::{Chiptune, Sample};
 use rugby::prelude::*;
 
 use super::GameBoy;
@@ -32,7 +32,7 @@ impl GameBoy {
 
 /// Rich audio sample.
 ///
-/// See [`rugby::emu::part::audio::Chiptune`]
+/// See [`rugby::emu::audio::Chiptune`]
 #[uniffi::remote(Record)]
 pub struct Chiptune {
     /// Master volume.
@@ -51,7 +51,7 @@ pub struct Chiptune {
 
 /// Audio sample.
 ///
-/// See [`rugby::emu::part::audio::Sample`]
+/// See [`rugby::emu::audio::Sample`]
 #[uniffi::remote(Record)]
 pub struct Sample {
     /// Left channel.

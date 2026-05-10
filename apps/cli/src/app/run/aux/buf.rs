@@ -11,7 +11,7 @@ use rubato::{
     SincInterpolationType,
     WindowFunction,
 };
-use rugby::emu::part::audio::Sample;
+use rugby::emu::audio::Sample;
 
 /// Audio latency maximum (in milliseconds).
 const DELAY: usize = super::LATENCY;

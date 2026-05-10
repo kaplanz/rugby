@@ -1,4 +1,4 @@
-use crate::api::part::video::Pixel;
+use crate::api::video::Pixel;
 
 /// Color values.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]

@@ -13,7 +13,6 @@ use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
-use crate::api::part::proc::Processor;
 use crate::chip::pic;
 use crate::dmg::mmap::Sram;
 
@@ -266,10 +265,9 @@ impl Port<u16> for Cpu {
     }
 }
 
-impl Processor for Cpu {
-    type Insn = Instruction;
-
-    fn insn(&self) -> Self::Insn {
+impl Cpu {
+    #[must_use]
+    pub fn insn(&self) -> Instruction {
         if let Stage::Execute(insn) = &self.etc.stage {
             insn.clone()
         } else {
@@ -281,11 +279,11 @@ impl Processor for Cpu {
         }
     }
 
-    fn goto(&mut self, addr: u16) {
+    pub fn goto(&mut self, addr: u16) {
         self.reg.pc.store(addr);
     }
 
-    fn exec(&mut self, code: u8) {
+    pub fn exec(&mut self, code: u8) {
         // Create a new instruction...
         let mut insn = Ok(Some(Instruction::decode(code)));
         // ... then execute it until completion
@@ -298,13 +296,13 @@ impl Processor for Cpu {
         }
     }
 
-    fn run(&mut self, prog: &[u8]) {
+    pub fn run(&mut self, prog: &[u8]) {
         for &code in prog {
             self.exec(code);
         }
     }
 
-    fn wake(&mut self) {
+    pub fn wake(&mut self) {
         self.etc.run = Status::Enabled;
     }
 }

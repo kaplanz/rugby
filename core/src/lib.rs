@@ -18,10 +18,7 @@ pub mod cart;
 pub mod chip;
 
 /// Emulator API.
-pub mod api {
-    pub mod core;
-    pub mod part;
-}
+pub mod api;
 
 pub use crate::model::dmg;
 pub use crate::rev::Revision;
