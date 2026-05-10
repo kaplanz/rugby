@@ -14,11 +14,7 @@ impl GameBoy {
     /// this is a no-op.
     #[uniffi::method]
     pub fn press(&self, key: Button) {
-        self.inner
-            .write()
-            .inside_mut()
-            .input()
-            .recv(Some((key, State::Dn).into()));
+        self.inner.write().recv(Some((key, State::Dn).into()));
     }
 
     /// Releases a button.
@@ -27,11 +23,7 @@ impl GameBoy {
     /// pressed, this is a no-op.
     #[uniffi::method]
     pub fn release(&self, key: Button) {
-        self.inner
-            .write()
-            .inside_mut()
-            .input()
-            .recv(Some((key, State::Up).into()));
+        self.inner.write().recv(Some((key, State::Up).into()));
     }
 }
 
