@@ -4,12 +4,13 @@ use rugby_arch::Block;
 use rugby_arch::reg::Register;
 
 use super::GameBoy;
+use crate::rev::Revision;
 
 /// Collect a trace with formatting matching [binjgb].
 ///
 /// [binjgb]: https://github.com/binji/binjgb
 #[must_use]
-pub fn binjgb(emu: &GameBoy) -> String {
+pub fn binjgb<R: Revision>(emu: &GameBoy<R>) -> String {
     let cpu = &emu.main.soc.cpu;
     let ppu = &emu.main.soc.ppu;
     [
@@ -45,7 +46,7 @@ pub fn binjgb(emu: &GameBoy) -> String {
 ///
 /// [gbdoc]: https://robertheaton.com/gameboy-doctor
 #[must_use]
-pub fn doctor(emu: &GameBoy) -> String {
+pub fn doctor<R: Revision>(emu: &GameBoy<R>) -> String {
     let cpu = &emu.main.soc.cpu;
     [
         format!("A:{:02X}", cpu.reg.a.load()),
