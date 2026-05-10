@@ -1,6 +1,12 @@
 //! Game Boy (DMG) revisions.
 
+use std::io::{BufRead, Write};
+
 use crate::arch::Block;
+use crate::core::api::audio::{Audio, Chiptune};
+use crate::core::api::cable::Cable;
+use crate::core::api::input::{Event, Input};
+use crate::core::api::video::{Aspect, Video};
 use crate::core::cart::Cartridge;
 use crate::core::dmg::{GameBoy, rev};
 #[cfg(feature = "cfg")]
@@ -85,6 +91,62 @@ impl Dmg {
         match self {
             Self::Zero(gb) => gb.eject(),
             Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.eject(),
+        }
+    }
+}
+
+impl Audio for Dmg {
+    fn sample(&self) -> Chiptune {
+        match self {
+            Self::Zero(gb) => gb.sample(),
+            Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.sample(),
+        }
+    }
+}
+
+impl Cable for Dmg {
+    fn rx(&mut self) -> &mut dyn BufRead {
+        match self {
+            Self::Zero(gb) => gb.rx(),
+            Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.rx(),
+        }
+    }
+
+    fn tx(&mut self) -> &mut dyn Write {
+        match self {
+            Self::Zero(gb) => gb.tx(),
+            Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.tx(),
+        }
+    }
+}
+
+impl Input for Dmg {
+    type Button = <GameBoy<rev::C> as Input>::Button;
+
+    fn recv(&mut self, events: impl IntoIterator<Item = Event<Self::Button>>) {
+        match self {
+            Self::Zero(gb) => gb.recv(events),
+            Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.recv(events),
+        }
+    }
+}
+
+impl Video for Dmg {
+    const SIZE: Aspect = GameBoy::<rev::C>::SIZE;
+
+    type Pixel = <GameBoy<rev::C> as Video>::Pixel;
+
+    fn vsync(&self) -> bool {
+        match self {
+            Self::Zero(gb) => gb.vsync(),
+            Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.vsync(),
+        }
+    }
+
+    fn frame(&self) -> &[Self::Pixel] {
+        match self {
+            Self::Zero(gb) => gb.frame(),
+            Self::A(gb) | Self::B(gb) | Self::C(gb) => gb.frame(),
         }
     }
 }

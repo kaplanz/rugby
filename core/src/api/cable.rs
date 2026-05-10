@@ -8,11 +8,11 @@ pub trait Cable {
     ///
     /// Reading from the receiver yields data produced by the core.
     #[must_use]
-    fn rx(&mut self) -> &mut impl BufRead;
+    fn rx(&mut self) -> &mut dyn BufRead;
 
     /// Gets the external serial transmitter.
     ///
     /// Writing to the transmitter forwards data to the core.
     #[must_use]
-    fn tx(&mut self) -> &mut impl Write;
+    fn tx(&mut self) -> &mut dyn Write;
 }
