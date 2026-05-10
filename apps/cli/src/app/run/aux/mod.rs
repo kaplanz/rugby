@@ -6,7 +6,7 @@ use std::time::Duration;
 use anyhow::{Result, anyhow};
 use log::debug;
 use rugby::core::dmg;
-use rugby::emu::part::audio::Sample;
+use rugby::emu::audio::Sample;
 
 use crate::app;
 use crate::exe::run::Cli;

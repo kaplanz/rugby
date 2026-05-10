@@ -16,7 +16,6 @@ use self::chip::ppu::Ppu;
 use self::chip::sio::Serial;
 use self::pcb::Motherboard;
 use crate::api::core::{self, Core};
-use crate::api::part::proc::Processor;
 use crate::rev::Revision;
 
 pub mod chip;
@@ -205,18 +204,6 @@ impl<R: Revision> core::has::Audio for GameBoy<R> {
 
     fn audio_mut(&mut self) -> &mut Self::Audio {
         &mut self.main.soc.apu
-    }
-}
-
-impl<R: Revision> core::has::Processor for GameBoy<R> {
-    type Proc = Cpu;
-
-    fn proc(&self) -> &Self::Proc {
-        &self.main.soc.cpu
-    }
-
-    fn proc_mut(&mut self) -> &mut Self::Proc {
-        &mut self.main.soc.cpu
     }
 }
 
