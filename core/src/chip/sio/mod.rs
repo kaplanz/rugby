@@ -98,12 +98,12 @@ impl Serial {
 }
 
 impl Api for Serial {
-    fn rx(&mut self) -> &mut impl BufRead {
+    fn rx(&mut self) -> &mut dyn BufRead {
         // Return `tx`, since the internal transmitter is the external receiver.
         &mut self.etc.tx
     }
 
-    fn tx(&mut self) -> &mut impl Write {
+    fn tx(&mut self) -> &mut dyn Write {
         // Return `rx`, since the internal receiver is the external transmitter.
         &mut self.etc.rx
     }

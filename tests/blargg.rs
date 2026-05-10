@@ -41,8 +41,6 @@ fn emulate(rom: &[u8], check: fn(&mut GameBoy) -> Result<()>) -> Result<()> {
 
 /// Check for test results.
 mod check {
-    use std::io::BufRead;
-
     use rugby::core::dmg::GameBoy;
     use rugby::prelude::*;
 
