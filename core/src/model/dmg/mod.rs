@@ -10,15 +10,12 @@ use rugby_arch::Block;
 use rugby_arch::mio::Mmio;
 use rugby_arch::reg::Port;
 
-use self::chip::apu::Apu;
 use self::chip::cpu::Cpu;
 use self::chip::joy::Joypad;
 use self::chip::ppu::Ppu;
-use self::chip::sio::Serial;
 use self::pcb::Motherboard;
 use crate::api::audio::{Audio, Chiptune};
 use crate::api::cable::Cable;
-use crate::api::core::{self, Core};
 use crate::api::input::{Event, Input};
 use crate::api::video::{Aspect, Video};
 use crate::rev::Revision;
@@ -195,56 +192,6 @@ where
         self.main.reset();
         self.boot.as_mut().map(Block::reset).unwrap_or_else(|| self.boot());
         self.cart.as_mut().map(Block::reset);
-    }
-}
-
-impl<R: Revision> Core for GameBoy<R> where GameBoy<R>: Instance {}
-
-impl<R: Revision> core::has::Audio for GameBoy<R> {
-    type Audio = Apu;
-
-    fn audio(&self) -> &Self::Audio {
-        &self.main.soc.apu
-    }
-
-    fn audio_mut(&mut self) -> &mut Self::Audio {
-        &mut self.main.soc.apu
-    }
-}
-
-impl<R: Revision> core::has::Input for GameBoy<R> {
-    type Input = Joypad;
-
-    fn input(&self) -> &Self::Input {
-        &self.main.soc.joy
-    }
-
-    fn input_mut(&mut self) -> &mut Self::Input {
-        &mut self.main.soc.joy
-    }
-}
-
-impl<R: Revision> core::has::Cable for GameBoy<R> {
-    type Cable = Serial;
-
-    fn cable(&self) -> &Self::Cable {
-        &self.main.soc.sio
-    }
-
-    fn cable_mut(&mut self) -> &mut Self::Cable {
-        &mut self.main.soc.sio
-    }
-}
-
-impl<R: Revision> core::has::Video for GameBoy<R> {
-    type Video = Ppu;
-
-    fn video(&self) -> &Self::Video {
-        &self.main.soc.ppu
-    }
-
-    fn video_mut(&mut self) -> &mut Self::Video {
-        &mut self.main.soc.ppu
     }
 }
 
