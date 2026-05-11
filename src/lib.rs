@@ -81,7 +81,6 @@ pub mod prelude {
     pub use crate::app::video::Video as _;
 
     // Emulator
-    pub use crate::emu::core::Core;
     pub use crate::emu::audio::Audio as _;
     pub use crate::emu::cable::Cable as _;
     pub use crate::emu::input::Input as _;
