@@ -1,4 +1,4 @@
-//! # Game Boy Core.
+//! Game Boy emulator core.
 //!
 //! This library implements the core behaviour of the various hardware
 //! components of the Nintendo Game Boy family of consoles.
