@@ -1,7 +1,7 @@
 //! Audio API.
 
 use rugby::api::audio;
-use rugby::api::audio::Audio as _;
+use rugby::api::audio::Audio;
 use wasm_bindgen::prelude::*;
 
 use super::GameBoy;

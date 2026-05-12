@@ -1,6 +1,6 @@
 //! Audio API.
 
-use rugby::api::audio::{Audio as _, Chiptune, Sample};
+use rugby::api::audio::{Audio, Chiptune, Sample};
 
 use super::GameBoy;
 
