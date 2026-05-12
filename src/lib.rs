@@ -40,7 +40,7 @@ pub use rugby_core as core;
 pub use crate::core::api;
 pub use crate::emu::GameBoy;
 
-mod emu;
+pub mod emu;
 
 /// Extra features.
 pub mod extra {
