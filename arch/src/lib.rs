@@ -1,4 +1,9 @@
-//! Emulator architecture primitives.
+//! Architecture primitives for `rugby`.
+//!
+//! This crate defines the foundational building blocks used throughout the
+//! emulator. It is hardware-agnostic: nothing here is specific to the Game
+//! Boy. All emulated hardware components are ultimately composed from these
+//! primitives.
 
 #![warn(clippy::pedantic)]
 

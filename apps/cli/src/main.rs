@@ -1,4 +1,6 @@
-//! Command-line application.
+//! Command-line frontend for `rugby`.
+//!
+//! This binary crate provides the `rugby` command-line application.
 
 #![warn(clippy::pedantic)]
 // Allowed lints: clippy
