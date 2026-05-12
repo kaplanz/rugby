@@ -1,7 +1,11 @@
-//! Bytes human formatter.
+//! Human-readable byte size formatting and parsing.
 //!
-//! This utility library easily converts between bytes as an integer and human
-//! size representations.
+//! `bfmt` converts between a raw byte count and human-readable size strings.
+//! Both SI (KB, MB, GB) and IEC (KiB, MiB, GiB) unit prefixes are supported.
+//!
+//! The central type is [`Size`], which implements [`std::str::FromStr`] for
+//! parsing and [`std::fmt::Display`] for formatting. Standard format specifiers
+//! (width, fill, precision) are honoured.
 //!
 //! # Examples
 //!
@@ -9,10 +13,10 @@
 //! use bfmt::Size;
 //!
 //! # fn main() -> Result<(), bfmt::Error> {
-//! // Parse bytes from string
+//! // Parse bytes from a string
 //! let size: Size = "1.0625 KiB".parse()?;
 //!
-//! // Extract the integer bytes value
+//! // Extract the raw byte count
 //! assert_eq!(u64::from(size), 1088);
 //!
 //! // Format back as a string

@@ -1,8 +1,18 @@
 //! A cycle-accurate Game Boy emulator.
 //!
-//! Emulator implementations for the following Game Boy models:
+//! This project emulator core implementations for the following Game Boy
+//! models:
 //!
-//! - [`DMG`](crate::core::dmg): [Game Boy]
+//! - [`DMG`](crate::core::dmg): _Game Boy_
+//!
+//! In addition, the following models are planned:
+//!
+//! - `CGB`: _Game Boy Color_
+//! - `AGB`: _Game Boy Advance_ (compat only)[^1]
+//!
+//! [^1]: Planned support covers Game Boy (Color) compatibility only. Game Boy
+//!       Advance games run on a distinct ARM-based architecture which is out of
+//!       scope for this project.
 //!
 //! # Examples
 //!
@@ -27,8 +37,6 @@
 //! #     break;
 //! }
 //! ```
-//!
-//! [Game Boy]: https://en.wikipedia.org/wiki/Game_Boy
 
 #![warn(clippy::pedantic)]
 

@@ -1,9 +1,17 @@
-//! Swift library port.
+//! Swift bindings for `rugby`.
 //!
-//! Exported as a Swift package called `RugbyKit`.
+//! This crate compiles to a static library and packaged for Swift as `RugbyKit`
+//! via [UniFFI]. It exposes the core emulator API to Swift on Apple platforms.
+//!
+//! The public surface is generated from UniFFI scaffolding. Call
+//! [`initialize`](init) once before using any other API to set up the logging
+//! backend.
+//!
+//! [UniFFI]: https://mozilla.github.io/uniffi-rs/
 
 #![warn(clippy::pedantic)]
 // Allowed lints: clippy
+#![allow(clippy::doc_markdown)]
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::missing_panics_doc)]
 
