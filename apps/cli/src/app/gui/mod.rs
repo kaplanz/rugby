@@ -2,10 +2,10 @@
 
 use anyhow::Result;
 use minifb::Key;
+use rugby::api::input::Event;
+use rugby::api::video::Frame;
 use rugby::core::chip::ppu;
 use rugby::core::dmg::chip::joy::Button;
-use rugby::emu::input::Event;
-use rugby::emu::video::Frame;
 use rugby::extra::pal::Palette;
 
 use self::win::{Main, Window};

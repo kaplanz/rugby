@@ -54,7 +54,7 @@ pub mod extra {
     pub use rugby_pal as pal;
 }
 
-pub use crate::core::api as emu;
+pub use crate::core::api;
 
 /// Name of this crate.
 pub const NAME: &str = env!("CARGO_CRATE_NAME");
@@ -71,9 +71,8 @@ pub const NAME: &str = env!("CARGO_CRATE_NAME");
 /// Includes all core and library API traits.
 #[rustfmt::skip]
 pub mod prelude {
-    // Emulator
-    pub use crate::emu::audio::Audio as _;
-    pub use crate::emu::cable::Cable as _;
-    pub use crate::emu::input::Input as _;
-    pub use crate::emu::video::Video as _;
+    pub use crate::api::audio::Audio as _;
+    pub use crate::api::cable::Cable as _;
+    pub use crate::api::input::Input as _;
+    pub use crate::api::video::Video as _;
 }
