@@ -34,26 +34,22 @@
 
 #[doc(inline)]
 pub use rugby_arch as arch;
+#[cfg(feature = "cfg")]
+#[doc(inline)]
+pub use rugby_cfg as cfg;
 #[doc(inline)]
 pub use rugby_core as core;
+#[cfg(feature = "gbd")]
+#[doc(inline)]
+pub use rugby_gbd as gbd;
+#[cfg(feature = "pal")]
+#[doc(inline)]
+pub use rugby_pal as pal;
 
 pub use crate::core::api;
 pub use crate::emu::GameBoy;
 
 pub mod emu;
-
-/// Extra features.
-pub mod extra {
-    #[cfg(feature = "cfg")]
-    #[doc(inline)]
-    pub use rugby_cfg as cfg;
-    #[cfg(feature = "gbd")]
-    #[doc(inline)]
-    pub use rugby_gbd as gbd;
-    #[cfg(feature = "pal")]
-    #[doc(inline)]
-    pub use rugby_pal as pal;
-}
 
 /// Name of this crate.
 pub const NAME: &str = env!("CARGO_CRATE_NAME");
