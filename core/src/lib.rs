@@ -14,11 +14,9 @@
 mod model;
 mod rev;
 
+pub mod api;
 pub mod cart;
 pub mod chip;
-
-/// Emulator API.
-pub mod api;
 
 pub use crate::model::dmg;
 pub use crate::rev::Revision;
