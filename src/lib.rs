@@ -38,9 +38,9 @@ pub use rugby_arch as arch;
 pub use rugby_core as core;
 
 pub use crate::core::api;
-pub use crate::sys::GameBoy;
+pub use crate::emu::GameBoy;
 
-mod sys;
+mod emu;
 
 /// Extra features.
 pub mod extra {
