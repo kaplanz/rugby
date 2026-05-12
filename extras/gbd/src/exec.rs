@@ -8,8 +8,8 @@ use itertools::Itertools;
 use orng::Orange;
 use rugby_arch::Block;
 use rugby_arch::reg::Port;
-use rugby_core::api::cable::Cable as _;
-use rugby_core::api::video::Video as _;
+use rugby_core::api::cable::Cable;
+use rugby_core::api::video::Video;
 use rugby_core::chip::ppu::LCD;
 
 use super::lang::{Keyword, Select, Serial, Value};
