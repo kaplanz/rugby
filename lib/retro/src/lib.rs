@@ -21,13 +21,13 @@ use std::ptr;
 use constcat::concat;
 use log::{error, info, warn};
 use parking_lot::Mutex;
+use rugby::api::audio::Sample;
+use rugby::api::input::State;
 use rugby::arch::Block;
 use rugby::core::cart::Cartridge;
 use rugby::core::chip::ppu::{self as ppu, LCD};
 use rugby::core::dmg::GameBoy;
 use rugby::core::dmg::chip::joy::Button;
-use rugby::emu::audio::Sample;
-use rugby::emu::input::State;
 use rugby::prelude::*;
 
 pub mod def;

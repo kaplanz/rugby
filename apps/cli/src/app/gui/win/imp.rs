@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 
 pub use minifb::Key;
 use minifb::{Result, Scale, ScaleMode, WindowOptions};
-use rugby::emu::input::{Event, State};
+use rugby::api::input::{Event, State};
 
 /// Color value of an individual pixel.
 pub type Pixel = u32;
