@@ -4,8 +4,8 @@ use std::io::ErrorKind::NotFound;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
-pub use rugby::extra::cfg::Config;
-use rugby::extra::cfg::fmt::toml;
+pub use rugby::cfg::Config;
+use rugby::cfg::fmt::toml;
 
 use crate::dir;
 

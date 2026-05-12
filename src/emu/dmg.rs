@@ -33,8 +33,9 @@ impl Default for Dmg {
 }
 
 #[cfg(feature = "cfg")]
-impl From<Rev> for Dmg {
-    fn from(rev: Rev) -> Self {
+impl From<crate::cfg::types::model::dmg::Rev> for Dmg {
+    fn from(rev: crate::cfg::types::model::dmg::Rev) -> Self {
+        use crate::cfg::types::model::dmg::Rev;
         match rev {
             Rev::Zero => Self::Zero(GameBoy::new()),
             Rev::A => Self::A(GameBoy::new()),

@@ -6,7 +6,7 @@ use rugby::api::input::Event;
 use rugby::api::video::Frame;
 use rugby::core::chip::ppu;
 use rugby::core::dmg::chip::joy::Button;
-use rugby::extra::pal::Palette;
+use rugby::pal::Palette;
 
 use self::win::{Main, Window};
 #[cfg(feature = "gfx")]

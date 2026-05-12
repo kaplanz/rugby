@@ -73,12 +73,12 @@ pub struct Settings {
     ///
     /// When options are specified in multiple locations, they will be applied
     /// with the following precedence: cli > env > file.
-    #[arg(long = "config", env = rugby::extra::cfg::env::CFG)]
+    #[arg(long = "config", env = rugby::cfg::env::CFG)]
     #[arg(value_name = "PATH")]
     #[arg(value_hint = ValueHint::FilePath)]
     #[arg(default_value_os_t = crate::cfg::path())]
-    #[arg(hide_default_value = std::env::var(rugby::extra::cfg::env::CFG).is_ok())]
-    #[arg(hide_env_values    = std::env::var(rugby::extra::cfg::env::CFG).is_err())]
+    #[arg(hide_default_value = std::env::var(rugby::cfg::env::CFG).is_ok())]
+    #[arg(hide_env_values    = std::env::var(rugby::cfg::env::CFG).is_err())]
     #[arg(help_heading = None)]
     #[arg(display_order = 1)]
     pub path: PathBuf,

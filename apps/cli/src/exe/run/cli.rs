@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use rugby::extra::cfg::types::speed;
+use rugby::cfg::types::speed;
 
 use super::NAME;
 use crate::cli::Settings;

@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use log::{debug, error, trace};
-use rugby::extra::gbd::prompt::{Error, Prompt};
+use rugby::gbd::prompt::{Error, Prompt};
 use rustyline::DefaultEditor as Editor;
 use rustyline::error::ReadlineError::{Eof, Interrupted as Int};
 use rustyline::history::History;
