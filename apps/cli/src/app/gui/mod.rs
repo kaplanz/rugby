@@ -2,7 +2,6 @@
 
 use anyhow::Result;
 use minifb::Key;
-use rugby::app;
 use rugby::core::chip::ppu;
 use rugby::core::dmg::chip::joy::Button;
 use rugby::emu::input::Event;
@@ -45,11 +44,9 @@ impl Frontend {
     }
 }
 
-impl app::input::Input for Frontend {
-    type Button = Button;
-
+impl Frontend {
     #[rustfmt::skip]
-    fn events(&mut self) -> Vec<Event<Self::Button>> {
+    pub fn events(&mut self) -> Vec<Event<Button>> {
         self.lcd
             // Fetch keys
             .keys()
@@ -67,12 +64,8 @@ impl app::input::Input for Frontend {
                 _ => None,
             }).collect()
     }
-}
 
-impl app::video::Video for Frontend {
-    type Pixel = ppu::Color;
-
-    fn draw(&mut self, frame: Frame<Self::Pixel>) {
+    pub fn draw(&mut self, frame: &Frame<ppu::Color>) {
         // Translate pixels
         let frame = frame
             .iter()

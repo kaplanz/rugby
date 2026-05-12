@@ -2,8 +2,6 @@
 
 use anyhow::Result;
 use log::debug;
-use rugby::app::input::Input;
-use rugby::app::video::Video;
 use rugby::core::chip::ppu;
 
 use crate::app::{self, Exit};
@@ -44,7 +42,7 @@ pub fn main(args: &Cli) -> Result<()> {
         // Draw main window
         if let Some(frame) = app::data::video::take() {
             // Redraw frame
-            gui.draw(frame);
+            gui.draw(&frame);
         } else {
             // Sync window
             gui.lcd.update();
