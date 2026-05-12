@@ -1,4 +1,12 @@
-//! Frontend for `rugby` compliant with the `libretro` specification.
+//! libretro frontend for `rugby`.
+//!
+//! This crate implements the [libretro] API as a `cdylib`, producing the
+//! `retro` shared library that any libretro-compatible frontend (such as
+//! RetroArch) can load to run Game Boy ROMs through `rugby`.
+//!
+//! This crate is not intended for use as a Rust library dependency.
+//!
+//! [libretro]: https://www.libretro.com/index.php/api/
 
 #![warn(clippy::pedantic)]
 // Allowed lints: rustc

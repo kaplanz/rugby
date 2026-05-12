@@ -1,6 +1,13 @@
-//! WebAssembly library port.
+//! WebAssembly bindings for `rugby`.
 //!
-//! Exported as a JS package called `rugby-wasm`.
+//! This crate compiles to a `cdylib` and is packaged for WASM as `rugby-wasm`
+//! via `[wasm-bindgen]`. It exposes the core emulator API to JavaScript on
+//! browsers.
+//!
+//! A browser-compatible logging backend is initialised automatically when the
+//! module loads.
+//!
+//! [wasm-bindgen]: https://wasm-bindgen.github.io/wasm-bindgen/
 
 #![warn(clippy::pedantic)]
 

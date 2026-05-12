@@ -1,7 +1,17 @@
-//! Pretty hexadecimal printing for slices of bytes.
+//! Pretty hexadecimal dump formatter for byte slices.
 //!
-//! Wrap any blob (big lump of bytes) in a [`Printer`] object to enable a simple
-//! and readable [`Display`] implementation.
+//! Wrap any byte slice in a [`Printer`] to get a human-readable hex dump with
+//! configurable word sizes. The output is modelled after classic `hexdump -C`
+//! style: each line shows an offset with hex columns grouped by word size.
+//!
+//! # Examples
+//!
+//! ```
+//! // Define some binary data
+//! let data = b"Hello, world!\n";
+//! // Print it as raw bytes
+//! println!("{}", hexd::Printer::<u8>::new(0, data));
+//! ```
 
 #![warn(clippy::pedantic)]
 

@@ -1,4 +1,17 @@
-//! Game Boy Debugger (GBD).
+//! Interactive debugger for `rugby`.
+//!
+//! This crate provides GBD (Game Boy Debugger), a [`Debugger`] that can be
+//! attached to a running [`GameBoy`] instance to pause, inspect, and step
+//! through emulation interactively.
+//!
+//! # Usage
+//!
+//! Construct a [`Debugger`] then wire up a [`Prompt`] implementation
+//! and optionally a log filter. The host drives the emulator loop and calls
+//! into the debugger each cycle. The debugger handles breakpoints, single-step,
+//! and user commands.
+//!
+//! This crate requires the `debug` feature to be enabled on `rugby-core`.
 
 #![warn(clippy::pedantic)]
 // Allowed lints: clippy
