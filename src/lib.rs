@@ -1,6 +1,7 @@
-//! # Game Boy
+//! A cycle-accurate Game Boy emulator.
 //!
 //! Emulator implementations for the following Game Boy models:
+//!
 //! - [`DMG`](crate::core::dmg): [Game Boy]
 //!
 //! # Examples

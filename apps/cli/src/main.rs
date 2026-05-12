@@ -1,4 +1,4 @@
-//! Command-line emulator.
+//! Command-line application.
 
 #![warn(clippy::pedantic)]
 // Allowed lints: clippy

@@ -1,5 +1,3 @@
-//! # `libretro`
-//!
 //! Frontend for `rugby` compliant with the `libretro` specification.
 
 #![warn(clippy::pedantic)]

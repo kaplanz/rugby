@@ -1,4 +1,4 @@
-//! Game Boy Architecture
+//! Emulator architecture primitives.
 
 #![warn(clippy::pedantic)]
 
