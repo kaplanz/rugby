@@ -4,10 +4,10 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail, ensure};
 use log::{debug, info, warn};
+use rugby::cfg;
 use rugby::core::cart::Cartridge;
 use rugby::core::dmg::GameBoy;
 use rugby::core::dmg::boot::Boot;
-use rugby::extra::cfg;
 
 use super::save;
 use crate::app::init;

@@ -6,9 +6,9 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use log::{debug, error, info, trace};
+use rugby::cfg;
+use rugby::cfg::types::When;
 use rugby::core::cart::Cartridge;
-use rugby::extra::cfg;
-use rugby::extra::cfg::types::When;
 
 /// Loads the cartridge RAM from a save file.
 pub fn load(rom: Option<&PathBuf>, args: &cfg::Cart, cart: &mut Cartridge) -> Result<()> {

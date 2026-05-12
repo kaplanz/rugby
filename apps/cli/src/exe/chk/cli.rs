@@ -1,6 +1,6 @@
 //! Command-line interface.
 
-use rugby::extra::cfg;
+use rugby::cfg;
 
 use super::NAME;
 use crate::exe::run::cli;
