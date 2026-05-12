@@ -1,6 +1,6 @@
 //! Audio API.
 
-use rugby::emu::audio;
+use rugby::api::audio;
 use rugby::prelude::*;
 use wasm_bindgen::prelude::*;
 

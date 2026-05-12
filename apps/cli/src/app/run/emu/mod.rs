@@ -5,12 +5,12 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context as _, Result};
 use log::{debug, info};
+use rugby::api::audio::Audio;
+use rugby::api::input::Input;
+use rugby::api::video::Video;
 use rugby::arch::Block;
 use rugby::core::chip::{cpu, ppu};
 use rugby::core::dmg;
-use rugby::emu::audio::Audio;
-use rugby::emu::input::Input;
-use rugby::emu::video::Video;
 
 use crate::app;
 #[cfg(feature = "trace")]
