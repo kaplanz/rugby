@@ -5,8 +5,15 @@
 //!
 //! # Features
 //!
-//! - [`clap`]: Parse CLI arguments and environment variables.
-//! - [`toml`]: Load configuration from a TOML document.
+//! **Formats**:
+//!
+//! - `clap`: parse CLI arguments and environment variables.
+//! - `toml`: load configuration from a TOML document.
+//!
+//! **Engines**:
+//!
+//! - `serde`: (de)serialization engine.
+//! - `facet`: compile time reflection.
 //!
 //! # Layering
 //!

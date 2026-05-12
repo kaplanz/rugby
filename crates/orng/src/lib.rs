@@ -1,17 +1,22 @@
-//! Wrapping range iteration.
+//! Wrapping range iteration over bounded integer types.
+//!
+//! [`Orange`] is an inclusive range that wraps around when the end bound is
+//! less than the start bound. It is useful for iterating over circular address
+//! spaces or ring-buffer indices without manual modular arithmetic.
+//!
+//! Construct an `Orange` from a standard [`std::ops::Range`] via `From`, then
+//! use it as an iterator. The wrapped end point is computed using saturating
+//! subtraction so empty ranges are handled correctly.
 //!
 //! # Examples
 //!
 //! ```
-//! use orng::Orange;
+//! // Wraps from 250 to 4: 250, 251, ..., 255, 0, 1, 2, 3, 4
+//! let range = orng::Orange::<u8>::from(250..5);
 //!
-//! // Create a wrapping range
-//! let range = Orange::<u8>::from(250..5);
-//!
-//! // Perform iteration
-//! for i in range {
-//!   // -- snip --
-//! }
+//! let values: Vec<u8> = range.into_iter().collect();
+//! assert_eq!(values.first(), Some(&250));
+//! assert_eq!(values.last(), Some(&4));
 //! ```
 
 #![warn(clippy::pedantic)]

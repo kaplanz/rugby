@@ -1,4 +1,21 @@
-//! Color palettes.
+//! DMG color palettes for `rugby`.
+//!
+//! The DMG model Game Boy renders graphics using a 2-bit indexed palette,
+//! mapping four shades (0-3) to display colors. This crate provides the
+//! [`Palette`] type and a curated set of named palette presets that replicate
+//! popular Game Boy screen color combinations.
+//!
+//! Each palette maps the four DMG shade indices to [`Color`] values expressed
+//! as 24-bit RGB.
+//!
+//! # Examples
+//!
+//! ```
+//! use rugby_pal::{Palette, AUTUMN_CHILL};
+//!
+//! // Index a preset palette to get the color for shade 0 (lightest)
+//! let lightest = AUTUMN_CHILL[0];
+//! ```
 
 #![warn(clippy::pedantic)]
 

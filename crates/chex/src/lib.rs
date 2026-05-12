@@ -1,6 +1,13 @@
-//! Hex color parser.
+//! Hexadecimal color parser and formatter.
 //!
-//! This library implements a string color parser for hexadecimal color values.
+//! `chex` parses CSS-style hex color strings (e.g. `"#a0a08b"`) into a
+//! strongly-typed [`Color`] value and formats them back. Named color constants
+//! (such as `"red"` or `"cornflowerblue"`) are also recognised.
+//!
+//! [`Color`] stores a 24-bit RGB value as a `u32` in `0x00RRGGBB` layout.
+//! It implements [`std::str::FromStr`] and [`std::fmt::Display`], and
+//! optionally supports `serde` (de)serialisation and `facet` reflection
+//! via feature flags.
 //!
 //! # Examples
 //!
@@ -8,13 +15,13 @@
 //! use chex::Color;
 //!
 //! # fn main() -> Result<(), chex::Error> {
-//! // Parse color from a string
+//! // Parse a color from a hex string
 //! let col: Color = "#a0a08b".parse()?;
 //!
-//! // Convert color as its integer value
+//! // Access the raw integer value
 //! assert_eq!(u32::from(col) / 3, 0x358ad9);
 //!
-//! // Format back as a string
+//! // Round-trip back to a string
 //! assert_eq!(format!("{col}"), "#a0a08b");
 //! #
 //! # Ok(())

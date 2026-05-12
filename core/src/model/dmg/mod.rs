@@ -1,6 +1,4 @@
-//! DMG: [Game Boy].
-//!
-//! [Game Boy]: https://en.wikipedia.org/wiki/Game_Boy
+//! _Game Boy_.
 
 use std::io::{BufRead, Write};
 use std::marker::PhantomData;
@@ -37,7 +35,7 @@ use crate::cart::Cartridge;
 #[expect(clippy::doc_markdown)]
 pub const CLOCK: u32 = 4_194_304;
 
-/// Game Boy handheld game console.
+/// _Game Boy_.
 #[derive(Debug, Default)]
 pub struct GameBoy<R: Revision = rev::C> {
     /// Boot ROM.
