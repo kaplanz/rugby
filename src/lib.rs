@@ -34,8 +34,6 @@
 
 mod sys;
 
-pub mod app;
-
 #[doc(inline)]
 pub use rugby_arch as arch;
 #[doc(inline)]
@@ -73,13 +71,6 @@ pub const NAME: &str = env!("CARGO_CRATE_NAME");
 /// Includes all core and library API traits.
 #[rustfmt::skip]
 pub mod prelude {
-    // Application
-    pub use crate::app::Frontend;
-    pub use crate::app::audio::Audio as _;
-    pub use crate::app::cable::Cable as _;
-    pub use crate::app::input::Input as _;
-    pub use crate::app::video::Video as _;
-
     // Emulator
     pub use crate::emu::audio::Audio as _;
     pub use crate::emu::cable::Cable as _;
