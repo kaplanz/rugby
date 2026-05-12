@@ -1,4 +1,4 @@
-//! Emulator API.
+//! Emulator component APIs.
 
 pub mod audio;
 pub mod cable;
