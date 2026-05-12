@@ -32,14 +32,15 @@
 
 #![warn(clippy::pedantic)]
 
-mod sys;
-
 #[doc(inline)]
 pub use rugby_arch as arch;
 #[doc(inline)]
 pub use rugby_core as core;
 
-pub use self::sys::GameBoy;
+pub use crate::core::api;
+pub use crate::sys::GameBoy;
+
+mod sys;
 
 /// Extra features.
 pub mod extra {
@@ -53,8 +54,6 @@ pub mod extra {
     #[doc(inline)]
     pub use rugby_pal as pal;
 }
-
-pub use crate::core::api;
 
 /// Name of this crate.
 pub const NAME: &str = env!("CARGO_CRATE_NAME");
