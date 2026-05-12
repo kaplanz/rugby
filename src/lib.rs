@@ -6,10 +6,9 @@
 //! # Examples
 //!
 //! ```
-//! use rugby::arch::Block; // for `Block::cycle`
-//! use rugby::core::dmg::GameBoy;
+//! use rugby::arch::Block;
 //! use rugby::core::cart::Cartridge;
-//! use rugby::prelude::*;
+//! use rugby::core::dmg::GameBoy;
 //!
 //! // Instantiate a cartridge from ROM bytes
 //! let rom: &[u8]; // -- snip --
@@ -58,21 +57,3 @@ pub use crate::core::api;
 
 /// Name of this crate.
 pub const NAME: &str = env!("CARGO_CRATE_NAME");
-
-/// A prelude for conveniently writing emulator code.
-///
-/// The purpose of this module is to alleviate imports of many common traits by
-/// adding a glob import to the top of modules:
-///
-/// ```rust
-/// use rugby::prelude::*;
-/// ```
-///
-/// Includes all core and library API traits.
-#[rustfmt::skip]
-pub mod prelude {
-    pub use crate::api::audio::Audio as _;
-    pub use crate::api::cable::Cable as _;
-    pub use crate::api::input::Input as _;
-    pub use crate::api::video::Video as _;
-}

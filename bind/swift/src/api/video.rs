@@ -1,6 +1,6 @@
 //! Video API.
 
-use rugby::prelude::*;
+use rugby::api::video::Video as _;
 
 use super::GameBoy;
 

@@ -41,8 +41,8 @@ fn emulate(rom: &[u8], check: fn(&mut GameBoy) -> Result<()>) -> Result<()> {
 
 /// Check for test results.
 mod check {
+    use rugby::api::cable::Cable as _;
     use rugby::core::dmg::GameBoy;
-    use rugby::prelude::*;
 
     use super::{Error, Result};
 

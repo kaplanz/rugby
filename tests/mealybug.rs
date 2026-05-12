@@ -1,7 +1,7 @@
+use rugby::api::video::Video as _;
 use rugby::arch::Block;
 use rugby::core::cart::Cartridge;
 use rugby::core::dmg::GameBoy;
-use rugby::prelude::*;
 
 mod common;
 
