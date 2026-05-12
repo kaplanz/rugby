@@ -2,7 +2,7 @@
 
 use anyhow::{Context as _, Result};
 use rugby::core::chip::ppu::LCD;
-use rugby::extra::pal::Palette;
+use rugby::pal::Palette;
 
 use super::util;
 use crate::app::gui::Frontend;
