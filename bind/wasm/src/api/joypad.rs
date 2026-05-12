@@ -1,8 +1,7 @@
 //! Joypad API.
 
-use rugby::api::input::State;
+use rugby::api::input::{Input as _, State};
 use rugby::core::dmg;
-use rugby::prelude::*;
 use wasm_bindgen::prelude::*;
 
 use crate::api::GameBoy;
