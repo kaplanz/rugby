@@ -99,3 +99,11 @@ conditions of their respective licenses:
 [blargg]:   https://github.com/retrio/gb-test-roms
 [mealybug]: https://github.com/mattcurrie/mealybug-tearoom-tests
 [mooneye]:  https://github.com/Gekkio/mooneye-test-suite
+
+### Utilities
+
+- [which.gb](/roms/util/which/which.gb) is included under the conditions of the
+  [MIT License](/roms/util/which/LICENSE) (dated 12 May 2026). See the project
+  [here][which].
+
+[which]: https://github.com/mattcurrie/which.gb
