@@ -249,12 +249,16 @@ mod tests {
                 timer.cycle();
             } // overflow  -> 0x00
             timer.reg.tima.store(0xfd);
-            //   overwrite -> 0xfd
-            for _ in 0..64 {
+            //   write     -> 0xfd (reload still pending)
+            for _ in 0..4 {
                 assert_eq!(timer.reg.tima.load(), 0xfd);
                 timer.cycle();
-            } // increment -> 0xfe
-            assert_eq!(timer.reg.tima.load(), 0xfe);
+            } // reload    -> 0xfe
+            for _ in 4..64 {
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+                timer.cycle();
+            } // increment -> 0xff
+            assert_eq!(timer.reg.tima.load(), 0xff);
         }
 
         // Test 2
@@ -278,12 +282,16 @@ mod tests {
                 timer.cycle();
             }
             timer.reg.tima.store(0xfd);
-            //   overwrite -> 0xfd
-            for _ in 1..64 {
+            //   write     -> 0xfd (reload still pending)
+            for _ in 1..4 {
                 assert_eq!(timer.reg.tima.load(), 0xfd);
                 timer.cycle();
-            } // increment -> 0xfe
-            assert_eq!(timer.reg.tima.load(), 0xfe);
+            } // reload    -> 0xfe
+            for _ in 4..64 {
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+                timer.cycle();
+            } // increment -> 0xff
+            assert_eq!(timer.reg.tima.load(), 0xff);
         }
 
         // Test 3
@@ -307,12 +315,16 @@ mod tests {
                 timer.cycle();
             }
             timer.reg.tima.store(0xfd);
-            //   overwrite -> 0xfd
-            for _ in 2..64 {
+            //   write     -> 0xfd (reload still pending)
+            for _ in 2..4 {
                 assert_eq!(timer.reg.tima.load(), 0xfd);
                 timer.cycle();
-            } // increment -> 0xfe
-            assert_eq!(timer.reg.tima.load(), 0xfe);
+            } // reload    -> 0xfe
+            for _ in 4..64 {
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+                timer.cycle();
+            } // increment -> 0xff
+            assert_eq!(timer.reg.tima.load(), 0xff);
         }
 
         // Test 4
