@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use rugby::cfg::types::speed;
+use rugby::cfg::types::{model, speed};
 
 use super::NAME;
 use crate::cli::Settings;
@@ -39,6 +39,15 @@ pub struct Opt {
     /// Cartridge options.
     #[command(flatten)]
     pub cart: Cart,
+
+    /// Hardware model.
+    ///
+    /// Selects the emulated hardware platform and optionally a silicon
+    /// revision. Overrides per-platform options from the config file.
+    #[arg(short = 'm', long = "model", value_name = "MODEL")]
+    #[arg(value_parser = model::ValueParser)]
+    #[arg(help_heading = None)]
+    pub model: Option<model::Model>,
 
     /// Simulated clock speed.
     ///
