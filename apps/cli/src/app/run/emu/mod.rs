@@ -122,7 +122,14 @@ pub fn main(args: &Cli) -> Result<()> {
             // This contains a graphical representation of the contents of VRAM.
             #[cfg(feature = "gfx")]
             if args.dbg.vram {
-                app::data::debug::gfx::draw(dmg::dbg::ppu(&emu));
+                let debug = match &emu {
+                    rugby::GameBoy::Dmg0(dmg) => dmg::dbg::ppu(dmg),
+                    rugby::GameBoy::DmgA(dmg)
+                    | rugby::GameBoy::DmgB(dmg)
+                    | rugby::GameBoy::DmgC(dmg) => dmg::dbg::ppu(dmg),
+                    _ => unreachable!(),
+                };
+                app::data::debug::gfx::draw(debug);
             }
         }
 
@@ -132,20 +139,25 @@ pub fn main(args: &Cli) -> Result<()> {
         // fetch/done stage.
         #[cfg(feature = "trace")]
         if let Some(trace) = trace.as_mut()
-            && matches!(
-                emu.main.soc.cpu.stage(),
-                cpu::Stage::Fetch | cpu::Stage::Done
-            )
             && ctx.total % 4 == 0
         {
-            match trace.emit(&emu) {
-                // Exit on completion
-                Err(trace::Error::Finished) => {
-                    info!("trace comparison successful");
-                    app::exit(app::Exit::Tracelog);
-                    break;
+            let stage = match &emu {
+                rugby::GameBoy::Dmg0(dmg) => dmg.main.soc.cpu.stage(),
+                rugby::GameBoy::DmgA(dmg)
+                | rugby::GameBoy::DmgB(dmg)
+                | rugby::GameBoy::DmgC(dmg) => dmg.main.soc.cpu.stage(),
+                _ => unreachable!(),
+            };
+            if matches!(stage, cpu::Stage::Fetch | cpu::Stage::Done) {
+                match trace.emit(&emu) {
+                    // Exit on completion
+                    Err(trace::Error::Finished) => {
+                        info!("trace comparison successful");
+                        app::exit(app::Exit::Tracelog);
+                        break;
+                    }
+                    res => res.context("failed to emit trace entry")?,
                 }
-                res => res.context("failed to emit trace entry")?,
             }
         }
 

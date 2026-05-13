@@ -4,10 +4,12 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail, ensure};
 use log::{debug, info, warn};
-use rugby::cfg;
+use rugby::cfg::types::model::dmg::Rev;
+use rugby::cfg::types::model::{self};
 use rugby::core::cart::Cartridge;
-use rugby::core::dmg::GameBoy;
 use rugby::core::dmg::boot::Boot;
+use rugby::core::dmg::{self, rev};
+use rugby::{GameBoy, cfg};
 
 use super::save;
 use crate::app::init;
@@ -16,6 +18,7 @@ use crate::exe::run::{self, Cli};
 
 /// Builds an emulator instance.
 pub fn emu(args: &Cli) -> Result<GameBoy> {
+    let cfg = &args.cfg.data;
     // Load cart ROM
     let mut cart = self::cart(args.cli.cart.rom.as_ref(), &args.cfg.data.cart)
         .context("invalid cartridge")?
@@ -29,7 +32,24 @@ pub fn emu(args: &Cli) -> Result<GameBoy> {
     let boot = self::boot(&args.cfg.data.boot, &args.cli.boot).context("invalid boot ROM")?;
 
     // Instantiate emulator
-    let mut emu = boot.map_or_else(GameBoy::new, GameBoy::with);
+    let rev = match &args.cli.model {
+        Some(model::Model::Dmg(dmg)) => dmg.rev.unwrap_or_default(),
+        None => cfg.model.dmg.rev.unwrap_or_default(),
+    };
+    let mut emu = match rev {
+        Rev::Zero => rugby::GameBoy::Dmg0(
+            boot.map_or_else(dmg::GameBoy::<rev::Zero>::new, dmg::GameBoy::with),
+        ),
+        Rev::A => {
+            rugby::GameBoy::DmgA(boot.map_or_else(dmg::GameBoy::<rev::A>::new, dmg::GameBoy::with))
+        }
+        Rev::B => {
+            rugby::GameBoy::DmgB(boot.map_or_else(dmg::GameBoy::<rev::B>::new, dmg::GameBoy::with))
+        }
+        Rev::C => {
+            rugby::GameBoy::DmgC(boot.map_or_else(dmg::GameBoy::<rev::C>::new, dmg::GameBoy::with))
+        }
+    };
     // Insert cartridge
     if let Some(cart) = cart {
         emu.insert(cart);
