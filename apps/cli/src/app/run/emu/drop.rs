@@ -1,7 +1,7 @@
 //! Emulator teardown.
 
 use anyhow::{Context, Result};
-use rugby::core::dmg::GameBoy;
+use rugby::GameBoy;
 
 use super::save;
 use crate::exe::run::Cli;

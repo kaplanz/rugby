@@ -7,7 +7,8 @@ use std::path::Path;
 
 use anyhow::{Context, bail};
 use either::Either;
-use rugby::core::dmg::GameBoy;
+use rugby::GameBoy;
+use rugby::core::{Revision, dmg};
 
 use self::cmp::Tracer as Tracecmp;
 use self::log::Tracer as Tracelog;
@@ -62,6 +63,14 @@ pub enum Tracer {
 impl Tracer {
     /// Emit and handle a trace entry.
     pub fn emit(&mut self, emu: &GameBoy) -> Result<()> {
+        match emu {
+            GameBoy::Dmg0(dmg) => self.emit_inner(dmg),
+            GameBoy::DmgA(dmg) | GameBoy::DmgB(dmg) | GameBoy::DmgC(dmg) => self.emit_inner(dmg),
+            _ => unreachable!(),
+        }
+    }
+
+    fn emit_inner<R: Revision>(&mut self, emu: &dmg::GameBoy<R>) -> Result<()> {
         match self {
             Tracer::Cmp(tracer) => tracer.emit(emu),
             Tracer::Log(tracer) => tracer.emit(emu),
@@ -93,9 +102,10 @@ mod cmp {
     use std::fmt::Display;
     use std::io::{self, BufRead, BufReader, Read};
 
-    use rugby::core::dmg;
+    use rugby::core::Revision;
+    use rugby::core::dmg::{self, GameBoy};
 
-    use super::{Error, Format, GameBoy};
+    use super::{Error, Format};
 
     /// Compare tracer.
     ///
@@ -111,7 +121,7 @@ mod cmp {
 
     impl Tracer {
         /// Compare a trace entry against the provided tracelog file.
-        pub fn emit(&mut self, emu: &GameBoy) -> super::Result<()> {
+        pub fn emit<R: Revision>(&mut self, emu: &GameBoy<R>) -> super::Result<()> {
             let len = 256;
 
             // Read trace entry
@@ -179,9 +189,10 @@ mod cmp {
 mod log {
     use std::io::{BufWriter, Write};
 
-    use rugby::core::dmg;
+    use rugby::core::Revision;
+    use rugby::core::dmg::{self, GameBoy};
 
-    use super::{Format, GameBoy};
+    use super::Format;
 
     /// Logging tracer.
     ///
@@ -195,7 +206,7 @@ mod log {
 
     impl Tracer {
         /// Emits a trace entry to the tracelog file.
-        pub fn emit(&mut self, emu: &GameBoy) -> super::Result<()> {
+        pub fn emit<R: Revision>(&mut self, emu: &GameBoy<R>) -> super::Result<()> {
             // Gather trace entry
             let entry = match self.fmt {
                 Format::Binjgb => dmg::dbg::trace::binjgb,
