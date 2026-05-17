@@ -22,6 +22,3 @@ getrandom = { version = "0.4.2", features = ["wasm_js"] }
 js-sys = "0.3.94"
 rugby = { workspace = true }
 wasm-bindgen = "0.2.117"
-
-[dev-dependencies]
-wasm-bindgen-test = "0.3.67"
