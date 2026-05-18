@@ -208,7 +208,7 @@ export default async function(cfg) {
     // Use blockquote tags instead of div tags.
     md.renderer.rules.alert_open = function(tokens, idx) {
       const { type } = tokens[idx].meta;
-      return `<blockquote class="callout ${type}">`;
+      return `<blockquote class="alert ${type}">`;
     };
     md.renderer.rules.alert_close = function() {
       return "</blockquote>\n";
