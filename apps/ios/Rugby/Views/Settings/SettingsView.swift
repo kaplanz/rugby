@@ -123,7 +123,7 @@ struct SettingsView: View {
                     MultiLineLabel(
                         "Show Welcome",
                         about: "Present the welcome splash screen.",
-                        systemImage: "app.gift",
+                        systemImage: "hand.wave",
                     )
                 }
                 .sheet(isPresented: $welcomeUsr) {
