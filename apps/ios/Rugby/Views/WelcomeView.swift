@@ -1,0 +1,181 @@
+//
+//  WelcomeView.swift
+//  Rugby
+//
+//  Created by Zakhary Kaplan on 2025-08-14.
+//
+
+import SwiftUI
+
+struct WelcomeView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(Options.self) private var opt
+
+    @State private var path = NavigationPath()
+
+    var body: some View {
+        @Bindable var cfg = opt.data
+        let pages: [AnyView] = [
+            AnyView(
+                VStack {
+                    AppIcon()
+                        .padding(4)
+                    Text("Welcome to \(Build.NAME)")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .padding(.bottom, 24)
+                    Item(
+                        title: "Your Library",
+                        about: """
+                            Import, export, and manage your game ROMs and saves files \
+                            directly on your device. You remain in control of your data.
+                            """
+                    ) {
+                        Image(systemName: "books.vertical.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(.cyan.gradient)
+                    }
+                    Item(
+                        title: "Play Your Way",
+                        about: """
+                            Whether that's on touchscreen, keyboard, or your \
+                            favourite game controller.
+                            """
+                    ) {
+                        LazyVGrid(
+                            columns: [
+                                .init(spacing: 2),
+                                .init(spacing: 2),
+                            ],
+                            spacing: 2,
+                        ) {
+                            Group {
+                                Image(systemName: "hand.tap.fill")
+                                    .resizable()
+                                Image(systemName: "keyboard.fill")
+                                    .resizable()
+                                Image(systemName: "arcade.stick.console.fill")
+                                    .resizable()
+                                Image(systemName: "gamecontroller.fill")
+                                    .resizable()
+                            }
+                            .aspectRatio(contentMode: .fit)
+                        }
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.green.gradient)
+                    }
+                    Item(
+                        title: "Cycle Accurate",
+                        about: """
+                            Enjoy your games as you would on original hardware. \
+                            Emulation accuracy will continue to improve until it's \
+                            perfect.
+                            """
+                    ) {
+                        Image(systemName: "target")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(.pink.gradient)
+                    }
+                    Item(
+                        title: "Open Source",
+                        about: """
+                            Want to peek behind the curtain? The source code is \
+                            readily available and permissively licensed.
+                            """
+                    ) {
+                        Image(systemName: "chevron.left.slash.chevron.right")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(.orange.gradient)
+                    }
+                    Spacer()
+                }
+                .fontDesign(.rounded)
+                .padding(24)
+            ),
+            AnyView(PalettePicker(pal: $cfg.pal)),
+            AnyView(
+                Text("Welcome!")
+                    .font(.largeTitle)
+                    .fontDesign(.rounded)
+                    .fontWeight(.heavy)
+                    .foregroundStyle(Color.accentColor.gradient)
+                    .ignoresSafeArea()
+            ),
+        ]
+        return NavigationStack(path: $path) {
+            Group {
+                pages[0]
+                    .navigationDestination(for: Int.self) { index in
+                        pages[index]
+                            .toolbar(.hidden, for: .navigationBar)
+                            .safeAreaPadding(.vertical, 48)
+                    }
+            }
+            .safeAreaPadding(.vertical, 48)
+        }
+        .safeAreaInset(edge: .bottom) {
+            GlassEffectContainer {
+                HStack {
+                    if !path.isEmpty {
+                        Button {
+                            withAnimation {
+                                path.removeLast()
+                            }
+                        } label: {
+                            Label("Back", systemImage: "chevron.backward")
+                                .imageScale(.large)
+                                .labelStyle(.iconOnly)
+                        }
+                        .buttonStyle(.glass)
+                    }
+                    Button {
+                        let next = path.count + 1
+                        if next < pages.count {
+                            path.append(next)
+                        } else {
+                            dismiss()
+                        }
+                    } label: {
+                        Text(path.count + 1 < pages.count ? "Continue" : "Finish")
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.glassProminent)
+                }
+                .controlSize(.large)
+            }
+        }
+        .safeAreaPadding(.horizontal, 24)
+    }
+}
+
+private struct Item<Image: View>: View {
+    let title: String
+    let about: String
+    @ViewBuilder
+    let image: () -> Image
+
+    var body: some View {
+        HStack(alignment: .top) {
+            image()
+                .frame(width: 36, height: 36)
+                .padding(4)
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.headline)
+                Text(about)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+#Preview {
+    WelcomeView()
+        .environment(Options())
+}
