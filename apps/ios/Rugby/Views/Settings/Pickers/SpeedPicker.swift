@@ -45,7 +45,7 @@ struct SpeedPicker: View {
                 Section {
                     let value = Binding(
                         get: { mult },
-                        set: { spd = .ratio($0.rounded(toPlaces: 2)) },
+                        set: { spd = .ratio($0.rounded(to: 2)) },
                     )
                     Stepper(spd.description, value: value, step: 0.01)
                     Slider(value: value, in: 0...3, step: 0.05)
