@@ -35,7 +35,7 @@ struct LibraryView: View {
                 ],
                 spacing: 12,
             ) {
-                if games.isEmpty {
+                if games.isEmpty && query.isEmpty {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(
                             style: .init(
