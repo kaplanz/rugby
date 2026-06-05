@@ -50,11 +50,13 @@ final class Video: @unchecked Sendable {
 
         // Create indexed colour space
         guard
-            let space = CGColorSpace(
-                indexedBaseSpace: CGColorSpaceCreateDeviceRGB(),
-                last: pal.count - 1,
-                colorTable: data.withUnsafeBytes { $0.bindMemory(to: UInt8.self).baseAddress! }
-            )
+            let space = data.withUnsafeBytes({ bytes -> CGColorSpace? in
+                CGColorSpace(
+                    indexedBaseSpace: CGColorSpaceCreateDeviceRGB(),
+                    last: pal.count - 1,
+                    colorTable: bytes.bindMemory(to: UInt8.self).baseAddress!
+                )
+            })
         else {
             return nil
         }
