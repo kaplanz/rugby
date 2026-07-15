@@ -85,9 +85,11 @@ fn bus_all_works() {
         (0x0400..=0x07ff)
             .map(|addr| cart.chip.ram().read(addr).unwrap())
             .for_each(|byte| assert_eq!(byte, 0x40));
+        // NOTE: 2 KiB RAM is mirrored every $0800 bytes.
         (0x0800..=0x1fff)
-            .map(|addr| cart.chip.ram().read(addr).ok())
-            .for_each(|byte| assert_eq!(byte, None));
+            .map(|addr| cart.chip.ram().read(addr).unwrap())
+            .zip((0x0800..=0x1fff).map(|addr| u8::from(addr & 0x0400 != 0) * 0x40))
+            .for_each(|(found, expected)| assert_eq!(found, expected));
     }
     // Object memory
     (0xfe00..=0xfe9f).for_each(|addr| bus.write(addr, 0x05));

@@ -313,7 +313,7 @@ impl Ram {
             }
         };
         let addr = usize::from(addr);
-        ((bank << 13) | addr & 0x1fff) % self.mem.len().max(0x2000)
+        ((bank << 13) | addr & 0x1fff) % self.mem.len().max(1)
     }
 }
 

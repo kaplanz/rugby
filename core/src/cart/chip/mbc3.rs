@@ -290,7 +290,7 @@ impl Ram {
     fn adjust(&self, addr: u16) -> usize {
         let bank = usize::from(self.ctl.ram.load());
         let addr = usize::from(addr);
-        ((bank << 13) | addr & 0x1fff) % self.mem.len().max(0x2000)
+        ((bank << 13) | addr & 0x1fff) % self.mem.len().max(1)
     }
 }
 
