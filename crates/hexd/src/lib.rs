@@ -127,7 +127,7 @@ impl Internal<'_> {
                 skip = true;
             } else {
                 // Format address as usual
-                write!(f, "{addr:#0width$x}:",).unwrap();
+                write!(f, "{addr:#0width$x}:").unwrap();
                 // Since this line is being printed usually, we must update the
                 // repeat byte in order to check if the next line is a repeat.
                 repeat = pad;

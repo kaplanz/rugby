@@ -54,14 +54,14 @@ impl Map {
     /// Find the entry for a given device.
     pub fn find(&self, entry: &Device) -> Option<&Entry> {
         self.0
-            .iter()
-            .flat_map(|(_, set)| set.iter())
+            .values()
+            .flat_map(|set| set.iter())
             .find(|it| Rc::ptr_eq(&it.entry, entry))
     }
 
     /// Gets an iterator over the entries of the map.
     pub fn iter(&self) -> impl Iterator + '_ {
-        self.0.iter().flat_map(|(_, set)| set.iter())
+        self.0.values().flat_map(|set| set.iter())
     }
 }
 
