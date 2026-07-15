@@ -223,7 +223,10 @@ impl Rom {
 
     /// Adjusts addresses by internal bank number.
     fn adjust(&self, addr: u16) -> usize {
-        let bank = usize::from(self.ctl.rom.load());
+        let bank = match usize::from(self.ctl.rom.load()) {
+            0 => 1,
+            x => x,
+        };
         let addr = usize::from(addr);
         ((bank << 14) | addr & 0x3fff) % self.mem.len().max(0x8000)
     }
