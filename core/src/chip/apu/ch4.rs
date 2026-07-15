@@ -192,8 +192,8 @@ impl Channel {
     /// Reloads the frequency timer.
     pub fn frequency_timer(&mut self) -> u16 {
         u16::from(match self.reg.nr43.borrow().divide() {
-            0 => 8,
-            x => x << 4,
+            0 => 2,
+            x => x << 2,
         }) << self.reg.nr43.borrow().shift()
     }
 }
