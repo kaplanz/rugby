@@ -205,6 +205,7 @@ impl Register for Latch {
         if !self.0 && value {
             debug!("latched clock data");
         }
+        self.0 = value;
     }
 }
 
