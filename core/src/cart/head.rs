@@ -495,6 +495,8 @@ pub mod parts {
                 | Board::Mbc3 { exram, .. }
                 | Board::Mbc5 { exram, .. }
                 | Board::Mmm01 { exram, .. } => *exram,
+                // NOTE: MBC2 always has built-in RAM.
+                Board::Mbc2 { .. } => true,
                 _ => false,
             }
         }
