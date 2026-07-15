@@ -14,11 +14,13 @@ use rugby_arch::mio::{Bus, Device, Mmio};
 use super::{Board, Error, Header, Result};
 
 mod mbc1;
+mod mbc2;
 mod mbc3;
 mod mbc5;
 mod none;
 
 pub use self::mbc1::Mbc1;
+pub use self::mbc2::Mbc2;
 pub use self::mbc3::Mbc3;
 pub use self::mbc5::Mbc5;
 pub use self::none::None;
@@ -43,6 +45,7 @@ pub trait Mbc {
 pub(crate) enum Chip {
     None(None),
     Mbc1(Mbc1),
+    Mbc2(Mbc2),
     Mbc3(Mbc3),
     Mbc5(Mbc5),
 }
@@ -66,6 +69,7 @@ impl Chip {
         match &head.board {
             &Board::None { .. } => Ok(Chip::None(None::new(rom, ram))),
             &Board::Mbc1 { .. } => Ok(Chip::Mbc1(Mbc1::new(rom, ram))),
+            &Board::Mbc2 { .. } => Ok(Chip::Mbc2(Mbc2::new(rom, ram))),
             &Board::Mbc3 { .. } => Ok(Chip::Mbc3(Mbc3::new(rom, ram))),
             &Board::Mbc5 { .. } => Ok(Chip::Mbc5(Mbc5::new(rom, ram))),
             kind => Err(Error::Unsupported(kind.clone())),
@@ -81,9 +85,11 @@ impl Chip {
     #[expect(unused_variables)]
     pub fn check(head: &Header, rom: &[u8]) -> Result<()> {
         match &head.board {
-            Board::None { .. } | Board::Mbc1 { .. } | Board::Mbc3 { .. } | Board::Mbc5 { .. } => {
-                Ok(())
-            }
+            Board::None { .. }
+            | Board::Mbc1 { .. }
+            | Board::Mbc2 { .. }
+            | Board::Mbc3 { .. }
+            | Board::Mbc5 { .. } => Ok(()),
             kind => Err(Error::Unsupported(kind.clone())),
         }
     }
@@ -94,6 +100,7 @@ impl Block for Chip {
         match self {
             Chip::None(mbc) => mbc.ready(),
             Chip::Mbc1(mbc) => mbc.ready(),
+            Chip::Mbc2(mbc) => mbc.ready(),
             Chip::Mbc3(mbc) => mbc.ready(),
             Chip::Mbc5(mbc) => mbc.ready(),
         }
@@ -103,6 +110,7 @@ impl Block for Chip {
         match self {
             Chip::None(mbc) => mbc.cycle(),
             Chip::Mbc1(mbc) => mbc.cycle(),
+            Chip::Mbc2(mbc) => mbc.cycle(),
             Chip::Mbc3(mbc) => mbc.cycle(),
             Chip::Mbc5(mbc) => mbc.cycle(),
         }
@@ -112,6 +120,7 @@ impl Block for Chip {
         match self {
             Chip::None(mbc) => mbc.reset(),
             Chip::Mbc1(mbc) => mbc.reset(),
+            Chip::Mbc2(mbc) => mbc.reset(),
             Chip::Mbc3(mbc) => mbc.reset(),
             Chip::Mbc5(mbc) => mbc.reset(),
         }
@@ -123,6 +132,7 @@ impl Mbc for Chip {
         match self {
             Chip::None(mbc) => mbc.rom(),
             Chip::Mbc1(mbc) => mbc.rom(),
+            Chip::Mbc2(mbc) => mbc.rom(),
             Chip::Mbc3(mbc) => mbc.rom(),
             Chip::Mbc5(mbc) => mbc.rom(),
         }
@@ -132,6 +142,7 @@ impl Mbc for Chip {
         match self {
             Chip::None(mbc) => mbc.ram(),
             Chip::Mbc1(mbc) => mbc.ram(),
+            Chip::Mbc2(mbc) => mbc.ram(),
             Chip::Mbc3(mbc) => mbc.ram(),
             Chip::Mbc5(mbc) => mbc.ram(),
         }
@@ -167,6 +178,7 @@ impl Chip {
         match self {
             Chip::None(mbc) => flash(mbc.ram.borrow_mut().inner_mut()),
             Chip::Mbc1(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::Mbc2(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
             Chip::Mbc3(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
             Chip::Mbc5(mbc) => flash(mbc.ram.borrow_mut().mem.as_mut()),
         }
@@ -188,6 +200,7 @@ impl Chip {
         match self {
             Chip::None(mbc) => dump(mbc.ram.borrow_mut().inner_mut()),
             Chip::Mbc1(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
+            Chip::Mbc2(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
             Chip::Mbc3(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
             Chip::Mbc5(mbc) => dump(mbc.ram.borrow_mut().mem.as_mut()),
         }
@@ -200,7 +213,7 @@ mod init {
 
     use log::{debug, warn};
 
-    use super::{Data, Header};
+    use super::{Board, Data, Header};
 
     /// Constructs a new ROM.
     pub fn rom(head: &Header, rom: &[u8]) -> Data {
@@ -234,6 +247,11 @@ mod init {
 
     /// Constructs a new RAM.
     pub fn ram(head: &Header) -> Data {
+        // NOTE: MBC2 contains 512 half-bytes of built-in RAM, which is not
+        //       reported by the header.
+        if let Board::Mbc2 { .. } = head.board {
+            return vec![0; 0x200].into_boxed_slice();
+        }
         if head.board.has_ram() && head.memory.ramsz == 0 {
             warn!("cartridge supports RAM, but specified size is zero");
         }
