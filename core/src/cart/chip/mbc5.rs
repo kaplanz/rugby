@@ -77,10 +77,6 @@ impl Block for Control {
 #[derive(Debug, Default)]
 struct Enable(bool);
 
-impl Enable {
-    const MASK: u8 = 0x0f;
-}
-
 impl Memory for Enable {
     fn read(&self, _: u16) -> Result<u8> {
         Err(Error::Misuse)
@@ -100,7 +96,8 @@ impl Register for Enable {
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = Self::MASK & value == 0x0a;
+        // NOTE: Unlike other MBCs, MBC5 compares the full byte.
+        self.0 = value == 0x0a;
         debug!("RAM Enable: {}", self.0);
     }
 }
@@ -237,7 +234,7 @@ impl Memory for Rom {
         match addr {
             // RAM Enable
             0x0000..=0x1fff => {
-                // ctl.ena <- data[3:0] == 0xA
+                // ctl.ena <- data == 0xA
                 self.ctl.ena.store(data);
             }
             // ROM Bank Number [8:0]
