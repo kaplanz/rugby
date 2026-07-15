@@ -54,7 +54,7 @@ impl Mbc for Mbc3 {
 /// |:---------------:|------|------|---------------------|
 /// | `$0000..=$1FFF` | 1bit | ENA  | RAM + Timer Enable. |
 /// | `$2000..=$3FFF` | 7bit | ROM  | ROM Bank Number.    |
-/// | `$4000..=$5FFF` | 2bit | RAM  | RAM Bank Number.    |
+/// | `$4000..=$5FFF` | 4bit | RAM  | RAM Bank Number.    |
 /// | `$6000..=$7FFF` | 1bit | LCD  | Latch Clock Data.   |
 #[rustfmt::skip]
 #[derive(Clone, Debug, Default)]
@@ -147,7 +147,7 @@ impl Register for RomBank {
 struct RamBank(u8);
 
 impl RamBank {
-    const MASK: u8 = 0x03;
+    const MASK: u8 = 0x0f;
 }
 
 impl Memory for RamBank {
@@ -299,6 +299,10 @@ impl Memory for Ram {
         if self.ctl.ena.load() == 0 {
             return Err(Error::Disabled);
         }
+        // Error when RTC is selected
+        if self.ctl.ram.load() & 0x08 != 0 {
+            return Err(Error::Disabled);
+        }
         // Perform adjusted read
         let index = self.adjust(addr);
         self.mem.get(index).ok_or(Error::Range).copied()
@@ -307,6 +311,10 @@ impl Memory for Ram {
     fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         // Error when disabled
         if self.ctl.ena.load() == 0 {
+            return Err(Error::Disabled);
+        }
+        // Error when RTC is selected
+        if self.ctl.ram.load() & 0x08 != 0 {
             return Err(Error::Disabled);
         }
         // Perform adjusted write
