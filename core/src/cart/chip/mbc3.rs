@@ -82,6 +82,10 @@ impl Block for Control {
 #[derive(Debug, Default)]
 struct Enable(bool);
 
+impl Enable {
+    const MASK: u8 = 0x0f;
+}
+
 impl Memory for Enable {
     fn read(&self, _: u16) -> Result<u8> {
         Err(Error::Misuse)
@@ -101,7 +105,7 @@ impl Register for Enable {
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = value & 0x0f == 0x0a;
+        self.0 = Self::MASK & value == 0x0a;
         debug!("RAM + Timer Enable: {}", self.0);
     }
 }
@@ -109,6 +113,10 @@ impl Register for Enable {
 /// ROM Bank Number.
 #[derive(Debug, Default)]
 struct RomBank(u8);
+
+impl RomBank {
+    const MASK: u8 = 0x7f;
+}
 
 impl Memory for RomBank {
     fn read(&self, _: u16) -> Result<u8> {
@@ -125,11 +133,11 @@ impl Register for RomBank {
     type Value = u8;
 
     fn load(&self) -> Self::Value {
-        self.0 & 0x7f
+        self.0 & Self::MASK
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = 0x7f & value;
+        self.0 = Self::MASK & value;
         debug!("ROM Bank Number: {:#04x}", self.0);
     }
 }
@@ -137,6 +145,10 @@ impl Register for RomBank {
 /// RAM Bank Number.
 #[derive(Debug, Default)]
 struct RamBank(u8);
+
+impl RamBank {
+    const MASK: u8 = 0x03;
+}
 
 impl Memory for RamBank {
     fn read(&self, _: u16) -> Result<u8> {
@@ -153,11 +165,11 @@ impl Register for RamBank {
     type Value = u8;
 
     fn load(&self) -> Self::Value {
-        self.0 & 0x03
+        self.0 & Self::MASK
     }
 
     fn store(&mut self, value: Self::Value) {
-        self.0 = 0x03 & value;
+        self.0 = Self::MASK & value;
         debug!("RAM Bank Number: {:#04x}", self.0);
     }
 }
@@ -165,6 +177,10 @@ impl Register for RamBank {
 /// Latch Clock Data.
 #[derive(Debug, Default)]
 struct Latch(bool);
+
+impl Latch {
+    const MASK: u8 = 0x01;
+}
 
 impl Memory for Latch {
     fn read(&self, _: u16) -> Result<u8> {
@@ -185,7 +201,7 @@ impl Register for Latch {
     }
 
     fn store(&mut self, value: Self::Value) {
-        let value = value & 0x01 != 0;
+        let value = Self::MASK & value != 0;
         if !self.0 && value {
             debug!("latched clock data");
         }
