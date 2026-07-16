@@ -169,10 +169,11 @@ fn bus_all_works() {
         .map(|addr: u16| emu.main.mem.hram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x0e));
     // Interrupt enable
+    // NOTE: All 8 bits of IE are writable
     (0xffff..=0xffff).for_each(|addr| bus.write(addr, 0x0f));
     (0x0000..=0x0000)
         .map(|_| emu.main.soc.pic.load(<Pic as Port<u8>>::Select::Ie))
-        .for_each(|byte| assert_eq!(byte, 0xef));
+        .for_each(|byte| assert_eq!(byte, 0x0f));
 }
 
 #[test]
