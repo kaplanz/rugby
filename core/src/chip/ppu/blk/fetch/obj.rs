@@ -97,6 +97,10 @@ pub(super) mod exec {
             row.xflip();
         }
 
+        // Discard pixels beyond the left screen edge
+        let skip = usize::from(8u8.saturating_sub(obj.xpos));
+        row.shift(skip);
+
         // Push to the FIFO
         //
         // NOTE: Some pixels may be discarded when FIFO is non-empty.

@@ -73,6 +73,14 @@ impl Row {
     pub fn xflip(&mut self) {
         self.0.reverse();
     }
+
+    /// Shift a row leftwards, filling with transparent pixels.
+    #[rustfmt::skip]
+    pub fn shift(&mut self, skip: usize) {
+        self.0 = std::array::from_fn(|idx| {
+            self.0.get(idx + skip).copied().unwrap_or(Color::C0)
+        });
+    }
 }
 
 impl From<[u8; 2]> for Row {
