@@ -68,7 +68,7 @@ behaviours.
 #### Results
 
 ```
-27 passed; 18 failed;
+26 passed; 19 failed;
 ```
 
 <details>
@@ -92,7 +92,7 @@ behaviours.
   |  ✅  | `dmg_sound/rom_singles/01-registers.gb`             |
   |  ❌  | `dmg_sound/rom_singles/02-len ctr.gb`               |
   |  ❌  | `dmg_sound/rom_singles/03-trigger.gb`               |
-  |  ✅  | `dmg_sound/rom_singles/04-sweep.gb`                 |
+  |  ❌  | `dmg_sound/rom_singles/04-sweep.gb`                 |
   |  ❌  | `dmg_sound/rom_singles/05-sweep details.gb`         |
   |  ✅  | `dmg_sound/rom_singles/06-overflow on trigger.gb`   |
   |  ✅  | `dmg_sound/rom_singles/07-len sweep period sync.gb` |

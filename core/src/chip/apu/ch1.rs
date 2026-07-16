@@ -103,7 +103,9 @@ impl Channel {
         // - Reload frequency
         self.etc.clk = u16::from_le_bytes([nr13.clk_lo(), nr14.clk_hi()]);
         // - Reload length timer (if expired)
-        self.etc.len = 0x40 - nr11.step();
+        if self.etc.len == 0 {
+            self.etc.len = 0x40 - nr11.step();
+        }
         // - Reload envelope timer
         self.etc.env.len = nr12.pace();
         // - Reload initial volume
