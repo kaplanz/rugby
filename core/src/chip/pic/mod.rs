@@ -199,7 +199,7 @@ impl Port<u8> for Pic {
 #[derive(Debug, Default)]
 pub struct Control {
     /// Interrupt flag.
-    pub flg: Shared<Register>,
+    pub flg: Shared<Flag>,
     /// Interrupt enable.
     pub ena: Shared<Enable>,
 }
@@ -218,7 +218,7 @@ impl Mmio for Control {
     }
 }
 
-/// Interrupt register.
+/// Interrupt flag register.
 ///
 /// Each [interrupt kind](Interrupt) has a corresponding bit position in a
 /// control register as follows:
@@ -231,13 +231,13 @@ impl Mmio for Control {
 /// |  3  | Serial   |
 /// |  4  | Joypad   |
 #[derive(Debug, Default)]
-pub struct Register(u8);
+pub struct Flag(u8);
 
-impl Register {
+impl Flag {
     const MASK: u8 = 0b0001_1111;
 }
 
-impl Memory for Register {
+impl Memory for Flag {
     fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
         Ok(self.load())
     }
@@ -248,7 +248,7 @@ impl Memory for Register {
     }
 }
 
-impl rugby_arch::reg::Register for Register {
+impl rugby_arch::reg::Register for Flag {
     type Value = u8;
 
     fn load(&self) -> Self::Value {
@@ -262,7 +262,7 @@ impl rugby_arch::reg::Register for Register {
 
 /// Interrupt enable register.
 ///
-/// Unlike the [interrupt flag](Register), all 8 bits are readable and
+/// Unlike the [interrupt flag](Flag), all 8 bits are readable and
 /// writable. Only the low 5 bits participate in interrupt handling.
 pub type Enable = u8;
 
@@ -270,7 +270,7 @@ pub type Enable = u8;
 #[derive(Clone, Debug)]
 pub struct Line {
     /// Interrupt flag.
-    flg: Shared<Register>,
+    flg: Shared<Flag>,
     /// Interrupt enable.
     ena: Shared<Enable>,
 }
@@ -289,7 +289,7 @@ impl Line {
     pub fn pending(&self) -> bool {
         let flg = self.flg.load();
         let ena = self.ena.load();
-        (flg & ena & Register::MASK) != 0
+        (flg & ena & Flag::MASK) != 0
     }
 
     /// Fetches the first pending interrupt.
