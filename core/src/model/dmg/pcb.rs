@@ -76,6 +76,9 @@ impl Block for Motherboard {
         // PPU: 4 MiHz
         if self.soc.ppu.ready() {
             self.soc.ppu.cycle();
+        } else {
+            // When the LCD is disabled, the PPU holds its reset state.
+            self.soc.ppu.disable();
         }
         // Serial: 8192 Hz
         if self.soc.sio.ready() && self.clk.is_multiple_of(512) {
