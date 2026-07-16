@@ -80,8 +80,8 @@ impl Channel {
 
         // Trigger channel
         //
-        // - Enable channel
-        self.etc.ena = true;
+        // - Enable channel (unless the DAC is off)
+        self.etc.ena = nr42.ivol() > 0 || nr42.sign();
         // - Reload frequency
         self.etc.clk = self.frequency_timer();
         // - Reload length timer (if expired)
@@ -213,6 +213,11 @@ impl Block for Channel {
         // Check for trigger
         if nr44.trigger() {
             self.trigger();
+        }
+
+        // Disable channel when the DAC is off
+        if !(nr42.ivol() > 0 || nr42.sign()) {
+            self.etc.ena = false;
         }
 
         // Tick frequency timer
