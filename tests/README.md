@@ -141,7 +141,7 @@ Correctness tests focusing on runtime changes made to the PPU.
 #### Results
 
 ```
-0 passed; 24 failed;
+1 passed; 23 failed;
 ```
 
 <details>
@@ -149,7 +149,7 @@ Correctness tests focusing on runtime changes made to the PPU.
 
   | Pass | Test                                                |
   |:----:| --------------------------------------------------- |
-  |  ❌  | `m2_win_en_toggle`                                  |
+  |  ✅  | `m2_win_en_toggle`                                  |
   |  ❌  | `m3_bgp_change`                                     |
   |  ❌  | `m3_bgp_change_sprites`                             |
   |  ❌  | `m3_lcdc_bg_en_change`                              |
