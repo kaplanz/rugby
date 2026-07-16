@@ -287,6 +287,9 @@ impl Block for Apu {
             // When disabled, all registers are reset and in read-only mode. We
             // can emulate this by constantly resetting these components.
             self.reset();
+            // Hold the frame sequencer at step 0 while powered off so
+            // power-on restarts the sequence from the beginning.
+            self.seq.clk = 0;
         }
 
         // Cycle frame sequencer
