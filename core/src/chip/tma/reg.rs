@@ -60,21 +60,25 @@ impl Register for Div {
 pub struct Tima {
     pub(super) reg: u8,
     pub(super) rel: Reload,
+    pub(super) sup: bool,
 }
 
 /// Timer reload counter.
 ///
 /// In effect, this models the 1 M-cycle (4 T-cycle) delay between a reload
-/// being triggered and it occurring.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+/// being triggered and it occurring, followed by the 1 M-cycle window during
+/// which the reload commits.
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub(super) enum Reload {
     /// Timer is not amid a reload.
     #[default]
     None,
     /// Reload pending in `N` cycles.
     Wait(u8),
-    /// Reload occurring this cycle.
-    Now,
+    /// Reload occurs this cycle.
+    Load,
+    /// Reload commit for `N` more cycles.
+    Done(u8),
 }
 
 impl Reload {
@@ -87,16 +91,16 @@ impl Reload {
     /// Advance the reload counter.
     pub(super) fn tick(&mut self) {
         *self = match self {
-            Reload::Wait(0) => Reload::Now,
+            // Advance to the reload
+            Reload::Wait(0) => Reload::Load,
             // Decrement cycles until reload
-            &mut Reload::Wait(mut count) => {
-                // Decrement cycles until reload
-                count -= 1;
-                // Update the reload counter
-                Reload::Wait(count)
-            }
-            // Reload just occurred, or counter is inactive
-            _ => Reload::None,
+            Reload::Wait(count) => Reload::Wait(*count - 1),
+            // Reload just occurred, so commit for the next M-cycle
+            Reload::Load => Reload::Done(3),
+            // Decrement cycles while committing
+            Reload::Done(count @ 1..) => Reload::Done(*count - 1),
+            // Commit finished, or counter is inactive
+            Reload::Done(0) | Reload::None => Reload::None,
         }
     }
 }
@@ -130,13 +134,16 @@ impl Register for Tima {
     }
 
     fn store(&mut self, value: Self::Value) {
-        // Ignore stores to TIMA during an active reload.
-        //
-        // A write during a pending reload must not cancel it. Only the
-        // register write is suppressed when the reload is executing, so
-        // the reload state is left untouched here.
-        if self.rel != Reload::Now {
-            self.reg.store(value);
+        match self.rel {
+            // Ignore stores while committing
+            Reload::Done(_) => {}
+            // Store, suppressing the copy from TMA
+            Reload::Wait(_) | Reload::Load => {
+                self.reg.store(value);
+                self.sup = true;
+            }
+            // Otherwise, store as usual
+            Reload::None => self.reg.store(value),
         }
     }
 }

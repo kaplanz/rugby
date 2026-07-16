@@ -83,16 +83,28 @@ impl Block for Timer {
         self.reg.div.borrow_mut().inc();
 
         // Reload TIMA
-        let reload = self.reg.tima.borrow().rel == reg::Reload::Now;
-        self.reg.tima.borrow_mut().rel.tick();
-        if reload {
-            // Reload from TMA
-            let tma = self.reg.tma.load();
-            self.reg.tima.store(tma);
+        let rel = self.reg.tima.borrow().rel;
+        // Request an interrupt
+        if rel == reg::Reload::Load {
             debug!("timer reloaded");
-            // Request an interrupt
             self.int.raise(Interrupt::Timer);
         }
+        // Commit the reload
+        if matches!(rel, reg::Reload::Load | reg::Reload::Done(1..)) {
+            if self.reg.tima.borrow().sup {
+                // A write to TIMA during the delay suppresses the copy. The
+                // written value is kept and the commit window is skipped.
+                self.reg.tima.borrow_mut().rel = reg::Reload::None;
+                self.reg.tima.borrow_mut().sup = false;
+            } else {
+                // Copy TMA into TIMA. Copying continuously for the entire
+                // window means writes to TMA during the reload cycle also
+                // propagate into TIMA.
+                let tma = self.reg.tma.load();
+                self.reg.tima.borrow_mut().reg = tma;
+            }
+        }
+        self.reg.tima.borrow_mut().rel.tick();
 
         // Check if TIMA should be incremented
         let this = self.andres();         // calculate AND result
@@ -185,7 +197,6 @@ impl Mmio for Control {
 
 /// Timer register models.
 pub mod reg;
-#[expect(clippy::too_many_lines)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -197,351 +208,318 @@ mod tests {
         timer.reg.tac.store(0b110);
         timer.reg.tma.store(0xfe);
         timer.reg.tima.store(0xfe);
+        assert_eq!(timer.reg.tima.load(), 0xfe);
 
-        for _ in 0..64 {
-            assert_eq!(timer.reg.tima.load(), 0xfe);
+        // hold   -> 0xfe
+        for _ in 1..64 {
             timer.cycle();
-        } // increment -> 0xff
-        for _ in 0..64 {
+            assert_eq!(timer.reg.tima.load(), 0xfe);
+        }
+        // cycle  -> 0xff
+        {
+            timer.cycle();
             assert_eq!(timer.reg.tima.load(), 0xff);
+        }
+        // hold   -> 0xff
+        for _ in 1..64 {
             timer.cycle();
-        } // overflow  -> 0x00
-        for _ in 0..4 {
-            assert_eq!(timer.reg.tima.load(), 0x00);
-            timer.cycle();
-        } // reload    -> 0xfe
-        for _ in 4..64 {
-            assert_eq!(timer.reg.tima.load(), 0xfe);
-            timer.cycle();
-        } // increment -> 0xff
-        for _ in 0..64 {
             assert_eq!(timer.reg.tima.load(), 0xff);
+        }
+        // wrap   -> 0x00
+        {
             timer.cycle();
-        } // overflow  -> 0x00
-        for _ in 0..4 {
             assert_eq!(timer.reg.tima.load(), 0x00);
+        }
+        // delay  -> 0x00
+        for _ in 1..4 {
             timer.cycle();
-        } // reload    -> 0xfe
-        for _ in 4..64 {
+            assert_eq!(timer.reg.tima.load(), 0x00);
+        }
+        // reload -> 0xfe
+        {
+            timer.cycle();
             assert_eq!(timer.reg.tima.load(), 0xfe);
+        }
+        // hold   -> 0xfe
+        for _ in 5..64 {
             timer.cycle();
-        } // increment -> 0xff
-        assert_eq!(timer.reg.tima.load(), 0xff);
+            assert_eq!(timer.reg.tima.load(), 0xfe);
+        }
+        // cycle  -> 0xff
+        {
+            timer.cycle();
+            assert_eq!(timer.reg.tima.load(), 0xff);
+        }
+        // hold   -> 0xff
+        for _ in 1..64 {
+            timer.cycle();
+            assert_eq!(timer.reg.tima.load(), 0xff);
+        }
+        // wrap   -> 0x00
+        {
+            timer.cycle();
+            assert_eq!(timer.reg.tima.load(), 0x00);
+        }
+        // delay  -> 0x00
+        for _ in 1..4 {
+            timer.cycle();
+            assert_eq!(timer.reg.tima.load(), 0x00);
+        }
+        // reload -> 0xfe
+        {
+            timer.cycle();
+            assert_eq!(timer.reg.tima.load(), 0xfe);
+        }
     }
 
     #[test]
     fn tima_write_reloading_working() {
-        let line = pic::Pic::default().line;
-        // Test 1
-        {
+        /// Runs a write-reloading test, storing `$FD` to `TIMA` after
+        /// `offset` delay cycles once the overflow has occurred.
+        fn run(line: &pic::Line, offset: usize) {
             // Configure 65536 Hz timer (64 cycles)
             let mut timer = Timer::new(line.clone());
             timer.reg.tac.store(0b110);
             timer.reg.tma.store(0xfe);
             timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            timer.reg.tima.store(0xfd);
-            //   write     -> 0xfd (reload still pending)
-            for _ in 0..4 {
-                assert_eq!(timer.reg.tima.load(), 0xfd);
-                timer.cycle();
-            } // reload    -> 0xfe
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            assert_eq!(timer.reg.tima.load(), 0xff);
-        }
-
-        // Test 2
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..1 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            }
-            timer.reg.tima.store(0xfd);
-            //   write     -> 0xfd (reload still pending)
-            for _ in 1..4 {
-                assert_eq!(timer.reg.tima.load(), 0xfd);
-                timer.cycle();
-            } // reload    -> 0xfe
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            assert_eq!(timer.reg.tima.load(), 0xff);
-        }
-
-        // Test 3
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..2 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            }
-            timer.reg.tima.store(0xfd);
-            //   write     -> 0xfd (reload still pending)
-            for _ in 2..4 {
-                assert_eq!(timer.reg.tima.load(), 0xfd);
-                timer.cycle();
-            } // reload    -> 0xfe
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            assert_eq!(timer.reg.tima.load(), 0xff);
-        }
-
-        // Test 4
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..3 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            } // reloading now
-            timer.reg.tima.store(0xfd); // write ignored!
-            {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            } // reload    -> 0xfe
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            assert_eq!(timer.reg.tima.load(), 0xff);
-        }
-
-        // Test 5
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..4 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            } // reload    -> 0xfe
-            timer.reg.tima.store(0xfd);
-            // overwrite   -> 0xfd
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfd);
-                timer.cycle();
-            } // increment -> 0xfe
             assert_eq!(timer.reg.tima.load(), 0xfe);
+
+            // hold   -> 0xfe
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // cycle  -> 0xff
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // hold   -> 0xff
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // wrap   -> 0x00
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // delay  -> 0x00
+            for _ in 0..offset {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // write  -> 0xfd (reload cancelled)
+            {
+                timer.reg.tima.store(0xfd);
+                assert_eq!(timer.reg.tima.load(), 0xfd);
+            }
+            // hold   -> 0xfd
+            for _ in offset..63 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfd);
+            }
+            // cycle  -> 0xfe
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+        }
+
+        let line = pic::Pic::default().line;
+        // Write during each cycle of the reload delay
+        run(&line, 0);
+        run(&line, 1);
+        run(&line, 2);
+        run(&line, 3);
+
+        // Test 5: write after the reload has occurred
+        {
+            // Configure 65536 Hz timer (64 cycles)
+            let mut timer = Timer::new(line.clone());
+            timer.reg.tac.store(0b110);
+            timer.reg.tma.store(0xfe);
+            timer.reg.tima.store(0xfe);
+            assert_eq!(timer.reg.tima.load(), 0xfe);
+
+            // hold   -> 0xfe
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // cycle  -> 0xff
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // hold   -> 0xff
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // wrap   -> 0x00
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // delay  -> 0x00
+            for _ in 1..4 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // reload -> 0xfe
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // write  -> 0xfe (ignored!)
+            {
+                timer.reg.tima.store(0xfd);
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // hold   -> 0xfe
+            for _ in 5..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // cycle  -> 0xff
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
         }
     }
 
     #[test]
     fn tma_write_reloading_working() {
+        /// Runs a write-reloading test, storing `$69` to `TMA` after
+        /// `offset` delay cycles once the overflow has occurred.
+        fn run(line: &pic::Line, offset: usize) {
+            // Configure 65536 Hz timer (64 cycles)
+            let mut timer = Timer::new(line.clone());
+            timer.reg.tac.store(0b110);
+            timer.reg.tma.store(0xfe);
+            timer.reg.tima.store(0xfe);
+            assert_eq!(timer.reg.tima.load(), 0xfe);
+
+            // hold   -> 0xfe
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // cycle  -> 0xff
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // hold   -> 0xff
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // wrap   -> 0x00
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // delay  -> 0x00
+            for _ in 0..offset {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // write  -> 0x69 (into TMA)
+            {
+                timer.reg.tma.store(0x69);
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // delay  -> 0x00
+            for _ in offset..3 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // reload -> 0x69
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x69);
+            }
+            // hold   -> 0x69
+            for _ in 4..63 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x69);
+            }
+            // cycle  -> 0x6a
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x6a);
+            }
+        }
+
         let line = pic::Pic::default().line;
-        // Test 1
+        // Write during each cycle of the reload delay
+        run(&line, 0);
+        run(&line, 1);
+        run(&line, 2);
+        run(&line, 3);
+
+        // Test 5: write while the reload is still committing
         {
             // Configure 65536 Hz timer (64 cycles)
             let mut timer = Timer::new(line.clone());
             timer.reg.tac.store(0b110);
             timer.reg.tma.store(0xfe);
             timer.reg.tima.store(0xfe);
+            assert_eq!(timer.reg.tima.load(), 0xfe);
 
-            for _ in 0..64 {
+            // hold   -> 0xfe
+            for _ in 1..64 {
+                timer.cycle();
                 assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            timer.reg.tma.store(0x69);
-            for _ in 0..4 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            } // reload    -> 0x69
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0x69);
-                timer.cycle();
-            } // increment -> 0x6a
-            assert_eq!(timer.reg.tima.load(), 0x6a);
-        }
-
-        // Test 2
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..1 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
             }
-            timer.reg.tma.store(0x69);
+            // cycle  -> 0xff
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // hold   -> 0xff
+            for _ in 1..64 {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0xff);
+            }
+            // wrap   -> 0x00
+            {
+                timer.cycle();
+                assert_eq!(timer.reg.tima.load(), 0x00);
+            }
+            // delay  -> 0x00
             for _ in 1..4 {
+                timer.cycle();
                 assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            } // reload    -> 0x69
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0x69);
-                timer.cycle();
-            } // increment -> 0x6a
-            assert_eq!(timer.reg.tima.load(), 0x6a);
-        }
-
-        // Test 3
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..2 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
             }
-            timer.reg.tma.store(0x69);
-            for _ in 2..4 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
+            // reload -> 0xfe
+            {
                 timer.cycle();
-            } // reload    -> 0x69
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0x69);
-                timer.cycle();
-            } // increment -> 0x6a
-            assert_eq!(timer.reg.tima.load(), 0x6a);
-        }
-
-        // Test 4
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
                 assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..3 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
             }
-            timer.reg.tma.store(0x69);
-            for _ in 3..4 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
+            // write  -> 0x69 (still committing!)
+            {
+                timer.reg.tma.store(0x69);
+                assert_eq!(timer.reg.tima.load(), 0xfe);
+            }
+            // copy   -> 0x69
+            {
                 timer.cycle();
-            } // reload    -> 0x69
-            for _ in 4..64 {
                 assert_eq!(timer.reg.tima.load(), 0x69);
+            }
+            // hold   -> 0x69
+            for _ in 6..64 {
                 timer.cycle();
-            } // increment -> 0x6a
-            assert_eq!(timer.reg.tima.load(), 0x6a);
-        }
-
-        // Test 5
-        {
-            // Configure 65536 Hz timer (64 cycles)
-            let mut timer = Timer::new(line.clone());
-            timer.reg.tac.store(0b110);
-            timer.reg.tma.store(0xfe);
-            timer.reg.tima.store(0xfe);
-
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
+                assert_eq!(timer.reg.tima.load(), 0x69);
+            }
+            // cycle  -> 0x6a
+            {
                 timer.cycle();
-            } // increment -> 0xff
-            for _ in 0..64 {
-                assert_eq!(timer.reg.tima.load(), 0xff);
-                timer.cycle();
-            } // overflow  -> 0x00
-            for _ in 0..4 {
-                assert_eq!(timer.reg.tima.load(), 0x00);
-                timer.cycle();
-            } // reload    -> 0xfe
-            timer.reg.tma.store(0x69); // too late!
-            for _ in 4..64 {
-                assert_eq!(timer.reg.tima.load(), 0xfe);
-                timer.cycle();
-            } // increment -> 0xff
-            assert_eq!(timer.reg.tima.load(), 0xff);
+                assert_eq!(timer.reg.tima.load(), 0x6a);
+            }
         }
     }
 }
