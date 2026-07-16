@@ -65,6 +65,10 @@ impl Block for Motherboard {
         if self.soc.cpu.stopped() && self.soc.joy.reg.load() & 0x0f != 0x0f {
             self.soc.cpu.wake();
         }
+        // Halt the oscillator while stopped
+        if self.soc.cpu.stopped() {
+            return;
+        }
 
         // APU: 4 MiHz
         if self.soc.apu.ready() {
