@@ -132,6 +132,8 @@ impl Block for Serial {
         // Clean-up after transfer is complete
         let mut sc = self.reg.sc.borrow_mut();
         if sc.bit == 0 {
+            // Consume received byte
+            let _ = self.etc.rx.pop_front();
             // Transfer out byte
             let tx = std::mem::take(&mut self.etc.ip);
             self.etc.tx.push_back(tx);
