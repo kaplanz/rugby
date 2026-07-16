@@ -201,7 +201,30 @@ pub type Scy = u8;
 pub type Scx = u8;
 
 /// `LY`: LCD Y coordinate.
-pub type Ly = u8;
+#[derive(Debug, Default)]
+pub struct Ly(u8);
+
+impl Memory for Ly {
+    fn read(&self, _: u16) -> rugby_arch::mem::Result<u8> {
+        Ok(self.load())
+    }
+
+    fn write(&mut self, _: u16, _: u8) -> rugby_arch::mem::Result<()> {
+        Ok(())
+    }
+}
+
+impl Register for Ly {
+    type Value = u8;
+
+    fn load(&self) -> Self::Value {
+        self.0
+    }
+
+    fn store(&mut self, value: Self::Value) {
+        self.0 = value;
+    }
+}
 
 /// `LYC`: LY compare.
 pub type Lyc = u8;
