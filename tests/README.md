@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-34 passed; 35 failed;
+35 passed; 34 failed;
 ```
 
 <details>
@@ -248,7 +248,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/ppu/lcdon_write_timing-GS.gb`           |
   |  ✅  | `acceptance/ppu/stat_irq_blocking.gb`               |
   |  ❌  | `acceptance/ppu/stat_lyc_onoff.gb`                  |
-  |  ❌  | `acceptance/ppu/vblank_stat_intr-GS.gb`             |
+  |  ✅  | `acceptance/ppu/vblank_stat_intr-GS.gb`             |
   |  ❌  | `acceptance/push_timing.gb`                         |
   |  ✅  | `acceptance/rapid_di_ei.gb`                         |
   |  ❌  | `acceptance/ret_cc_timing.gb`                       |
