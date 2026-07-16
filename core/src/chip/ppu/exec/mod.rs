@@ -67,6 +67,9 @@ impl Mode {
         ppu.reg.stat.borrow_mut().set_mode(next.value());
         ppu.reg.stat.borrow_mut().set_lyc(ly == lyc);
 
+        // Latch window trigger
+        ppu.etc.ytrg |= ppu.reg.lcdc.borrow().win_enable() && ly == ppu.reg.wy.load();
+
         // Compute STAT interrupt
         let stat = *ppu.reg.stat.borrow();
         #[rustfmt::skip]

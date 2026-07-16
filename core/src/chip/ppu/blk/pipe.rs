@@ -77,15 +77,13 @@ impl Pipeline {
             let win_enabled = ppu.reg.lcdc.borrow().win_enable();
             // 2. Fetcher is still at the background
             let fetch_at_bg = self.bgw.layer == Layer::Background;
-            // 3. Y-coordinate is below the window
-            // FIXME: Should really be checked at the start of mode 2 (scan),
-            //        and stored for the entire frame duration.
-            let y_below_win = ppu.reg.wy.load() <= ppu.reg.ly.load();
+            // 3. Y-coordinate has matched the window this frame
+            let y_triggered = ppu.etc.ytrg;
             // 4. X-coordinate is right of window
             let x_right_win = ppu.reg.wx.load() <= self.lx + 7;
             //
             // Determine result:
-            win_enabled && fetch_at_bg && y_below_win && x_right_win
+            win_enabled && fetch_at_bg && y_triggered && x_right_win
         };
         if window_reached {
             trace!(
