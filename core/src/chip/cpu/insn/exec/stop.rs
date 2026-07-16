@@ -1,4 +1,4 @@
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Error, Execute, Operation, Return, Status};
 
 pub const fn default() -> Operation {
     Operation::Stop(Stop::Execute)
@@ -25,18 +25,24 @@ impl From<Stop> for Operation {
     }
 }
 
-fn execute(code: u8, _: &mut Cpu) -> Return {
+fn execute(code: u8, cpu: &mut Cpu) -> Return {
     // Check opcode
     if code != 0x10 {
         return Err(Error::Opcode(code));
     }
 
-    // Execute STOP
-    // <https://gbdev.io/pandocs/imgs/gb_stop.png>
-    #[cfg(debug_assertions)]
-    return Err(Error::Unimplemented(code));
+    // Skip stop mode while a button is held
+    if cpu.read(0xff00) & 0x0f == 0x0f {
+        // Reset the divider
+        cpu.write(0xff04, 0);
+        // Enter stop mode
+        cpu.etc.run = Status::Stopped;
+    }
+    // Consume the padding byte unless an interrupt is pending
+    if !cpu.int.pending() {
+        cpu.fetchbyte();
+    }
 
     // Finish
-    #[allow(unreachable_code)]
     Ok(None)
 }
