@@ -189,6 +189,22 @@ impl Ppu {
     pub fn mode(&self) -> &Mode {
         &self.etc.mode
     }
+
+    /// Holds the PPU in its disabled state.
+    ///
+    /// While the LCD is off, `LY` reads 0, the STAT mode reports 0, and the
+    /// frame state machine restarts from the beginning on re-enable.
+    pub fn disable(&mut self) {
+        // Reset scanline
+        self.reg.ly.store(0);
+        // Report STAT mode 0
+        self.reg.stat.borrow_mut().set_mode(0);
+        // Reset internal state
+        self.etc.dot = 0;
+        self.etc.int = false;
+        self.etc.ywin = 0;
+        self.etc.mode = Mode::default();
+    }
 }
 
 impl Api for Ppu {
