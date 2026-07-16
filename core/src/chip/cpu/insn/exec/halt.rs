@@ -1,3 +1,5 @@
+use rugby_arch::reg::Register;
+
 use super::{Cpu, Error, Execute, Operation, Return, Status};
 
 pub const fn default() -> Operation {
@@ -31,15 +33,21 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
         return Err(Error::Opcode(code));
     }
 
-    // Perform HALT bug
-    if !cpu.etc.ime.enabled() && cpu.int.pending() {
-        cpu.etc.halt_bug = true;
-        // Do not execute HALT
-        return Ok(None);
+    // Handle pending interrupts
+    if cpu.int.pending() {
+        // Skip halt mode entirely
+        if cpu.etc.ime.enabled() {
+            // Rewind onto this instruction
+            let pc = cpu.reg.pc.load().wrapping_sub(1);
+            cpu.reg.pc.store(pc);
+        } else {
+            // Perform HALT bug
+            cpu.etc.halt_bug = true;
+        }
+    } else {
+        // Execute HALT
+        cpu.etc.run = Status::Halted;
     }
-
-    // Execute HALT
-    cpu.etc.run = Status::Halted;
 
     // Finish
     Ok(None)
