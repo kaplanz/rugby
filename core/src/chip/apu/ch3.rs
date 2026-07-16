@@ -86,6 +86,16 @@ impl Channel {
             self.etc.ena = false;
         }
     }
+
+    /// Disables this channel.
+    ///
+    /// Similar to a [reset](Block::reset), except that the length timer is
+    /// retained, as it survives the APU being powered off.
+    pub fn disable(&mut self) {
+        let len = self.etc.len;
+        self.reset();
+        self.etc.len = len;
+    }
 }
 
 impl Block for Channel {
