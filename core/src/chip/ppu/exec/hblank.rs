@@ -29,6 +29,8 @@ impl HBlank {
             } else {
                 // Reset internal window line counter
                 ppu.etc.ywin = 0;
+                // Reset window trigger latch
+                ppu.etc.ytrg = false;
                 // Request an interrupt
                 ppu.int.raise(Interrupt::VBlank);
                 // Enter vblank

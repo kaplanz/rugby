@@ -155,6 +155,11 @@ pub struct Internal {
     int: bool,
     /// Window line.
     ywin: u8,
+    /// Window trigger.
+    ///
+    /// Latched when `LY == WY` while the window is enabled. Held until the
+    /// end of the frame.
+    ytrg: bool,
     /// Graphics mode.
     mode: Mode,
 }
@@ -172,6 +177,7 @@ impl Default for Internal {
             dot: u16::default(),
             int: bool::default(),
             ywin: u8::default(),
+            ytrg: bool::default(),
             mode: Mode::default(),
         }
     }
@@ -203,6 +209,7 @@ impl Ppu {
         self.etc.dot = 0;
         self.etc.int = false;
         self.etc.ywin = 0;
+        self.etc.ytrg = false;
         self.etc.mode = Mode::default();
     }
 }
