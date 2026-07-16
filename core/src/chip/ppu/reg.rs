@@ -134,7 +134,8 @@ impl Register for Stat {
     }
 
     fn store(&mut self, value: Self::Value) {
-        *self = Self::from_bits(value);
+        // NOTE: Bits 2:0 are read-only.
+        *self = Self::from_bits((value & 0xf8) | (self.into_bits() & 0x07));
     }
 }
 
