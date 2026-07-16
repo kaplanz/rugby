@@ -320,7 +320,7 @@ pub struct Control {
     /// Viewport X position
     pub scx:  Shared<u8>,
     /// LCD Y coordinate
-    pub ly:   Shared<u8>,
+    pub ly:   Shared<reg::Ly>,
     /// LY compare
     pub lyc:  Shared<u8>,
     /// OAM DMA source address
