@@ -88,8 +88,8 @@ impl Channel {
 
         // Trigger channel
         //
-        // - Enable channel
-        self.etc.ena = true;
+        // - Enable channel (unless the DAC is off)
+        self.etc.ena = nr12.ivol() > 0 || nr12.sign();
         // - Reload sweep enable
         let (has_pace, has_step) = (nr10.pace() != 0, nr10.step() != 0);
         self.etc.swp.ena = has_pace || has_step;

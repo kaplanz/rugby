@@ -50,8 +50,8 @@ impl Channel {
 
         // Trigger channel
         //
-        // - Enable channel
-        self.etc.ena = true;
+        // - Enable channel (unless the DAC is off)
+        self.etc.ena = self.reg.nr30.borrow().dac();
         // - Reload frequency
         self.etc.clk = u16::from_le_bytes([nr33.clk_lo(), nr34.clk_hi()]);
         // - Reload length timer (if expired)
@@ -103,6 +103,11 @@ impl Block for Channel {
         // Check for trigger
         if nr34.trigger() {
             self.trigger();
+        }
+
+        // Disable channel when the DAC is off
+        if !nr30.dac() {
+            self.etc.ena = false;
         }
 
         // Tick frequency timer
