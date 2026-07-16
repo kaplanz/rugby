@@ -53,8 +53,8 @@ impl Channel {
 
         // Trigger channel
         //
-        // - Enable channel
-        self.etc.ena = true;
+        // - Enable channel (unless the DAC is off)
+        self.etc.ena = nr22.ivol() > 0 || nr22.sign();
         // - Reload frequency
         self.etc.clk = u16::from_le_bytes([nr23.clk_lo(), nr24.clk_hi()]);
         // - Reload length timer (if expired)
@@ -154,6 +154,11 @@ impl Block for Channel {
         // Check for trigger
         if nr24.trigger() {
             self.trigger();
+        }
+
+        // Disable channel when the DAC is off
+        if !(nr22.ivol() > 0 || nr22.sign()) {
+            self.etc.ena = false;
         }
 
         // Tick frequency timer
