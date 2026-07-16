@@ -47,6 +47,8 @@ impl Mode {
 
     #[must_use]
     pub(super) fn exec(self, ppu: &mut Ppu) -> Self {
+        // Check for vertical blank entry
+        let entry = !matches!(&self, Mode::VBlank(_));
         // Execute state machine
         let next = match self {
             // Mode 2
@@ -72,7 +74,11 @@ impl Mode {
             // Mode 0
             Mode::HBlank(_) => stat.hblank_int(),
             // Mode 1
-            Mode::VBlank(_) => stat.vblank_int(),
+            //
+            // NOTE: Entering the vertical blank also raises the OAM source.
+            //       This is not documented by Pan Docs, but is verified on
+            //       hardware by mooneye's `vblank_stat_intr` test.
+            Mode::VBlank(_) => stat.vblank_int() || (entry && stat.oam_int()),
             // Mode 3
             Mode::Draw(_)   => false,
             // Mode 2
