@@ -305,6 +305,18 @@ impl Cpu {
     pub fn wake(&mut self) {
         self.etc.run = Status::Enabled;
     }
+
+    /// Checks if the processor is halted.
+    #[must_use]
+    pub fn halted(&self) -> bool {
+        self.etc.run == Status::Halted
+    }
+
+    /// Checks if the processor is stopped.
+    #[must_use]
+    pub fn stopped(&self) -> bool {
+        self.etc.run == Status::Stopped
+    }
 }
 
 /// Processor memory.

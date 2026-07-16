@@ -2,6 +2,7 @@
 
 use log::warn;
 use rugby_arch::Block;
+use rugby_arch::reg::Register;
 
 use super::chip::Chip;
 use super::mmap::{Bank, Mmap};
@@ -56,8 +57,12 @@ impl Block for Motherboard {
     }
 
     fn cycle(&mut self) {
-        // Wake on pending interrupt
-        if !self.soc.cpu.ready() && self.soc.pic.line.pending() {
+        // Wake halted CPU on pending interrupt
+        if self.soc.cpu.halted() && self.soc.pic.line.pending() {
+            self.soc.cpu.wake();
+        }
+        // Wake stopped CPU on joypad input
+        if self.soc.cpu.stopped() && self.soc.joy.reg.load() & 0x0f != 0x0f {
             self.soc.cpu.wake();
         }
 
