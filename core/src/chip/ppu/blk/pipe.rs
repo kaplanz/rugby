@@ -117,6 +117,14 @@ impl Pipeline {
         // Pop from the background FIFO
         let mut bgwin = self.bgw.fifo.pop()?;
 
+        // Discard scrolled background pixels
+        if self.scx > 0 {
+            // One fewer pixel to discard
+            self.scx -= 1;
+            // Discard this pixel
+            return None;
+        }
+
         // Overwrite if the background/window is disabled
         if !ppu.reg.lcdc.borrow().bg_win_enable() {
             bgwin.col = Color::C0;
@@ -129,15 +137,6 @@ impl Pipeline {
             bgwin // no sprite; use background/window pixel
         };
 
-        // Discard scrolled background pixels
-        if self.scx > 0 {
-            // One fewer pixel to discard
-            self.scx -= 1;
-            // Discard this pixel
-            None
-        } else {
-            // Return this pixel
-            Some(pixel)
-        }
+        Some(pixel)
     }
 }
