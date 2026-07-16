@@ -1,6 +1,6 @@
 //! Direct memory access.
 
-use log::{debug, trace, warn};
+use log::{debug, trace};
 use rugby_arch::mem::Memory;
 use rugby_arch::mio::Bus;
 use rugby_arch::reg::Register;
@@ -111,16 +111,12 @@ impl Register for Control {
     }
 
     fn store(&mut self, value: Self::Value) {
-        match self.mode {
-            Mode::Off => {
-                // Request a new transfer
-                self.mode = Mode::Req(value);
-                debug!("request: 0xfe00 <- {value:#04x}00");
-            }
-            Mode::Req(_) | Mode::On { .. } => {
-                warn!("ignored request; already in progress");
-            }
-        }
+        // Request a new transfer
+        //
+        // NOTE: Writes during an active transfer restart it from the newly
+        //       written source page.
+        self.mode = Mode::Req(value);
+        debug!("request: 0xfe00 <- {value:#04x}00");
         // Always update stored value
         self.page.store(value);
     }
