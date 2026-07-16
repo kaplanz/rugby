@@ -286,7 +286,14 @@ impl Block for Apu {
         } else {
             // When disabled, all registers are reset and in read-only mode. We
             // can emulate this by constantly resetting these components.
-            self.reset();
+            //
+            // NOTE: Hardware keeps the length registers writable while the
+            //       APU is off, and length timers survive the power cycle.
+            self.ch1.disable();
+            self.ch2.disable();
+            self.ch3.disable();
+            self.ch4.disable();
+            self.reg.disable();
             // Hold the frame sequencer at step 0 while powered off so
             // power-on restarts the sequence from the beginning.
             self.seq.clk = 0;
@@ -462,6 +469,40 @@ pub struct Control {
     pub nr43: Shared<Nr43>,
     /// CH4 control.
     pub nr44: Shared<Nr44>,
+}
+
+impl Control {
+    /// Disables the registers.
+    ///
+    /// Similar to a [reset](Block::reset), except that the length bits of
+    /// the length registers are retained, as they stay writable while the
+    /// APU is off.
+    fn disable(&mut self) {
+        // Global Control Registers
+        self.nr52.take();
+        self.nr51.take();
+        self.nr50.take();
+        // Sound Channel 1 - Pulse with wavelength sweep
+        self.nr10.take();
+        self.nr11.borrow_mut().set_duty(0);
+        self.nr12.take();
+        self.nr13.take();
+        self.nr14.take();
+        // Sound Channel 2 - Pulse
+        self.nr21.borrow_mut().set_duty(0);
+        self.nr22.take();
+        self.nr23.take();
+        self.nr24.take();
+        // Sound Channel 3 - Wave output
+        self.nr30.take();
+        self.nr32.take();
+        self.nr33.take();
+        self.nr34.take();
+        // Sound Channel 4 - Noise
+        self.nr42.take();
+        self.nr43.take();
+        self.nr44.take();
+    }
 }
 
 impl Block for Control {

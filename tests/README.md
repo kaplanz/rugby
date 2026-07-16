@@ -68,7 +68,7 @@ behaviours.
 #### Results
 
 ```
-26 passed; 19 failed;
+27 passed; 18 failed;
 ```
 
 <details>
@@ -96,7 +96,7 @@ behaviours.
   |  ❌  | `dmg_sound/rom_singles/05-sweep details.gb`         |
   |  ✅  | `dmg_sound/rom_singles/06-overflow on trigger.gb`   |
   |  ✅  | `dmg_sound/rom_singles/07-len sweep period sync.gb` |
-  |  ❌  | `dmg_sound/rom_singles/08-len ctr during power.gb`  |
+  |  ✅  | `dmg_sound/rom_singles/08-len ctr during power.gb`  |
   |  ❌  | `dmg_sound/rom_singles/09-wave read while on.gb`    |
   |  ❌  | `dmg_sound/rom_singles/10-wave trigger while on.gb` |
   |  ❌  | `dmg_sound/rom_singles/11-regs after power.gb`      |
