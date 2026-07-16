@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-35 passed; 34 failed;
+36 passed; 33 failed;
 ```
 
 <details>
@@ -204,7 +204,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/add_sp_e_timing.gb`                     |
   |  ✅  | `acceptance/bits/mem_oam.gb`                        |
   |  ✅  | `acceptance/bits/reg_f.gb`                          |
-  |  ❌  | `acceptance/bits/unused_hwio-GS.gb`                 |
+  |  ✅  | `acceptance/bits/unused_hwio-GS.gb`                 |
   |  ❌  | `acceptance/boot_div-dmg0.gb`                       |
   |  ❌  | `acceptance/boot_div-dmgABCmgb.gb`                  |
   |  ❌  | `acceptance/boot_hwio-dmg0.gb`                      |

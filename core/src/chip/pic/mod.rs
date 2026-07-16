@@ -201,7 +201,7 @@ pub struct Control {
     /// Interrupt flag.
     pub flg: Shared<Register>,
     /// Interrupt enable.
-    pub ena: Shared<Register>,
+    pub ena: Shared<Enable>,
 }
 
 impl Block for Control {
@@ -260,13 +260,19 @@ impl rugby_arch::reg::Register for Register {
     }
 }
 
+/// Interrupt enable register.
+///
+/// Unlike the [interrupt flag](Register), all 8 bits are readable and
+/// writable. Only the low 5 bits participate in interrupt handling.
+pub type Enable = u8;
+
 /// Interrupt line.
 #[derive(Clone, Debug)]
 pub struct Line {
     /// Interrupt flag.
     flg: Shared<Register>,
     /// Interrupt enable.
-    ena: Shared<Register>,
+    ena: Shared<Enable>,
 }
 
 impl Line {
