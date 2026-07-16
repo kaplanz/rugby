@@ -56,6 +56,8 @@ impl Channel {
         self.etc.clk = u16::from_le_bytes([nr33.clk_lo(), nr34.clk_hi()]);
         // - Reload length timer (if expired)
         self.etc.len = 0x100 - u16::from(nr31.step());
+        // - Restart wave playback
+        self.etc.idx = 0;
     }
 
     /// Tick the channel's length timer.
