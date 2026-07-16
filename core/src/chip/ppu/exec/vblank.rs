@@ -13,22 +13,32 @@ impl VBlank {
     pub const LAST: u16 = LCD.ht + 10;
 
     pub fn exec(self, ppu: &mut Ppu) -> Mode {
+        // Zero the scanline register partway into line 153
+        //
+        // NOTE: `LY` only reads 153 for the first few dots of the final
+        //       scanline, reading 0 for its remainder.
+        if u16::from(ppu.etc.line) == Self::LAST - 1 && ppu.etc.dot == 4 {
+            ppu.reg.ly.store(0);
+        }
         // Transition state machine
         if ppu.etc.dot + 1 < HBlank::DOTS {
             // Continue vblank
             Mode::VBlank(self)
         } else {
             // Increment scanline
-            let ly = ppu.reg.ly.load() + 1;
-            ppu.reg.ly.store(ly);
+            let line = ppu.etc.line + 1;
 
             // Determine scanline type
-            if u16::from(ly) < Self::LAST {
+            if u16::from(line) < Self::LAST {
+                // Update scanline
+                ppu.reg.ly.store(line);
+                ppu.etc.line = line;
                 // Continue vblank
                 Mode::VBlank(self)
             } else {
                 // Reset scanline
                 ppu.reg.ly.store(0);
+                ppu.etc.line = 0;
                 // Enter scan
                 debug!("entered mode 2: scan OAM");
                 Mode::Scan(self.into())
