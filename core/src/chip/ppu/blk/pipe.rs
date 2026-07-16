@@ -33,7 +33,7 @@ impl Pipeline {
             self.ipr.extend(
                 objs.iter()
                     .enumerate()
-                    .filter(|(_, obj)| obj.xpos == self.lx + 8)
+                    .filter(|(_, obj)| obj.xpos.max(8) == self.lx + 8)
                     .map(|(idx, _)| idx),
             );
         }
