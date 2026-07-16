@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-36 passed; 33 failed;
+38 passed; 31 failed;
 ```
 
 <details>
@@ -268,8 +268,8 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ✅  | `acceptance/timer/tim11.gb`                         |
   |  ✅  | `acceptance/timer/tim11_div_trigger.gb`             |
   |  ✅  | `acceptance/timer/tima_reload.gb`                   |
-  |  ❌  | `acceptance/timer/tima_write_reloading.gb`          |
-  |  ❌  | `acceptance/timer/tma_write_reloading.gb`           |
+  |  ✅  | `acceptance/timer/tima_write_reloading.gb`          |
+  |  ✅  | `acceptance/timer/tma_write_reloading.gb`           |
 
 </details>
 
