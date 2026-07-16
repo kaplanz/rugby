@@ -20,15 +20,14 @@ impl Scan {
     pub fn exec(mut self, ppu: &mut Ppu) -> Mode {
         // Scanning a single entry takes 2 dots
         if ppu.etc.dot.is_multiple_of(2) {
-            // Sprites should only be scanned when:
+            // Scan until 10 sprites have been found.
             //
-            // 1. Objects are are enabled (TODO: verify this)
-            let objs_enabled = ppu.reg.lcdc.borrow().obj_enable();
-            // 2. Fewer than 10 sprites have been found
-            let not_at_limit = self.objs.len() < 10;
-            //
-            // When all conditions are met, scan for sprites
-            if objs_enabled && not_at_limit {
+            // NOTE: Scanning always occurs regardless of whether objects are
+            //       enabled. `LCDC[1]` is instead consulted when drawing, where
+            //       it gates sprite fetching, so a sprite scanned here is still
+            //       drawn if the game re-enables objects before its pixels are
+            //       reached in mode 3.
+            if self.objs.len() < 10 {
                 // Read OAM entry
                 let obj = [0, 1, 2, 3].map(|idx| {
                     let addr = self.addr + idx;
