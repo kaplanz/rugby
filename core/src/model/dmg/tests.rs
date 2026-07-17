@@ -53,17 +53,18 @@ fn boot_disable_works() {
 #[expect(clippy::too_many_lines)]
 fn bus_all_works() {
     let mut emu = setup();
+    let hram = emu.main.soc.cpu.mem.hram.clone();
     let bus = &mut emu.main.soc.cpu;
 
     // Boot ROM
-    if let Some(boot) = &emu.boot {
+    if let Some(boot) = &emu.main.soc.boot {
         (0x0000..=0x00ff)
             .map(|addr| boot.mem.borrow().boot.read(addr).unwrap())
             .zip(BOOT)
             .for_each(|(byte, &game)| assert_eq!(byte, game));
     }
     // Cartridge ROM
-    if let Some(cart) = &emu.cart {
+    if let Some(cart) = &emu.main.cart {
         (0x0100..=0x7fff)
             .map(|addr| cart.chip.rom().read(addr).unwrap())
             .zip(&GAME[0x0100..=0x7fff])
@@ -72,10 +73,10 @@ fn bus_all_works() {
     // Video RAM
     (0x8000..=0x9fff).for_each(|addr| bus.write(addr, 0x03));
     (0x0000..=0x1fff)
-        .map(|addr: u16| emu.main.mem.vram.read(addr).unwrap())
+        .map(|addr: u16| emu.main.vram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x03));
     // External RAM
-    if let Some(cart) = &emu.cart {
+    if let Some(cart) = &emu.main.cart {
         (0xa000..=0xa3ff).for_each(|addr| bus.write(addr, 0x04));
         bus.write(0x0100, 0x0a); // enable RAM
         (0xa400..=0xa7ff).for_each(|addr| bus.write(addr, 0x40));
@@ -94,7 +95,7 @@ fn bus_all_works() {
     // Object memory
     (0xfe00..=0xfe9f).for_each(|addr| bus.write(addr, 0x05));
     (0x0000..=0x009f)
-        .map(|addr: u16| emu.main.mem.oam.read(addr).unwrap())
+        .map(|addr: u16| emu.main.soc.ppu.mem.oam.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x05));
     // Joypad
     (0xff00..=0xff00).for_each(|addr| bus.write(addr, 0x60));
@@ -158,7 +159,7 @@ fn bus_all_works() {
         .for_each(|(found, expected)| assert_eq!(found, expected));
     // Boot ROM disable
     (0xff50..=0xff50).for_each(|addr| bus.write(addr, 0x0d));
-    if let Some(boot) = &emu.boot {
+    if let Some(boot) = &emu.main.soc.boot {
         (0x0000..=0x0000)
             .map(|addr| boot.reg.read(addr).unwrap())
             .for_each(|byte| assert_eq!(byte, 0xff));
@@ -166,7 +167,7 @@ fn bus_all_works() {
     // High RAM
     (0xff80..=0xfffe).for_each(|addr| bus.write(addr, 0x0e));
     (0x0000..=0x007e)
-        .map(|addr: u16| emu.main.mem.hram.read(addr).unwrap())
+        .map(|addr: u16| hram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x0e));
     // Interrupt enable
     // NOTE: All 8 bits of IE are writable

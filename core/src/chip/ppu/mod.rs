@@ -9,7 +9,7 @@ use self::exec::hblank::HBlank;
 use self::exec::vblank::VBlank;
 use super::{dma, irq};
 use crate::api::video::{self, Aspect, Video as Api};
-use crate::dmg::mmap::Sram;
+use crate::dmg::pcb::Vram;
 
 mod blk;
 mod exec;
@@ -39,14 +39,6 @@ pub const LCD: Aspect = Aspect { wd: 160, ht: 144 };
 
 /// Display framebuffer.
 pub type Frame = video::Frame<Color>;
-
-/// Video RAM.
-///
-/// 8 KiB RAM used to store tile [data][tdata] and [maps][tmaps].
-///
-/// [tdata]: https://gbdev.io/pandocs/Tile_Data.html
-/// [tmaps]: https://gbdev.io/pandocs/Tile_Maps.html
-pub type Vram = Sram;
 
 /// Object attribute memory.
 ///

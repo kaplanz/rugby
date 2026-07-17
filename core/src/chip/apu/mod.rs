@@ -398,6 +398,14 @@ pub struct Bank {
     pub wave: Shared<Wave>,
 }
 
+impl Default for Bank {
+    fn default() -> Self {
+        Self {
+            wave: Shared::new(Wave::from([u8::default(); 0x0010])),
+        }
+    }
+}
+
 /// Audio registers.
 ///
 /// | Address | Size | Name | Description                   |
