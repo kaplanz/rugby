@@ -2,7 +2,7 @@ use rugby_arch::mem::Memory;
 use rugby_arch::reg::Port;
 
 use self::boot::Boot;
-use self::chip::pic::Pic;
+use self::chip::irq::Irq;
 use self::chip::ppu::Ppu;
 use self::chip::tma::Timer;
 use super::*;
@@ -121,7 +121,7 @@ fn bus_all_works() {
     // Interrupt flag
     (0xff0f..=0xff0f).for_each(|addr| bus.write(addr, 0x09));
     (0x0000..=0x0000)
-        .map(|_| emu.main.soc.pic.load(<Pic as Port<u8>>::Select::If))
+        .map(|_| emu.main.soc.irq.load(<Irq as Port<u8>>::Select::If))
         .for_each(|byte| assert_eq!(byte, 0xe9));
     // Audio
     (0xff10..=0xff27).for_each(|addr| bus.write(addr, 0x0a));
@@ -172,7 +172,7 @@ fn bus_all_works() {
     // NOTE: All 8 bits of IE are writable
     (0xffff..=0xffff).for_each(|addr| bus.write(addr, 0x0f));
     (0x0000..=0x0000)
-        .map(|_| emu.main.soc.pic.load(<Pic as Port<u8>>::Select::Ie))
+        .map(|_| emu.main.soc.irq.load(<Irq as Port<u8>>::Select::Ie))
         .for_each(|byte| assert_eq!(byte, 0x0f));
 }
 

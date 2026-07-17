@@ -9,7 +9,7 @@ use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
-use super::pic::{self, Interrupt};
+use super::irq::{self, Interrupt};
 use crate::api::input::{Event, Input as Api, State};
 
 /// Joypad inputs.
@@ -81,7 +81,7 @@ pub struct Joypad {
     /// Joypad register.
     pub reg: Shared<Control>,
     /// Interrupt line.
-    pub int: pic::Line,
+    pub irq: irq::Line,
 }
 
 impl Api for Joypad {
@@ -110,7 +110,7 @@ impl Api for Joypad {
             debug!("updated keys: {keys:?}");
             // Schedule an interrupt on changes
             if trigger {
-                self.int.raise(Interrupt::Joypad);
+                self.irq.raise(Interrupt::Joypad);
             }
         } else {
             trace!("received no input events");

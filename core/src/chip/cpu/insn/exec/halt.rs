@@ -34,7 +34,7 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     }
 
     // Handle pending interrupts
-    if cpu.int.pending() {
+    if cpu.irq.pending() {
         // Skip halt mode entirely
         if cpu.etc.ime.enabled() {
             // Rewind onto this instruction

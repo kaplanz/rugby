@@ -32,7 +32,7 @@ impl HBlank {
                 // Reset window trigger latch
                 ppu.etc.ytrg = false;
                 // Request an interrupt
-                ppu.int.raise(Interrupt::VBlank);
+                ppu.irq.raise(Interrupt::VBlank);
                 // Enter vblank
                 debug!("entered mode 1: vblank");
                 Mode::VBlank(self.into())

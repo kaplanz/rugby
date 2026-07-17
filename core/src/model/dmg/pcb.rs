@@ -58,7 +58,7 @@ impl Block for Motherboard {
 
     fn cycle(&mut self) {
         // Wake halted CPU on pending interrupt
-        if self.soc.cpu.halted() && self.soc.pic.line.pending() {
+        if self.soc.cpu.halted() && self.soc.irq.line.pending() {
             self.soc.cpu.wake();
         }
         // Wake stopped CPU on joypad input

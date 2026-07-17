@@ -6,7 +6,7 @@ use self::hblank::HBlank;
 use self::scan::Scan;
 use self::vblank::VBlank;
 use super::super::ppu;
-use crate::chip::pic::Interrupt;
+use crate::chip::irq::Interrupt;
 
 pub mod draw;
 pub mod hblank;
@@ -90,7 +90,7 @@ impl Mode {
         // Trigger STAT interrupt
         if int && !ppu.etc.int {
             // Only trigger on rising edge
-            ppu.int.raise(Interrupt::LcdStat);
+            ppu.irq.raise(Interrupt::LcdStat);
         }
         // Update STAT interrupt
         ppu.etc.int = int;
