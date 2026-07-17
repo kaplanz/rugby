@@ -35,13 +35,13 @@ pub enum Interrupt {
     /// Requested by the [PPU] as configured by the [STAT] register.
     ///
     /// [ppu]:  super::ppu
-    /// [stat]: super::ppu::Control::stat
+    /// [stat]: super::ppu::File::stat
     LcdStat = 0b0000_0010,
     /// Timer overflow.
     ///
     /// Requested by the [timer] whenever the [TIMA] register overflows.
     ///
-    /// [tima]:  super::tma::Control::tima
+    /// [tima]:  super::tma::File::tima
     /// [timer]: super::tma
     Timer   = 0b0000_0100,
     /// Serial transfer.
@@ -145,14 +145,14 @@ pub enum Select {
 #[derive(Debug)]
 pub struct Irq {
     /// Interrupt registers.
-    pub reg: Control,
+    pub reg: File,
     /// Interrupt line.
     pub line: Line,
 }
 
 impl Default for Irq {
     fn default() -> Self {
-        let reg = Control::default();
+        let reg = File::default();
         Self {
             line: Line::new(&reg),
             reg,
@@ -197,21 +197,21 @@ impl Port<u8> for Irq {
 /// | `$FF0F` | Byte | IF   | Interrupt flag   |
 /// | `$FFFF` | Byte | IE   | Interrupt enable |
 #[derive(Debug, Default)]
-pub struct Control {
+pub struct File {
     /// Interrupt flag.
     pub flg: Shared<Flag>,
     /// Interrupt enable.
     pub ena: Shared<Enable>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         self.flg.take();
         self.ena.take();
     }
 }
 
-impl Mmio for Control {
+impl Mmio for File {
     fn attach(&self, bus: &mut Bus) {
         bus.map(0xff0f..=0xff0f, self.flg.clone().into());
         bus.map(0xffff..=0xffff, self.ena.clone().into());
@@ -277,7 +277,7 @@ pub struct Line {
 
 impl Line {
     /// Constructs a new `Line`.
-    fn new(reg: &Control) -> Self {
+    fn new(reg: &File) -> Self {
         Self {
             flg: reg.flg.clone(),
             ena: reg.ena.clone(),

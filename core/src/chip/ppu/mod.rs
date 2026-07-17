@@ -127,7 +127,7 @@ pub enum Select {
 #[derive(Debug)]
 pub struct Ppu {
     /// Graphics registers.
-    pub reg: Control,
+    pub reg: File,
     /// Graphics memory.
     pub mem: Bank,
     /// Graphics internals.
@@ -332,7 +332,7 @@ pub struct Bank {
 /// | `$FF4B` | Byte | WX   | Window X position             |
 #[rustfmt::skip]
 #[derive(Debug, Default)]
-pub struct Control {
+pub struct File {
     /// LCD control
     pub lcdc: Shared<reg::Lcdc>,
     /// LCD status
@@ -359,11 +359,11 @@ pub struct Control {
     pub wx:   Shared<u8>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {}
 }
 
-impl Mmio for Control {
+impl Mmio for File {
     fn attach(&self, bus: &mut Bus) {
         bus.map(0xff40..=0xff40, self.lcdc.clone().into());
         bus.map(0xff41..=0xff41, self.stat.clone().into());

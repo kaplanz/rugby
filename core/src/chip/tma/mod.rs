@@ -28,7 +28,7 @@ pub enum Select {
 #[derive(Debug)]
 pub struct Timer {
     /// Timer registers.
-    pub reg: Control,
+    pub reg: File,
     /// Timer internals.
     pub etc: Internal,
     /// Interrupt line.
@@ -53,7 +53,7 @@ impl Timer {
     #[must_use]
     pub fn new(int: irq::Line) -> Self {
         Self {
-            reg: Control::default(),
+            reg: File::default(),
             etc: Internal::default(),
             int,
         }
@@ -166,7 +166,7 @@ impl Port<u8> for Timer {
 /// | `$FF06` | Byte | TMA  | Timer modulo     |
 /// | `$FF07` | Byte | TAC  | Timer control    |
 #[derive(Debug, Default)]
-pub struct Control {
+pub struct File {
     /// Divider register.
     pub div: Shared<reg::Div>,
     /// Timer counter.
@@ -177,7 +177,7 @@ pub struct Control {
     pub tac: Shared<reg::Tac>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         self.div.take();
         self.tima.take();
@@ -186,7 +186,7 @@ impl Block for Control {
     }
 }
 
-impl Mmio for Control {
+impl Mmio for File {
     fn attach(&self, bus: &mut Bus) {
         bus.map(0xff04..=0xff04, self.div.clone().into());
         bus.map(0xff05..=0xff05, self.tima.clone().into());

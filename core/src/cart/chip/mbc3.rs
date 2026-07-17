@@ -11,7 +11,7 @@ use super::{Data, Mbc};
 /// [mbc3]: https://gbdev.io/pandocs/MBC3.html
 #[derive(Clone, Debug)]
 pub struct Mbc3 {
-    ctl: Control,
+    reg: File,
     pub(super) rom: Shared<Rom>,
     pub(super) ram: Shared<Ram>,
     #[expect(unused)]
@@ -22,11 +22,11 @@ impl Mbc3 {
     /// Constructs a new `Mbc3`.
     #[must_use]
     pub fn new(rom: Data, ram: Data) -> Self {
-        let ctl = Control::default();
+        let reg = File::default();
         Self {
-            rom: Shared::new(Rom::new(ctl.clone(), rom)),
-            ram: Shared::new(Ram::new(ctl.clone(), ram)),
-            ctl,
+            rom: Shared::new(Rom::new(reg.clone(), rom)),
+            ram: Shared::new(Ram::new(reg.clone(), ram)),
+            reg,
             rtc: Rtc,
         }
     }
@@ -34,7 +34,7 @@ impl Mbc3 {
 
 impl Block for Mbc3 {
     fn reset(&mut self) {
-        self.ctl.reset();
+        self.reg.reset();
     }
 }
 
@@ -58,7 +58,7 @@ impl Mbc for Mbc3 {
 /// | `$6000..=$7FFF` | 1bit | LCD  | Latch Clock Data.   |
 #[rustfmt::skip]
 #[derive(Clone, Debug, Default)]
-struct Control {
+struct File {
     /// RAM + Timer Enable.
     ena: Shared<Enable>,
     /// ROM Bank Number.
@@ -69,7 +69,7 @@ struct Control {
     lcd: Shared<Latch>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         self.ena.take();
         self.rom.take();
@@ -212,19 +212,19 @@ impl Register for Latch {
 /// MBC3 ROM.
 #[derive(Debug)]
 pub(super) struct Rom {
-    ctl: Control,
+    reg: File,
     pub(super) mem: Data,
 }
 
 impl Rom {
     /// Constructs a new `Rom`.
-    fn new(ctl: Control, mem: Data) -> Self {
-        Self { ctl, mem }
+    fn new(reg: File, mem: Data) -> Self {
+        Self { reg, mem }
     }
 
     /// Adjusts addresses by internal bank number.
     fn adjust(&self, addr: u16) -> usize {
-        let bank = match usize::from(self.ctl.rom.load()) {
+        let bank = match usize::from(self.reg.rom.load()) {
             0 => 1,
             x => x,
         };
@@ -248,24 +248,24 @@ impl Memory for Rom {
         match addr {
             // RAM Enable
             0x0000..=0x1fff => {
-                // ctl.ena <- data[3:0] == 0xA
-                self.ctl.ena.store(data);
+                // reg.ena <- data[3:0] == 0xA
+                self.reg.ena.store(data);
             }
             // ROM Bank Number
             0x2000..=0x3fff => {
-                // ctl.rom[4:0] <- data[4:0]
-                self.ctl.rom.store(data);
+                // reg.rom[4:0] <- data[4:0]
+                self.reg.rom.store(data);
             }
             // RAM Bank Number
             0x4000..=0x5fff => {
-                // ctl.rom[1:0] <- data[1:0]
-                self.ctl.ram.store(data);
+                // reg.rom[1:0] <- data[1:0]
+                self.reg.ram.store(data);
             }
             // Banking Mode Select
             0x6000..=0x7fff => {
-                // ctl.sel <- data[3:0] == 0xA
+                // reg.sel <- data[3:0] == 0xA
                 error!("unimplemented: Mbc3::write(${addr:04x}, {data:#04x})");
-                self.ctl.lcd.store(data);
+                self.reg.lcd.store(data);
             }
             _ => return Err(Error::Range),
         }
@@ -276,19 +276,19 @@ impl Memory for Rom {
 /// MBC3 RAM.
 #[derive(Debug)]
 pub(super) struct Ram {
-    ctl: Control,
+    reg: File,
     pub(super) mem: Data,
 }
 
 impl Ram {
     /// Constructs a new `Ram`.
-    fn new(ctl: Control, mem: Data) -> Self {
-        Self { ctl, mem }
+    fn new(reg: File, mem: Data) -> Self {
+        Self { reg, mem }
     }
 
     /// Adjusts addresses by internal bank number.
     fn adjust(&self, addr: u16) -> usize {
-        let bank = usize::from(self.ctl.ram.load());
+        let bank = usize::from(self.reg.ram.load());
         let addr = usize::from(addr);
         ((bank << 13) | addr & 0x1fff) % self.mem.len().max(1)
     }
@@ -297,11 +297,11 @@ impl Ram {
 impl Memory for Ram {
     fn read(&self, addr: u16) -> Result<u8> {
         // Error when disabled
-        if self.ctl.ena.load() == 0 {
+        if self.reg.ena.load() == 0 {
             return Err(Error::Disabled);
         }
         // Error when RTC is selected
-        if self.ctl.ram.load() & 0x08 != 0 {
+        if self.reg.ram.load() & 0x08 != 0 {
             return Err(Error::Disabled);
         }
         // Perform adjusted read
@@ -311,11 +311,11 @@ impl Memory for Ram {
 
     fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         // Error when disabled
-        if self.ctl.ena.load() == 0 {
+        if self.reg.ena.load() == 0 {
             return Err(Error::Disabled);
         }
         // Error when RTC is selected
-        if self.ctl.ram.load() & 0x08 != 0 {
+        if self.reg.ram.load() & 0x08 != 0 {
             return Err(Error::Disabled);
         }
         // Perform adjusted write

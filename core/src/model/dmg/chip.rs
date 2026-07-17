@@ -44,7 +44,7 @@ impl Chip {
         let irq = irq::Irq::default();
         // Hardware timer
         let tma = tma::Timer {
-            reg: tma::Control::default(),
+            reg: tma::File::default(),
             etc: tma::Internal::default(),
             int: irq.line.clone(),
         };
@@ -56,27 +56,27 @@ impl Chip {
         // Audio processing unit
         let apu = {
             let mem = apu::Bank::default();
-            let reg = apu::Control::default();
+            let reg = apu::File::default();
             apu::Apu {
                 ch1: apu::ch1::Channel {
                     out: f32::default(),
-                    reg: apu::ch1::Control::with(&reg),
+                    reg: apu::ch1::File::with(&reg),
                     etc: apu::ch1::Internal::default(),
                 },
                 ch2: apu::ch2::Channel {
                     out: f32::default(),
-                    reg: apu::ch2::Control::with(&reg),
+                    reg: apu::ch2::File::with(&reg),
                     etc: apu::ch2::Internal::default(),
                 },
                 ch3: apu::ch3::Channel {
                     out: f32::default(),
-                    reg: apu::ch3::Control::with(&reg),
+                    reg: apu::ch3::File::with(&reg),
                     mem: mem.clone(),
                     etc: apu::ch3::Internal::default(),
                 },
                 ch4: apu::ch4::Channel {
                     out: f32::default(),
-                    reg: apu::ch4::Control::with(&reg),
+                    reg: apu::ch4::File::with(&reg),
                     etc: apu::ch4::Internal::default(),
                 },
                 reg,
@@ -93,7 +93,7 @@ impl Chip {
         let cpu = cpu::Cpu {
             bus: noc.cpu(),
             mem: cpu::Bank::default(),
-            reg: cpu::Control::default(),
+            reg: cpu::File::default(),
             etc: cpu::Internal::default(),
             int: irq.line.clone(),
         };
@@ -114,7 +114,7 @@ impl Chip {
                 vram: vram.clone(),
                 oam,
             },
-            reg: ppu::Control {
+            reg: ppu::File {
                 dma: dma.reg.clone(),
                 ..Default::default()
             },
@@ -123,7 +123,7 @@ impl Chip {
         };
         // Serial communications port
         let sio = sio::Serial {
-            reg: sio::Control::default(),
+            reg: sio::File::default(),
             etc: sio::Internal::default(),
             int: irq.line.clone(),
         };
