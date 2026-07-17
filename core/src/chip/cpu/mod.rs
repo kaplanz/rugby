@@ -14,15 +14,9 @@ use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
 use crate::chip::irq;
-use crate::dmg::mmap::Sram;
 
 pub mod insn;
 pub mod reg;
-
-/// Work RAM.
-///
-/// 8 KiB RAM used as general-purpose transient memory.
-pub type Wram = Sram;
 
 /// High RAM.
 ///
@@ -323,14 +317,19 @@ impl Cpu {
 ///
 /// |     Address     |  Size  | Name | Description   |
 /// |:---------------:|--------|------|---------------|
-/// | `$C000..=$DFFF` |  8 KiB | WRAM | Work RAM      |
 /// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
 #[derive(Clone, Debug)]
 pub struct Bank {
-    /// Work RAM.
-    pub wram: Shared<Wram>,
     /// High RAM.
     pub hram: Shared<Hram>,
+}
+
+impl Default for Bank {
+    fn default() -> Self {
+        Self {
+            hram: Shared::new(Hram::from([u8::default(); 0x007f])),
+        }
+    }
 }
 
 /// Processor registers.

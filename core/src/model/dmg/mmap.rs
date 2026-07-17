@@ -1,61 +1,9 @@
 //! Memory map.
 
 use rugby_arch::Shared;
-use rugby_arch::mem::Ram;
 use rugby_arch::mio::{Bus, Mmio};
 
-use super::chip::apu::Wave;
-use super::chip::cpu::{Hram, Wram};
-use super::chip::ppu::{Oam, Vram};
 use super::pcb::Motherboard;
-
-/// Sharp LH5164N (64K SRAM).
-pub type Sram = Ram<[u8; 0x2000]>;
-
-/// Memory bank.
-///
-/// |     Address     |  Size  | Name | Description   |
-/// |:---------------:|--------|------|---------------|
-/// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
-/// | `$C000..=$DFFF` |  8 KiB | WRAM | Work RAM      |
-/// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
-/// | `$FF30..=$FF3F` |   16 B | WAVE | Wave RAM      |
-/// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
-#[derive(Clone, Debug)]
-pub struct Bank {
-    /// Video RAM.
-    pub vram: Shared<Vram>,
-    /// Work RAM.
-    pub wram: Shared<Wram>,
-    /// Object memory.
-    pub oam: Shared<Oam>,
-    /// Wave memory.
-    pub wave: Shared<Wave>,
-    /// High RAM.
-    pub hram: Shared<Hram>,
-}
-
-#[rustfmt::skip]
-impl Default for Bank {
-    fn default() -> Self {
-        Self {
-            vram: Shared::new(Vram::from([u8::default(); 0x2000])),
-            wram: Shared::new(Wram::from([u8::default(); 0x2000])),
-            oam:  Shared::new( Oam::from([u8::default(); 0x00a0])),
-            wave: Shared::new(Wave::from([u8::default(); 0x0010])),
-            hram: Shared::new(Hram::from([u8::default(); 0x007f])),
-        }
-    }
-}
-
-impl Bank {
-    /// Constructs a new `Bank`.
-    #[must_use]
-    #[rustfmt::skip]
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
 
 /// Memory-mapped I/O.
 ///
@@ -152,9 +100,9 @@ impl Motherboard {
     fn ibus(&self) {
         let mut ibus = self.noc.ibus.borrow_mut();
         // Memory map
-        ibus.map(0xfe00..=0xfe9f, self.mem.oam .clone().into()); // OAM
-        ibus.map(0xff30..=0xff3f, self.mem.wave.clone().into()); // WAVE
-        ibus.map(0xff80..=0xfffe, self.mem.hram.clone().into()); // HRAM
+        ibus.map(0xfe00..=0xfe9f, self.soc.ppu.mem.oam .clone().into()); // OAM
+        ibus.map(0xff30..=0xff3f, self.soc.apu.mem.wave.clone().into()); // WAVE
+        ibus.map(0xff80..=0xfffe, self.soc.cpu.mem.hram.clone().into()); // HRAM
         // I/O registers
         self.soc.apu.attach(&mut ibus); // Audio
         self.soc.joy.attach(&mut ibus); // Joypad
@@ -168,14 +116,14 @@ impl Motherboard {
     fn ebus(&self) {
         let mut ebus = self.noc.ebus.borrow_mut();
         // Memory map
-        ebus.map(0xc000..=0xdfff, self.mem.wram.clone().into()); // WRAM
-        ebus.map(0xe000..=0xffff, self.mem.wram.clone().into()); // ECHO
+        ebus.map(0xc000..=0xdfff, self.wram.clone().into()); // WRAM
+        ebus.map(0xe000..=0xffff, self.wram.clone().into()); // ECHO
     }
 
     /// Connect graphics bus.
     fn vbus(&self) {
         let mut vbus = self.noc.vbus.borrow_mut();
         // Memory map
-        vbus.map(0x8000..=0x9fff, self.mem.vram.clone().into()); // VRAM
+        vbus.map(0x8000..=0x9fff, self.vram.clone().into()); // VRAM
     }
 }

@@ -2,7 +2,9 @@
 
 use rugby_arch::{Block, Shared};
 
-use super::mmap::{Bank, Mmap};
+use super::boot;
+use super::mmap::Mmap;
+use super::pcb::Vram;
 pub use crate::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 
 /// Sharp LR35902 (DMG-CPU).
@@ -10,6 +12,8 @@ pub use crate::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 pub struct Chip {
     /// Audio processing unit.
     pub apu: apu::Apu,
+    /// Boot ROM.
+    pub boot: Option<boot::Chip>,
     /// Central processing unit.
     pub cpu: cpu::Cpu,
     /// Direct memory access unit.
@@ -35,7 +39,7 @@ impl Chip {
     /// component, as there is a somewhat complicated dependency chain between
     /// which parts are connected to each other.
     #[must_use]
-    pub fn new(mem: &Bank, noc: &Mmap) -> Self {
+    pub fn new(vram: &Shared<Vram>, noc: &Mmap) -> Self {
         // Interrupt controller
         let irq = irq::Irq::default();
         // Hardware timer
@@ -44,12 +48,14 @@ impl Chip {
             etc: tma::Internal::default(),
             int: irq.line.clone(),
         };
+        // Object attribute memory
+        //
+        // Created before the PPU and DMA, which each hold a handle.
+        let oam = Shared::new(ppu::Oam::from([u8::default(); 0x00a0]));
 
         // Audio processing unit
         let apu = {
-            let mem = apu::Bank {
-                wave: mem.wave.clone(),
-            };
+            let mem = apu::Bank::default();
             let reg = apu::Control::default();
             apu::Apu {
                 ch1: apu::ch1::Channel {
@@ -86,10 +92,7 @@ impl Chip {
         // Central processing unit
         let cpu = cpu::Cpu {
             bus: noc.cpu(),
-            mem: cpu::Bank {
-                wram: mem.wram.clone(),
-                hram: mem.hram.clone(),
-            },
+            mem: cpu::Bank::default(),
             reg: cpu::Control::default(),
             etc: cpu::Internal::default(),
             int: irq.line.clone(),
@@ -97,7 +100,7 @@ impl Chip {
         // Direct memory access unit
         let dma = dma::Dma {
             bus: noc.dma(),
-            mem: mem.oam.clone(),
+            mem: oam.clone(),
             reg: Shared::new(dma::Control::default()),
         };
         // Joypad controller
@@ -108,8 +111,8 @@ impl Chip {
         // Picture processing unit
         let ppu = ppu::Ppu {
             mem: ppu::Bank {
-                vram: mem.vram.clone(),
-                oam: mem.oam.clone(),
+                vram: vram.clone(),
+                oam,
             },
             reg: ppu::Control {
                 dma: dma.reg.clone(),
@@ -128,6 +131,7 @@ impl Chip {
         // Finish construction
         Self {
             apu,
+            boot: None,
             cpu,
             dma,
             irq,
