@@ -15,7 +15,7 @@ pub struct Channel {
     /// Channel output.
     pub out: f32,
     /// Channel registers.
-    pub reg: Control,
+    pub reg: File,
     /// Channel memory.
     pub mem: Bank,
     /// Channel internals.
@@ -180,7 +180,7 @@ impl Block for Channel {
 
 /// Channel 3 registers.
 #[derive(Debug)]
-pub struct Control {
+pub struct File {
     /// `[$FF1A]` - NR30: Channel 3 DAC enable.
     pub nr30: Shared<Nr30>,
     /// `[$FF1B]` - NR31: Channel 3 length timer.
@@ -193,10 +193,10 @@ pub struct Control {
     pub nr34: Shared<Nr34>,
 }
 
-impl Control {
+impl File {
     /// Instantiates a `Channel` with the provided control registers.
     #[must_use]
-    pub fn with(reg: &super::Control) -> Self {
+    pub fn with(reg: &super::File) -> Self {
         Self {
             nr30: reg.nr30.clone(),
             nr31: reg.nr31.clone(),

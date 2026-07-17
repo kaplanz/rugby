@@ -11,7 +11,7 @@ use super::{Data, Mbc};
 /// [mbc1]: https://gbdev.io/pandocs/MBC1.html
 #[derive(Clone, Debug)]
 pub struct Mbc1 {
-    ctl: Control,
+    reg: File,
     pub(super) rom: Shared<Rom>,
     pub(super) ram: Shared<Ram>,
 }
@@ -20,18 +20,18 @@ impl Mbc1 {
     /// Constructs a new `Mbc1`.
     #[must_use]
     pub fn new(rom: Data, ram: Data) -> Self {
-        let ctl = Control::default();
+        let reg = File::default();
         Self {
-            rom: Shared::new(Rom::new(ctl.clone(), rom)),
-            ram: Shared::new(Ram::new(ctl.clone(), ram)),
-            ctl,
+            rom: Shared::new(Rom::new(reg.clone(), rom)),
+            ram: Shared::new(Ram::new(reg.clone(), ram)),
+            reg,
         }
     }
 }
 
 impl Block for Mbc1 {
     fn reset(&mut self) {
-        self.ctl.reset();
+        self.reg.reset();
     }
 }
 
@@ -55,7 +55,7 @@ impl Mbc for Mbc1 {
 /// | `$6000..=$7FFF` | 1bit | SEL  | Banking Mode Select. |
 #[rustfmt::skip]
 #[derive(Clone, Debug, Default)]
-struct Control {
+struct File {
     /// RAM Enable.
     ena: Shared<Enable>,
     /// ROM Bank Number.
@@ -66,7 +66,7 @@ struct Control {
     sel: Shared<Select>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         self.ena.take();
         self.rom.take();
@@ -206,24 +206,24 @@ impl Register for Select {
 /// MBC1 ROM.
 #[derive(Debug)]
 pub(super) struct Rom {
-    ctl: Control,
+    reg: File,
     pub(super) mem: Data,
 }
 
 impl Rom {
     /// Constructs a new `Rom`.
-    fn new(ctl: Control, mem: Data) -> Self {
-        Self { ctl, mem }
+    fn new(reg: File, mem: Data) -> Self {
+        Self { reg, mem }
     }
 
     /// Adjusts addresses by internal bank number.
     fn adjust0(&self, addr: u16) -> usize {
         let bank = {
             let lo = 0;
-            let hi = if self.ctl.sel.load() == 0 {
+            let hi = if self.reg.sel.load() == 0 {
                 0
             } else {
-                usize::from(self.ctl.ram.load())
+                usize::from(self.reg.ram.load())
             };
             (hi << 5) | lo
         };
@@ -234,11 +234,11 @@ impl Rom {
     /// Adjusts addresses by internal bank number.
     fn adjust1(&self, addr: u16) -> usize {
         let bank = {
-            let lo = match usize::from(self.ctl.rom.load()) {
+            let lo = match usize::from(self.reg.rom.load()) {
                 0 => 1,
                 x => x,
             };
-            let hi = usize::from(self.ctl.ram.load());
+            let hi = usize::from(self.reg.ram.load());
             (hi << 5) | lo
         };
         let addr = usize::from(addr);
@@ -266,23 +266,23 @@ impl Memory for Rom {
         match addr {
             // RAM Enable
             0x0000..=0x1fff => {
-                // ctl.ena <- data[3:0] == 0xA
-                self.ctl.ena.store(data);
+                // reg.ena <- data[3:0] == 0xA
+                self.reg.ena.store(data);
             }
             // ROM Bank Number
             0x2000..=0x3fff => {
-                // ctl.rom[4:0] <- data[4:0]
-                self.ctl.rom.store(data);
+                // reg.rom[4:0] <- data[4:0]
+                self.reg.rom.store(data);
             }
             // RAM Bank Number
             0x4000..=0x5fff => {
-                // ctl.rom[1:0] <- data[1:0]
-                self.ctl.ram.store(data);
+                // reg.rom[1:0] <- data[1:0]
+                self.reg.ram.store(data);
             }
             // Banking Mode Select
             0x6000..=0x7fff => {
-                // ctl.sel <- data[0]
-                self.ctl.sel.store(data);
+                // reg.sel <- data[0]
+                self.reg.sel.store(data);
             }
             _ => return Err(Error::Range),
         }
@@ -293,23 +293,23 @@ impl Memory for Rom {
 /// MBC1 RAM.
 #[derive(Debug)]
 pub(super) struct Ram {
-    ctl: Control,
+    reg: File,
     pub(super) mem: Data,
 }
 
 impl Ram {
     /// Constructs a new `Ram`.
-    fn new(ctl: Control, mem: Data) -> Self {
-        Self { ctl, mem }
+    fn new(reg: File, mem: Data) -> Self {
+        Self { reg, mem }
     }
 
     /// Adjusts addresses by internal bank number.
     fn adjust(&self, addr: u16) -> usize {
         let bank = {
-            if self.ctl.sel.load() == 0 {
+            if self.reg.sel.load() == 0 {
                 0
             } else {
-                usize::from(self.ctl.ram.load())
+                usize::from(self.reg.ram.load())
             }
         };
         let addr = usize::from(addr);
@@ -320,7 +320,7 @@ impl Ram {
 impl Memory for Ram {
     fn read(&self, addr: u16) -> Result<u8> {
         // Error when disabled
-        if self.ctl.ena.load() == 0 {
+        if self.reg.ena.load() == 0 {
             return Err(Error::Disabled);
         }
         // Translate address
@@ -334,7 +334,7 @@ impl Memory for Ram {
 
     fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         // Error when disabled
-        if self.ctl.ena.load() == 0 {
+        if self.reg.ena.load() == 0 {
             return Err(Error::Disabled);
         }
         // Translate address

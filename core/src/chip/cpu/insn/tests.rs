@@ -10,7 +10,7 @@ fn setup() -> Cpu {
     Cpu {
         bus,
         mem: Bank::default(),
-        reg: Control::default(),
+        reg: File::default(),
         etc: Internal::default(),
         irq: irq.line,
     }
