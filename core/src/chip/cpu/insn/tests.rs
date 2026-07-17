@@ -9,10 +9,7 @@ fn setup() -> Cpu {
     let irq = irq::Irq::default();
     Cpu {
         bus,
-        mem: Bank {
-            wram: Shared::new(Wram::from([u8::default(); 0x2000])),
-            hram: Shared::new(Hram::from([u8::default(); 0x007f])),
-        },
+        mem: Bank::default(),
         reg: Control::default(),
         etc: Internal::default(),
         irq: irq.line,

@@ -1,22 +1,50 @@
 //! DMG-01 motherboard.
 
 use log::warn;
-use rugby_arch::Block;
+use rugby_arch::mem::Ram;
 use rugby_arch::reg::Register;
+use rugby_arch::{Block, Shared};
 
 use super::chip::Chip;
-use super::mmap::{Bank, Mmap};
+use super::mmap::Mmap;
+use crate::cart::Cartridge;
+
+/// Sharp LH5164N (64K SRAM).
+pub type Sram = Ram<[u8; 0x2000]>;
+
+/// Video RAM.
+///
+/// 8 KiB RAM used to store tile [data][tdata] and [maps][tmaps].
+///
+/// [tdata]: https://gbdev.io/pandocs/Tile_Data.html
+/// [tmaps]: https://gbdev.io/pandocs/Tile_Maps.html
+pub type Vram = Sram;
+
+/// Work RAM.
+///
+/// 8 KiB RAM used as general-purpose transient memory.
+pub type Wram = Sram;
 
 /// DMG-CPU-01 PCB.
 #[derive(Debug)]
 pub struct Motherboard {
     /// Crystal oscillator.
     pub clk: u128,
-    /// Embedded memory.
-    pub mem: Bank,
+    /// Video RAM.
+    ///
+    /// Designated U2 on the PCB.
+    pub vram: Shared<Vram>,
+    /// Work RAM.
+    ///
+    /// Designated U3 on the PCB.
+    pub wram: Shared<Wram>,
+    /// Game cartridge.
+    pub cart: Option<Cartridge>,
     /// Network-on-chip.
     pub noc: Mmap,
     /// System-on-chip.
+    ///
+    /// Designated U1 on the PCB.
     pub soc: Chip,
 }
 
@@ -24,15 +52,27 @@ impl Default for Motherboard {
     fn default() -> Self {
         // Crystal oscillator
         let clk = u128::default();
-        // Embedded memory
-        let mem = Bank::new();
+        // Video RAM
+        let vram = Shared::new(Vram::from([u8::default(); 0x2000]));
+        // Work RAM
+        let wram = Shared::new(Wram::from([u8::default(); 0x2000]));
+        // Cartridge slot
+        let cart = None;
         // Network-on-chip
         let noc = Mmap::new();
         // System-on-chip
-        let soc = Chip::new(&mem, &noc);
+        let soc = Chip::new(&vram, &noc);
 
         // Finish construction
-        Self { clk, mem, noc, soc }.prep()
+        Self {
+            clk,
+            vram,
+            wram,
+            cart,
+            noc,
+            soc,
+        }
+        .prep()
     }
 }
 

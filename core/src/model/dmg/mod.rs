@@ -38,10 +38,6 @@ pub const CLOCK: u32 = 4_194_304;
 /// _Game Boy_.
 #[derive(Debug, Default)]
 pub struct GameBoy<R: Revision = rev::C> {
-    /// Boot ROM.
-    boot: Option<boot::Chip>,
-    /// Game cartridge.
-    cart: Option<Cartridge>,
     /// DMG-01 Motherboard.
     #[cfg(feature = "debug")]
     pub main: Motherboard,
@@ -122,7 +118,7 @@ impl<R: Revision> GameBoy<R> {
         // Initialize boot ROM
         let boot = boot::Chip::new(boot);
         boot.attach(&mut this.main.noc.ibus.borrow_mut());
-        this.boot = Some(boot);
+        this.main.soc.boot = Some(boot);
 
         this
     }
@@ -143,7 +139,7 @@ impl<R: Revision> GameBoy<R> {
     /// Gets the inserted game cartridge, if any.
     #[must_use]
     pub fn cart(&self) -> Option<&Cartridge> {
-        self.cart.as_ref()
+        self.main.cart.as_ref()
     }
 
     /// Inserts a game cartridge.
@@ -158,18 +154,18 @@ impl<R: Revision> GameBoy<R> {
         // Insert supplied cartridge
         let ebus = &mut *self.main.noc.ebus.borrow_mut();
         cart.attach(ebus);
-        self.cart = Some(cart);
+        self.main.cart = Some(cart);
     }
 
     /// Ejects the inserted game cartridge, if any.
     pub fn eject(&mut self) -> Option<Cartridge> {
         // Disconnect from bus
         let ebus = &mut *self.main.noc.ebus.borrow_mut();
-        if let Some(cart) = &self.cart {
+        if let Some(cart) = &self.main.cart {
             cart.detach(ebus);
         }
         // Remove inserted cartridge
-        self.cart.take()
+        self.main.cart.take()
     }
 }
 
@@ -188,8 +184,8 @@ where
     #[rustfmt::skip]
     fn reset(&mut self) {
         self.main.reset();
-        self.boot.as_mut().map(Block::reset).unwrap_or_else(|| self.boot());
-        self.cart.as_mut().map(Block::reset);
+        self.main.soc.boot.as_mut().map(Block::reset).unwrap_or_else(|| self.boot());
+        self.main.cart.as_mut().map(Block::reset);
     }
 }
 
