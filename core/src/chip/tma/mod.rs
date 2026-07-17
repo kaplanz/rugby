@@ -5,7 +5,7 @@ use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
-use super::pic::{self, Interrupt};
+use super::irq::{self, Interrupt};
 
 /// Timer register select.
 ///
@@ -32,7 +32,7 @@ pub struct Timer {
     /// Timer internals.
     pub etc: Internal,
     /// Interrupt line.
-    pub int: pic::Line,
+    pub irq: irq::Line,
 }
 
 /// Timer internals.
@@ -51,11 +51,11 @@ impl Internal {
 impl Timer {
     /// Constructs a new `Timer`.
     #[must_use]
-    pub fn new(int: pic::Line) -> Self {
+    pub fn new(irq: irq::Line) -> Self {
         Self {
             reg: Control::default(),
             etc: Internal::default(),
-            int,
+            irq,
         }
     }
 
@@ -87,7 +87,7 @@ impl Block for Timer {
         // Request an interrupt
         if rel == reg::Reload::Load {
             debug!("timer reloaded");
-            self.int.raise(Interrupt::Timer);
+            self.irq.raise(Interrupt::Timer);
         }
         // Commit the reload
         if matches!(rel, reg::Reload::Load | reg::Reload::Done(1..)) {
@@ -204,7 +204,7 @@ mod tests {
     #[test]
     fn tima_reload_works() {
         // Configure 65536 Hz timer (64 cycles)
-        let mut timer = Timer::new(pic::Pic::default().line);
+        let mut timer = Timer::new(irq::Irq::default().line);
         timer.reg.tac.store(0b110);
         timer.reg.tma.store(0xfe);
         timer.reg.tima.store(0xfe);
@@ -276,7 +276,7 @@ mod tests {
     fn tima_write_reloading_working() {
         /// Runs a write-reloading test, storing `$FD` to `TIMA` after
         /// `offset` delay cycles once the overflow has occurred.
-        fn run(line: &pic::Line, offset: usize) {
+        fn run(line: &irq::Line, offset: usize) {
             // Configure 65536 Hz timer (64 cycles)
             let mut timer = Timer::new(line.clone());
             timer.reg.tac.store(0b110);
@@ -326,7 +326,7 @@ mod tests {
             }
         }
 
-        let line = pic::Pic::default().line;
+        let line = irq::Irq::default().line;
         // Write during each cycle of the reload delay
         run(&line, 0);
         run(&line, 1);
@@ -394,7 +394,7 @@ mod tests {
     fn tma_write_reloading_working() {
         /// Runs a write-reloading test, storing `$69` to `TMA` after
         /// `offset` delay cycles once the overflow has occurred.
-        fn run(line: &pic::Line, offset: usize) {
+        fn run(line: &irq::Line, offset: usize) {
             // Configure 65536 Hz timer (64 cycles)
             let mut timer = Timer::new(line.clone());
             timer.reg.tac.store(0b110);
@@ -454,7 +454,7 @@ mod tests {
             }
         }
 
-        let line = pic::Pic::default().line;
+        let line = irq::Irq::default().line;
         // Write during each cycle of the reload delay
         run(&line, 0);
         run(&line, 1);

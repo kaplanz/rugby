@@ -3,7 +3,7 @@
 use rugby_arch::{Block, Shared};
 
 use super::mmap::{Bank, Mmap};
-pub use crate::chip::{apu, cpu, dma, joy, pic, ppu, sio, tma};
+pub use crate::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
@@ -14,10 +14,10 @@ pub struct Chip {
     pub cpu: cpu::Cpu,
     /// Direct memory access unit.
     pub dma: dma::Dma,
+    /// Interrupt controller.
+    pub irq: irq::Irq,
     /// Joypad controller.
     pub joy: joy::Joypad,
-    /// Interrupt controller.
-    pub pic: pic::Pic,
     /// Picture processing unit
     pub ppu: ppu::Ppu,
     /// Serial communications port.
@@ -37,12 +37,12 @@ impl Chip {
     #[must_use]
     pub fn new(mem: &Bank, noc: &Mmap) -> Self {
         // Interrupt controller
-        let pic = pic::Pic::default();
+        let irq = irq::Irq::default();
         // Hardware timer
         let tma = tma::Timer {
             reg: tma::Control::default(),
             etc: tma::Internal::default(),
-            int: pic.line.clone(),
+            irq: irq.line.clone(),
         };
 
         // Audio processing unit
@@ -92,7 +92,7 @@ impl Chip {
             },
             reg: cpu::Control::default(),
             etc: cpu::Internal::default(),
-            int: pic.line.clone(),
+            irq: irq.line.clone(),
         };
         // Direct memory access unit
         let dma = dma::Dma {
@@ -104,7 +104,7 @@ impl Chip {
         // Joypad controller
         let joy = joy::Joypad {
             reg: Shared::new(joy::Control::default()),
-            int: pic.line.clone(),
+            irq: irq.line.clone(),
         };
         // Picture processing unit
         let ppu = ppu::Ppu {
@@ -117,13 +117,13 @@ impl Chip {
                 ..Default::default()
             },
             etc: ppu::Internal::default(),
-            int: pic.line.clone(),
+            irq: irq.line.clone(),
         };
         // Serial communications port
         let sio = sio::Serial {
             reg: sio::Control::default(),
             etc: sio::Internal::default(),
-            int: pic.line.clone(),
+            irq: irq.line.clone(),
         };
 
         // Finish construction
@@ -131,8 +131,8 @@ impl Chip {
             apu,
             cpu,
             dma,
+            irq,
             joy,
-            pic,
             ppu,
             sio,
             tma,

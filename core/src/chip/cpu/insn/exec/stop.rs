@@ -39,7 +39,7 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
         cpu.etc.run = Status::Stopped;
     }
     // Consume the padding byte unless an interrupt is pending
-    if !cpu.int.pending() {
+    if !cpu.irq.pending() {
         cpu.fetchbyte();
     }
 

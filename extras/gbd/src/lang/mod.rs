@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
 
 use orng::Orange;
-use rugby_core::chip::{apu, cpu, pic, ppu, sio, tma};
+use rugby_core::chip::{apu, cpu, irq, ppu, sio, tma};
 
 use super::Tick;
 
@@ -436,7 +436,7 @@ pub enum Select {
     Apu(apu::Select),
     Byte(cpu::Select8),
     Word(cpu::Select16),
-    Pic(pic::Select),
+    Irq(irq::Select),
     Ppu(ppu::Select),
     Serial(sio::Select),
     Timer(tma::Select),

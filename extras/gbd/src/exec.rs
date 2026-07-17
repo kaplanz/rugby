@@ -247,8 +247,8 @@ pub fn load(emu: &GameBoy, loc: Select) -> Result<()> {
             let word: u16 = emu.main.soc.cpu.load(reg);
             advise::info!("{reg:?}: {word:#06x}");
         }
-        Select::Pic(reg) => {
-            let byte: u8 = emu.main.soc.pic.load(reg);
+        Select::Irq(reg) => {
+            let byte: u8 = emu.main.soc.irq.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Ppu(reg) => {
@@ -390,13 +390,13 @@ pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
             // Perform the store
             soc.cpu.store(reg, word);
         }
-        Select::Pic(reg) => {
+        Select::Irq(reg) => {
             // Extract the byte
             let Value::Byte(byte) = value else {
                 return Err(Error::Value);
             };
             // Perform the store
-            soc.pic.store(reg, byte);
+            soc.irq.store(reg, byte);
         }
         Select::Ppu(reg) => {
             // Extract the byte

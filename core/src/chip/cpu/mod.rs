@@ -13,7 +13,7 @@ use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
-use crate::chip::pic;
+use crate::chip::irq;
 use crate::dmg::mmap::Sram;
 
 pub mod insn;
@@ -87,7 +87,7 @@ pub struct Cpu {
     /// Processor internals.
     pub etc: Internal,
     /// Interrupt line.
-    pub int: pic::Line,
+    pub irq: irq::Line,
 }
 
 /// Processor internals.
@@ -557,13 +557,13 @@ impl Stage {
 
             // Check for pending interrupts
             let int = (cpu.etc.ime == Ime::Enabled)
-                .then(|| cpu.int.fetch())
+                .then(|| cpu.irq.fetch())
                 .flatten();
 
             // Handle pending interrupt...
             if let Some(int) = int {
                 // Acknowledge the interrupt
-                cpu.int.clear(int);
+                cpu.irq.clear(int);
                 // Skip `Stage::Fetch`
                 let insn = Instruction::int(int);
                 debug!("${pc:04x}: {insn}", pc = int.handler());

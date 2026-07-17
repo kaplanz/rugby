@@ -8,7 +8,7 @@ use num::traits::{WrappingAdd, WrappingSub};
 use num::{Bounded, Integer};
 use orng::Orange;
 use pest::iterators::Pair;
-use rugby_core::chip::{apu, cpu, pic, ppu, sio, tma};
+use rugby_core::chip::{apu, cpu, irq, ppu, sio, tma};
 
 use super::{Command, Keyword, Result, Rule, Select, Serial, Tick, Value};
 
@@ -175,7 +175,7 @@ pub fn command(input: Pair<Rule>) -> Result<Command> {
             let value = match locs.first().exception()? {
                 Select::Apu(_)
                     | Select::Byte(_)
-                    | Select::Pic(_)
+                    | Select::Irq(_)
                     | Select::Ppu(_)
                     | Select::Serial(_)
                     | Select::Timer(_)
@@ -425,11 +425,11 @@ pub fn location(pair: Pair<Rule>) -> Result<Select> {
                 rule => return rule.exception(),
             })
         }
-        Rule::Pic => {
+        Rule::Irq => {
             let reg = pair.into_inner().next().exception()?;
-            Select::Pic(match reg.as_rule() {
-                Rule::If => pic::Select::If,
-                Rule::Ie => pic::Select::Ie,
+            Select::Irq(match reg.as_rule() {
+                Rule::If => irq::Select::If,
+                Rule::Ie => irq::Select::Ie,
                 rule => return rule.exception(),
             })
         }
