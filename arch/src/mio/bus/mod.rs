@@ -19,8 +19,6 @@ type Range = RangeInclusive<u16>;
 pub struct Bus {
     /// Memory map.
     mmap: Map,
-    /// Lock status.
-    lock: bool,
 }
 
 impl Bus {
@@ -46,20 +44,6 @@ impl Bus {
     pub fn unmap(&mut self, dev: &Device) -> bool {
         self.mmap.unmap(dev)
     }
-
-    /// Locks the bus.
-    ///
-    /// When locked, read/write operations will always [fail](Error::Busy).
-    pub fn busy(&mut self) {
-        self.lock = true;
-    }
-
-    /// Unlocks the bus.
-    ///
-    /// When locked, read/write operations will always [fail](Error::Busy).
-    pub fn free(&mut self) {
-        self.lock = false;
-    }
 }
 
 impl<const N: usize> From<[(Range, Device); N]> for Bus {
@@ -74,11 +58,6 @@ impl<const N: usize> From<[(Range, Device); N]> for Bus {
 
 impl Memory for Bus {
     fn read(&self, addr: u16) -> Result<u8> {
-        // No-op if locked
-        if self.lock {
-            return Err(Error::Busy);
-        }
-        // Read if unlocked
         self.mmap
             .select(addr)
             .flat_map(|it| {
@@ -92,11 +71,6 @@ impl Memory for Bus {
     }
 
     fn write(&mut self, addr: u16, data: u8) -> Result<()> {
-        // No-op if locked
-        if self.lock {
-            return Err(Error::Busy);
-        }
-        // Write if unlocked
         self.mmap
             .select(addr)
             .flat_map(|it| {
