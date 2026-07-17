@@ -133,7 +133,7 @@ pub enum Select {
 #[derive(Debug)]
 pub struct Apu {
     /// Audio registers.
-    pub reg: Control,
+    pub reg: File,
     /// Audio memory.
     pub mem: Bank,
     /// Channel 1.
@@ -434,7 +434,7 @@ impl Default for Bank {
 ///
 /// [regs]: https://gbdev.io/pandocs/Audio_Registers.html
 #[derive(Debug, Default)]
-pub struct Control {
+pub struct File {
     /// Audio master control.
     pub nr52: Shared<Nr52>,
     /// Sound panning.
@@ -479,7 +479,7 @@ pub struct Control {
     pub nr44: Shared<Nr44>,
 }
 
-impl Control {
+impl File {
     /// Disables the registers.
     ///
     /// Similar to a [reset](Block::reset), except that the length bits of
@@ -513,7 +513,7 @@ impl Control {
     }
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         // Global Control Registers
         self.nr52.take();
@@ -544,7 +544,7 @@ impl Block for Control {
     }
 }
 
-impl Mmio for Control {
+impl Mmio for File {
     fn attach(&self, bus: &mut Bus) {
         // Global Control Registers
         bus.map(0xff26..=0xff26, self.nr52.clone().into());

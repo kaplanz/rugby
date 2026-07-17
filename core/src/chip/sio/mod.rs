@@ -40,7 +40,7 @@ pub enum Select {
 #[derive(Debug)]
 pub struct Serial {
     /// Serial registers.
-    pub reg: Control,
+    pub reg: File,
     /// Serial internals.
     pub etc: Internal,
     /// Interrupt line.
@@ -182,21 +182,21 @@ impl Port<u8> for Serial {
 /// | `$FF01` | Byte | SB   | Serial transfer data    |
 /// | `$FF02` | Byte | SC   | Serial transfer control |
 #[derive(Debug, Default)]
-pub struct Control {
+pub struct File {
     /// Serial transfer data.
     pub sb: Shared<reg::Sb>,
     /// Serial transfer control.
     pub sc: Shared<reg::Sc>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         self.sb.take();
         self.sc.take();
     }
 }
 
-impl Mmio for Control {
+impl Mmio for File {
     fn attach(&self, bus: &mut Bus) {
         bus.map(0xff01..=0xff01, self.sb.clone().into());
         bus.map(0xff02..=0xff02, self.sc.clone().into());

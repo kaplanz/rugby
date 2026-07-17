@@ -11,7 +11,7 @@ use super::{Data, Mbc};
 /// [mbc2]: https://gbdev.io/pandocs/MBC2.html
 #[derive(Clone, Debug)]
 pub struct Mbc2 {
-    ctl: Control,
+    reg: File,
     pub(super) rom: Shared<Rom>,
     pub(super) ram: Shared<Ram>,
 }
@@ -20,18 +20,18 @@ impl Mbc2 {
     /// Constructs a new `Mbc2`.
     #[must_use]
     pub fn new(rom: Data, ram: Data) -> Self {
-        let ctl = Control::default();
+        let reg = File::default();
         Self {
-            rom: Shared::new(Rom::new(ctl.clone(), rom)),
-            ram: Shared::new(Ram::new(ctl.clone(), ram)),
-            ctl,
+            rom: Shared::new(Rom::new(reg.clone(), rom)),
+            ram: Shared::new(Ram::new(reg.clone(), ram)),
+            reg,
         }
     }
 }
 
 impl Block for Mbc2 {
     fn reset(&mut self) {
-        self.ctl.reset();
+        self.reg.reset();
     }
 }
 
@@ -57,14 +57,14 @@ impl Mbc for Mbc2 {
 /// Bit 8 of the address selects the register: ENA if clear, ROM if set.
 #[rustfmt::skip]
 #[derive(Clone, Debug, Default)]
-struct Control {
+struct File {
     /// RAM Enable.
     ena: Shared<Enable>,
     /// ROM Bank Number.
     rom: Shared<RomBank>,
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         self.ena.take();
         self.rom.take();
@@ -138,19 +138,19 @@ impl Register for RomBank {
 /// MBC2 ROM.
 #[derive(Debug)]
 pub(super) struct Rom {
-    ctl: Control,
+    reg: File,
     pub(super) mem: Data,
 }
 
 impl Rom {
     /// Constructs a new `Rom`.
-    fn new(ctl: Control, mem: Data) -> Self {
-        Self { ctl, mem }
+    fn new(reg: File, mem: Data) -> Self {
+        Self { reg, mem }
     }
 
     /// Adjusts addresses by internal bank number.
     fn adjust(&self, addr: u16) -> usize {
-        let bank = match usize::from(self.ctl.rom.load()) {
+        let bank = match usize::from(self.reg.rom.load()) {
             0 => 1,
             x => x,
         };
@@ -175,13 +175,13 @@ impl Memory for Rom {
             0x0000..=0x3fff => {
                 // RAM Enable
                 if addr & 0x0100 == 0 {
-                    // ctl.ena <- data[3:0] == 0xA
-                    self.ctl.ena.store(data);
+                    // reg.ena <- data[3:0] == 0xA
+                    self.reg.ena.store(data);
                 }
                 // ROM Bank Number
                 else {
-                    // ctl.rom[3:0] <- data[3:0]
-                    self.ctl.rom.store(data);
+                    // reg.rom[3:0] <- data[3:0]
+                    self.reg.rom.store(data);
                 }
             }
             _ => return Err(Error::Range),
@@ -199,14 +199,14 @@ impl Memory for Rom {
 /// full address range.
 #[derive(Debug)]
 pub(super) struct Ram {
-    ctl: Control,
+    reg: File,
     pub(super) mem: Data,
 }
 
 impl Ram {
     /// Constructs a new `Ram`.
-    fn new(ctl: Control, mem: Data) -> Self {
-        Self { ctl, mem }
+    fn new(reg: File, mem: Data) -> Self {
+        Self { reg, mem }
     }
 
     /// Adjusts addresses by internal memory size.
@@ -218,7 +218,7 @@ impl Ram {
 impl Memory for Ram {
     fn read(&self, addr: u16) -> Result<u8> {
         // Error when disabled
-        if self.ctl.ena.load() == 0 {
+        if self.reg.ena.load() == 0 {
             return Err(Error::Disabled);
         }
         // Perform adjusted read
@@ -230,7 +230,7 @@ impl Memory for Ram {
 
     fn write(&mut self, addr: u16, data: u8) -> Result<()> {
         // Error when disabled
-        if self.ctl.ena.load() == 0 {
+        if self.reg.ena.load() == 0 {
             return Err(Error::Disabled);
         }
         // Perform adjusted write

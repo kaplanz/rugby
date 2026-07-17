@@ -14,7 +14,7 @@ pub struct Channel {
     /// Channel output.
     pub out: f32,
     /// Channel registers.
-    pub reg: Control,
+    pub reg: File,
     /// Channel internals.
     pub etc: Internal,
 }
@@ -270,7 +270,7 @@ impl Block for Channel {
 
 /// Channel 4 registers.
 #[derive(Debug)]
-pub struct Control {
+pub struct File {
     /// `[$FF20]` - NR41: Channel 4 length timer.
     pub nr41: Shared<Nr41>,
     /// `[$FF21]` - NR42: Channel 4 volume & envelope.
@@ -281,10 +281,10 @@ pub struct Control {
     pub nr44: Shared<Nr44>,
 }
 
-impl Control {
+impl File {
     /// Instantiates a `Channel` with the provided control registers.
     #[must_use]
-    pub fn with(reg: &super::Control) -> Self {
+    pub fn with(reg: &super::File) -> Self {
         Self {
             nr41: reg.nr41.clone(),
             nr42: reg.nr42.clone(),

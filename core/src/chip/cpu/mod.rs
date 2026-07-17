@@ -75,7 +75,7 @@ pub struct Cpu {
     /// Processor bus.
     pub bus: Bus,
     /// Processor registers.
-    pub reg: Control,
+    pub reg: File,
     /// Processor memory.
     pub mem: Bank,
     /// Processor internals.
@@ -347,7 +347,7 @@ impl Default for Bank {
 /// | Word | SP   | Stack pointer.                |
 /// | Word | PC   | Program counter.              |
 #[derive(Debug, Default)]
-pub struct Control {
+pub struct File {
     /// Accumulator register.
     pub a: reg::A,
     /// Flags register.
@@ -370,7 +370,7 @@ pub struct Control {
     pub pc: reg::Pc,
 }
 
-impl Control {
+impl File {
     /// Joint BC register.
     pub(crate) fn bc(&'_ self) -> Alias<'_> {
         Alias {
@@ -420,13 +420,13 @@ impl Control {
     }
 }
 
-impl Block for Control {
+impl Block for File {
     fn reset(&mut self) {
         std::mem::take(&mut self.pc);
     }
 }
 
-impl Display for Control {
+impl Display for File {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "┌───┬────┬───┬────┐")?;
         writeln!(
