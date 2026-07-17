@@ -91,7 +91,7 @@ impl Bank {
 /// | `$FF03..=$FF03` |    1 B | ---      | ---              | ---       |
 /// | `$FF04..=$FF07` |    4 B | `timer`  | Timer            | Internal  |
 /// | `$FF08..=$FF0E` |    7 B | ---      | ---              | ---       |
-/// | `$FF0F..=$FF0F` |    1 B | `pic`    | Interrupt flag   | Internal  |
+/// | `$FF0F..=$FF0F` |    1 B | `irq`    | Interrupt flag   | Internal  |
 /// | `$FF10..=$FF26` |   23 B | `apu`    | Audio            | Internal  |
 /// | `$FF27..=$FF2F` |    9 B | ---      | ---              | ---       |
 /// | `$FF30..=$FF3F` |   16 B | `apu`    | Wave RAM         | Internal  |
@@ -100,7 +100,7 @@ impl Bank {
 /// | `$FF50..=$FF50` |    1 B | `boot`   | Boot disable     | Internal  |
 /// | `$FF51..=$FF7F` |   47 B | ---      | ---              | ---       |
 /// | `$FF80..=$FFFE` |  127 B | `cpu`    | High RAM         | Internal  |
-/// | `$FFFF..=$FFFF` |    1 B | `pic`    | Interrupt enable | Internal  |
+/// | `$FFFF..=$FFFF` |    1 B | `irq`    | Interrupt enable | Internal  |
 ///
 /// [map]: https://gbdev.io/pandocs/Memory_Map.html
 #[derive(Clone, Debug, Default)]
@@ -158,7 +158,7 @@ impl Motherboard {
         // I/O registers
         self.soc.apu.attach(&mut ibus); // Audio
         self.soc.joy.attach(&mut ibus); // Joypad
-        self.soc.pic.attach(&mut ibus); // Interrupts
+        self.soc.irq.attach(&mut ibus); // Interrupts
         self.soc.ppu.attach(&mut ibus); // Graphics
         self.soc.sio.attach(&mut ibus); // Serial
         self.soc.tma.attach(&mut ibus); // Timer

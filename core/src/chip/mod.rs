@@ -7,8 +7,8 @@
 pub mod apu;
 pub mod cpu;
 pub mod dma;
+pub mod irq;
 pub mod joy;
-pub mod pic;
 pub mod ppu;
 pub mod sio;
 pub mod tma;

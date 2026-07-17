@@ -143,14 +143,14 @@ pub enum Select {
 
 /// Programmable interrupt controller.
 #[derive(Debug)]
-pub struct Pic {
+pub struct Irq {
     /// Interrupt registers.
     pub reg: Control,
     /// Interrupt line.
     pub line: Line,
 }
 
-impl Default for Pic {
+impl Default for Irq {
     fn default() -> Self {
         let reg = Control::default();
         Self {
@@ -160,19 +160,19 @@ impl Default for Pic {
     }
 }
 
-impl Block for Pic {
+impl Block for Irq {
     fn reset(&mut self) {
         self.reg.reset();
     }
 }
 
-impl Mmio for Pic {
+impl Mmio for Irq {
     fn attach(&self, bus: &mut Bus) {
         self.reg.attach(bus);
     }
 }
 
-impl Port<u8> for Pic {
+impl Port<u8> for Irq {
     type Select = Select;
 
     fn load(&self, reg: Self::Select) -> u8 {

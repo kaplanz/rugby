@@ -19,8 +19,8 @@ src/
 │   ├── apu/        # audio processor
 │   ├── cpu/        # processor core
 │   ├── dma/        # direct memory access
+│   ├── irq/        # interrupt controller
 │   ├── joy/        # joypad controller
-│   ├── pic/        # interrupt controller
 │   ├── ppu/        # video processor
 │   ├── sio/        # serial interface
 │   └── tma/        # hardware timer
@@ -42,7 +42,7 @@ src/
       - [x] MBC3
       - [x] MBC5
       - [ ] Camera
-  - [x] Interrupts (PIC)
+  - [x] Interrupts (IRQ)
   - [x] Graphics (PPU)
     - [x] Functional correctness
       - [x] Background drawing

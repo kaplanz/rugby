@@ -6,7 +6,7 @@ use super::super::*;
 
 fn setup() -> Cpu {
     let bus = Bus::default();
-    let pic = pic::Pic::default();
+    let irq = irq::Irq::default();
     Cpu {
         bus,
         mem: Bank {
@@ -15,7 +15,7 @@ fn setup() -> Cpu {
         },
         reg: Control::default(),
         etc: Internal::default(),
-        int: pic.line,
+        int: irq.line,
     }
 }
 

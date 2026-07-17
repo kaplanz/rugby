@@ -7,7 +7,7 @@ use rugby_arch::{Block, Shared};
 
 use self::exec::hblank::HBlank;
 use self::exec::vblank::VBlank;
-use super::{dma, pic};
+use super::{dma, irq};
 use crate::api::video::{self, Aspect, Video as Api};
 use crate::dmg::mmap::Sram;
 
@@ -141,7 +141,7 @@ pub struct Ppu {
     /// Graphics internals.
     pub etc: Internal,
     /// Interrupt line.
-    pub int: pic::Line,
+    pub int: irq::Line,
 }
 
 /// Graphics internals.

@@ -13,7 +13,7 @@ use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
-use crate::chip::pic;
+use crate::chip::irq;
 use crate::dmg::mmap::Sram;
 
 pub mod insn;
@@ -87,7 +87,7 @@ pub struct Cpu {
     /// Processor internals.
     pub etc: Internal,
     /// Interrupt line.
-    pub int: pic::Line,
+    pub int: irq::Line,
 }
 
 /// Processor internals.
