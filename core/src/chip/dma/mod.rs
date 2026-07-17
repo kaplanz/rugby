@@ -7,7 +7,6 @@ use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
 pub use super::ppu::Oam;
-use crate::dmg::mmap::Mmap;
 
 /// Direct memory access unit.
 #[derive(Debug)]
@@ -18,8 +17,6 @@ pub struct Dma {
     pub reg: Shared<Control>,
     /// DMA memory.
     pub mem: Shared<Oam>,
-    /// Network-on-chip.
-    pub noc: Mmap,
 }
 
 impl Block for Dma {
@@ -43,11 +40,6 @@ impl Block for Dma {
                 Mode::On { hi, lo: 0x00 }
             }
             Mode::On { hi, mut lo } => {
-                // Free system buses
-                if lo > 0x00 {
-                    self.noc.ebus.borrow_mut().free();
-                    self.noc.vbus.borrow_mut().free();
-                }
                 // Transfer single byte
                 let addr = u16::from_be_bytes([hi, lo]);
                 let data = self.bus.read(addr).unwrap_or(0xff);
@@ -56,10 +48,6 @@ impl Block for Dma {
                 // Increment transfer index
                 lo += 1;
                 if usize::from(lo) < self.mem.borrow().inner().len() {
-                    // Lock system buses
-                    self.noc.ebus.borrow_mut().busy();
-                    self.noc.vbus.borrow_mut().busy();
-                    // Continue transfer
                     Mode::On { hi, lo }
                 } else {
                     // Complete transfer
