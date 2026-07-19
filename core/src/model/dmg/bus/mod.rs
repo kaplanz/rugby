@@ -92,7 +92,7 @@ impl Ibus {
 /// | `$0000..=$7FFF` | 32 KiB | `cart` | Cartridge ROM |
 /// | `$A000..=$BFFF` |  8 KiB | `cart` | External RAM  |
 /// | `$C000..=$FFFF` |  8 KiB | `wram` | Work/Echo RAM |
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 #[derive(Memory)]
 pub struct Ebus {
     /// Game cartridge.
@@ -120,7 +120,7 @@ impl Default for Ebus {
 /// |     Address     |  Size  | Device | Description |
 /// |:---------------:|-------:|--------|-------------|
 /// | `$8000..=$9FFF` |  8 KiB | `vram` | Video RAM   |
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 #[derive(Memory)]
 pub struct Vbus {
     /// Video RAM.
@@ -149,7 +149,7 @@ impl Default for Vbus {
 /// | `$FF46..=$FF46` |    1 B | `dma`  | OAM DMA          |
 /// | `$FF50..=$FF50` |    1 B | `boot` | Boot disable     |
 /// | `$FFFF..=$FFFF` |    1 B | `irq`  | Interrupt enable |
-#[derive(Clone, Debug, Default)]
+#[derive(Debug, Default)]
 #[derive(Memory)]
 pub struct File {
     /// Joypad.

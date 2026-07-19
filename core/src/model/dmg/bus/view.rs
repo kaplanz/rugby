@@ -43,7 +43,7 @@ pub struct Cpu {
 /// | `$8000..=$9FFF` | `vbus` | Video RAM     |
 /// | `$A000..=$BFFF` | `ebus` | External RAM  |
 /// | `$C000..=$FFFF` | `ebus` | Work/Echo RAM |
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 #[derive(Memory)]
 pub struct Dma {
     /// Video bus.
