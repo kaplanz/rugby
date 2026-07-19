@@ -27,13 +27,9 @@ impl From<[Row; 8]> for Tile {
 impl From<[u8; 16]> for Tile {
     fn from(bytes: [u8; 16]) -> Self {
         Self(
-            bytes
-                .chunks_exact(2)
-                .map(|row| <[_; 2]>::try_from(row).unwrap())
-                .map(Row::from)
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap(),
+            <[_; 8]>::try_from(bytes.as_chunks().0)
+                .unwrap()
+                .map(Row::from),
         )
     }
 }

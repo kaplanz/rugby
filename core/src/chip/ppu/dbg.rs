@@ -36,26 +36,17 @@ impl Debug {
         let layer = Layer::Background;
 
         // Extract tile data, maps
-        let tdat: [_; 0x180] = (0..0x1800)
+        let tdat: [_; 0x1800] = std::array::from_fn(|addr| u16::try_from(addr).unwrap())
+            .map(|addr| ppu.mem.vram.read(addr).unwrap());
+        let tdat: [_; 0x180] = <[_; 0x180]>::try_from(tdat.as_chunks().0) // 16 bytes per tile
+            .unwrap()
+            .map(Tile::from);
+        let map1: [_; 0x400] = std::array::from_fn(|idx| u16::try_from(0x1800 + idx).unwrap())
             .map(|addr| ppu.mem.vram.read(addr).unwrap())
-            .collect_vec()
-            .chunks_exact(16) // 16-bytes per tile
-            .map(|tile| Tile::from(<[_; 16]>::try_from(tile).unwrap()))
-            .collect_vec()
-            .try_into()
-            .unwrap();
-        let map1: [_; 0x400] = (0x1800..0x1c00)
+            .map(|tnum| tdat[usize::from(Ppu::tidx(ppu, layer, tnum) >> 4)].clone());
+        let map2: [_; 0x400] = std::array::from_fn(|idx| u16::try_from(0x1c00 + idx).unwrap())
             .map(|addr| ppu.mem.vram.read(addr).unwrap())
-            .map(|tnum| tdat[usize::from(Ppu::tidx(ppu, layer, tnum) >> 4)].clone())
-            .collect_vec()
-            .try_into()
-            .unwrap();
-        let map2: [_; 0x400] = (0x1c00..0x2000)
-            .map(|addr| ppu.mem.vram.read(addr).unwrap())
-            .map(|tnum| tdat[usize::from(Ppu::tidx(ppu, layer, tnum) >> 4)].clone())
-            .collect_vec()
-            .try_into()
-            .unwrap();
+            .map(|tnum| tdat[usize::from(Ppu::tidx(ppu, layer, tnum) >> 4)].clone());
 
         // Render tile data, maps
         let meta = Meta::Bgw;
