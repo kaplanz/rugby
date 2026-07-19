@@ -17,9 +17,9 @@ use crate::api::input::{Event, Input};
 use crate::api::video::{Aspect, Video};
 use crate::rev::Revision;
 
+pub mod bus;
 #[cfg(feature = "debug")]
 pub mod dbg;
-pub mod mmap;
 pub mod pcb;
 pub mod soc;
 

@@ -3,7 +3,7 @@
 use rugby_arch::{Block, Shared};
 
 use super::pcb::{Vram, Wram};
-use super::{boot, mmap};
+use super::{boot, bus};
 use crate::cart;
 pub use crate::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 
@@ -94,9 +94,9 @@ impl SoC {
         };
         // Direct memory access unit
         let dma = dma::Dma {
-            bus: mmap::view::Dma {
-                vbus: mmap::Vbus { vram: vram.clone() },
-                ebus: mmap::Ebus {
+            bus: bus::view::Dma {
+                vbus: bus::Vbus { vram: vram.clone() },
+                ebus: bus::Ebus {
                     cart: cart.clone(),
                     wram: wram.clone(),
                 },
@@ -132,12 +132,12 @@ impl SoC {
         let cpu = {
             let mem = cpu::Bank::default();
             cpu::Cpu {
-                bus: mmap::view::Cpu {
-                    ibus: mmap::Ibus {
+                bus: bus::view::Cpu {
+                    ibus: bus::Ibus {
                         boot: boot.clone(),
                         ppu: ppu.mem.clone(),
                         apu: apu.mem.clone(),
-                        io: mmap::File {
+                        io: bus::File {
                             joy: joy.reg.clone(),
                             sio: sio.reg.clone(),
                             tma: tma.reg.clone(),
@@ -149,8 +149,8 @@ impl SoC {
                         },
                         cpu: mem.clone(),
                     },
-                    vbus: mmap::Vbus { vram: vram.clone() },
-                    ebus: mmap::Ebus {
+                    vbus: bus::Vbus { vram: vram.clone() },
+                    ebus: bus::Ebus {
                         cart: cart.clone(),
                         wram: wram.clone(),
                     },
