@@ -5,7 +5,7 @@ use rugby_arch::mem::Ram;
 use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
-use super::chip::Chip;
+use super::soc::SoC;
 use crate::cart;
 
 /// Sharp LH5164N (64K SRAM).
@@ -42,7 +42,7 @@ pub struct Motherboard {
     /// System-on-chip.
     ///
     /// Designated U1 on the PCB.
-    pub soc: Chip,
+    pub soc: SoC,
 }
 
 impl Default for Motherboard {
@@ -56,7 +56,7 @@ impl Default for Motherboard {
         // Cartridge slot
         let cart = cart::Slot::new();
         // System-on-chip
-        let soc = Chip::new(&vram, &wram, &cart);
+        let soc = SoC::new(&vram, &wram, &cart);
 
         // Finish construction
         Self {

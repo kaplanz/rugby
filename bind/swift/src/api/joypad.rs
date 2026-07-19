@@ -1,7 +1,7 @@
 //! Joypad API.
 
 use rugby::api::input::{Input, State};
-use rugby::core::dmg::chip::joy::Button;
+use rugby::core::dmg::soc::joy::Button;
 
 use super::GameBoy;
 

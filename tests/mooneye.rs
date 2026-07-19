@@ -6,7 +6,7 @@ use rugby::arch::Block;
 use rugby::arch::reg::Port;
 use rugby::core::Revision;
 use rugby::core::cart::Cartridge;
-use rugby::core::dmg::chip::cpu::Cpu;
+use rugby::core::dmg::soc::cpu::Cpu;
 use rugby::core::dmg::{GameBoy, rev};
 
 /// Number of cycles after which the test is considered to have failed due to a

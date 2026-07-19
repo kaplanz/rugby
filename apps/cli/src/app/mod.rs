@@ -180,7 +180,7 @@ pub mod data {
     pub mod input {
         use parking_lot::Mutex;
         use rugby::api::input::Event;
-        use rugby::core::dmg::chip::joy::Button;
+        use rugby::core::dmg::soc::joy::Button;
 
         /// Input queue.
         static INPUT: Mutex<Vec<Event<Button>>> = Mutex::new(Vec::new());

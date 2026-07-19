@@ -14,7 +14,7 @@ impl GameBoy {
     /// this is a no-op.
     pub fn press(&mut self, key: Button) {
         self.0
-            .recv(Some((dmg::chip::joy::Button::from(key), State::Dn).into()));
+            .recv(Some((dmg::soc::joy::Button::from(key), State::Dn).into()));
     }
 
     /// Releases a button.
@@ -23,7 +23,7 @@ impl GameBoy {
     /// pressed, this is a no-op.
     pub fn release(&mut self, key: Button) {
         self.0
-            .recv(Some((dmg::chip::joy::Button::from(key), State::Up).into()));
+            .recv(Some((dmg::soc::joy::Button::from(key), State::Up).into()));
     }
 }
 
@@ -52,17 +52,17 @@ pub enum Button {
 }
 
 #[rustfmt::skip]
-impl From<Button> for dmg::chip::joy::Button {
+impl From<Button> for dmg::soc::joy::Button {
     fn from(value: Button) -> Self {
         match value {
-            Button::A      => dmg::chip::joy::Button::A,
-            Button::B      => dmg::chip::joy::Button::B,
-            Button::Select => dmg::chip::joy::Button::Select,
-            Button::Start  => dmg::chip::joy::Button::Start,
-            Button::Right  => dmg::chip::joy::Button::Right,
-            Button::Left   => dmg::chip::joy::Button::Left,
-            Button::Up     => dmg::chip::joy::Button::Up,
-            Button::Down   => dmg::chip::joy::Button::Down,
+            Button::A      => dmg::soc::joy::Button::A,
+            Button::B      => dmg::soc::joy::Button::B,
+            Button::Select => dmg::soc::joy::Button::Select,
+            Button::Start  => dmg::soc::joy::Button::Start,
+            Button::Right  => dmg::soc::joy::Button::Right,
+            Button::Left   => dmg::soc::joy::Button::Left,
+            Button::Up     => dmg::soc::joy::Button::Up,
+            Button::Down   => dmg::soc::joy::Button::Down,
         }
     }
 }

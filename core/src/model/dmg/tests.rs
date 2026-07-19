@@ -2,9 +2,9 @@ use rugby_arch::mem::Memory;
 use rugby_arch::reg::Port;
 
 use self::boot::Boot;
-use self::chip::irq::Irq;
-use self::chip::ppu::Ppu;
-use self::chip::tma::Timer;
+use self::soc::irq::Irq;
+use self::soc::ppu::Ppu;
+use self::soc::tma::Timer;
 use super::*;
 use crate::cart::Cartridge;
 use crate::cart::chip::Mbc;

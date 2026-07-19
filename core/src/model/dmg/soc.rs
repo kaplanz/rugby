@@ -9,7 +9,7 @@ pub use crate::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 
 /// Sharp LR35902 (DMG-CPU).
 #[derive(Debug)]
-pub struct Chip {
+pub struct SoC {
     /// Audio processing unit.
     pub apu: apu::Apu,
     /// Boot ROM.
@@ -30,8 +30,8 @@ pub struct Chip {
     pub tma: tma::Timer,
 }
 
-impl Chip {
-    /// Constructs a new `Chip`.
+impl SoC {
+    /// Constructs a new `SoC`.
     ///
     /// # Note
     ///
@@ -177,7 +177,7 @@ impl Chip {
     }
 }
 
-impl Block for Chip {
+impl Block for SoC {
     fn ready(&self) -> bool {
         self.cpu.ready()
     }

@@ -31,8 +31,8 @@ use rugby_arch::Shared;
 use rugby_arch::mem::Memory;
 
 use super::boot;
-use super::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 use super::pcb::{Vram, Wram};
+use super::soc::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 use crate::cart;
 
 pub mod view;
