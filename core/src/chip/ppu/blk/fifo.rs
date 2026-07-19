@@ -21,20 +21,17 @@ impl Fifo {
     /// Pushes a row of pixels into the FIFO.
     #[expect(clippy::needless_pass_by_value)]
     pub fn push(&mut self, row: Row, meta: Meta) {
-        let iter = std::mem::take(&mut self.0)
-            .into_iter()
-            .map(Some)
-            .chain(std::iter::repeat(None))
-            .zip(row)
-            .map(|(old, new)| {
-                let new = Pixel::new(new, meta.clone());
-                if let Some(old) = old {
-                    Pixel::blend(new, old)
-                } else {
-                    new
-                }
-            });
-        self.0 = iter.collect();
+        row.into_iter().enumerate().for_each(|(idx, col)| {
+            let new = Pixel::new(col, meta.clone());
+            // Where does this pixel belong?
+            if idx < self.0.len() {
+                // Blend onto queued pixel
+                self.0[idx] = Pixel::blend(new, self.0[idx].clone());
+            } else {
+                // Extend queue with pixel
+                self.0.push_back(new);
+            }
+        });
     }
 
     /// Removes the next pixel from the FIFO and returns it.
