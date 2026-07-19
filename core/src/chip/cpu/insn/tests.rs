@@ -1,14 +1,11 @@
 use std::iter;
 
-use rugby_arch::mio::Bus;
-
 use super::super::*;
 
 fn setup() -> Cpu {
-    let bus = Bus::default();
     let irq = irq::Irq::default();
     Cpu {
-        bus,
+        bus: mmap::view::Cpu::default(),
         mem: Bank::default(),
         reg: File::default(),
         etc: Internal::default(),

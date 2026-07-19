@@ -1,7 +1,6 @@
 //! Video processor.
 
-use rugby_arch::mem::Ram;
-use rugby_arch::mio::{Bus, Mmio};
+use rugby_arch::mem::{Memory, Ram};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
@@ -248,12 +247,6 @@ impl Block for Ppu {
     }
 }
 
-impl Mmio for Ppu {
-    fn attach(&self, bus: &mut Bus) {
-        self.reg.attach(bus);
-    }
-}
-
 #[rustfmt::skip]
 impl Port<u8> for Ppu {
     type Select = Select;
@@ -300,11 +293,23 @@ impl Port<u8> for Ppu {
 /// | `$8000..=$9FFF` |  8 KiB | VRAM | Video RAM     |
 /// | `$FE00..=$FEA0` |  160 B | OAM  | Object memory |
 #[derive(Clone, Debug)]
+#[derive(Memory)]
 pub struct Bank {
     /// Video RAM.
+    #[mmap(0x8000..=0x9fff, mask = 0x1fff)]
     pub vram: Shared<Vram>,
     /// Object memory.
+    #[mmap(0xfe00..=0xfe9f, mask = 0x00ff)]
     pub oam: Shared<Oam>,
+}
+
+impl Default for Bank {
+    fn default() -> Self {
+        Self {
+            vram: Shared::new(Vram::from([u8::default(); 0x2000])),
+            oam: Shared::new(Oam::from([u8::default(); 0x00a0])),
+        }
+    }
 }
 
 /// Graphics registers.
@@ -324,51 +329,46 @@ pub struct Bank {
 /// | `$FF4A` | Byte | WY   | Window Y position             |
 /// | `$FF4B` | Byte | WX   | Window X position             |
 #[rustfmt::skip]
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
+#[derive(Memory)]
 pub struct File {
     /// LCD control
+    #[mmap(0xff40)]
     pub lcdc: Shared<reg::Lcdc>,
     /// LCD status
+    #[mmap(0xff41)]
     pub stat: Shared<reg::Stat>,
     /// Viewport Y position
+    #[mmap(0xff42)]
     pub scy:  Shared<u8>,
     /// Viewport X position
+    #[mmap(0xff43)]
     pub scx:  Shared<u8>,
     /// LCD Y coordinate
+    #[mmap(0xff44)]
     pub ly:   Shared<reg::Ly>,
     /// LY compare
+    #[mmap(0xff45)]
     pub lyc:  Shared<u8>,
     /// OAM DMA source address
     pub dma:  Shared<dma::Control>,
     /// BG palette data
+    #[mmap(0xff47)]
     pub bgp:  Shared<reg::Pal>,
     /// OBJ palette 0 data
+    #[mmap(0xff48)]
     pub obp0: Shared<reg::Pal>,
     /// OBJ palette 1 data
+    #[mmap(0xff49)]
     pub obp1: Shared<reg::Pal>,
     /// Window Y position
+    #[mmap(0xff4a)]
     pub wy:   Shared<u8>,
     /// Window X position
+    #[mmap(0xff4b)]
     pub wx:   Shared<u8>,
 }
 
 impl Block for File {
     fn reset(&mut self) {}
-}
-
-impl Mmio for File {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff40..=0xff40, self.lcdc.clone().into());
-        bus.map(0xff41..=0xff41, self.stat.clone().into());
-        bus.map(0xff42..=0xff42, self.scy.clone().into());
-        bus.map(0xff43..=0xff43, self.scx.clone().into());
-        bus.map(0xff44..=0xff44, self.ly.clone().into());
-        bus.map(0xff45..=0xff45, self.lyc.clone().into());
-        bus.map(0xff46..=0xff46, self.dma.clone().into());
-        bus.map(0xff47..=0xff47, self.bgp.clone().into());
-        bus.map(0xff48..=0xff48, self.obp0.clone().into());
-        bus.map(0xff49..=0xff49, self.obp1.clone().into());
-        bus.map(0xff4a..=0xff4a, self.wy.clone().into());
-        bus.map(0xff4b..=0xff4b, self.wx.clone().into());
-    }
 }

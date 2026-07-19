@@ -8,12 +8,12 @@ use std::fmt::{Debug, Display};
 
 use log::{debug, error, trace, warn};
 use rugby_arch::mem::{Memory, Ram};
-use rugby_arch::mio::Bus;
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
 use crate::chip::irq;
+use crate::dmg::mmap;
 
 pub mod insn;
 pub mod reg;
@@ -73,7 +73,7 @@ pub enum Select16 {
 #[derive(Debug)]
 pub struct Cpu {
     /// Processor bus.
-    pub bus: Bus,
+    pub bus: mmap::view::Cpu,
     /// Processor registers.
     pub reg: File,
     /// Processor memory.
@@ -319,8 +319,10 @@ impl Cpu {
 /// |:---------------:|--------|------|---------------|
 /// | `$FF80..=$FFFE` |  127 B | HRAM | High RAM      |
 #[derive(Clone, Debug)]
+#[derive(Memory)]
 pub struct Bank {
     /// High RAM.
+    #[mmap(0xff80..=0xfffe, mask = 0x007f)]
     pub hram: Shared<Hram>,
 }
 

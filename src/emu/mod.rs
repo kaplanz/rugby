@@ -70,7 +70,7 @@ impl Block for GameBoy {
 impl GameBoy {
     /// Gets the inserted cartridge, if any.
     #[must_use]
-    pub fn cart(&self) -> Option<&Cartridge> {
+    pub fn cart(&self) -> Option<Cartridge> {
         match self {
             Self::Dmg0(dmg) => dmg.cart(),
             Self::DmgA(dmg) | Self::DmgB(dmg) | Self::DmgC(dmg) => dmg.cart(),

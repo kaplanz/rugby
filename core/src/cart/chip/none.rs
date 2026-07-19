@@ -1,7 +1,6 @@
-use rugby_arch::mio::Device;
 use rugby_arch::{Block, Shared};
 
-use super::{Data, Mbc};
+use super::{Data, Device, Mbc};
 
 /// Cartridge ROM.
 type Rom = rugby_arch::mem::Rom<Data>;

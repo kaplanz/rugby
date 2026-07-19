@@ -6,8 +6,7 @@ use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
 use super::chip::Chip;
-use super::mmap::Mmap;
-use crate::cart::Cartridge;
+use crate::cart;
 
 /// Sharp LH5164N (64K SRAM).
 pub type Sram = Ram<[u8; 0x2000]>;
@@ -38,10 +37,8 @@ pub struct Motherboard {
     ///
     /// Designated U3 on the PCB.
     pub wram: Shared<Wram>,
-    /// Game cartridge.
-    pub cart: Option<Cartridge>,
-    /// Network-on-chip.
-    pub noc: Mmap,
+    /// Cartridge slot.
+    pub cart: cart::Slot,
     /// System-on-chip.
     ///
     /// Designated U1 on the PCB.
@@ -57,11 +54,9 @@ impl Default for Motherboard {
         // Work RAM
         let wram = Shared::new(Wram::from([u8::default(); 0x2000]));
         // Cartridge slot
-        let cart = None;
-        // Network-on-chip
-        let noc = Mmap::new();
+        let cart = cart::Slot::new();
         // System-on-chip
-        let soc = Chip::new(&vram, &noc);
+        let soc = Chip::new(&vram, &wram, &cart);
 
         // Finish construction
         Self {
@@ -69,10 +64,8 @@ impl Default for Motherboard {
             vram,
             wram,
             cart,
-            noc,
             soc,
         }
-        .prep()
     }
 }
 
@@ -81,13 +74,6 @@ impl Motherboard {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Prepares a `Motherboard`.
-    #[must_use]
-    fn prep(self) -> Self {
-        self.mmap();
-        self
     }
 }
 

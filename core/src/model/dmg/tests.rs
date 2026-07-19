@@ -57,14 +57,14 @@ fn bus_all_works() {
     let bus = &mut emu.main.soc.cpu;
 
     // Boot ROM
-    if let Some(boot) = &emu.main.soc.boot {
+    if let Some(boot) = emu.main.soc.boot.get() {
         (0x0000..=0x00ff)
             .map(|addr| boot.mem.borrow().boot.read(addr).unwrap())
             .zip(BOOT)
             .for_each(|(byte, &game)| assert_eq!(byte, game));
     }
     // Cartridge ROM
-    if let Some(cart) = &emu.main.cart {
+    if let Some(cart) = emu.main.cart.get() {
         (0x0100..=0x7fff)
             .map(|addr| cart.chip.rom().read(addr).unwrap())
             .zip(&GAME[0x0100..=0x7fff])
@@ -76,7 +76,7 @@ fn bus_all_works() {
         .map(|addr: u16| emu.main.vram.read(addr).unwrap())
         .for_each(|byte| assert_eq!(byte, 0x03));
     // External RAM
-    if let Some(cart) = &emu.main.cart {
+    if let Some(cart) = emu.main.cart.get() {
         (0xa000..=0xa3ff).for_each(|addr| bus.write(addr, 0x04));
         bus.write(0x0100, 0x0a); // enable RAM
         (0xa400..=0xa7ff).for_each(|addr| bus.write(addr, 0x40));
@@ -159,7 +159,7 @@ fn bus_all_works() {
         .for_each(|(found, expected)| assert_eq!(found, expected));
     // Boot ROM disable
     (0xff50..=0xff50).for_each(|addr| bus.write(addr, 0x0d));
-    if let Some(boot) = &emu.main.soc.boot {
+    if let Some(boot) = emu.main.soc.boot.get() {
         (0x0000..=0x0000)
             .map(|addr| boot.reg.read(addr).unwrap())
             .for_each(|byte| assert_eq!(byte, 0xff));
@@ -179,7 +179,8 @@ fn bus_all_works() {
 
 #[test]
 fn bus_unmapped_works() {
-    let bus = &mut setup().main.noc.ibus;
+    let mut emu = setup();
+    let bus = &mut emu.main.soc.cpu.bus;
 
     // Test unmapped addresses
     for range in [0xfea0..=0xfeff, 0xff03..=0xff03, 0xff27..=0xff2f] {

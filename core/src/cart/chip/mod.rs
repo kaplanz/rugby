@@ -8,8 +8,8 @@ use std::fmt::Debug;
 use std::io;
 
 use log::{debug, trace};
-use rugby_arch::Block;
-use rugby_arch::mio::{Bus, Device, Mmio};
+use rugby_arch::mem::{self, Memory};
+use rugby_arch::{Block, Shared};
 
 use super::{Board, Error, Header, Result};
 
@@ -27,6 +27,9 @@ pub use self::none::None;
 
 /// Memory data.
 type Data = Box<[u8]>;
+
+/// Memory device.
+type Device = Shared<dyn Memory>;
 
 /// Memory bank controller.
 pub trait Mbc {
@@ -149,15 +152,55 @@ impl Mbc for Chip {
     }
 }
 
-impl Mmio for Chip {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0x0000..=0x7fff, self.rom());
-        bus.map(0xa000..=0xbfff, self.ram());
+impl Memory for Chip {
+    fn read(&self, addr: u16) -> mem::Result<u8> {
+        match addr {
+            // Cartridge ROM
+            0x0000..=0x7fff => match self {
+                Chip::None(mbc) => mbc.rom.read(addr),
+                Chip::Mbc1(mbc) => mbc.rom.read(addr),
+                Chip::Mbc2(mbc) => mbc.rom.read(addr),
+                Chip::Mbc3(mbc) => mbc.rom.read(addr),
+                Chip::Mbc5(mbc) => mbc.rom.read(addr),
+            },
+            // Cartridge RAM
+            0xa000..=0xbfff => {
+                let addr = addr & 0x1fff;
+                match self {
+                    Chip::None(mbc) => mbc.ram.read(addr),
+                    Chip::Mbc1(mbc) => mbc.ram.read(addr),
+                    Chip::Mbc2(mbc) => mbc.ram.read(addr),
+                    Chip::Mbc3(mbc) => mbc.ram.read(addr),
+                    Chip::Mbc5(mbc) => mbc.ram.read(addr),
+                }
+            }
+            _ => Err(mem::Error::Range),
+        }
     }
 
-    fn detach(&self, bus: &mut Bus) {
-        assert!(bus.unmap(&self.rom()));
-        assert!(bus.unmap(&self.ram()));
+    fn write(&mut self, addr: u16, data: u8) -> mem::Result<()> {
+        match addr {
+            // Cartridge ROM
+            0x0000..=0x7fff => match self {
+                Chip::None(mbc) => mbc.rom.write(addr, data),
+                Chip::Mbc1(mbc) => mbc.rom.write(addr, data),
+                Chip::Mbc2(mbc) => mbc.rom.write(addr, data),
+                Chip::Mbc3(mbc) => mbc.rom.write(addr, data),
+                Chip::Mbc5(mbc) => mbc.rom.write(addr, data),
+            },
+            // Cartridge RAM
+            0xa000..=0xbfff => {
+                let addr = addr & 0x1fff;
+                match self {
+                    Chip::None(mbc) => mbc.ram.write(addr, data),
+                    Chip::Mbc1(mbc) => mbc.ram.write(addr, data),
+                    Chip::Mbc2(mbc) => mbc.ram.write(addr, data),
+                    Chip::Mbc3(mbc) => mbc.ram.write(addr, data),
+                    Chip::Mbc5(mbc) => mbc.ram.write(addr, data),
+                }
+            }
+            _ => Err(mem::Error::Range),
+        }
     }
 }
 

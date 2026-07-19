@@ -12,7 +12,6 @@ mod clk;
 
 pub mod dev;
 pub mod mem;
-pub mod mio;
 pub mod reg;
 
 use std::cell::RefCell;

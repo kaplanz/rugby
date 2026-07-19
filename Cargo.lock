@@ -2209,7 +2209,6 @@ dependencies = [
 name = "rugby-arch"
 version = "0.1.0"
 dependencies = [
- "indexmap 2.14.0",
  "rand",
  "rugby-arch-macros",
  "thiserror 2.0.18",
