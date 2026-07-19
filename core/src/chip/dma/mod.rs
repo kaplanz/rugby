@@ -6,13 +6,13 @@ use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
 pub use super::ppu::Oam;
-use crate::dmg::mmap;
+use crate::dmg::bus;
 
 /// Direct memory access unit.
 #[derive(Debug)]
 pub struct Dma {
     /// DMA bus.
-    pub bus: mmap::view::Dma,
+    pub bus: bus::view::Dma,
     /// DMA register.
     pub reg: Shared<Control>,
     /// DMA memory.

@@ -13,7 +13,7 @@ use rugby_arch::{Block, Shared};
 
 use self::insn::Instruction;
 use crate::chip::irq;
-use crate::dmg::mmap;
+use crate::dmg::bus;
 
 pub mod insn;
 pub mod reg;
@@ -73,7 +73,7 @@ pub enum Select16 {
 #[derive(Debug)]
 pub struct Cpu {
     /// Processor bus.
-    pub bus: mmap::view::Cpu,
+    pub bus: bus::view::Cpu,
     /// Processor registers.
     pub reg: File,
     /// Processor memory.

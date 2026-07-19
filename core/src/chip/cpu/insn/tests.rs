@@ -5,7 +5,7 @@ use super::super::*;
 fn setup() -> Cpu {
     let irq = irq::Irq::default();
     Cpu {
-        bus: mmap::view::Cpu::default(),
+        bus: bus::view::Cpu::default(),
         mem: Bank::default(),
         reg: File::default(),
         etc: Internal::default(),
