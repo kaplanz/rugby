@@ -99,6 +99,12 @@ impl<M: Memory + ?Sized> Memory for Shared<M> {
     }
 }
 
+impl<M: Memory + 'static> From<Shared<M>> for Shared<dyn Memory> {
+    fn from(value: Shared<M>) -> Self {
+        Self(value.0)
+    }
+}
+
 impl Memory for Vec<u8> {
     fn read(&self, addr: u16) -> Result<u8> {
         self.as_slice().read(addr)
@@ -117,9 +123,6 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 #[derive(thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
-    /// Device is unavailable.
-    #[error("device is unavailable")]
-    Busy,
     /// Device is disabled.
     #[error("device is disabled")]
     Disabled,

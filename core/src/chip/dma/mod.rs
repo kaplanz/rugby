@@ -2,17 +2,17 @@
 
 use log::{debug, trace};
 use rugby_arch::mem::Memory;
-use rugby_arch::mio::Bus;
 use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
 pub use super::ppu::Oam;
+use crate::dmg::mmap;
 
 /// Direct memory access unit.
 #[derive(Debug)]
 pub struct Dma {
     /// DMA bus.
-    pub bus: Bus,
+    pub bus: mmap::view::Dma,
     /// DMA register.
     pub reg: Shared<Control>,
     /// DMA memory.

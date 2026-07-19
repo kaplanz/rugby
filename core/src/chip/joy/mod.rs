@@ -5,7 +5,6 @@ use std::ops::BitOr;
 
 use log::{debug, trace};
 use rugby_arch::mem::Memory;
-use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
@@ -121,12 +120,6 @@ impl Api for Joypad {
 impl Block for Joypad {
     fn reset(&mut self) {
         self.reg.reset();
-    }
-}
-
-impl Mmio for Joypad {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff00..=0xff00, self.reg.clone().into());
     }
 }
 

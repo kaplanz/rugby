@@ -1,10 +1,9 @@
 use log::{debug, error, trace};
 use rugby_arch::mem::{Error, Memory, Result};
-use rugby_arch::mio::Device;
 use rugby_arch::reg::Register;
 use rugby_arch::{Block, Shared};
 
-use super::{Data, Mbc};
+use super::{Data, Device, Mbc};
 
 /// [MBC3][mbc3] cartridge type.
 ///

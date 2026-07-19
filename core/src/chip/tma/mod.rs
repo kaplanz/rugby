@@ -1,7 +1,7 @@
 //! Hardware timer.
 
 use log::{debug, trace};
-use rugby_arch::mio::{Bus, Mmio};
+use rugby_arch::mem::Memory;
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
@@ -129,12 +129,6 @@ impl Block for Timer {
     }
 }
 
-impl Mmio for Timer {
-    fn attach(&self, bus: &mut Bus) {
-        self.reg.attach(bus);
-    }
-}
-
 impl Port<u8> for Timer {
     type Select = Select;
 
@@ -165,15 +159,20 @@ impl Port<u8> for Timer {
 /// | `$FF05` | Byte | TIMA | Timer counter    |
 /// | `$FF06` | Byte | TMA  | Timer modulo     |
 /// | `$FF07` | Byte | TAC  | Timer control    |
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
+#[derive(Memory)]
 pub struct File {
     /// Divider register.
+    #[mmap(0xff04)]
     pub div: Shared<reg::Div>,
     /// Timer counter.
+    #[mmap(0xff05)]
     pub tima: Shared<reg::Tima>,
     /// Timer modulo.
+    #[mmap(0xff06)]
     pub tma: Shared<reg::Tma>,
     /// Timer control.
+    #[mmap(0xff07)]
     pub tac: Shared<reg::Tac>,
 }
 
@@ -183,15 +182,6 @@ impl Block for File {
         self.tima.take();
         self.tma.take();
         self.tac.take();
-    }
-}
-
-impl Mmio for File {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff04..=0xff04, self.div.clone().into());
-        bus.map(0xff05..=0xff05, self.tima.clone().into());
-        bus.map(0xff06..=0xff06, self.tma.clone().into());
-        bus.map(0xff07..=0xff07, self.tac.clone().into());
     }
 }
 

@@ -1,7 +1,6 @@
 //! Audio processor.
 
-use rugby_arch::mem::Ram;
-use rugby_arch::mio::{Bus, Mmio};
+use rugby_arch::mem::{Memory, Ram};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
@@ -325,12 +324,6 @@ impl Block for Apu {
     }
 }
 
-impl Mmio for Apu {
-    fn attach(&self, bus: &mut Bus) {
-        self.reg.attach(bus);
-    }
-}
-
 impl Port<u8> for Apu {
     type Select = Select;
 
@@ -393,8 +386,10 @@ impl Port<u8> for Apu {
 /// |:---------------:|------|------|-------------|
 /// | `$FF30..=$FF3F` | 16 B | WAVE | Wave RAM    |
 #[derive(Clone, Debug)]
+#[derive(Memory)]
 pub struct Bank {
     /// Wave RAM.
+    #[mmap(0xff30..=0xff3f, mask = 0x000f)]
     pub wave: Shared<Wave>,
 }
 
@@ -433,49 +428,71 @@ impl Default for Bank {
 /// | `$FF23` | Byte | NR44 | CH4 control                   |
 ///
 /// [regs]: https://gbdev.io/pandocs/Audio_Registers.html
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
+#[derive(Memory)]
 pub struct File {
     /// Audio master control.
+    #[mmap(0xff26)]
     pub nr52: Shared<Nr52>,
     /// Sound panning.
+    #[mmap(0xff25)]
     pub nr51: Shared<Nr51>,
     /// Master volume & VIN panning.
+    #[mmap(0xff24)]
     pub nr50: Shared<Nr50>,
     /// CH1 period sweep.
+    #[mmap(0xff10)]
     pub nr10: Shared<Nr10>,
     /// CH1 length timer & duty cycle.
+    #[mmap(0xff11)]
     pub nr11: Shared<Nr11>,
     /// CH1 volume & envelope.
+    #[mmap(0xff12)]
     pub nr12: Shared<Nr12>,
     /// CH1 period low.
+    #[mmap(0xff13)]
     pub nr13: Shared<Nr13>,
     /// CH1 period high & control.
+    #[mmap(0xff14)]
     pub nr14: Shared<Nr14>,
     /// CH2 length timer & duty cycle.
+    #[mmap(0xff16)]
     pub nr21: Shared<Nr21>,
     /// CH2 volume & envelope.
+    #[mmap(0xff17)]
     pub nr22: Shared<Nr22>,
     /// CH2 period low.
+    #[mmap(0xff18)]
     pub nr23: Shared<Nr23>,
     /// CH2 period high & control.
+    #[mmap(0xff19)]
     pub nr24: Shared<Nr24>,
     /// CH3 DAC enable.
+    #[mmap(0xff1a)]
     pub nr30: Shared<Nr30>,
     /// CH3 length timer.
+    #[mmap(0xff1b)]
     pub nr31: Shared<Nr31>,
     /// CH3 output level.
+    #[mmap(0xff1c)]
     pub nr32: Shared<Nr32>,
     /// CH3 period low.
+    #[mmap(0xff1d)]
     pub nr33: Shared<Nr33>,
     /// CH3 period high & control.
+    #[mmap(0xff1e)]
     pub nr34: Shared<Nr34>,
     /// CH4 length timer.
+    #[mmap(0xff20)]
     pub nr41: Shared<Nr41>,
     /// CH4 volume & envelope.
+    #[mmap(0xff21)]
     pub nr42: Shared<Nr42>,
     /// CH4 frequency & randomness.
+    #[mmap(0xff22)]
     pub nr43: Shared<Nr43>,
     /// CH4 control.
+    #[mmap(0xff23)]
     pub nr44: Shared<Nr44>,
 }
 
@@ -541,36 +558,5 @@ impl Block for File {
         self.nr42.take();
         self.nr43.take();
         self.nr44.take();
-    }
-}
-
-impl Mmio for File {
-    fn attach(&self, bus: &mut Bus) {
-        // Global Control Registers
-        bus.map(0xff26..=0xff26, self.nr52.clone().into());
-        bus.map(0xff25..=0xff25, self.nr51.clone().into());
-        bus.map(0xff24..=0xff24, self.nr50.clone().into());
-        // Sound Channel 1 - Pulse with wavelength sweep
-        bus.map(0xff10..=0xff10, self.nr10.clone().into());
-        bus.map(0xff11..=0xff11, self.nr11.clone().into());
-        bus.map(0xff12..=0xff12, self.nr12.clone().into());
-        bus.map(0xff13..=0xff13, self.nr13.clone().into());
-        bus.map(0xff14..=0xff14, self.nr14.clone().into());
-        // Sound Channel 2 - Pulse
-        bus.map(0xff16..=0xff16, self.nr21.clone().into());
-        bus.map(0xff17..=0xff17, self.nr22.clone().into());
-        bus.map(0xff18..=0xff18, self.nr23.clone().into());
-        bus.map(0xff19..=0xff19, self.nr24.clone().into());
-        // Sound Channel 3 - Wave output
-        bus.map(0xff1a..=0xff1a, self.nr30.clone().into());
-        bus.map(0xff1b..=0xff1b, self.nr31.clone().into());
-        bus.map(0xff1c..=0xff1c, self.nr32.clone().into());
-        bus.map(0xff1d..=0xff1d, self.nr33.clone().into());
-        bus.map(0xff1e..=0xff1e, self.nr34.clone().into());
-        // Sound Channel 4 - Noise
-        bus.map(0xff20..=0xff20, self.nr41.clone().into());
-        bus.map(0xff21..=0xff21, self.nr42.clone().into());
-        bus.map(0xff22..=0xff22, self.nr43.clone().into());
-        bus.map(0xff23..=0xff23, self.nr44.clone().into());
     }
 }

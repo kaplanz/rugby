@@ -2,9 +2,9 @@
 
 use rugby_arch::{Block, Shared};
 
-use super::boot;
-use super::mmap::Mmap;
-use super::pcb::Vram;
+use super::pcb::{Vram, Wram};
+use super::{boot, mmap};
+use crate::cart;
 pub use crate::chip::{apu, cpu, dma, irq, joy, ppu, sio, tma};
 
 /// Sharp LR35902 (DMG-CPU).
@@ -13,7 +13,7 @@ pub struct Chip {
     /// Audio processing unit.
     pub apu: apu::Apu,
     /// Boot ROM.
-    pub boot: Option<boot::Chip>,
+    pub boot: boot::Slot,
     /// Central processing unit.
     pub cpu: cpu::Cpu,
     /// Direct memory access unit.
@@ -39,7 +39,10 @@ impl Chip {
     /// component, as there is a somewhat complicated dependency chain between
     /// which parts are connected to each other.
     #[must_use]
-    pub fn new(vram: &Shared<Vram>, noc: &Mmap) -> Self {
+    #[expect(clippy::too_many_lines)]
+    pub fn new(vram: &Shared<Vram>, wram: &Shared<Wram>, cart: &cart::Slot) -> Self {
+        // Boot ROM
+        let boot = boot::Slot::new();
         // Interrupt controller
         let irq = irq::Irq::default();
         // Hardware timer
@@ -89,17 +92,13 @@ impl Chip {
                 etc: apu::Internal::default(),
             }
         };
-        // Central processing unit
-        let cpu = cpu::Cpu {
-            bus: noc.cpu(),
-            mem: cpu::Bank::default(),
-            reg: cpu::File::default(),
-            etc: cpu::Internal::default(),
-            irq: irq.line.clone(),
-        };
         // Direct memory access unit
         let dma = dma::Dma {
-            bus: noc.dma(),
+            bus: mmap::view::Dma {
+                cart: cart.clone(),
+                vram: vram.clone(),
+                wram: wram.clone(),
+            },
             mem: oam.clone(),
             reg: Shared::new(dma::Control::default()),
         };
@@ -127,11 +126,39 @@ impl Chip {
             etc: sio::Internal::default(),
             irq: irq.line.clone(),
         };
+        // Central processing unit
+        let cpu = {
+            let mem = cpu::Bank::default();
+            cpu::Cpu {
+                bus: mmap::view::Cpu {
+                    boot: boot.clone(),
+                    cart: cart.clone(),
+                    ppu: ppu.mem.clone(),
+                    wram: wram.clone(),
+                    apu: apu.mem.clone(),
+                    io: mmap::File {
+                        joy: joy.reg.clone(),
+                        sio: sio.reg.clone(),
+                        tma: tma.reg.clone(),
+                        irq: irq.reg.clone(),
+                        apu: apu.reg.clone(),
+                        dma: dma.reg.clone(),
+                        ppu: ppu.reg.clone(),
+                        boot: boot.clone(),
+                    },
+                    cpu: mem.clone(),
+                },
+                mem,
+                reg: cpu::File::default(),
+                etc: cpu::Internal::default(),
+                irq: irq.line.clone(),
+            }
+        };
 
         // Finish construction
         Self {
             apu,
-            boot: None,
+            boot,
             cpu,
             dma,
             irq,

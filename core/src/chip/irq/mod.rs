@@ -4,7 +4,6 @@ use std::fmt::Display;
 
 use log::trace;
 use rugby_arch::mem::Memory;
-use rugby_arch::mio::{Bus, Mmio};
 use rugby_arch::reg::{Port, Register as _};
 use rugby_arch::{Block, Shared};
 
@@ -166,12 +165,6 @@ impl Block for Irq {
     }
 }
 
-impl Mmio for Irq {
-    fn attach(&self, bus: &mut Bus) {
-        self.reg.attach(bus);
-    }
-}
-
 impl Port<u8> for Irq {
     type Select = Select;
 
@@ -196,11 +189,14 @@ impl Port<u8> for Irq {
 /// |:-------:|------|------|------------------|
 /// | `$FF0F` | Byte | IF   | Interrupt flag   |
 /// | `$FFFF` | Byte | IE   | Interrupt enable |
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
+#[derive(Memory)]
 pub struct File {
     /// Interrupt flag.
+    #[mmap(0xff0f)]
     pub flg: Shared<Flag>,
     /// Interrupt enable.
+    #[mmap(0xffff)]
     pub ena: Shared<Enable>,
 }
 
@@ -208,13 +204,6 @@ impl Block for File {
     fn reset(&mut self) {
         self.flg.take();
         self.ena.take();
-    }
-}
-
-impl Mmio for File {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff0f..=0xff0f, self.flg.clone().into());
-        bus.map(0xffff..=0xffff, self.ena.clone().into());
     }
 }
 

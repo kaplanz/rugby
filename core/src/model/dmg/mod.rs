@@ -5,7 +5,6 @@ use std::marker::PhantomData;
 
 use log::warn;
 use rugby_arch::Block;
-use rugby_arch::mio::Mmio;
 use rugby_arch::reg::Port;
 
 use self::chip::cpu::Cpu;
@@ -116,9 +115,7 @@ impl<R: Revision> GameBoy<R> {
         let mut this = Self::default();
 
         // Initialize boot ROM
-        let boot = boot::Chip::new(boot);
-        boot.attach(&mut this.main.noc.ibus.borrow_mut());
-        this.main.soc.boot = Some(boot);
+        this.main.soc.boot.insert(boot::Chip::new(boot));
 
         this
     }
@@ -138,8 +135,8 @@ impl<R: Revision> GameBoy<R> {
 
     /// Gets the inserted game cartridge, if any.
     #[must_use]
-    pub fn cart(&self) -> Option<&Cartridge> {
-        self.main.cart.as_ref()
+    pub fn cart(&self) -> Option<Cartridge> {
+        self.main.cart.get()
     }
 
     /// Inserts a game cartridge.
@@ -152,20 +149,12 @@ impl<R: Revision> GameBoy<R> {
             warn!("ejected previous cartridge: {}", cart.header());
         }
         // Insert supplied cartridge
-        let ebus = &mut *self.main.noc.ebus.borrow_mut();
-        cart.attach(ebus);
-        self.main.cart = Some(cart);
+        self.main.cart.insert(cart);
     }
 
     /// Ejects the inserted game cartridge, if any.
     pub fn eject(&mut self) -> Option<Cartridge> {
-        // Disconnect from bus
-        let ebus = &mut *self.main.noc.ebus.borrow_mut();
-        if let Some(cart) = &self.main.cart {
-            cart.detach(ebus);
-        }
-        // Remove inserted cartridge
-        self.main.cart.take()
+        self.main.cart.eject()
     }
 }
 
@@ -181,11 +170,14 @@ where
         self.main.cycle();
     }
 
-    #[rustfmt::skip]
     fn reset(&mut self) {
         self.main.reset();
-        self.main.soc.boot.as_mut().map(Block::reset).unwrap_or_else(|| self.boot());
-        self.main.cart.as_mut().map(Block::reset);
+        if self.main.soc.boot.exists() {
+            self.main.soc.boot.reset();
+        } else {
+            self.boot();
+        }
+        self.main.cart.reset();
     }
 }
 

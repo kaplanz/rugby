@@ -12,8 +12,8 @@
 
 use std::io;
 
-use rugby_arch::Block;
-use rugby_arch::mio::{Bus, Mmio};
+use rugby_arch::mem::{self, Memory};
+use rugby_arch::{Block, Shared};
 
 use self::chip::Chip;
 use self::head::parts::Board;
@@ -22,6 +22,61 @@ pub mod chip;
 pub mod head;
 
 pub use self::head::Header;
+
+/// Cartridge slot.
+///
+/// Dispatches accesses to the inserted cartridge, leaving an empty slot
+/// unmapped.
+#[derive(Clone, Debug, Default)]
+pub struct Slot(Shared<Option<Cartridge>>);
+
+impl Slot {
+    /// Constructs a new, empty `Slot`.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Gets the inserted cartridge, if any.
+    #[must_use]
+    pub fn get(&self) -> Option<Cartridge> {
+        self.0.borrow().clone()
+    }
+
+    /// Inserts a cartridge into the slot.
+    pub fn insert(&mut self, cart: Cartridge) {
+        *self.0.borrow_mut() = Some(cart);
+    }
+
+    /// Ejects the inserted cartridge, if any.
+    pub fn eject(&mut self) -> Option<Cartridge> {
+        self.0.borrow_mut().take()
+    }
+}
+
+impl Block for Slot {
+    fn reset(&mut self) {
+        if let Some(cart) = self.0.borrow_mut().as_mut() {
+            cart.reset();
+        }
+    }
+}
+
+impl Memory for Slot {
+    fn read(&self, addr: u16) -> mem::Result<u8> {
+        self.0
+            .borrow()
+            .as_ref()
+            .map_or(Err(mem::Error::Range), |cart| cart.read(addr))
+    }
+
+    fn write(&mut self, addr: u16, data: u8) -> mem::Result<()> {
+        self.0
+            .borrow_mut()
+            .as_mut()
+            .map_or(Err(mem::Error::Range), |cart| cart.write(addr, data))
+    }
+}
 
 /// Game cartridge.
 ///
@@ -134,13 +189,13 @@ impl Block for Cartridge {
     }
 }
 
-impl Mmio for Cartridge {
-    fn attach(&self, bus: &mut Bus) {
-        self.chip.attach(bus);
+impl Memory for Cartridge {
+    fn read(&self, addr: u16) -> mem::Result<u8> {
+        self.chip.read(addr)
     }
 
-    fn detach(&self, bus: &mut Bus) {
-        self.chip.detach(bus);
+    fn write(&mut self, addr: u16, data: u8) -> mem::Result<()> {
+        self.chip.write(addr, data)
     }
 }
 

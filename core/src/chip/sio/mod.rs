@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 use std::io::{BufRead, Write};
 
 use log::{debug, trace};
-use rugby_arch::mio::{Bus, Mmio};
+use rugby_arch::mem::Memory;
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
@@ -151,12 +151,6 @@ impl Block for Serial {
     }
 }
 
-impl Mmio for Serial {
-    fn attach(&self, bus: &mut Bus) {
-        self.reg.attach(bus);
-    }
-}
-
 impl Port<u8> for Serial {
     type Select = Select;
 
@@ -181,11 +175,14 @@ impl Port<u8> for Serial {
 /// |:-------:|------|------|-------------------------|
 /// | `$FF01` | Byte | SB   | Serial transfer data    |
 /// | `$FF02` | Byte | SC   | Serial transfer control |
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
+#[derive(Memory)]
 pub struct File {
     /// Serial transfer data.
+    #[mmap(0xff01)]
     pub sb: Shared<reg::Sb>,
     /// Serial transfer control.
+    #[mmap(0xff02)]
     pub sc: Shared<reg::Sc>,
 }
 
@@ -193,13 +190,6 @@ impl Block for File {
     fn reset(&mut self) {
         self.sb.take();
         self.sc.take();
-    }
-}
-
-impl Mmio for File {
-    fn attach(&self, bus: &mut Bus) {
-        bus.map(0xff01..=0xff01, self.sb.clone().into());
-        bus.map(0xff02..=0xff02, self.sc.clone().into());
     }
 }
 
