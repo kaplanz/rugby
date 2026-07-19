@@ -3,7 +3,7 @@
 pub mod trace;
 
 use super::GameBoy;
-use super::chip::ppu;
+use super::soc::ppu;
 use crate::rev::Revision;
 
 /// Collect debug information from the PPU.

@@ -34,7 +34,7 @@ use rugby::arch::Block;
 use rugby::core::cart::Cartridge;
 use rugby::core::chip::ppu::{self as ppu, LCD};
 use rugby::core::dmg::GameBoy;
-use rugby::core::dmg::chip::joy::Button;
+use rugby::core::dmg::soc::joy::Button;
 
 pub mod def;
 #[rustfmt::skip]

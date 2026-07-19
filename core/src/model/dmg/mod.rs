@@ -7,21 +7,21 @@ use log::warn;
 use rugby_arch::Block;
 use rugby_arch::reg::Port;
 
-use self::chip::cpu::Cpu;
-use self::chip::joy::Joypad;
-use self::chip::ppu::Ppu;
 use self::pcb::Motherboard;
+use self::soc::cpu::Cpu;
+use self::soc::joy::Joypad;
+use self::soc::ppu::Ppu;
 use crate::api::audio::{Audio, Chiptune};
 use crate::api::cable::Cable;
 use crate::api::input::{Event, Input};
 use crate::api::video::{Aspect, Video};
 use crate::rev::Revision;
 
-pub mod chip;
 #[cfg(feature = "debug")]
 pub mod dbg;
 pub mod mmap;
 pub mod pcb;
+pub mod soc;
 
 pub mod boot;
 pub mod rev;
