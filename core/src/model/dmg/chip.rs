@@ -95,9 +95,11 @@ impl Chip {
         // Direct memory access unit
         let dma = dma::Dma {
             bus: mmap::view::Dma {
-                cart: cart.clone(),
-                vram: vram.clone(),
-                wram: wram.clone(),
+                vbus: mmap::Vbus { vram: vram.clone() },
+                ebus: mmap::Ebus {
+                    cart: cart.clone(),
+                    wram: wram.clone(),
+                },
             },
             mem: oam.clone(),
             reg: Shared::new(dma::Control::default()),
@@ -131,22 +133,27 @@ impl Chip {
             let mem = cpu::Bank::default();
             cpu::Cpu {
                 bus: mmap::view::Cpu {
-                    boot: boot.clone(),
-                    cart: cart.clone(),
-                    ppu: ppu.mem.clone(),
-                    wram: wram.clone(),
-                    apu: apu.mem.clone(),
-                    io: mmap::File {
-                        joy: joy.reg.clone(),
-                        sio: sio.reg.clone(),
-                        tma: tma.reg.clone(),
-                        irq: irq.reg.clone(),
-                        apu: apu.reg.clone(),
-                        dma: dma.reg.clone(),
-                        ppu: ppu.reg.clone(),
+                    ibus: mmap::Ibus {
                         boot: boot.clone(),
+                        ppu: ppu.mem.clone(),
+                        apu: apu.mem.clone(),
+                        io: mmap::File {
+                            joy: joy.reg.clone(),
+                            sio: sio.reg.clone(),
+                            tma: tma.reg.clone(),
+                            irq: irq.reg.clone(),
+                            apu: apu.reg.clone(),
+                            dma: dma.reg.clone(),
+                            ppu: ppu.reg.clone(),
+                            boot: boot.clone(),
+                        },
+                        cpu: mem.clone(),
                     },
-                    cpu: mem.clone(),
+                    vbus: mmap::Vbus { vram: vram.clone() },
+                    ebus: mmap::Ebus {
+                        cart: cart.clone(),
+                        wram: wram.clone(),
+                    },
                 },
                 mem,
                 reg: cpu::File::default(),
