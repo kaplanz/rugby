@@ -85,27 +85,16 @@ impl Row {
 
 impl From<[u8; 2]> for Row {
     fn from(data: [u8; 2]) -> Self {
-        // this will necessarily succeed
         Self(
-            (0..u8::BITS)
-                // combine upper and lower bytes into colors for each bit
-                .map(|bit| {
-                    // Extract color bits
-                    let mask = 1 << bit;
-                    let bit0 = data[0] & mask != 0;
-                    let bit1 = data[1] & mask != 0;
-                    // Combine into color value
-                    (u8::from(bit1) << 1) | u8::from(bit0)
-                })
-                // reverse the bits, since bit 7 represents the leftmost pixel,
-                // and bit 0 the rightmost
-                .rev()
-                // convert each 2-bit value into color values
-                .map(Color::from)
-                // collect all row of 8 color values
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap(),
+            std::array::from_fn(|idx| {
+                // Extract color bits
+                let mask = 1 << (7 - idx);
+                let bit0 = data[0] & mask != 0;
+                let bit1 = data[1] & mask != 0;
+                // Combine into color value
+                (u8::from(bit1) << 1) | u8::from(bit0)
+            })
+            .map(Color::from),
         )
     }
 }
