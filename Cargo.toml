@@ -53,6 +53,7 @@ opt-level = 3
 members = [
   "apps/cli",
   "arch",
+  "arch/macros",
   "bind/*",
   "core",
   "crates/*",
@@ -86,6 +87,7 @@ parking_lot = "0.12.5"
 png = "0.18.1"
 rugby = { path = "." }
 rugby-arch = { path = "arch" }
+rugby-arch-macros = { path = "arch/macros" }
 rugby-cfg = { path = "extras/cfg" }
 rugby-core = { path = "core" }
 rugby-gbd = { path = "extras/gbd" }

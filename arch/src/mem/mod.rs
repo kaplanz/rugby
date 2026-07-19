@@ -14,6 +14,8 @@ use crate::reg::Register;
 mod ram;
 mod rom;
 
+pub use rugby_arch_macros::Memory;
+
 pub use self::ram::Ram;
 pub use self::rom::Rom;
 
