@@ -38,9 +38,6 @@ pub const CLOCK: u32 = 4_194_304;
 #[derive(Debug, Default)]
 pub struct GameBoy<R: Revision = rev::C> {
     /// DMG-01 Motherboard.
-    #[cfg(feature = "debug")]
-    pub main: Motherboard,
-    #[cfg(not(feature = "debug"))]
     main: Motherboard,
     /// Revision marker.
     _rev: PhantomData<R>,
@@ -155,6 +152,20 @@ impl<R: Revision> GameBoy<R> {
     /// Ejects the inserted game cartridge, if any.
     pub fn eject(&mut self) -> Option<Cartridge> {
         self.main.cart.eject()
+    }
+}
+
+#[cfg(feature = "debug")]
+impl<R: Revision> GameBoy<R> {
+    /// Borrows the internal emulator.
+    #[must_use]
+    pub fn inner(&self) -> &Motherboard {
+        &self.main
+    }
+
+    /// Mutably borrows the internal emulator.
+    pub fn inner_mut(&mut self) -> &mut Motherboard {
+        &mut self.main
     }
 }
 
