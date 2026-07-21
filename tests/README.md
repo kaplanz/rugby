@@ -275,6 +275,82 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 
 ---
 
+### Wilbertpol
+
+[![wilbertpol origin][wilbertpol.git.badge]][wilbertpol.git.hyper]
+[![wilbertpol source][wilbertpol.src.badge]][wilbertpol.src.hyper]
+
+[wilbertpol.git.badge]: https://img.shields.io/badge/wilbertpol-origin-2188a7?logo=github
+[wilbertpol.git.hyper]: https://github.com/wilbertpol/mooneye-gb
+[wilbertpol.src.badge]: https://img.shields.io/badge/wilbertpol-source-a72145?logo=rust
+[wilbertpol.src.hyper]: ./wilbertpol.rs
+
+Extends [Mooneye](#mooneye) with detailed tests of the PPU's dot-level
+timing.
+
+#### Results
+
+```
+7 passed; 40 failed;
+```
+
+<details>
+  <summary>Full results</summary>
+
+  | Pass | Test                                                      |
+  |:----:| --------------------------------------------------------- |
+  |  ❌  | `acceptance/gpu/hblank_ly_scx_timing-GS.gb`               |
+  |  ❌  | `acceptance/gpu/hblank_ly_scx_timing_nops.gb`             |
+  |  ❌  | `acceptance/gpu/hblank_ly_scx_timing_variant_nops.gb`     |
+  |  ❌  | `acceptance/gpu/intr_0_timing.gb`                         |
+  |  ✅  | `acceptance/gpu/intr_1_2_timing-GS.gb`                    |
+  |  ✅  | `acceptance/gpu/intr_1_timing.gb`                         |
+  |  ❌  | `acceptance/gpu/intr_2_0_timing.gb`                       |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx1_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx2_timing_nops.gb`         |
+  |  ✅  | `acceptance/gpu/intr_2_mode0_scx3_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx4_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx5_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx6_timing_nops.gb`         |
+  |  ✅  | `acceptance/gpu/intr_2_mode0_scx7_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx8_timing_nops.gb`         |
+  |  ✅  | `acceptance/gpu/intr_2_mode0_timing.gb`                   |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites.gb`           |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_nops.gb`      |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx1_nops.gb` |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx2_nops.gb` |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx3_nops.gb` |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx4_nops.gb` |
+  |  ❌  | `acceptance/gpu/intr_2_mode3_timing.gb`                   |
+  |  ❌  | `acceptance/gpu/intr_2_oam_ok_timing.gb`                  |
+  |  ❌  | `acceptance/gpu/intr_2_timing.gb`                         |
+  |  ❌  | `acceptance/gpu/lcdon_mode_timing.gb`                     |
+  |  ❌  | `acceptance/gpu/ly00_01_mode0_2.gb`                       |
+  |  ❌  | `acceptance/gpu/ly00_mode0_2-GS.gb`                       |
+  |  ❌  | `acceptance/gpu/ly00_mode1_0-GS.gb`                       |
+  |  ❌  | `acceptance/gpu/ly00_mode2_3.gb`                          |
+  |  ❌  | `acceptance/gpu/ly00_mode3_0.gb`                          |
+  |  ❌  | `acceptance/gpu/ly143_144_145.gb`                         |
+  |  ❌  | `acceptance/gpu/ly143_144_152_153.gb`                     |
+  |  ❌  | `acceptance/gpu/ly143_144_mode0_1.gb`                     |
+  |  ❌  | `acceptance/gpu/ly143_144_mode3_0.gb`                     |
+  |  ❌  | `acceptance/gpu/ly_lyc-GS.gb`                             |
+  |  ❌  | `acceptance/gpu/ly_lyc_0-GS.gb`                           |
+  |  ❌  | `acceptance/gpu/ly_lyc_0_write-GS.gb`                     |
+  |  ❌  | `acceptance/gpu/ly_lyc_144-GS.gb`                         |
+  |  ❌  | `acceptance/gpu/ly_lyc_153-GS.gb`                         |
+  |  ❌  | `acceptance/gpu/ly_lyc_153_write-GS.gb`                   |
+  |  ❌  | `acceptance/gpu/ly_lyc_write-GS.gb`                       |
+  |  ❌  | `acceptance/gpu/ly_new_frame-GS.gb`                       |
+  |  ✅  | `acceptance/gpu/stat_irq_blocking.gb`                     |
+  |  ❌  | `acceptance/gpu/stat_write_if-GS.gb`                      |
+  |  ❌  | `acceptance/gpu/vblank_if_timing.gb`                      |
+  |  ✅  | `acceptance/gpu/vblank_stat_intr-GS.gb`                   |
+
+</details>
+
+---
+
 ## Attribution
 
 Attribution of all included open-source software is listed in the project's
