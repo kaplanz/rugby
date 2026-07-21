@@ -291,7 +291,7 @@ timing.
 #### Results
 
 ```
-7 passed; 40 failed;
+8 passed; 39 failed;
 ```
 
 <details>
@@ -339,7 +339,7 @@ timing.
   |  ❌  | `acceptance/gpu/ly_lyc_0_write-GS.gb`                     |
   |  ❌  | `acceptance/gpu/ly_lyc_144-GS.gb`                         |
   |  ❌  | `acceptance/gpu/ly_lyc_153-GS.gb`                         |
-  |  ❌  | `acceptance/gpu/ly_lyc_153_write-GS.gb`                   |
+  |  ✅  | `acceptance/gpu/ly_lyc_153_write-GS.gb`                   |
   |  ❌  | `acceptance/gpu/ly_lyc_write-GS.gb`                       |
   |  ❌  | `acceptance/gpu/ly_new_frame-GS.gb`                       |
   |  ✅  | `acceptance/gpu/stat_irq_blocking.gb`                     |
