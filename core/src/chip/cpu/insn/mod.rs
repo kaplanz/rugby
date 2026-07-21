@@ -42,7 +42,7 @@ impl Instruction {
 
     /// Constructs a new interrupt `Instruction`.
     #[must_use]
-    pub fn int(int: Interrupt) -> Self {
+    pub fn vector(int: Interrupt) -> Self {
         Self {
             code: int as u8,
             oper: Operation::Int(exec::int::Int::default()),

@@ -564,7 +564,7 @@ impl Stage {
             // Handle pending interrupt...
             if let Some(int) = int {
                 // Skip `Stage::Fetch`
-                let insn = Instruction::int(int);
+                let insn = Instruction::vector(int);
                 debug!("${pc:04x}: {insn}", pc = int.handler());
                 self = Stage::Execute(insn);
             }
