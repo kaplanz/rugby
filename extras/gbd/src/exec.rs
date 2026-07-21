@@ -34,7 +34,7 @@ pub fn capture(emu: &mut GameBoy, path: &Path, force: bool) -> Result<()> {
     // Process screen data
     let lcd = emu
         // extract frame buffer
-        .main
+        .inner()
         .soc
         .ppu
         .frame()
@@ -127,7 +127,7 @@ pub fn freq(gbd: &mut Debugger, mode: Option<Tick>) -> Result<()> {
 
 pub fn goto(emu: &mut GameBoy, addr: u16) -> Result<()> {
     // Jump to specified address
-    emu.main.soc.cpu.goto(addr);
+    emu.inner_mut().soc.cpu.goto(addr);
 
     Ok(())
 }
@@ -146,7 +146,7 @@ pub fn help(what: Option<Keyword>) -> Result<()> {
 
 pub fn jump(gbd: &mut Debugger, emu: &mut GameBoy, addr: u16) -> Result<()> {
     // Jump to specified address
-    emu.main.soc.cpu.goto(addr);
+    emu.inner_mut().soc.cpu.goto(addr);
     // Continue execution
     r#continue(gbd)?;
 
@@ -202,7 +202,7 @@ pub fn info(gbd: &Debugger, what: Option<Keyword>) -> Result<()> {
 }
 
 pub fn list(gbd: &Debugger, emu: &GameBoy) -> Result<()> {
-    let insn = emu.main.soc.cpu.insn();
+    let insn = emu.inner().soc.cpu.insn();
     advise::info!(
         "${addr:04x}: {opcode:02X} ; {insn}",
         addr = gbd.pc,
@@ -236,31 +236,31 @@ pub fn load(emu: &GameBoy, loc: Select) -> Result<()> {
     // Perform the load
     match loc {
         Select::Apu(reg) => {
-            let byte: u8 = emu.main.soc.apu.load(reg);
+            let byte: u8 = emu.inner().soc.apu.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Byte(reg) => {
-            let byte: u8 = emu.main.soc.cpu.load(reg);
+            let byte: u8 = emu.inner().soc.cpu.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Word(reg) => {
-            let word: u16 = emu.main.soc.cpu.load(reg);
+            let word: u16 = emu.inner().soc.cpu.load(reg);
             advise::info!("{reg:?}: {word:#06x}");
         }
         Select::Irq(reg) => {
-            let byte: u8 = emu.main.soc.irq.load(reg);
+            let byte: u8 = emu.inner().soc.irq.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Ppu(reg) => {
-            let byte: u8 = emu.main.soc.ppu.load(reg);
+            let byte: u8 = emu.inner().soc.ppu.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Serial(reg) => {
-            let byte: u8 = emu.main.soc.sio.load(reg);
+            let byte: u8 = emu.inner().soc.sio.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
         Select::Timer(reg) => {
-            let byte: u8 = emu.main.soc.tma.load(reg);
+            let byte: u8 = emu.inner().soc.tma.load(reg);
             advise::info!("{reg:?}: {byte:#04x}");
         }
     }
@@ -274,7 +274,7 @@ pub fn quit() -> Result<()> {
 
 pub fn read(emu: &mut GameBoy, addr: u16) -> Result<()> {
     // Perform the read
-    let byte = emu.main.soc.cpu.read(addr);
+    let byte = emu.inner().soc.cpu.read(addr);
     advise::info!("${addr:04x}: {byte:02x}");
 
     Ok(())
@@ -285,7 +285,7 @@ pub fn read_range(emu: &mut GameBoy, range: Orange<u16>) -> Result<()> {
     let Orange { start, .. } = range.clone();
     let iter = range.into_iter();
     // Load all reads
-    let data: Vec<_> = iter.map(|addr| emu.main.soc.cpu.read(addr)).collect();
+    let data: Vec<_> = iter.map(|addr| emu.inner().soc.cpu.read(addr)).collect();
     // Display results
     advise::info!("read {size}:", size = bfmt::Size::from(data.len()));
     let data = format!("{}", hexd::Printer::<u8>::new(start.into(), &data));
@@ -307,7 +307,7 @@ pub fn reset(gbd: &mut Debugger, emu: &mut GameBoy) -> Result<()> {
 }
 
 pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
-    let sio = &mut emu.main.soc.sio;
+    let sio = &mut emu.inner_mut().soc.sio;
     match mode {
         Serial::Peek | Serial::Recv => {
             // Receive serial data
@@ -336,7 +336,7 @@ pub fn serial(emu: &mut GameBoy, mode: Serial) -> Result<()> {
         }
         Serial::Send(data) => {
             // Transmit serial data
-            let nbytes = emu.main.soc.sio.tx().write(&data)?;
+            let nbytes = emu.inner_mut().soc.sio.tx().write(&data)?;
             let extra = data.len() - nbytes;
             // Display results
             advise::info!("transmitted {size}", size = bfmt::Size::from(nbytes));
@@ -364,7 +364,7 @@ pub fn stores(emu: &mut GameBoy, locs: Vec<Select>, value: Value) -> Result<()> 
 
 #[expect(clippy::needless_pass_by_value)]
 pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
-    let soc = &mut emu.main.soc;
+    let soc = &mut emu.inner_mut().soc;
     match loc {
         Select::Apu(reg) => {
             // Extract the byte
@@ -430,7 +430,7 @@ pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
 }
 
 pub fn write(emu: &mut GameBoy, addr: u16, byte: u8) -> Result<()> {
-    let cpu = &mut emu.main.soc.cpu;
+    let cpu = &mut emu.inner_mut().soc.cpu;
     // Perform the write
     cpu.write(addr, byte);
     let data = cpu.read(addr);
@@ -444,7 +444,7 @@ pub fn write(emu: &mut GameBoy, addr: u16, byte: u8) -> Result<()> {
 }
 
 pub fn write_range(emu: &mut GameBoy, range: Orange<u16>, byte: u8) -> Result<()> {
-    let cpu = &mut emu.main.soc.cpu;
+    let cpu = &mut emu.inner_mut().soc.cpu;
     // Create iterator from range
     let Orange { start, end } = range.clone();
     let iter = range.into_iter();

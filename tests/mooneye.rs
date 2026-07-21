@@ -42,7 +42,7 @@ where
 fn check<R: Revision>(emu: &GameBoy<R>) -> Result<()> {
     type Select = <Cpu as Port<u16>>::Select;
     // Extract register values
-    let cpu = &emu.main.soc.cpu;
+    let cpu = &emu.inner().soc.cpu;
     let bc: u16 = cpu.load(Select::BC);
     let de: u16 = cpu.load(Select::DE);
     let hl: u16 = cpu.load(Select::HL);

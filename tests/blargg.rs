@@ -19,7 +19,7 @@ fn emulate(rom: &[u8], check: fn(&mut GameBoy) -> Result<()>) -> Result<()> {
     // Load the cartridge
     emu.insert(cart);
     // Write in-progress sentinel
-    emu.main.soc.cpu.write(0xa000, 0x80);
+    emu.inner_mut().soc.cpu.write(0xa000, 0x80);
 
     // Loop until completion or timeout
     for cycle in 0..TIMEOUT {
@@ -62,7 +62,7 @@ mod check {
     /// tests which print lots of information that scrolls off screen.
     pub fn console(emu: &mut GameBoy) -> Result<()> {
         // Extract serial output
-        let buf = emu.main.soc.sio.rx().fill_buf()?;
+        let buf = emu.inner_mut().soc.sio.rx().fill_buf()?;
         // Calculate pass/fail conditions
         let repr = String::from_utf8_lossy(buf);
         let pass = repr.contains("Passed");
@@ -96,7 +96,7 @@ mod check {
     /// just printing the final output at the end.
     pub fn memory(emu: &mut GameBoy) -> Result<()> {
         // Extract memory output
-        let cpu = &emu.main.soc.cpu;
+        let cpu = &emu.inner().soc.cpu;
         let res = cpu.read(0xa000);
         let chk = [0xa001, 0xa002, 0xa003].map(|addr| cpu.read(addr));
         // Calculate pass/fail conditions

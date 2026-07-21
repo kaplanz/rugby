@@ -99,8 +99,8 @@ impl Debugger {
 
     /// Synchronizes the debugger with the console.
     pub fn sync(&mut self, emu: &GameBoy) {
-        let cpu = &emu.main.soc.cpu;
-        let ppu = &emu.main.soc.ppu;
+        let cpu = &emu.inner().soc.cpu;
+        let ppu = &emu.inner().soc.ppu;
 
         // Update program counter
         self.pc = cpu.load(cpu::Select16::PC);

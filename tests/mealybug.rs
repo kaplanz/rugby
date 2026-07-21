@@ -24,7 +24,7 @@ fn emulate(rom: &[u8], img: &[u8]) -> Result<()> {
         emu.cycle();
     }
     // Calculate difference
-    let delta = image::cmp(emu.main.soc.ppu.frame(), img);
+    let delta = image::cmp(emu.inner().soc.ppu.frame(), img);
     let total = img.len();
 
     // Check for success
