@@ -273,6 +273,18 @@ impl Line {
         }
     }
 
+    /// Samples the interrupt enable register.
+    #[must_use]
+    pub fn ena(&self) -> u8 {
+        self.ena.load()
+    }
+
+    /// Samples the interrupt flag register.
+    #[must_use]
+    pub fn flg(&self) -> u8 {
+        self.flg.load()
+    }
+
     /// Checks if an interrupt is pending.
     #[must_use]
     pub fn pending(&self) -> bool {

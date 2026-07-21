@@ -563,8 +563,6 @@ impl Stage {
 
             // Handle pending interrupt...
             if let Some(int) = int {
-                // Acknowledge the interrupt
-                cpu.irq.clear(int);
                 // Skip `Stage::Fetch`
                 let insn = Instruction::int(int);
                 debug!("${pc:04x}: {insn}", pc = int.handler());

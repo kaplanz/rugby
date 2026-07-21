@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-38 passed; 31 failed;
+39 passed; 30 failed;
 ```
 
 <details>
@@ -225,7 +225,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ✅  | `acceptance/halt_ime1_timing2-GS.gb`                |
   |  ✅  | `acceptance/if_ie_registers.gb`                     |
   |  ✅  | `acceptance/instr/daa.gb`                           |
-  |  ❌  | `acceptance/interrupts/ie_push.gb`                  |
+  |  ✅  | `acceptance/interrupts/ie_push.gb`                  |
   |  ✅  | `acceptance/intr_timing.gb`                         |
   |  ❌  | `acceptance/jp_cc_timing.gb`                        |
   |  ❌  | `acceptance/jp_timing.gb`                           |
