@@ -21,6 +21,7 @@ impl HBlank {
             // Increment scanline
             let ly = ppu.reg.ly.load() + 1;
             ppu.reg.ly.store(ly);
+            ppu.etc.line = ly;
 
             // Determine scanline type
             if u16::from(ly) < LCD.ht {

@@ -142,6 +142,11 @@ pub struct Internal {
     buf: Frame,
     /// Cycle count.
     dot: u16,
+    /// Scanline count.
+    ///
+    /// Tracks the current scanline internally, as `LY` diverges from it
+    /// during line 153.
+    line: u8,
     /// STAT interrupt.
     int: bool,
     /// Window line.
@@ -166,6 +171,7 @@ impl Default for Internal {
         Self {
             buf: vec![Color::default(); LCD.depth()].into_boxed_slice(),
             dot: u16::default(),
+            line: u8::default(),
             int: bool::default(),
             ywin: u8::default(),
             ytrg: bool::default(),
@@ -198,6 +204,7 @@ impl Ppu {
         self.reg.stat.borrow_mut().set_mode(0);
         // Reset internal state
         self.etc.dot = 0;
+        self.etc.line = 0;
         self.etc.int = false;
         self.etc.ywin = 0;
         self.etc.ytrg = false;
@@ -219,7 +226,7 @@ impl Api for Ppu {
         // 2. Mode is vertical blank
         let vblank = matches!(self.etc.mode, Mode::VBlank(_));
         // 3. Last scanline of frame
-        let bottom = (VBlank::LAST - 1) == self.reg.ly.load().into();
+        let bottom = (VBlank::LAST - 1) == self.etc.line.into();
         // 4. Last dot of scanline
         let finish = (HBlank::DOTS - 1) == self.etc.dot;
         //
