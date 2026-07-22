@@ -68,7 +68,7 @@ behaviours.
 #### Results
 
 ```
-19 passed; 26 failed;
+21 passed; 24 failed;
 ```
 
 <details>
@@ -105,12 +105,12 @@ behaviours.
   |  ✅  | `instr_timing/instr_timing.gb`                      |
   |  ❌  | `interrupt_time/interrupt_time.gb`                  |
   |  ❌  | `mem_timing/individual/01-read_timing.gb`           |
-  |  ❌  | `mem_timing/individual/02-write_timing.gb`          |
+  |  ✅  | `mem_timing/individual/02-write_timing.gb`          |
   |  ❌  | `mem_timing/individual/03-modify_timing.gb`         |
   |  ❌  | `mem_timing/mem_timing.gb`                          |
   |  ❌  | `mem_timing-2/mem_timing.gb`                        |
   |  ❌  | `mem_timing-2/rom_singles/01-read_timing.gb`        |
-  |  ❌  | `mem_timing-2/rom_singles/02-write_timing.gb`       |
+  |  ✅  | `mem_timing-2/rom_singles/02-write_timing.gb`       |
   |  ❌  | `mem_timing-2/rom_singles/03-modify_timing.gb`      |
   |  ❌  | `oam_bug/oam_bug.gb`                                |
   |  ❌  | `oam_bug/rom_singles/1-lcd_sync.gb`                 |
