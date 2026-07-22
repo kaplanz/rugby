@@ -19,7 +19,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0x0d, exec: exec::dec::default(),    repr: "DEC C",          legacy: None },
     Instruction { code: 0x0e, exec: exec::ld::default(),     repr: "LD C, n8",       legacy: None },
     Instruction { code: 0x0f, exec: exec::rrca::default(),   repr: "RRCA",           legacy: None },
-    Instruction { code: 0x10, exec: exec::legacy,            repr: "STOP",           legacy: Some(exec::stop::default) },
+    Instruction { code: 0x10, exec: exec::stop::default(),   repr: "STOP",           legacy: None },
     Instruction { code: 0x11, exec: exec::ldw::default(),    repr: "LD DE, (n16)",   legacy: None },
     Instruction { code: 0x12, exec: exec::ld::default(),     repr: "LD (DE), A",     legacy: None },
     Instruction { code: 0x13, exec: exec::incw::default(),   repr: "INC DE",         legacy: None },

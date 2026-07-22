@@ -1,34 +1,15 @@
-use super::{Cpu, Error, Execute, Operation, Return, Status};
+use rugby_arch::Block;
 
-pub const fn default() -> Operation {
-    Operation::Stop(Stop::Execute)
+use super::{Cpu, Exec, Instruction, Status};
+
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Stop {
-    #[default]
-    Execute,
-}
-
-impl Execute for Stop {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Stop> for Operation {
-    fn from(value: Stop) -> Self {
-        Self::Stop(value)
-    }
-}
-
-fn execute(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     if code != 0x10 {
-        return Err(Error::Opcode(code));
+        unreachable!("unexpected opcode: {code:#04X}");
     }
 
     // Skip stop mode while a button is held
@@ -43,6 +24,23 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
         cpu.fetchbyte();
     }
 
+    // Park until woken
+    if cpu.etc.run == Status::Stopped {
+        return cpu.step(wait);
+    }
+
+    // Release the blocks for the composed fetch
+    cpu.blk.cycle();
     // Finish
-    Ok(None)
+    None
+}
+
+fn wait(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Keep waiting while stopped
+    if cpu.etc.run == Status::Stopped {
+        return cpu.step(wait);
+    }
+
+    // Finish
+    None
 }
