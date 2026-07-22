@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-37 passed; 32 failed;
+38 passed; 31 failed;
 ```
 
 <details>
@@ -236,7 +236,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/oam_dma/sources-GS.gb`                  |
   |  ❌  | `acceptance/oam_dma_start.gb`                       |
   |  ❌  | `acceptance/oam_dma_timing.gb`                      |
-  |  ❌  | `acceptance/pop_timing.gb`                          |
+  |  ✅  | `acceptance/pop_timing.gb`                          |
   |  ❌  | `acceptance/ppu/hblank_ly_scx_timing-GS.gb`         |
   |  ✅  | `acceptance/ppu/intr_1_2_timing-GS.gb`              |
   |  ❌  | `acceptance/ppu/intr_2_0_timing.gb`                 |
