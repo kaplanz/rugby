@@ -1,50 +1,16 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Jr(Jr::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Jr {
-    #[default]
-    Fetch,
-    Check(u8),
-    Jump(u8),
-}
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Fetch Z <- [PC++]
+    let z = cpu.fetchbyte();
+    cpu.reg.z.store(z);
 
-impl Execute for Jr {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch     => fetch(code, cpu),
-            Self::Check(e8) => check(code, cpu, e8),
-            Self::Jump(e8)  => jump(code, cpu, e8),
-        }
-    }
-}
-
-impl From<Jr> for Operation {
-    fn from(value: Jr) -> Self {
-        Self::Jr(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
-    // Check opcode
-    match code {
-        0x18 | 0x20 | 0x28 | 0x30 | 0x38 => {
-            // Fetch e8 <- [PC++]
-            let e8 = cpu.fetchbyte();
-            // Proceed
-            Ok(Some(Jr::Check(e8).into()))
-        }
-        code => Err(Error::Opcode(code)),
-    }
-}
-
-fn check(code: u8, cpu: &mut Cpu, e8: u8) -> Return {
     // Evaluate condition
     #[rustfmt::skip]
     let cond = match code {
@@ -53,26 +19,54 @@ fn check(code: u8, cpu: &mut Cpu, e8: u8) -> Return {
         0x30 => !cpu.reg.f.c(),
         0x38 =>  cpu.reg.f.c(),
         0x18 => true,
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     };
 
     // Check condition
     if cond {
         // Proceed
-        Ok(Some(Jr::Jump(e8).into()))
+        cpu.step(cycle3)
     } else {
-        // Finish
-        Ok(None)
+        // Proceed
+        cpu.step(cycle5)
     }
 }
 
-fn jump(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
-    // Perform jump
-    let e8 = e8 as i8 as i16;
-    let pc = cpu.reg.pc.load() as i16;
-    let pc = pc.wrapping_add(e8) as u16;
-    cpu.reg.pc.store(pc);
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Load operands
+    let pc = cpu.reg.pc.load().to_le_bytes();
+    let e8 = cpu.reg.z.load();
+    let sign = e8 & 0x80 != 0;
+
+    // Execute JR (LSB)
+    let (res, carry) = pc[0].overflowing_add(e8);
+    cpu.reg.z.store(res);
+
+    // Adjust MSB with the carry
+    #[rustfmt::skip]
+    let adj = match (carry, sign) {
+        (true, false) => 1u8,
+        (false, true) => 0xff,
+        _             => 0,
+    };
+    cpu.reg.w.store(pc[1].wrapping_add(adj));
+
+    // Proceed
+    cpu.step(cycle4)
+}
+
+fn cycle4(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Perform jump PC <- WZ
+    let wz = cpu.reg.wz().load();
+    cpu.reg.pc.store(wz);
 
     // Finish
-    Ok(None)
+    None
+}
+
+fn cycle5(_: u8, _: &mut Cpu) -> Option<Instruction> {
+    // Delay by 1 cycle (untaken jumps only)
+
+    // Finish
+    None
 }
