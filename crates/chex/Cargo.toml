@@ -11,8 +11,8 @@ publish = false
 
 [dependencies]
 facet = { workspace = true, optional = true }
-phf = { version = "0.13.1", features = ["macros"] }
-serde_with = { version = "3.18.0", optional = true }
+phf = { version = "0.14.0", features = ["macros"] }
+serde_with = { version = "3.21.0", optional = true }
 thiserror = { workspace = true }
 
 [features]
