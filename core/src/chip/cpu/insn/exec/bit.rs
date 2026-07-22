@@ -1,54 +1,36 @@
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use rugby_arch::reg::Register;
 
-pub const fn default() -> Operation {
-    Operation::Bit(Bit::Fetch)
+use super::{Cpu, Exec, Instruction, help};
+
+pub const fn default() -> Exec {
+    cycle3
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Bit {
-    #[default]
-    Fetch,
-    Execute(u8),
-}
-
-impl Execute for Bit {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-        }
-    }
-}
-
-impl From<Bit> for Operation {
-    fn from(value: Bit) -> Self {
-        Self::Bit(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x46 | 0x4e | 0x56 | 0x5e | 0x66 | 0x6e | 0x76 | 0x7e => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Bit::Execute(op2).into()))
+            cpu.step(cycle4)
         }
         0x40..=0x7f => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle4(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
+fn cycle4(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute BIT
     let op1 = (code & 0x38) >> 3;
+    let op2 = cpu.reg.z.load();
     let res = (0b1 << op1) & op2;
 
     // Set flags
@@ -57,5 +39,5 @@ fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
     cpu.reg.f.set_h(true);
 
     // Finish
-    Ok(None)
+    None
 }
