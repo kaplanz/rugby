@@ -1,73 +1,47 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use super::{Cpu, Exec, Instruction, help};
 
-pub const fn default() -> Operation {
-    Operation::Adc(Adc::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Adc {
-    #[default]
-    Fetch,
-    Execute(u8),
-}
-
-impl Execute for Adc {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-        }
-    }
-}
-
-impl From<Adc> for Operation {
-    fn from(value: Adc) -> Self {
-        Self::Adc(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x8e => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Adc::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xce => {
-            // Fetch n8 <- [PC++]
-            let op2 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Adc::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0x88..=0x8f => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle3(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute ADC
     let acc = cpu.reg.a.load();
-    let cin = cpu.reg.f.c() as u8;
-    let (res, carry0) = acc.overflowing_add(op2);
-    let (res, carry1) = res.overflowing_add(cin);
+    let op2 = cpu.reg.z.load();
+    let (res, f) = cpu.blk.alu.adc(acc, op2, cpu.reg.f);
     cpu.reg.a.store(res);
-
-    // Set flags
-    cpu.reg.f.set_z(res == 0);
-    cpu.reg.f.set_n(false);
-    cpu.reg.f.set_h(0x0f < (acc & 0x0f) + (op2 & 0x0f) + cin);
-    cpu.reg.f.set_c(carry0 | carry1);
+    cpu.reg.f = f;
 
     // Finish
-    Ok(None)
+    None
 }
