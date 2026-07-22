@@ -15,9 +15,17 @@
 
 #![allow(clippy::unnecessary_wraps)]
 
-use super::{Cpu, Error, Execute, Ime, Result, Status, help};
+use log::error;
+
+use super::{Cpu, Error, Execute, Ime, Instruction, Result, Status, help};
+
+/// Stage function handle.
+pub type Exec = fn(u8, &mut Cpu) -> Option<Instruction>;
 
 type Return = Result<Option<Operation>>;
+
+/// Legacy operation constructor.
+pub(super) type Start = fn() -> Operation;
 
 /// Instruction operation state.
 #[derive(Clone, Debug)]
@@ -48,7 +56,6 @@ pub enum Operation {
     Nop(nop::Nop),
     Or(or::Or),
     Pop(pop::Pop),
-    Prefix(prefix::Prefix),
     Push(push::Push),
     Res(res::Res),
     Ret(ret::Ret),
@@ -105,7 +112,6 @@ impl Execute for Operation {
             Operation::Nop(inner)    => inner.exec(code, cpu),
             Operation::Or(inner)     => inner.exec(code, cpu),
             Operation::Pop(inner)    => inner.exec(code, cpu),
-            Operation::Prefix(inner) => inner.exec(code, cpu),
             Operation::Push(inner)   => inner.exec(code, cpu),
             Operation::Res(inner)    => inner.exec(code, cpu),
             Operation::Ret(inner)    => inner.exec(code, cpu),
@@ -132,6 +138,47 @@ impl Execute for Operation {
             Operation::Xor(inner)    => inner.exec(code, cpu),
         }
     }
+}
+
+/// Executes the in-flight legacy operation.
+///
+/// Resumes the operation in flight, or starts the installed
+/// instruction's operation anew.
+pub(super) fn legacy(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Resume the in-flight operation, or start anew
+    let oper = if let Some(oper) = cpu.etc.oper.take() {
+        oper
+    } else {
+        // Start the installed instruction's operation
+        let start = cpu.etc.insn.legacy.expect("not a legacy instruction");
+        start()
+    };
+    // Execute a single stage of the operation
+    match oper.exec(code, cpu) {
+        Ok(Some(next)) => {
+            // Store the next stage
+            cpu.etc.oper = Some(next);
+            // Proceed
+            cpu.step(legacy)
+        }
+        Ok(None) => {
+            // Finish
+            None
+        }
+        Err(err) => {
+            // Log the error
+            error!("{err}");
+            // Stop the CPU
+            cpu.etc.run = Status::Stopped;
+            // Finish
+            None
+        }
+    }
+}
+
+/// Constructs the interrupt service routine's operation.
+pub(super) fn vector() -> Operation {
+    Operation::Int(int::Int::Fetch)
 }
 
 /// Arithmetic add with carry.
