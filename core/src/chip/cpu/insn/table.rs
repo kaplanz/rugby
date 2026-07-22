@@ -264,14 +264,14 @@ pub const DECODE: [Instruction; 0x100] = [
 /// Prefix lookup table.
 #[rustfmt::skip]
 pub const PREFIX: [Instruction; 0x100] = [
-    Instruction { code: 0x00, exec: exec::legacy,          repr: "RLC B",       legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x01, exec: exec::legacy,          repr: "RLC C",       legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x02, exec: exec::legacy,          repr: "RLC D",       legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x03, exec: exec::legacy,          repr: "RLC E",       legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x04, exec: exec::legacy,          repr: "RLC H",       legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x05, exec: exec::legacy,          repr: "RLC L",       legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x06, exec: exec::legacy,          repr: "RLC (HL)",    legacy: Some(exec::rlc::default) },
-    Instruction { code: 0x07, exec: exec::legacy,          repr: "RLC A",       legacy: Some(exec::rlc::default) },
+    Instruction { code: 0x00, exec: exec::rlc::default(),  repr: "RLC B",       legacy: None },
+    Instruction { code: 0x01, exec: exec::rlc::default(),  repr: "RLC C",       legacy: None },
+    Instruction { code: 0x02, exec: exec::rlc::default(),  repr: "RLC D",       legacy: None },
+    Instruction { code: 0x03, exec: exec::rlc::default(),  repr: "RLC E",       legacy: None },
+    Instruction { code: 0x04, exec: exec::rlc::default(),  repr: "RLC H",       legacy: None },
+    Instruction { code: 0x05, exec: exec::rlc::default(),  repr: "RLC L",       legacy: None },
+    Instruction { code: 0x06, exec: exec::rlc::default(),  repr: "RLC (HL)",    legacy: None },
+    Instruction { code: 0x07, exec: exec::rlc::default(),  repr: "RLC A",       legacy: None },
     Instruction { code: 0x08, exec: exec::legacy,          repr: "RRC B",       legacy: Some(exec::rrc::default) },
     Instruction { code: 0x09, exec: exec::legacy,          repr: "RRC C",       legacy: Some(exec::rrc::default) },
     Instruction { code: 0x0a, exec: exec::legacy,          repr: "RRC D",       legacy: Some(exec::rrc::default) },
