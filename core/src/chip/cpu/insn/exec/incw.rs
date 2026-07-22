@@ -1,65 +1,38 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Incw(Incw::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Incw {
-    #[default]
-    Fetch,
-    Execute(u16),
-}
-
-impl Execute for Incw {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op1) => execute(code, cpu, op1),
-        }
-    }
-}
-
-impl From<Incw> for Operation {
-    fn from(value: Incw) -> Self {
-        Self::Incw(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
-    // Check opcode
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Load r16
     let op1 = match code {
         0x03 => cpu.reg.bc().load(),
         0x13 => cpu.reg.de().load(),
         0x23 => cpu.reg.hl().load(),
         0x33 => cpu.reg.sp.load(),
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     };
 
-    // Proceed
-    Ok(Some(Incw::Execute(op1).into()))
-}
-
-fn execute(code: u8, cpu: &mut Cpu, op1: u16) -> Return {
     // Execute INCW
-    let res = op1.wrapping_add(1);
+    let res = cpu.blk.idu.inc(op1);
     match code {
-        0x03 => {
-            cpu.reg.bc_mut().store(res);
-        }
-        0x13 => {
-            cpu.reg.de_mut().store(res);
-        }
-        0x23 => {
-            cpu.reg.hl_mut().store(res);
-        }
+        0x03 => cpu.reg.bc_mut().store(res),
+        0x13 => cpu.reg.de_mut().store(res),
+        0x23 => cpu.reg.hl_mut().store(res),
         0x33 => cpu.reg.sp.store(res),
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 
+    // Proceed
+    cpu.step(cycle3)
+}
+
+fn cycle3(_: u8, _: &mut Cpu) -> Option<Instruction> {
+    // Delay by 1 cycle
+
     // Finish
-    Ok(None)
+    None
 }

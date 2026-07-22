@@ -1,56 +1,36 @@
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use rugby_arch::reg::Register;
 
-pub const fn default() -> Operation {
-    Operation::Res(Res::Fetch)
+use super::{Cpu, Exec, Instruction, help};
+
+pub const fn default() -> Exec {
+    cycle3
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Res {
-    #[default]
-    Fetch,
-    Execute(u8),
-    Delay,
-}
-
-impl Execute for Res {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-            Self::Delay        => delay(code, cpu),
-        }
-    }
-}
-
-impl From<Res> for Operation {
-    fn from(value: Res) -> Self {
-        Self::Res(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x86 | 0x8e | 0x96 | 0x9e | 0xa6 | 0xae | 0xb6 | 0xbe => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Res::Execute(op2).into()))
+            cpu.step(cycle4)
         }
         0x80..=0xbf => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle4(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
+fn cycle4(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute RES
     let op1 = (code & 0x38) >> 3;
+    let op2 = cpu.reg.z.load();
     let mask = !(0b1 << op1);
     let res = mask & op2;
 
@@ -60,21 +40,21 @@ fn execute(code: u8, cpu: &mut Cpu, op2: u8) -> Return {
             // Write [HL]
             cpu.writebyte(res);
             // Proceed
-            Ok(Some(Res::Delay.into()))
+            cpu.step(cycle5)
         }
         0x80..=0xbf => {
             // Store r8
             help::set_op8(cpu, code & 0x07, res);
             // Finish
-            Ok(None)
+            None
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn delay(_: u8, _: &mut Cpu) -> Return {
+fn cycle5(_: u8, _: &mut Cpu) -> Option<Instruction> {
     // Delay by 1 cycle
 
     // Finish
-    Ok(None)
+    None
 }

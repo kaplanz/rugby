@@ -1,117 +1,125 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Addw(Addw::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Addw {
-    #[default]
-    Fetch,
-    Execute(u16, u16),
-    Fetch0xE8,
-    Delay0xE8(u8),
-    Execute0xE8(u8),
-}
-
-impl Execute for Addw {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch             => fetch(code, cpu),
-            Self::Execute(op1, op2) => execute(code, cpu, op1, op2),
-            Self::Fetch0xE8         => fetch_0xe8(code, cpu),
-            Self::Delay0xE8(e8)     => delay_0xe8(code, cpu, e8),
-            Self::Execute0xE8(e8)   => execute_0xe8(code, cpu, e8),
-        }
-    }
-}
-
-impl From<Addw> for Operation {
-    fn from(value: Addw) -> Self {
-        Self::Addw(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
-        0x09 => {
-            let op1 = cpu.reg.hl().load();
-            let op2 = cpu.reg.bc().load();
+        // ADD HL, r16
+        0x09 | 0x19 | 0x29 | 0x39 => {
+            // Load operands
+            let op1 = cpu.reg.l.load();
+            let op2 = match code {
+                0x09 => cpu.reg.c.load(),
+                0x19 => cpu.reg.e.load(),
+                0x29 => cpu.reg.l.load(),
+                0x39 => cpu.reg.sp.load().to_le_bytes()[0],
+                code => unreachable!("unexpected opcode: {code:#04X}"),
+            };
+
+            // Execute ADDW (LSB)
+            let (res, carry) = op1.overflowing_add(op2);
+            cpu.reg.l.store(res);
+
+            // Set flags
+            cpu.reg.f.set_n(false);
+            cpu.reg.f.set_h(0x0f < (op1 & 0x0f) + (op2 & 0x0f));
+            cpu.reg.f.set_c(carry);
+
             // Proceed
-            Ok(Some(Addw::Execute(op1, op2).into()))
+            cpu.step(cycle3)
         }
-        0x19 => {
-            let op1 = cpu.reg.hl().load();
-            let op2 = cpu.reg.de().load();
-            // Proceed
-            Ok(Some(Addw::Execute(op1, op2).into()))
-        }
-        0x29 => {
-            let op1 = cpu.reg.hl().load();
-            let op2 = cpu.reg.hl().load();
-            // Proceed
-            Ok(Some(Addw::Execute(op1, op2).into()))
-        }
-        0x39 => {
-            let op1 = cpu.reg.hl().load();
-            let op2 = cpu.reg.sp.load();
-            // Proceed
-            Ok(Some(Addw::Execute(op1, op2).into()))
-        }
+        // ADD SP, e8
         0xe8 => {
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
+
             // Proceed
-            Ok(Some(Addw::Fetch0xE8.into()))
+            cpu.step(cycle3)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(_: u8, cpu: &mut Cpu, op1: u16, op2: u16) -> Return {
-    // Execute ADDW
-    let (res, carry) = op1.overflowing_add(op2);
-    cpu.reg.hl_mut().store(res);
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Check opcode
+    match code {
+        // ADD HL, r16
+        0x09 | 0x19 | 0x29 | 0x39 => {
+            // Load operands
+            let op1 = cpu.reg.h.load();
+            let op2 = match code {
+                0x09 => cpu.reg.b.load(),
+                0x19 => cpu.reg.d.load(),
+                0x29 => cpu.reg.h.load(),
+                0x39 => cpu.reg.sp.load().to_le_bytes()[1],
+                code => unreachable!("unexpected opcode: {code:#04X}"),
+            };
+            let cin = cpu.reg.f.c() as u8;
 
-    // Set flags
-    cpu.reg.f.set_n(false);
-    cpu.reg.f.set_h(0x0fff < (op1 & 0x0fff) + (op2 & 0x0fff));
-    cpu.reg.f.set_c(carry);
+            // Execute ADDW (MSB)
+            let (res, carry0) = op1.overflowing_add(op2);
+            let (res, carry1) = res.overflowing_add(cin);
+            cpu.reg.h.store(res);
 
-    // Finish
-    Ok(None)
+            // Set flags
+            cpu.reg.f.set_n(false);
+            cpu.reg.f.set_h(0x0f < (op1 & 0x0f) + (op2 & 0x0f) + cin);
+            cpu.reg.f.set_c(carry0 | carry1);
+
+            // Finish
+            None
+        }
+        // ADD SP, e8
+        0xe8 => {
+            // Load operands
+            let op1 = cpu.reg.sp.load().to_le_bytes()[0];
+            let op2 = cpu.reg.z.load();
+
+            // Execute ADDW (LSB)
+            let res = op1.wrapping_add(op2);
+            cpu.reg.z.store(res);
+
+            // Set flags
+            cpu.reg.f.set_z(false);
+            cpu.reg.f.set_n(false);
+            cpu.reg.f.set_h(0x0f < (op1 & 0x0f) + (op2 & 0x0f));
+            cpu.reg.f.set_c(0xff < u16::from(op1) + u16::from(op2));
+
+            // Proceed
+            cpu.step(cycle4)
+        }
+        code => unreachable!("unexpected opcode: {code:#04X}"),
+    }
 }
 
-fn fetch_0xe8(_: u8, cpu: &mut Cpu) -> Return {
-    // Fetch e8 <- [PC++]
-    let e8 = cpu.fetchbyte();
+fn cycle4(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Recover the operand's sign
+    let spl = cpu.reg.sp.load().to_le_bytes()[0];
+    let e8 = cpu.reg.z.load().wrapping_sub(spl);
+    // Prepare the adjustment
+    let adj = if e8 & 0x80 == 0 { 0x00 } else { 0xff };
+    let cin = cpu.reg.f.c() as u8;
+
+    // Execute ADDW (MSB)
+    let op1 = cpu.reg.sp.load().to_le_bytes()[1];
+    let res = op1.wrapping_add(adj).wrapping_add(cin);
+    cpu.reg.w.store(res);
 
     // Proceed
-    Ok(Some(Addw::Delay0xE8(e8).into()))
+    cpu.step(cycle5)
 }
 
-fn delay_0xe8(_: u8, _: &mut Cpu, e8: u8) -> Return {
-    // Delay by 1 cycle
-
-    // Proceed
-    Ok(Some(Addw::Execute0xE8(e8).into()))
-}
-
-fn execute_0xe8(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
-    // Execute ADDW
-    let op1 = cpu.reg.sp.load();
-    let op2 = e8 as i8 as u16;
-    let res = op1.wrapping_add(op2);
-    cpu.reg.sp.store(res);
-
-    // Set flags
-    cpu.reg.f.set_z(false);
-    cpu.reg.f.set_n(false);
-    cpu.reg.f.set_h(0x000f < (op1 & 0x000f) + (op2 & 0x000f));
-    cpu.reg.f.set_c(0x00ff < (op1 & 0x00ff) + (op2 & 0x00ff));
+fn cycle5(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Store SP <- WZ
+    let wz = cpu.reg.wz().load();
+    cpu.reg.sp.store(wz);
 
     // Finish
-    Ok(None)
+    None
 }

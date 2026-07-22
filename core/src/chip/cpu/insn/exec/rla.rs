@@ -1,36 +1,15 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Rla(Rla::Execute)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Rla {
-    #[default]
-    Execute,
-}
-
-impl Execute for Rla {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Rla> for Operation {
-    fn from(value: Rla) -> Self {
-        Self::Rla(value)
-    }
-}
-
-fn execute(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     if code != 0x17 {
-        return Err(Error::Opcode(code));
+        unreachable!("unexpected opcode: {code:#04X}");
     }
 
     // Execute RLA
@@ -47,5 +26,5 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     cpu.reg.f.set_c(carry);
 
     // Finish
-    Ok(None)
+    None
 }

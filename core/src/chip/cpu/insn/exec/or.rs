@@ -1,73 +1,47 @@
-use std::ops::BitOr;
-
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use super::{Cpu, Exec, Instruction, help};
 
-pub const fn default() -> Operation {
-    Operation::Or(Or::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Or {
-    #[default]
-    Fetch,
-    Execute(u8),
-}
-
-impl Execute for Or {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-        }
-    }
-}
-
-impl From<Or> for Operation {
-    fn from(value: Or) -> Self {
-        Self::Or(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0xb6 => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Or::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xf6 => {
-            // Fetch n8 <- [PC++]
-            let op2 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Or::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xb0..=0xb7 => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle3(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute OR
     let acc = cpu.reg.a.load();
-    let res = acc.bitor(op2);
+    let op2 = cpu.reg.z.load();
+    let (res, f) = cpu.blk.alu.or(acc, op2, cpu.reg.f);
     cpu.reg.a.store(res);
-
-    // Set flags
-    cpu.reg.f.set_z(res == 0);
-    cpu.reg.f.set_n(false);
-    cpu.reg.f.set_h(false);
-    cpu.reg.f.set_c(false);
+    cpu.reg.f = f;
 
     // Finish
-    Ok(None)
+    None
 }

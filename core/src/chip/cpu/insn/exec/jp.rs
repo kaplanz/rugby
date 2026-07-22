@@ -1,68 +1,37 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Jp(Jp::Fetch0)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Jp {
-    #[default]
-    Fetch0,
-    Fetch1(u8),
-    Check(u16),
-    Jump(u16),
-}
-
-impl Execute for Jp {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch0     => fetch0(code, cpu),
-            Self::Fetch1(a8) => fetch1(code, cpu, a8),
-            Self::Check(a16) => check(code, cpu, a16),
-            Self::Jump(a16)  => jump(code, cpu, a16),
-        }
-    }
-}
-
-impl From<Jp> for Operation {
-    fn from(value: Jp) -> Self {
-        Self::Jp(value)
-    }
-}
-
-fn fetch0(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0xc2 | 0xc3 | 0xca | 0xd2 | 0xda => {
-            // Fetch lower(a16) <- [PC]
-            let a8 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Jp::Fetch1(a8).into()))
+            cpu.step(cycle3)
         }
         0xe9 => {
-            // Load HL
-            let a16 = cpu.reg.hl().load();
-            // Continue
-            jump(code, cpu, a16)
+            // Perform jump PC <- HL
+            let hl = cpu.reg.hl().load();
+            cpu.reg.pc.store(hl);
+            // Finish
+            None
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn fetch1(_: u8, cpu: &mut Cpu, a8: u8) -> Return {
-    // Fetch upper(a16) <- [PC + 1]
-    let b8 = cpu.fetchbyte();
-    // Combine into a16
-    let a16 = u16::from_le_bytes([a8, b8]);
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Fetch W <- [PC++]
+    let w = cpu.fetchbyte();
+    cpu.reg.w.store(w);
 
-    // Proceed
-    Ok(Some(Jp::Check(a16).into()))
-}
-
-fn check(code: u8, cpu: &mut Cpu, a16: u16) -> Return {
     // Evaluate condition
     #[rustfmt::skip]
     let cond = match code {
@@ -71,23 +40,31 @@ fn check(code: u8, cpu: &mut Cpu, a16: u16) -> Return {
         0xd2 => !cpu.reg.f.c(),
         0xda =>  cpu.reg.f.c(),
         0xc3 => true,
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     };
 
     // Check condition
     if cond {
         // Proceed
-        Ok(Some(Jp::Jump(a16).into()))
+        cpu.step(cycle4)
     } else {
-        // Finish
-        Ok(None)
+        // Proceed
+        cpu.step(cycle5)
     }
 }
 
-fn jump(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
-    // Perform jump
-    cpu.reg.pc.store(a16);
+fn cycle4(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Perform jump PC <- WZ
+    let wz = cpu.reg.wz().load();
+    cpu.reg.pc.store(wz);
+
+    // Proceed
+    cpu.step(cycle5)
+}
+
+fn cycle5(_: u8, _: &mut Cpu) -> Option<Instruction> {
+    // Delay by 1 cycle (untaken jumps enter early)
 
     // Finish
-    Ok(None)
+    None
 }

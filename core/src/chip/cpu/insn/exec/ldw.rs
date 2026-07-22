@@ -1,158 +1,147 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Ldw(Ldw::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-#[expect(unused)]
-pub enum Ldw {
-    #[default]
-    Fetch,
-    ReadLsb,
-    ReadMsb(u8),
-    Execute(u16),
-    Load(u16),
-    WriteLsb(u16, u16),
-    WriteMsb(u16, u16),
-    Add(u8),
-    Delay,
-}
-
-impl Execute for Ldw {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch             => fetch(code, cpu),
-            Self::ReadLsb           => read_lsb(code, cpu),
-            Self::ReadMsb(lsb)      => read_msb(code, cpu, lsb),
-            Self::Execute(op2)      => execute(code, cpu, op2),
-            Self::Load(a16)         => load(code, cpu, a16),
-            Self::WriteLsb(a16, sp) => write_lsb(code, cpu, a16, sp),
-            Self::WriteMsb(a16, sp) => write_msb(code, cpu, a16, sp),
-            Self::Add(e8)           => add(code, cpu, e8),
-            Self::Delay             => delay(code, cpu),
-        }
-    }
-}
-
-impl From<Ldw> for Operation {
-    fn from(value: Ldw) -> Self {
-        Self::Ldw(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     #[expect(clippy::match_same_arms)]
     match code {
         // LD r16, n16
-        0x01 | 0x11 | 0x21 | 0x31 => {
-            // Continue
-            read_lsb(code, cpu)
-        }
         // LD [a16], SP
-        0x08 => {
-            // Continue
-            read_lsb(code, cpu)
+        0x01 | 0x08 | 0x11 | 0x21 | 0x31 => {
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
+            // Proceed
+            cpu.step(cycle3)
         }
         // LD HL, SP + e8
         0xf8 => {
-            // Fetch e8 <- [PC++]
-            let e8 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Ldw::Add(e8).into()))
+            cpu.step(cycle3)
         }
         // LD SP, HL
         0xf9 => {
-            // Load HL
-            let r16 = cpu.reg.hl().load();
+            // Store SP <- HL
+            let hl = cpu.reg.hl().load();
+            cpu.reg.sp.store(hl);
             // Proceed
-            Ok(Some(Ldw::Execute(r16).into()))
+            cpu.step(cycle3)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn read_lsb(_: u8, cpu: &mut Cpu) -> Return {
-    // Fetch LSB <- [PC++]
-    let lsb = cpu.fetchbyte();
-    // Proceed
-    Ok(Some(Ldw::ReadMsb(lsb).into()))
-}
-
-fn read_msb(_: u8, cpu: &mut Cpu, lsb: u8) -> Return {
-    // Fetch MSB <- [PC++]
-    let msb = cpu.fetchbyte();
-    // Combine bytes
-    let n16 = u16::from_le_bytes([lsb, msb]);
-
-    // Proceed
-    Ok(Some(Ldw::Execute(n16).into()))
-}
-
-fn execute(code: u8, cpu: &mut Cpu, op2: u16) -> Return {
-    // Execute LDW
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Check opcode
     match code {
-        0x01 => cpu.reg.bc_mut().store(op2),
-        0x08 => return load(code, cpu, op2),
-        0x11 => cpu.reg.de_mut().store(op2),
-        0x21 => cpu.reg.hl_mut().store(op2),
-        0x31 | 0xf9 => cpu.reg.sp.store(op2),
-        code => return Err(Error::Opcode(code)),
+        // LD SP, HL
+        0xf9 => {
+            // Delay by 1 cycle
+
+            // Finish
+            None
+        }
+        // LD r16, n16
+        // LD [a16], SP
+        0x01 | 0x08 | 0x11 | 0x21 | 0x31 => {
+            // Fetch W <- [PC++]
+            let w = cpu.fetchbyte();
+            cpu.reg.w.store(w);
+            // Proceed
+            cpu.step(cycle4)
+        }
+        // LD HL, SP + e8
+        0xf8 => {
+            // Load operands
+            let op1 = cpu.reg.sp.load().to_le_bytes()[0];
+            let op2 = cpu.reg.z.load();
+
+            // Execute LDW (LSB)
+            let res = op1.wrapping_add(op2);
+            cpu.reg.l.store(res);
+
+            // Set flags
+            cpu.reg.f.set_z(false);
+            cpu.reg.f.set_n(false);
+            cpu.reg.f.set_h(0x0f < (op1 & 0x0f) + (op2 & 0x0f));
+            cpu.reg.f.set_c(0xff < u16::from(op1) + u16::from(op2));
+
+            // Proceed
+            cpu.step(cycle4)
+        }
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
-
-    // Finish
-    Ok(None)
 }
 
-fn load(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
-    // Load SP
+fn cycle4(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Check opcode
+    match code {
+        // LD r16, n16
+        0x01 | 0x11 | 0x21 | 0x31 => {
+            // Store r16 <- WZ
+            let wz = cpu.reg.wz().load();
+            match code {
+                0x01 => cpu.reg.bc_mut().store(wz),
+                0x11 => cpu.reg.de_mut().store(wz),
+                0x21 => cpu.reg.hl_mut().store(wz),
+                0x31 => cpu.reg.sp.store(wz),
+                code => unreachable!("unexpected opcode: {code:#04X}"),
+            }
+            // Finish
+            None
+        }
+        // LD [a16], SP
+        0x08 => {
+            // Write [WZ] <- lower(SP)
+            let wz = cpu.reg.wz().load();
+            let sp = cpu.reg.sp.load();
+            cpu.blk.bus.write(wz, sp.to_le_bytes()[0]);
+            // Increment WZ
+            let wz = cpu.blk.idu.inc(wz);
+            cpu.reg.wz_mut().store(wz);
+            // Proceed
+            cpu.step(cycle5)
+        }
+        // LD HL, SP + e8
+        0xf8 => {
+            // Prepare the adjustment
+            let e8 = cpu.reg.z.load();
+            let adj = if e8 & 0x80 == 0 { 0x00 } else { 0xff };
+            let cin = cpu.reg.f.c() as u8;
+
+            // Execute LDW (MSB)
+            let op1 = cpu.reg.sp.load().to_le_bytes()[1];
+            let res = op1.wrapping_add(adj).wrapping_add(cin);
+            cpu.reg.h.store(res);
+
+            // Finish
+            None
+        }
+        code => unreachable!("unexpected opcode: {code:#04X}"),
+    }
+}
+
+fn cycle5(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Write [WZ] <- upper(SP)
+    let wz = cpu.reg.wz().load();
     let sp = cpu.reg.sp.load();
+    cpu.blk.bus.write(wz, sp.to_le_bytes()[1]);
 
     // Proceed
-    Ok(Some(Ldw::WriteLsb(a16, sp).into()))
+    cpu.step(cycle6)
 }
 
-fn write_lsb(_: u8, cpu: &mut Cpu, a16: u16, sp: u16) -> Return {
-    // Write a16 <- lower(SP)
-    cpu.blk.bus.write(a16, sp.to_le_bytes()[0]);
-
-    // Proceed
-    Ok(Some(Ldw::WriteMsb(a16, sp).into()))
-}
-
-fn write_msb(_: u8, cpu: &mut Cpu, mut a16: u16, sp: u16) -> Return {
-    // Write a16 + 1 <- upper(SP)
-    a16 = a16.wrapping_add(1);
-    cpu.blk.bus.write(a16, sp.to_le_bytes()[1]);
-
-    // Finish
-    Ok(None)
-}
-
-fn add(_: u8, cpu: &mut Cpu, e8: u8) -> Return {
-    // LD HL, SP + e8
-    let sp = cpu.reg.sp.load();
-    let e16 = e8 as i8 as u16;
-    let res = sp.wrapping_add(e16);
-    cpu.reg.hl_mut().store(res);
-
-    // Set flags
-    cpu.reg.f.set_z(false);
-    cpu.reg.f.set_n(false);
-    cpu.reg.f.set_h(0x000f < (sp & 0x000f) + (e16 & 0x000f));
-    cpu.reg.f.set_c(0x00ff < (sp & 0x00ff) + (e16 & 0x00ff));
-
-    // Proceed
-    Ok(Some(Ldw::Delay.into()))
-}
-
-fn delay(_: u8, _: &mut Cpu) -> Return {
+fn cycle6(_: u8, _: &mut Cpu) -> Option<Instruction> {
     // Delay by 1 cycle
 
     // Finish
-    Ok(None)
+    None
 }
