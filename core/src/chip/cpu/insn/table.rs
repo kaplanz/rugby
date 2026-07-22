@@ -121,7 +121,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0x73, exec: exec::legacy,            repr: "LD (HL), E",     legacy: Some(exec::ld::default) },
     Instruction { code: 0x74, exec: exec::legacy,            repr: "LD (HL), H",     legacy: Some(exec::ld::default) },
     Instruction { code: 0x75, exec: exec::legacy,            repr: "LD (HL), L",     legacy: Some(exec::ld::default) },
-    Instruction { code: 0x76, exec: exec::legacy,            repr: "HALT",           legacy: Some(exec::halt::default) },
+    Instruction { code: 0x76, exec: exec::halt::default(),   repr: "HALT",           legacy: None },
     Instruction { code: 0x77, exec: exec::legacy,            repr: "LD (HL), A",     legacy: Some(exec::ld::default) },
     Instruction { code: 0x78, exec: exec::legacy,            repr: "LD A, B",        legacy: Some(exec::ld::default) },
     Instruction { code: 0x79, exec: exec::legacy,            repr: "LD A, C",        legacy: Some(exec::ld::default) },

@@ -1,36 +1,15 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return, Status};
+use super::{Cpu, Exec, Instruction, Status};
 
-pub const fn default() -> Operation {
-    Operation::Halt(Halt::Execute)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Halt {
-    #[default]
-    Execute,
-}
-
-impl Execute for Halt {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Halt> for Operation {
-    fn from(value: Halt) -> Self {
-        Self::Halt(value)
-    }
-}
-
-fn execute(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     if code != 0x76 {
-        return Err(Error::Opcode(code));
+        unreachable!("unexpected opcode: {code:#04X}");
     }
 
     // Handle pending interrupts
@@ -44,11 +23,23 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
             // Perform HALT bug
             cpu.etc.halt_bug = true;
         }
-    } else {
-        // Execute HALT
-        cpu.etc.run = Status::Halted;
+        // Finish
+        return None;
+    }
+
+    // Execute HALT
+    cpu.etc.run = Status::Halted;
+
+    // Await an interrupt
+    cpu.step(wait)
+}
+
+fn wait(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Keep waiting while halted
+    if cpu.etc.run == Status::Halted {
+        return cpu.step(wait);
     }
 
     // Finish
-    Ok(None)
+    None
 }
