@@ -1,70 +1,46 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use super::{Cpu, Exec, Instruction, help};
 
-pub const fn default() -> Operation {
-    Operation::Cp(Cp::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Cp {
-    #[default]
-    Fetch,
-    Execute(u8),
-}
-
-impl Execute for Cp {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-        }
-    }
-}
-
-impl From<Cp> for Operation {
-    fn from(value: Cp) -> Self {
-        Self::Cp(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0xbe => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Cp::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xfe => {
-            // Fetch n8 <- [PC++]
-            let op2 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Cp::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xb8..=0xbf => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle3(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute CP
     let acc = cpu.reg.a.load();
-    let (res, carry) = acc.overflowing_sub(op2);
-
-    // Set flags
-    cpu.reg.f.set_z(res == 0);
-    cpu.reg.f.set_n(true);
-    cpu.reg.f.set_h((op2 & 0x0f) > (acc & 0x0f));
-    cpu.reg.f.set_c(carry);
+    let op2 = cpu.reg.z.load();
+    let (_, f) = cpu.blk.alu.cmp(acc, op2, cpu.reg.f);
+    cpu.reg.f = f;
 
     // Finish
-    Ok(None)
+    None
 }
