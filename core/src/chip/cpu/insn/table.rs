@@ -66,7 +66,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0x3c, exec: exec::legacy,            repr: "INC A",          legacy: Some(exec::inc::default) },
     Instruction { code: 0x3d, exec: exec::legacy,            repr: "DEC A",          legacy: Some(exec::dec::default) },
     Instruction { code: 0x3e, exec: exec::legacy,            repr: "LD A, n8",       legacy: Some(exec::ld::default) },
-    Instruction { code: 0x3f, exec: exec::legacy,            repr: "CCP",            legacy: Some(exec::ccf::default) },
+    Instruction { code: 0x3f, exec: exec::ccf::default(),    repr: "CCP",            legacy: None },
     Instruction { code: 0x40, exec: exec::legacy,            repr: "LD B, B",        legacy: Some(exec::ld::default) },
     Instruction { code: 0x41, exec: exec::legacy,            repr: "LD B, C",        legacy: Some(exec::ld::default) },
     Instruction { code: 0x42, exec: exec::legacy,            repr: "LD B, D",        legacy: Some(exec::ld::default) },
