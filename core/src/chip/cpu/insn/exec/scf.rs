@@ -1,34 +1,13 @@
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Scf(Scf::Execute)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Scf {
-    #[default]
-    Execute,
-}
-
-impl Execute for Scf {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Scf> for Operation {
-    fn from(value: Scf) -> Self {
-        Self::Scf(value)
-    }
-}
-
-fn execute(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     if code != 0x37 {
-        return Err(Error::Opcode(code));
+        unreachable!("unexpected opcode: {code:#04X}");
     }
 
     // Execute SCF
@@ -37,5 +16,5 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     cpu.reg.f.set_c(true);
 
     // Finish
-    Ok(None)
+    None
 }
