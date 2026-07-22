@@ -62,26 +62,6 @@ pub fn cycle1(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     install(insn, cpu)
 }
 
-/// Fetches and decodes a prefixed instruction.
-///
-/// Models the second machine cycle of a `PREFIX`-family instruction:
-/// reads the opcode at `PC` and decodes it via the prefix table. No
-/// interrupt check occurs, so an interrupt can never dispatch between
-/// `$CB` and its opcode byte.
-pub(super) fn prefix(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
-    // Fetch the prefixed opcode
-    let pc = cpu.reg.pc.load();
-    let op = cpu.fetchbyte();
-    // Decode via the prefix table
-    let insn = Instruction::prefix(op);
-
-    // Log the instruction
-    debug!("${pc:04x}: {insn}");
-
-    // Install the instruction
-    install(insn, cpu)
-}
-
 /// Installs a decoded instruction's chain.
 fn install(insn: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
     let Instruction { code, legacy, .. } = insn;
