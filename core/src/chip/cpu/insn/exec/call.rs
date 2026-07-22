@@ -1,66 +1,31 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Call(Call::Fetch0)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Call {
-    #[default]
-    Fetch0,
-    Fetch1(u8),
-    Check(u16),
-    Push0(u16),
-    Push1(u16),
-    Jump(u16),
-}
-
-impl Execute for Call {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch0      => fetch0(code, cpu),
-            Self::Fetch1(lsb) => fetch1(code, cpu, lsb),
-            Self::Check(a16)  => check(code, cpu, a16),
-            Self::Push0(a16)  => push0(code, cpu, a16),
-            Self::Push1(a16)  => push1(code, cpu, a16),
-            Self::Jump(a16)   => jump(code, cpu, a16),
-        }
-    }
-}
-
-impl From<Call> for Operation {
-    fn from(value: Call) -> Self {
-        Self::Call(value)
-    }
-}
-
-fn fetch0(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0xc4 | 0xcc | 0xcd | 0xd4 | 0xdc => (),
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 
-    // Fetch lower(a16) <- [PC++]
-    let lsb = cpu.fetchbyte();
-    // Proceed
-    Ok(Some(Call::Fetch1(lsb).into()))
-}
-
-fn fetch1(_: u8, cpu: &mut Cpu, lsb: u8) -> Return {
-    // Fetch upper(a16) <- [PC++]
-    let msb = cpu.fetchbyte();
-    // Combine into a16
-    let a16 = u16::from_le_bytes([lsb, msb]);
+    // Fetch Z <- [PC++]
+    let z = cpu.fetchbyte();
+    cpu.reg.z.store(z);
 
     // Proceed
-    Ok(Some(Call::Check(a16).into()))
+    cpu.step(cycle3)
 }
 
-fn check(code: u8, cpu: &mut Cpu, a16: u16) -> Return {
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Fetch W <- [PC++]
+    let w = cpu.fetchbyte();
+    cpu.reg.w.store(w);
+
     // Evaluate condition
     #[rustfmt::skip]
     let cond = match code {
@@ -69,43 +34,58 @@ fn check(code: u8, cpu: &mut Cpu, a16: u16) -> Return {
         0xd4 => !cpu.reg.f.c(),
         0xdc =>  cpu.reg.f.c(),
         0xcd => true,
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     };
 
     // Check condition
     if cond {
         // Proceed
-        Ok(Some(Call::Push0(a16).into()))
+        cpu.step(cycle4)
     } else {
-        // Finish
-        Ok(None)
+        // Proceed
+        cpu.step(cycle7)
     }
 }
 
-fn push0(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
-    // Load PC
-    let pc = cpu.reg.pc.load().to_le_bytes();
-    // Push [--SP] <- upper(PC++)
-    cpu.pushbyte(pc[1]);
+fn cycle4(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Decrement SP
+    let sp = cpu.reg.sp.load();
+    let sp = cpu.blk.idu.dec(sp);
+    cpu.reg.sp.store(sp);
 
     // Proceed
-    Ok(Some(Call::Push1(a16).into()))
+    cpu.step(cycle5)
 }
 
-fn push1(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
-    // Load PC
+fn cycle5(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Write [SP] <- upper(PC)
+    let sp = cpu.reg.sp.load();
     let pc = cpu.reg.pc.load().to_le_bytes();
-    // Push [--SP] <- lower(PC++)
-    cpu.pushbyte(pc[0]);
+    cpu.blk.bus.write(sp, pc[1]);
+    // Decrement SP
+    let sp = cpu.blk.idu.dec(sp);
+    cpu.reg.sp.store(sp);
 
     // Proceed
-    Ok(Some(Call::Jump(a16).into()))
+    cpu.step(cycle6)
 }
 
-fn jump(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
-    // Perform jump
-    cpu.reg.pc.store(a16);
+fn cycle6(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Write [SP] <- lower(PC)
+    let sp = cpu.reg.sp.load();
+    let pc = cpu.reg.pc.load().to_le_bytes();
+    cpu.blk.bus.write(sp, pc[0]);
+    // Perform jump PC <- WZ
+    let wz = cpu.reg.wz().load();
+    cpu.reg.pc.store(wz);
+
+    // Proceed
+    cpu.step(cycle7)
+}
+
+fn cycle7(_: u8, _: &mut Cpu) -> Option<Instruction> {
+    // Delay by 1 cycle (untaken calls enter early)
 
     // Finish
-    Ok(None)
+    None
 }
