@@ -246,7 +246,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0xf0, exec: exec::legacy,            repr: "LDH A, (a8)",    legacy: Some(exec::ldh::default) },
     Instruction { code: 0xf1, exec: exec::legacy,            repr: "POP AF",         legacy: Some(exec::pop::default) },
     Instruction { code: 0xf2, exec: exec::legacy,            repr: "LD A, (C)",      legacy: Some(exec::ldh::default) },
-    Instruction { code: 0xf3, exec: exec::legacy,            repr: "DI",             legacy: Some(exec::di::default) },
+    Instruction { code: 0xf3, exec: exec::di::default(),     repr: "DI",             legacy: None },
     Instruction { code: 0xf4, exec: exec::legacy,            repr: "UNUSED",         legacy: Some(exec::unused::default) },
     Instruction { code: 0xf5, exec: exec::legacy,            repr: "PUSH AF",        legacy: Some(exec::push::default) },
     Instruction { code: 0xf6, exec: exec::legacy,            repr: "OR A, n8",       legacy: Some(exec::or::default) },
