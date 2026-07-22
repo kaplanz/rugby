@@ -118,7 +118,7 @@ fn load(_: u8, cpu: &mut Cpu, a16: u16) -> Return {
 
 fn write_lsb(_: u8, cpu: &mut Cpu, a16: u16, sp: u16) -> Return {
     // Write a16 <- lower(SP)
-    cpu.write(a16, sp.to_le_bytes()[0]);
+    cpu.blk.bus.write(a16, sp.to_le_bytes()[0]);
 
     // Proceed
     Ok(Some(Ldw::WriteMsb(a16, sp).into()))
@@ -127,7 +127,7 @@ fn write_lsb(_: u8, cpu: &mut Cpu, a16: u16, sp: u16) -> Return {
 fn write_msb(_: u8, cpu: &mut Cpu, mut a16: u16, sp: u16) -> Return {
     // Write a16 + 1 <- upper(SP)
     a16 = a16.wrapping_add(1);
-    cpu.write(a16, sp.to_le_bytes()[1]);
+    cpu.blk.bus.write(a16, sp.to_le_bytes()[1]);
 
     // Finish
     Ok(None)

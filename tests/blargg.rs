@@ -19,7 +19,7 @@ fn emulate(rom: &[u8], check: fn(&mut GameBoy) -> Result<()>) -> Result<()> {
     // Load the cartridge
     emu.insert(cart);
     // Write in-progress sentinel
-    emu.inner_mut().soc.cpu.write(0xa000, 0x80);
+    emu.inner_mut().soc.cpu.blk.bus.write(0xa000, 0x80);
 
     // Loop until completion or timeout
     for cycle in 0..TIMEOUT {
@@ -97,8 +97,8 @@ mod check {
     pub fn memory(emu: &mut GameBoy) -> Result<()> {
         // Extract memory output
         let cpu = &emu.inner().soc.cpu;
-        let res = cpu.read(0xa000);
-        let chk = [0xa001, 0xa002, 0xa003].map(|addr| cpu.read(addr));
+        let res = cpu.blk.bus.read(0xa000);
+        let chk = [0xa001, 0xa002, 0xa003].map(|addr| cpu.blk.bus.read(addr));
         // Calculate pass/fail conditions
         let chkd = chk == [0xde, 0xb0, 0x61];
         let done = chkd && res != 0x80;

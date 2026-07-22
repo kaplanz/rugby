@@ -24,6 +24,12 @@ pub type H = u8;
 /// `L`: Address register (low byte).
 pub type L = u8;
 
+/// `W`: Private register W.
+pub type W = u8;
+
+/// `Z`: Private register Z.
+pub type Z = u8;
+
 /// `SP`: Stack pointer.
 pub type Sp = u16;
 

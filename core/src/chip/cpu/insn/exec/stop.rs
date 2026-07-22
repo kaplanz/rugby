@@ -32,9 +32,9 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     }
 
     // Skip stop mode while a button is held
-    if cpu.read(0xff00) & 0x0f == 0x0f {
+    if cpu.blk.bus.read(0xff00) & 0x0f == 0x0f {
         // Reset the divider
-        cpu.write(0xff04, 0);
+        cpu.blk.bus.write(0xff04, 0);
         // Enter stop mode
         cpu.etc.run = Status::Stopped;
     }

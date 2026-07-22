@@ -3,6 +3,7 @@
 use std::fmt::{Debug, Display};
 
 use log::trace;
+use rugby_arch::Block;
 
 use self::exec::Operation;
 use super::{Cpu, Ime, Status};
@@ -62,6 +63,8 @@ impl Instruction {
     ///
     /// Errors if the instruction failed to execute.
     pub fn exec(mut self, cpu: &mut Cpu) -> Result<Option<Self>> {
+        // Begin M-cycle
+        cpu.blk.cycle();
         // Execute operation
         trace!("{self:?}");
         let res = self.oper.exec(self.code, cpu)?;

@@ -63,7 +63,7 @@ pub fn doctor<R: Revision>(emu: &GameBoy<R>) -> String {
             "PCMEM:{}",
             [0, 1, 2, 3]
                 .map(|offs| cpu.reg.pc.load() + offs)
-                .map(|addr| cpu.read(addr))
+                .map(|addr| cpu.blk.bus.read(addr))
                 .map(|data| format!("{data:02X}"))
                 .join(","),
         ),

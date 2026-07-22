@@ -64,8 +64,8 @@ impl Instance for GameBoy<rev::Zero> {
         cpu.store(Select::SP, 0xfffe_u16);
 
         // Perform bootup sequence
-        cpu.write(0xff40, 0x91); // enable display
-        cpu.write(0xff50, 0x01); // disable boot ROM
+        cpu.blk.bus.write(0xff40, 0x91); // enable display
+        cpu.blk.bus.write(0xff50, 0x01); // disable boot ROM
         cpu.exec(0xfb);          // enable interrupts
         cpu.goto(0x0100);        // transfer program control
     }
@@ -86,8 +86,8 @@ impl Instance for GameBoy<rev::A> {
         cpu.store(Select::SP, 0xfffe_u16);
 
         // Perform bootup sequence
-        cpu.write(0xff40, 0x91); // enable display
-        cpu.write(0xff50, 0x01); // disable boot ROM
+        cpu.blk.bus.write(0xff40, 0x91); // enable display
+        cpu.blk.bus.write(0xff50, 0x01); // disable boot ROM
         cpu.exec(0xfb);          // enable interrupts
         cpu.goto(0x0100);        // transfer program control
     }
