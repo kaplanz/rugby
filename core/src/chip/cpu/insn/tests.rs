@@ -1,5 +1,3 @@
-use std::iter;
-
 use super::super::*;
 use crate::dmg::bus;
 
@@ -14,6 +12,24 @@ fn setup() -> Cpu {
     }
 }
 
+/// Counts the machine cycles occupied by an instruction.
+///
+/// Starts at `base` for the cycles already accounted (the opcode
+/// fetches), then drives the chain until it concludes or parks in halt
+/// mode.
+fn cycles(cpu: &mut Cpu, mut insn: Instruction, base: usize) -> usize {
+    let mut count = base;
+    while let Some(next) = insn.exec(cpu) {
+        insn = next;
+        count += 1;
+        // Stop once parked in halt mode
+        if cpu.etc.run == Status::Halted {
+            break;
+        }
+    }
+    count
+}
+
 #[test]
 fn cycle_count() {
     // Test each instruction
@@ -22,16 +38,10 @@ fn cycle_count() {
         let expect = CYCLES[code as usize];
         // Create CPU model, decode instruction
         let mut cpu = setup();
-        let mut insn = Instruction::decode(code);
+        let insn = Instruction::decode(code);
         // Count instruction execution cycles
         let found = if expect > 0 {
-            1 + iter::from_fn(move || {
-                insn.clone()
-                    .exec(&mut cpu)
-                    .unwrap_or_else(|_| panic!("should execute: {code:#04X} ; {insn}"))
-                    .map(|next| insn = next)
-            })
-            .count()
+            cycles(&mut cpu, insn, 1)
         } else {
             expect
         };
@@ -53,15 +63,9 @@ fn prefix_cycle_count() {
         let expect = PREFIX[code as usize];
         // Create CPU model, decode prefixed instruction
         let mut cpu = setup();
-        let mut insn = Instruction::prefix(code);
+        let insn = Instruction::prefix(code);
         // Count instruction execution cycles
-        let found = 2 + iter::from_fn(move || {
-            insn.clone()
-                .exec(&mut cpu)
-                .unwrap_or_else(|_| panic!("should execute: {code:#04X} ; {insn}"))
-                .map(|next| insn = next)
-        })
-        .count();
+        let found = cycles(&mut cpu, insn, 2);
         // Confirm match with cycle table
         assert_eq!(
             expect,

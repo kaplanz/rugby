@@ -5,11 +5,13 @@ use std::fmt::{Debug, Display};
 use log::trace;
 use rugby_arch::Block;
 
-use self::exec::Operation;
+pub(super) use self::exec::Operation;
+use self::exec::{Exec, Start};
 use super::{Cpu, Ime, Status};
 use crate::chip::irq::Interrupt;
 
 mod exec;
+mod fetch;
 mod table;
 
 /// Instruction operation execution interface.
@@ -17,28 +19,82 @@ trait Execute {
     fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>>;
 }
 
+/// Executes a single M-cycle of the in-flight instruction.
+///
+/// # Panics
+///
+/// Cannot panic.
+pub fn cycle(cpu: &mut Cpu) {
+    trace!("{:?}", cpu.etc.insn);
+
+    // Trigger a fresh M-cycle
+    cpu.blk.cycle();
+
+    // Execute the in-flight stage
+    let Instruction { code, exec, .. } = cpu.etc.insn;
+    cpu.etc.insn = if let Some(next) = exec(code, cpu) {
+        // Proceed with in-flight instruction
+        cpu.etc.busy = true;
+        next
+    } else if cpu.etc.insn.legacy.is_some() {
+        // Legacy conclusion: fetch next cycle (transitional)
+        cpu.etc.busy = false;
+        Instruction {
+            exec: fetch::cycle1,
+            ..cpu.etc.insn
+        }
+    } else {
+        // Concurrently fetch next instruction
+        cpu.etc.busy = false;
+        fetch::cycle1(code, cpu).expect("fetch will always succeed")
+    }
+}
+
+impl Cpu {
+    /// Proceeds to the given stage of the in-flight instruction.
+    #[allow(clippy::unnecessary_wraps)]
+    fn step(&self, exec: Exec) -> Option<Instruction> {
+        Some(Instruction {
+            exec,
+            ..self.etc.insn
+        })
+    }
+}
+
 /// Processor instruction.
 ///
 /// Stores the currently executing instruction together with its state. Can be
 /// started and resumed.
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Instruction {
     code: u8,
-    oper: Operation,
+    exec: Exec,
     repr: &'static str,
+    legacy: Option<Start>,
+}
+
+impl Default for Instruction {
+    fn default() -> Self {
+        Self {
+            code: 0x00,
+            exec: fetch::cycle1,
+            repr: "FETCH",
+            legacy: None,
+        }
+    }
 }
 
 impl Instruction {
     /// Constructs a new `Instruction` with the given opcode.
     #[must_use]
     pub fn decode(code: u8) -> Self {
-        table::DECODE[code as usize].clone()
+        table::DECODE[code as usize]
     }
 
     /// Constructs a new prefix `Instruction` with the given opcode.
     #[must_use]
     pub fn prefix(code: u8) -> Self {
-        table::PREFIX[code as usize].clone()
+        table::PREFIX[code as usize]
     }
 
     /// Constructs a new interrupt `Instruction`.
@@ -46,8 +102,9 @@ impl Instruction {
     pub fn vector(int: Interrupt) -> Self {
         Self {
             code: int as u8,
-            oper: Operation::Int(exec::int::Int::default()),
+            exec: exec::legacy,
             repr: int.repr(),
+            legacy: Some(exec::vector),
         }
     }
 
@@ -58,23 +115,15 @@ impl Instruction {
     }
 
     /// Executes a single stage of the instruction.
-    ///
-    /// # Errors
-    ///
-    /// Errors if the instruction failed to execute.
-    pub fn exec(mut self, cpu: &mut Cpu) -> Result<Option<Self>> {
+    pub fn exec(self, cpu: &mut Cpu) -> Option<Self> {
+        // Install the instruction
+        cpu.etc.insn = self;
         // Begin M-cycle
         cpu.blk.cycle();
         // Execute operation
         trace!("{self:?}");
-        let res = self.oper.exec(self.code, cpu)?;
-        // Extract next stage
-        self.oper = match res {
-            Some(exec) => exec,
-            None => return Ok(None),
-        };
-        // Return updated state
-        Ok(Some(self))
+        // Return the next stage
+        (self.exec)(self.code, cpu)
     }
 }
 
@@ -83,8 +132,8 @@ impl Debug for Instruction {
         f.debug_struct(std::any::type_name::<Self>())
             .field("code", &format_args!("{:02X?}", self.code))
             .field("repr", &self.repr)
-            .field("oper", &format_args!("{:02X?}", self.oper))
-            .finish()
+            .field("exec", &format_args!("{:02X?}", self.exec))
+            .finish_non_exhaustive()
     }
 }
 
@@ -98,8 +147,9 @@ impl From<Interrupt> for Instruction {
     fn from(value: Interrupt) -> Self {
         Self {
             code: value as u8,
-            oper: Operation::Int(exec::int::Int::default()),
+            exec: exec::legacy,
             repr: value.repr(),
+            legacy: Some(exec::vector),
         }
     }
 }

@@ -9,7 +9,7 @@ use rugby::api::audio::Audio;
 use rugby::api::input::Input;
 use rugby::api::video::Video;
 use rugby::arch::Block;
-use rugby::core::chip::{cpu, ppu};
+use rugby::core::chip::ppu;
 use rugby::core::dmg;
 
 use crate::app;
@@ -141,14 +141,14 @@ pub fn main(args: &Cli) -> Result<()> {
         if let Some(trace) = trace.as_mut()
             && ctx.total % 4 == 0
         {
-            let stage = match &emu {
-                rugby::GameBoy::Dmg0(dmg) => dmg.inner().soc.cpu.stage(),
+            let boundary = match &emu {
+                rugby::GameBoy::Dmg0(dmg) => dmg.inner().soc.cpu.boundary(),
                 rugby::GameBoy::DmgA(dmg)
                 | rugby::GameBoy::DmgB(dmg)
-                | rugby::GameBoy::DmgC(dmg) => dmg.inner().soc.cpu.stage(),
+                | rugby::GameBoy::DmgC(dmg) => dmg.inner().soc.cpu.boundary(),
                 _ => unreachable!(),
             };
-            if matches!(stage, cpu::Stage::Fetch | cpu::Stage::Done) {
+            if boundary {
                 match trace.emit(&emu) {
                     // Exit on completion
                     Err(trace::Error::Finished) => {
