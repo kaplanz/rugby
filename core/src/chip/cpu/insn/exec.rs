@@ -17,28 +17,22 @@
 
 use log::error;
 
-use super::{Cpu, Error, Execute, Ime, Instruction, Result, Status, help};
+use super::{Cpu, Execute, Ime, Instruction, Result, Status, help};
 
 /// Stage function handle.
 pub type Exec = fn(u8, &mut Cpu) -> Option<Instruction>;
-
-type Return = Result<Option<Operation>>;
 
 /// Legacy operation constructor.
 pub(super) type Start = fn() -> Operation;
 
 /// Instruction operation state.
 #[derive(Clone, Debug)]
-pub enum Operation {
-    Xor(xor::Xor),
-}
+pub enum Operation {}
 
 impl Execute for Operation {
     #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>> {
-        match self {
-            Operation::Xor(inner)    => inner.exec(code, cpu),
-        }
+    fn exec(self, _: u8, _: &mut Cpu) -> Result<Option<Operation>> {
+        match self {}
     }
 }
 
@@ -47,13 +41,10 @@ impl Execute for Operation {
 /// Resumes the operation in flight, or starts the installed
 /// instruction's operation anew.
 pub(super) fn legacy(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
-    // Resume the in-flight operation, or start anew
-    let oper = if let Some(oper) = cpu.etc.oper.take() {
-        oper
-    } else {
-        // Start the installed instruction's operation
-        let start = cpu.etc.insn.legacy.expect("not a legacy instruction");
-        start()
+    // Resume the in-flight operation
+    let Some(oper) = cpu.etc.oper.take() else {
+        // No legacy operations remain to start
+        unreachable!("no legacy operations remain");
     };
     // Execute a single stage of the operation
     match oper.exec(code, cpu) {
