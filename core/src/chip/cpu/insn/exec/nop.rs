@@ -1,36 +1,15 @@
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Nop(Nop::Execute)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Nop {
-    #[default]
-    Execute,
-}
-
-impl Execute for Nop {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Nop> for Operation {
-    fn from(value: Nop) -> Self {
-        Self::Nop(value)
-    }
-}
-
-fn execute(code: u8, _cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, _: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     if code != 0x00 {
-        return Err(Error::Opcode(code));
+        unreachable!("unexpected opcode: {code:#04X}");
     }
 
     // Finish
-    Ok(None)
+    None
 }
