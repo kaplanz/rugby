@@ -8,15 +8,14 @@
 #![allow(clippy::unnecessary_wraps)]
 
 use log::{debug, trace};
-use rugby_arch::Block;
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Ime, Instruction, exec};
+use super::{Cpu, Ime, Instruction};
 
 /// Fetches and decodes the next instruction.
 ///
 /// Checks for pending interrupts, reads the opcode at `PC`, and decodes
-/// it, installing the decoded instruction's chain.
+/// it, returning the decoded instruction's chain.
 pub fn cycle1(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Log previous register state
     trace!("registers:\n{}", cpu.reg);
@@ -31,8 +30,8 @@ pub fn cycle1(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
         debug!("${pc:04x}: {insn}", pc = int.handler());
         // Disable interrupts
         cpu.etc.ime = Ime::Disabled;
-        // Install the dispatch
-        return install(insn, cpu);
+        // Return the dispatch
+        return Some(insn);
     }
 
     // Fetch the next opcode
@@ -58,26 +57,6 @@ pub fn cycle1(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
         cpu.etc.ime = Ime::Enabled;
     }
 
-    // Install the instruction
-    install(insn, cpu)
-}
-
-/// Installs a decoded instruction's chain.
-fn install(insn: Instruction, cpu: &mut Cpu) -> Option<Instruction> {
-    let Instruction { code, legacy, .. } = insn;
-    cpu.etc.insn = insn;
-    if legacy.is_some() {
-        // Release the blocks for the co-hosted stage
-        cpu.blk.cycle();
-        // Legacy entry: co-host the first stage (transitional)
-        match exec::legacy(code, cpu) {
-            // Proceed to the next stage
-            Some(next) => Some(next),
-            // Completed within the fetch cycle
-            None => cpu.step(cycle1),
-        }
-    } else {
-        // Chained entry: the first work cycle runs next
-        Some(insn)
-    }
+    // Return the instruction
+    Some(insn)
 }

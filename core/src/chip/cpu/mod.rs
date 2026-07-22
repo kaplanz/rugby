@@ -89,8 +89,6 @@ pub struct Cpu {
 pub struct Internal {
     /// In-flight instruction.
     insn: Instruction,
-    /// In-flight legacy operation (transitional).
-    oper: Option<insn::Operation>,
     /// Mid-instruction marker.
     busy: bool,
     /// Running status.

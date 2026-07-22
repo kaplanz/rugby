@@ -15,59 +15,10 @@
 
 #![allow(clippy::unnecessary_wraps)]
 
-use log::error;
-
-use super::{Cpu, Execute, Ime, Instruction, Result, Status, help};
+use super::{Cpu, Ime, Instruction, Status, help};
 
 /// Stage function handle.
 pub type Exec = fn(u8, &mut Cpu) -> Option<Instruction>;
-
-/// Legacy operation constructor.
-pub(super) type Start = fn() -> Operation;
-
-/// Instruction operation state.
-#[derive(Clone, Debug)]
-pub enum Operation {}
-
-impl Execute for Operation {
-    #[rustfmt::skip]
-    fn exec(self, _: u8, _: &mut Cpu) -> Result<Option<Operation>> {
-        match self {}
-    }
-}
-
-/// Executes the in-flight legacy operation.
-///
-/// Resumes the operation in flight, or starts the installed
-/// instruction's operation anew.
-pub(super) fn legacy(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
-    // Resume the in-flight operation
-    let Some(oper) = cpu.etc.oper.take() else {
-        // No legacy operations remain to start
-        unreachable!("no legacy operations remain");
-    };
-    // Execute a single stage of the operation
-    match oper.exec(code, cpu) {
-        Ok(Some(next)) => {
-            // Store the next stage
-            cpu.etc.oper = Some(next);
-            // Proceed
-            cpu.step(legacy)
-        }
-        Ok(None) => {
-            // Finish
-            None
-        }
-        Err(err) => {
-            // Log the error
-            error!("{err}");
-            // Stop the CPU
-            cpu.etc.run = Status::Stopped;
-            // Finish
-            None
-        }
-    }
-}
 
 /// Arithmetic add with carry.
 pub(super) mod adc;

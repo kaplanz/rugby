@@ -5,19 +5,13 @@ use std::fmt::{Debug, Display};
 use log::trace;
 use rugby_arch::Block;
 
-pub(super) use self::exec::Operation;
-use self::exec::{Exec, Start};
+use self::exec::Exec;
 use super::{Cpu, Ime, Status};
 use crate::chip::irq::Interrupt;
 
 mod exec;
 mod fetch;
 mod table;
-
-/// Instruction operation execution interface.
-trait Execute {
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>>;
-}
 
 /// Executes a single M-cycle of the in-flight instruction.
 ///
@@ -36,13 +30,6 @@ pub fn cycle(cpu: &mut Cpu) {
         // Proceed with in-flight instruction
         cpu.etc.busy = true;
         next
-    } else if cpu.etc.insn.legacy.is_some() {
-        // Legacy conclusion: fetch next cycle (transitional)
-        cpu.etc.busy = false;
-        Instruction {
-            exec: fetch::cycle1,
-            ..cpu.etc.insn
-        }
     } else {
         // Concurrently fetch next instruction
         cpu.etc.busy = false;
@@ -70,7 +57,6 @@ pub struct Instruction {
     code: u8,
     exec: Exec,
     repr: &'static str,
-    legacy: Option<Start>,
 }
 
 impl Default for Instruction {
@@ -79,7 +65,6 @@ impl Default for Instruction {
             code: 0x00,
             exec: fetch::cycle1,
             repr: "FETCH",
-            legacy: None,
         }
     }
 }
@@ -104,7 +89,6 @@ impl Instruction {
             code: int as u8,
             exec: exec::int::default(),
             repr: int.repr(),
-            legacy: None,
         }
     }
 
@@ -149,7 +133,6 @@ impl From<Interrupt> for Instruction {
             code: value as u8,
             exec: exec::int::default(),
             repr: value.repr(),
-            legacy: None,
         }
     }
 }
@@ -189,25 +172,6 @@ mod help {
             _ => panic!("Illegal register."),
         }
     }
-}
-
-/// A convenient type alias for [`Result`](std::result::Result).
-pub type Result<T> = std::result::Result<T, Error>;
-
-/// An error caused by an [instruction](Instruction).
-#[derive(Debug)]
-#[derive(thiserror::Error)]
-#[non_exhaustive]
-pub enum Error {
-    /// Illegal instruction.
-    #[error("illegal instruction: {0:#04X}")]
-    Illegal(u8),
-    /// Unexpected opcode.
-    #[error("unexpected opcode: {0:#04X}")]
-    Opcode(u8),
-    /// Unimplemented instruction.
-    #[error("unimplemented: {0:#04X}")]
-    Unimplemented(u8),
 }
 
 #[cfg(test)]
