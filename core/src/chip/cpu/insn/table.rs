@@ -220,7 +220,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0xd6, exec: exec::legacy,            repr: "SUB n8",         legacy: Some(exec::sub::default) },
     Instruction { code: 0xd7, exec: exec::legacy,            repr: "RST 10H",        legacy: Some(exec::rst::default) },
     Instruction { code: 0xd8, exec: exec::ret::default(),    repr: "RET C",          legacy: None },
-    Instruction { code: 0xd9, exec: exec::legacy,            repr: "RETI",           legacy: Some(exec::reti::default) },
+    Instruction { code: 0xd9, exec: exec::reti::default(),   repr: "RETI",           legacy: None },
     Instruction { code: 0xda, exec: exec::jp::default(),     repr: "JP C, a16",      legacy: None },
     Instruction { code: 0xdb, exec: exec::legacy,            repr: "UNUSED",         legacy: Some(exec::unused::default) },
     Instruction { code: 0xdc, exec: exec::call::default(),   repr: "CALL C, a16",    legacy: None },
