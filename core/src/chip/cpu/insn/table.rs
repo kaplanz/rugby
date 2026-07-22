@@ -3,7 +3,7 @@ use super::{Instruction, exec};
 /// Instruction lookup table.
 #[rustfmt::skip]
 pub const DECODE: [Instruction; 0x100] = [
-    Instruction { code: 0x00, exec: exec::legacy,            repr: "NOP",            legacy: Some(exec::nop::default) },
+    Instruction { code: 0x00, exec: exec::nop::default(),    repr: "NOP",            legacy: None },
     Instruction { code: 0x01, exec: exec::ldw::default(),    repr: "LD BC, n16",     legacy: None },
     Instruction { code: 0x02, exec: exec::ld::default(),     repr: "LD (BC), A",     legacy: None },
     Instruction { code: 0x03, exec: exec::incw::default(),   repr: "INC BC",         legacy: None },
