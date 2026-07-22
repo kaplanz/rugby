@@ -401,7 +401,6 @@ impl File {
     }
 
     /// Joint WZ register.
-    #[expect(unused)]
     pub(crate) fn wz(&'_ self) -> Alias<'_> {
         Alias {
             hi: &self.w,
