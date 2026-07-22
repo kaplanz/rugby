@@ -102,9 +102,9 @@ impl Instruction {
     pub fn vector(int: Interrupt) -> Self {
         Self {
             code: int as u8,
-            exec: exec::legacy,
+            exec: exec::int::default(),
             repr: int.repr(),
-            legacy: Some(exec::vector),
+            legacy: None,
         }
     }
 
@@ -147,9 +147,9 @@ impl From<Interrupt> for Instruction {
     fn from(value: Interrupt) -> Self {
         Self {
             code: value as u8,
-            exec: exec::legacy,
+            exec: exec::int::default(),
             repr: value.repr(),
-            legacy: Some(exec::vector),
+            legacy: None,
         }
     }
 }
