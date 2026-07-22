@@ -1,34 +1,13 @@
-use super::{Cpu, Error, Execute, Ime, Operation, Return};
+use super::{Cpu, Exec, Ime, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Ei(Ei::Execute)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Ei {
-    #[default]
-    Execute,
-}
-
-impl Execute for Ei {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Ei> for Operation {
-    fn from(value: Ei) -> Self {
-        Self::Ei(value)
-    }
-}
-
-fn execute(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     if code != 0xfb {
-        return Err(Error::Opcode(code));
+        unreachable!("unexpected opcode: {code:#04X}");
     }
 
     // Execute EI
@@ -37,5 +16,5 @@ fn execute(code: u8, cpu: &mut Cpu) -> Return {
     }
 
     // Finish
-    Ok(None)
+    None
 }
