@@ -42,7 +42,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0x24, exec: exec::legacy,            repr: "INC H",          legacy: Some(exec::inc::default) },
     Instruction { code: 0x25, exec: exec::legacy,            repr: "DEC H",          legacy: Some(exec::dec::default) },
     Instruction { code: 0x26, exec: exec::legacy,            repr: "LD H, n8",       legacy: Some(exec::ld::default) },
-    Instruction { code: 0x27, exec: exec::legacy,            repr: "DAA",            legacy: Some(exec::daa::default) },
+    Instruction { code: 0x27, exec: exec::daa::default(),    repr: "DAA",            legacy: None },
     Instruction { code: 0x28, exec: exec::legacy,            repr: "JR Z, e8",       legacy: Some(exec::jr::default) },
     Instruction { code: 0x29, exec: exec::addw::default(),   repr: "ADD HL, HL",     legacy: None },
     Instruction { code: 0x2a, exec: exec::legacy,            repr: "LD A, (HL+)",    legacy: Some(exec::ld::default) },
