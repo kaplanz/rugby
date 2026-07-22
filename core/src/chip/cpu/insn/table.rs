@@ -58,7 +58,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0x34, exec: exec::inc::default(),    repr: "INC (HL)",       legacy: None },
     Instruction { code: 0x35, exec: exec::dec::default(),    repr: "DEC (HL)",       legacy: None },
     Instruction { code: 0x36, exec: exec::ld::default(),     repr: "LD (HL), n8",    legacy: None },
-    Instruction { code: 0x37, exec: exec::legacy,            repr: "SCF",            legacy: Some(exec::scf::default) },
+    Instruction { code: 0x37, exec: exec::scf::default(),    repr: "SCF",            legacy: None },
     Instruction { code: 0x38, exec: exec::jr::default(),     repr: "JR C, e8",       legacy: None },
     Instruction { code: 0x39, exec: exec::addw::default(),   repr: "ADD HL, SP",     legacy: None },
     Instruction { code: 0x3a, exec: exec::ld::default(),     repr: "LD A, (HL-)",    legacy: None },
