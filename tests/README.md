@@ -291,7 +291,7 @@ timing.
 #### Results
 
 ```
-4 passed; 43 failed;
+6 passed; 41 failed;
 ```
 
 <details>
@@ -304,7 +304,7 @@ timing.
   |  ❌  | `acceptance/gpu/hblank_ly_scx_timing_variant_nops.gb`     |
   |  ❌  | `acceptance/gpu/intr_0_timing.gb`                         |
   |  ✅  | `acceptance/gpu/intr_1_2_timing-GS.gb`                    |
-  |  ❌  | `acceptance/gpu/intr_1_timing.gb`                         |
+  |  ✅  | `acceptance/gpu/intr_1_timing.gb`                         |
   |  ❌  | `acceptance/gpu/intr_2_0_timing.gb`                       |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx1_timing_nops.gb`         |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx2_timing_nops.gb`         |
@@ -339,7 +339,7 @@ timing.
   |  ❌  | `acceptance/gpu/ly_lyc_0_write-GS.gb`                     |
   |  ❌  | `acceptance/gpu/ly_lyc_144-GS.gb`                         |
   |  ❌  | `acceptance/gpu/ly_lyc_153-GS.gb`                         |
-  |  ❌  | `acceptance/gpu/ly_lyc_153_write-GS.gb`                   |
+  |  ✅  | `acceptance/gpu/ly_lyc_153_write-GS.gb`                   |
   |  ❌  | `acceptance/gpu/ly_lyc_write-GS.gb`                       |
   |  ❌  | `acceptance/gpu/ly_new_frame-GS.gb`                       |
   |  ✅  | `acceptance/gpu/stat_irq_blocking.gb`                     |
