@@ -409,7 +409,6 @@ impl File {
     }
 
     /// Joint mutable WZ register.
-    #[expect(unused)]
     pub(crate) fn wz_mut(&'_ mut self) -> AliasMut<'_> {
         AliasMut {
             hi: &mut self.w,
