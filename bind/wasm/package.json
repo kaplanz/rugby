@@ -9,6 +9,6 @@
     "build": "wasm-pack build"
   },
   "devDependencies": {
-    "wasm-pack": "^0.14.0"
+    "wasm-pack": "^0.15.0"
   }
 }
