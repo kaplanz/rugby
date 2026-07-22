@@ -1,30 +1,19 @@
-use super::{Cpu, Error, Execute, Operation, Return};
+use log::error;
 
-pub const fn default() -> Operation {
-    Operation::Unused(Unused::Execute)
+use super::{Cpu, Exec, Instruction};
+
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Unused {
-    #[default]
-    Execute,
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Log the illegal instruction
+    error!("illegal instruction: {code:#04X}");
+    // Hang the processor
+    cpu.step(hang)
 }
 
-impl Execute for Unused {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Execute => execute(code, cpu),
-        }
-    }
-}
-
-impl From<Unused> for Operation {
-    fn from(value: Unused) -> Self {
-        Self::Unused(value)
-    }
-}
-
-fn execute(code: u8, _: &mut Cpu) -> Return {
-    Err(Error::Illegal(code))
+fn hang(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Hang forever
+    cpu.step(hang)
 }

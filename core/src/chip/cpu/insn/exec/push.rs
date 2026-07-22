@@ -1,83 +1,70 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Push(Push::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Push {
-    #[default]
-    Fetch,
-    Push0,
-    Push1,
-    Delay,
-}
-
-impl Execute for Push {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch => fetch(code, cpu),
-            Self::Push0 => push0(code, cpu),
-            Self::Push1 => push1(code, cpu),
-            Self::Delay => delay(code, cpu),
-        }
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Check opcode
+    match code {
+        0xc5 | 0xd5 | 0xe5 | 0xf5 => (),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
-}
 
-impl From<Push> for Operation {
-    fn from(value: Push) -> Self {
-        Self::Push(value)
-    }
-}
-
-fn fetch(_: u8, _: &mut Cpu) -> Return {
-    // Delay by 1 cycle
+    // Decrement SP
+    let sp = cpu.reg.sp.load();
+    let sp = cpu.blk.idu.dec(sp);
+    cpu.reg.sp.store(sp);
 
     // Proceed
-    Ok(Some(Push::Push0.into()))
+    cpu.step(cycle3)
 }
 
-fn push0(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Load MSB
     let msb = match code {
         0xc5 => &cpu.reg.b,
         0xd5 => &cpu.reg.d,
         0xe5 => &cpu.reg.h,
         0xf5 => &cpu.reg.a,
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
     .load();
 
-    // Push MSB
-    cpu.pushbyte(msb);
+    // Write [SP] <- MSB
+    let sp = cpu.reg.sp.load();
+    cpu.blk.bus.write(sp, msb);
+    // Decrement SP
+    let sp = cpu.blk.idu.dec(sp);
+    cpu.reg.sp.store(sp);
 
     // Proceed
-    Ok(Some(Push::Push1.into()))
+    cpu.step(cycle4)
 }
 
-fn push1(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle4(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Load LSB
     let lsb = match code {
         0xc5 => cpu.reg.c.load(),
         0xd5 => cpu.reg.e.load(),
         0xe5 => cpu.reg.l.load(),
         0xf5 => cpu.reg.f.load(),
-        code => return Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     };
 
-    // Push LSB
-    cpu.pushbyte(lsb);
+    // Write [SP] <- LSB
+    let sp = cpu.reg.sp.load();
+    cpu.blk.bus.write(sp, lsb);
 
     // Proceed
-    Ok(Some(Push::Delay.into()))
+    cpu.step(cycle5)
 }
 
-fn delay(_: u8, _: &mut Cpu) -> Return {
+fn cycle5(_: u8, _: &mut Cpu) -> Option<Instruction> {
     // Delay by 1 cycle
 
     // Finish
-    Ok(None)
+    None
 }

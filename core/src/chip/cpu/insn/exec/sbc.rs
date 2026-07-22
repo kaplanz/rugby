@@ -1,73 +1,47 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use super::{Cpu, Exec, Instruction, help};
 
-pub const fn default() -> Operation {
-    Operation::Sbc(Sbc::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Sbc {
-    #[default]
-    Fetch,
-    Execute(u8),
-}
-
-impl Execute for Sbc {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-        }
-    }
-}
-
-impl From<Sbc> for Operation {
-    fn from(value: Sbc) -> Self {
-        Self::Sbc(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x9e => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Sbc::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xde => {
-            // Fetch n8 <- [PC++]
-            let n8 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Sbc::Execute(n8).into()))
+            cpu.step(cycle3)
         }
         0x98..=0x9f => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle3(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
-    // Execute SUB
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Execute SBC
     let acc = cpu.reg.a.load();
-    let cin = cpu.reg.f.c() as u8;
-    let (res, carry0) = acc.overflowing_sub(op2);
-    let (res, carry1) = res.overflowing_sub(cin);
+    let op2 = cpu.reg.z.load();
+    let (res, f) = cpu.blk.alu.sbc(acc, op2, cpu.reg.f);
     cpu.reg.a.store(res);
-
-    // Set flags
-    cpu.reg.f.set_z(res == 0);
-    cpu.reg.f.set_n(true);
-    cpu.reg.f.set_h((op2 & 0x0f) + cin > (acc & 0x0f));
-    cpu.reg.f.set_c(carry0 | carry1);
+    cpu.reg.f = f;
 
     // Finish
-    Ok(None)
+    None
 }

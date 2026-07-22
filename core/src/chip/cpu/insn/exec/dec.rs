@@ -1,158 +1,72 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Dec(Dec::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Dec {
-    #[default]
-    Fetch,
-    Execute(u8),
-    Delay,
-}
-
-impl Execute for Dec {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op1) => execute(code, cpu, op1),
-            Self::Delay        => delay(code, cpu),
-        }
-    }
-}
-
-impl From<Dec> for Operation {
-    fn from(value: Dec) -> Self {
-        Self::Dec(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x35 => {
-            // Read [HL]
-            let op1 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Dec::Execute(op1).into()))
+            cpu.step(cycle3)
         }
-        0x05 => {
-            // Load B
-            let op1 = cpu.reg.b.load();
+        0x05 | 0x0d | 0x15 | 0x1d | 0x25 | 0x2d | 0x3d => {
+            // Prepare Z
+            let z = match code {
+                0x05 => cpu.reg.b.load(),
+                0x0d => cpu.reg.c.load(),
+                0x15 => cpu.reg.d.load(),
+                0x1d => cpu.reg.e.load(),
+                0x25 => cpu.reg.h.load(),
+                0x2d => cpu.reg.l.load(),
+                0x3d => cpu.reg.a.load(),
+                code => unreachable!("unexpected opcode: {code:#04X}"),
+            };
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op1)
+            cycle3(code, cpu)
         }
-        0x0d => {
-            // Load C
-            let op1 = cpu.reg.c.load();
-            // Continue
-            execute(code, cpu, op1)
-        }
-        0x15 => {
-            // Load D
-            let op1 = cpu.reg.d.load();
-            // Continue
-            execute(code, cpu, op1)
-        }
-        0x1d => {
-            // Load E
-            let op1 = cpu.reg.e.load();
-            // Continue
-            execute(code, cpu, op1)
-        }
-        0x25 => {
-            // Load H
-            let op1 = cpu.reg.h.load();
-            // Continue
-            execute(code, cpu, op1)
-        }
-        0x2d => {
-            // Load L
-            let op1 = cpu.reg.l.load();
-            // Continue
-            execute(code, cpu, op1)
-        }
-        0x3d => {
-            // Load A
-            let op1 = cpu.reg.a.load();
-            // Continue
-            execute(code, cpu, op1)
-        }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-#[expect(clippy::verbose_bit_mask)]
-fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute DEC
-    let res = op1.wrapping_sub(1);
+    let op1 = cpu.reg.z.load();
+    let (res, f) = cpu.blk.alu.dec(op1, cpu.reg.f);
+    cpu.reg.f = f;
 
-    // Set flags
-    cpu.reg.f.set_z(res == 0);
-    cpu.reg.f.set_n(true);
-    cpu.reg.f.set_h(op1 & 0x0f == 0);
-
-    // Check opcode
+    // Store result
     match code {
         0x35 => {
             // Write [HL]
             cpu.writebyte(res);
             // Proceed
-            Ok(Some(Dec::Delay.into()))
+            return cpu.step(cycle4);
         }
-        0x05 => {
-            // Store B
-            cpu.reg.b.store(res);
-            // Finish
-            Ok(None)
-        }
-        0x0d => {
-            // Store C
-            cpu.reg.c.store(res);
-            // Finish
-            Ok(None)
-        }
-        0x15 => {
-            // Store D
-            cpu.reg.d.store(res);
-            // Finish
-            Ok(None)
-        }
-        0x1d => {
-            // Store E
-            cpu.reg.e.store(res);
-            // Finish
-            Ok(None)
-        }
-        0x25 => {
-            // Store H
-            cpu.reg.h.store(res);
-            // Finish
-            Ok(None)
-        }
-        0x2d => {
-            // Store L
-            cpu.reg.l.store(res);
-            // Finish
-            Ok(None)
-        }
-        0x3d => {
-            // Store A
-            cpu.reg.a.store(res);
-            // Finish
-            Ok(None)
-        }
-        code => Err(Error::Opcode(code)),
+        0x05 => cpu.reg.b.store(res),
+        0x0d => cpu.reg.c.store(res),
+        0x15 => cpu.reg.d.store(res),
+        0x1d => cpu.reg.e.store(res),
+        0x25 => cpu.reg.h.store(res),
+        0x2d => cpu.reg.l.store(res),
+        0x3d => cpu.reg.a.store(res),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
+
+    // Finish
+    None
 }
 
-fn delay(_: u8, _: &mut Cpu) -> Return {
+fn cycle4(_: u8, _: &mut Cpu) -> Option<Instruction> {
     // Delay by 1 cycle
 
     // Finish
-    Ok(None)
+    None
 }

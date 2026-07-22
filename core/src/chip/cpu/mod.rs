@@ -6,7 +6,6 @@
 
 use std::fmt::{Debug, Display};
 
-use log::{debug, error, trace};
 use rugby_arch::mem::{Memory, Ram};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
@@ -88,10 +87,10 @@ pub struct Cpu {
 /// Processor internals.
 #[derive(Debug, Default)]
 pub struct Internal {
-    /// Prefix instruction.
-    prefix: bool,
-    /// Execution stage.
-    stage: Stage,
+    /// In-flight instruction.
+    insn: Instruction,
+    /// Mid-instruction marker.
+    busy: bool,
     /// Running status.
     run: Status,
     /// Interrupt master enable.
@@ -109,10 +108,10 @@ impl Internal {
 }
 
 impl Cpu {
-    /// Gets the CPU's execution stage.
+    /// Checks whether the processor is between instructions.
     #[must_use]
-    pub fn stage(&self) -> &Stage {
-        &self.etc.stage
+    pub fn boundary(&self) -> bool {
+        !self.etc.busy
     }
 
     /// Fetch the next byte after PC.
@@ -174,7 +173,7 @@ impl Block for Cpu {
     }
 
     fn cycle(&mut self) {
-        self.etc.stage = std::mem::take(&mut self.etc.stage).exec(self);
+        insn::cycle(self);
     }
 
     fn reset(&mut self) {
@@ -246,15 +245,7 @@ impl Port<u16> for Cpu {
 impl Cpu {
     #[must_use]
     pub fn insn(&self) -> Instruction {
-        if let Stage::Execute(insn) = &self.etc.stage {
-            insn.clone()
-        } else {
-            // Fetch opcode at PC
-            let pc = self.reg.pc.load();
-            let op = self.blk.bus.read(pc);
-            // Construct instruction
-            Instruction::decode(op)
-        }
+        self.etc.insn
     }
 
     pub fn goto(&mut self, addr: u16) {
@@ -263,14 +254,10 @@ impl Cpu {
 
     pub fn exec(&mut self, code: u8) {
         // Create a new instruction...
-        let mut insn = Ok(Some(Instruction::decode(code)));
+        let mut insn = Some(Instruction::decode(code));
         // ... then execute it until completion
-        while let Ok(Some(work)) = insn {
+        while let Some(work) = insn {
             insn = work.exec(self);
-        }
-        // Report any errors
-        if let Err(err) = insn {
-            error!("{err}");
         }
     }
 
@@ -412,7 +399,6 @@ impl File {
     }
 
     /// Joint WZ register.
-    #[expect(unused)]
     pub(crate) fn wz(&'_ self) -> Alias<'_> {
         Alias {
             hi: &self.w,
@@ -421,7 +407,6 @@ impl File {
     }
 
     /// Joint mutable WZ register.
-    #[expect(unused)]
     pub(crate) fn wz_mut(&'_ mut self) -> AliasMut<'_> {
         AliasMut {
             hi: &mut self.w,
@@ -543,112 +528,6 @@ pub enum Status {
     Halted,
     /// Stopped; very low-power.
     Stopped,
-}
-
-/// Processor execution stage.
-#[derive(Clone, Debug, Default)]
-pub enum Stage {
-    /// Fetch and decode.
-    #[default]
-    Fetch,
-    /// Execute instruction.
-    Execute(Instruction),
-    /// Completed execution.
-    Done,
-}
-
-impl Stage {
-    fn exec(mut self, cpu: &mut Cpu) -> Self {
-        // Begin M-cycle
-        cpu.blk.cycle();
-
-        // If done, proceed to fetch this cycle
-        if let Stage::Done = self {
-            // Log previous register stage
-            trace!("registers:\n{}", cpu.reg);
-
-            // Check for pending interrupts
-            let int = (cpu.etc.ime == Ime::Enabled)
-                .then(|| cpu.irq.fetch())
-                .flatten();
-
-            // Handle pending interrupt...
-            if let Some(int) = int {
-                // Skip `Stage::Fetch`
-                let insn = Instruction::vector(int);
-                debug!("${pc:04x}: {insn}", pc = int.handler());
-                self = Stage::Execute(insn);
-            }
-            // ... or fetch next instruction
-            else {
-                // Proceed to `Stage::Fetch`
-                self = Stage::Fetch;
-            }
-        }
-
-        // If fetch, proceed to execute this cycle
-        if let Stage::Fetch = self {
-            // Read the next instruction
-            let pc = cpu.reg.pc.load();
-            let op = cpu.fetchbyte();
-
-            // Decode the instruction
-            let insn = if std::mem::take(&mut cpu.etc.prefix) {
-                Instruction::prefix
-            } else {
-                Instruction::decode
-            }(op);
-
-            // Check for HALT bug
-            if cpu.etc.halt_bug {
-                // Service the bug by rolling back the PC
-                let mut pc = cpu.reg.pc.load();
-                pc = pc.wrapping_sub(1);
-                cpu.reg.pc.store(pc);
-                cpu.etc.halt_bug = false;
-            }
-
-            // Log the instruction
-            debug!("${pc:04x}: {insn}");
-
-            // Enable interrupts (after EI, RETI)
-            if let Ime::WillEnable = cpu.etc.ime {
-                cpu.etc.ime = Ime::Enabled;
-            }
-
-            // Proceed to `Stage::Execute(_)`
-            self = Stage::Execute(insn);
-        }
-
-        // Execute the current stage
-        if let Stage::Execute(insn) = self {
-            // Execute a cycle of the instruction
-            let insn = insn.exec(cpu);
-            // Proceed to next stage
-            self = match insn {
-                Ok(Some(insn)) => Stage::Execute(insn),
-                Ok(None) => {
-                    if cpu.etc.prefix {
-                        // Atomically handle prefix instructions
-                        Stage::Fetch
-                    } else {
-                        // Otherwise, conclude the instruction
-                        Stage::Done
-                    }
-                }
-                Err(err) => {
-                    // Log the error
-                    error!("{err}");
-                    // Stop the CPU
-                    cpu.etc.run = Status::Stopped;
-                    // Continue to next instruction
-                    Stage::Done
-                }
-            };
-        }
-
-        self
-    }
 }
 
 /// Interrupt master enable.

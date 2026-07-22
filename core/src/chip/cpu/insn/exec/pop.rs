@@ -1,74 +1,59 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 
-pub const fn default() -> Operation {
-    Operation::Pop(Pop::Pop1)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Pop {
-    #[default]
-    Pop1,
-    Pop0,
-    Delay,
-}
-
-impl Execute for Pop {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Pop1  => pop1(code, cpu),
-            Self::Pop0  => pop0(code, cpu),
-            Self::Delay => delay(code, cpu),
-        }
-    }
-}
-
-impl From<Pop> for Operation {
-    fn from(value: Pop) -> Self {
-        Self::Pop(value)
-    }
-}
-
-fn pop1(code: u8, cpu: &mut Cpu) -> Return {
-    // Pop LSB <- [SP++]
-    let lsb = cpu.popbyte();
-
-    // Store LSB
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Check opcode
     match code {
-        0xc1 => cpu.reg.c.store(lsb),
-        0xd1 => cpu.reg.e.store(lsb),
-        0xe1 => cpu.reg.l.store(lsb),
-        0xf1 => cpu.reg.f.store(lsb),
-        code => return Err(Error::Opcode(code)),
+        0xc1 | 0xd1 | 0xe1 | 0xf1 => (),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
+
+    // Pop Z <- [SP++]
+    let z = cpu.popbyte();
+    cpu.reg.z.store(z);
 
     // Proceed
-    Ok(Some(Pop::Pop0.into()))
+    cpu.step(cycle3)
 }
 
-fn pop0(code: u8, cpu: &mut Cpu) -> Return {
-    // Pop MSB <- [SP++]
-    let msb = cpu.popbyte();
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Pop W <- [SP++]
+    let w = cpu.popbyte();
+    cpu.reg.w.store(w);
 
-    // Store MSB
+    // Proceed
+    cpu.step(cycle4)
+}
+
+fn cycle4(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Store r16 <- WZ
+    let w = cpu.reg.w.load();
+    let z = cpu.reg.z.load();
     match code {
-        0xc1 => &mut cpu.reg.b,
-        0xd1 => &mut cpu.reg.d,
-        0xe1 => &mut cpu.reg.h,
-        0xf1 => &mut cpu.reg.a,
-        code => return Err(Error::Opcode(code)),
+        0xc1 => {
+            cpu.reg.b.store(w);
+            cpu.reg.c.store(z);
+        }
+        0xd1 => {
+            cpu.reg.d.store(w);
+            cpu.reg.e.store(z);
+        }
+        0xe1 => {
+            cpu.reg.h.store(w);
+            cpu.reg.l.store(z);
+        }
+        0xf1 => {
+            cpu.reg.a.store(w);
+            cpu.reg.f.store(z);
+        }
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
-    .store(msb);
 
     // Finish
-    Ok(Some(Pop::Delay.into()))
-}
-
-fn delay(_: u8, _: &mut Cpu) -> Return {
-    // Delay by 1 cycle
-
-    // Finish
-    Ok(None)
+    None
 }

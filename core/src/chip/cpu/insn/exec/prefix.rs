@@ -1,39 +1,28 @@
-use super::{Cpu, Error, Execute, Operation, Return};
+use log::debug;
+use rugby_arch::reg::Register;
 
-pub const fn default() -> Operation {
-    Operation::Prefix(Prefix::Fetch)
+use super::{Cpu, Exec, Instruction};
+
+pub const fn default() -> Exec {
+    cycle1
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Prefix {
-    #[default]
-    Fetch,
-}
+/// Fetches and decodes a prefixed instruction.
+///
+/// Models the second machine cycle of a `PREFIX`-family instruction:
+/// reads the opcode at `PC` and decodes it via the prefix table. No
+/// interrupt check occurs, so an interrupt can never dispatch between
+/// `$CB` and its opcode byte.
+fn cycle1(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Fetch the prefixed opcode
+    let pc = cpu.reg.pc.load();
+    let op = cpu.fetchbyte();
+    // Decode via the prefix table
+    let insn = Instruction::prefix(op);
 
-impl Execute for Prefix {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch => fetch(code, cpu),
-        }
-    }
-}
+    // Log the instruction
+    debug!("${pc:04x}: {insn}");
 
-impl From<Prefix> for Operation {
-    fn from(value: Prefix) -> Self {
-        Self::Prefix(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
-    // Check opcode
-    if code != 0xcb {
-        return Err(Error::Opcode(code));
-    }
-
-    // Execute PREFIX
-    cpu.etc.prefix = true;
-
-    // Proceed
-    Ok(None)
+    // Return the instruction
+    Some(insn)
 }

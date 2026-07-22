@@ -1,55 +1,35 @@
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use rugby_arch::reg::Register;
 
-pub const fn default() -> Operation {
-    Operation::Sra(Sra::Fetch)
+use super::{Cpu, Exec, Instruction, help};
+
+pub const fn default() -> Exec {
+    cycle3
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Sra {
-    #[default]
-    Fetch,
-    Execute(u8),
-    Delay,
-}
-
-impl Execute for Sra {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op1) => execute(code, cpu, op1),
-            Self::Delay        => delay(code, cpu),
-        }
-    }
-}
-
-impl From<Sra> for Operation {
-    fn from(value: Sra) -> Self {
-        Self::Sra(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle3(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x2e => {
-            // Read [HL]
-            let op1 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Sra::Execute(op1).into()))
+            cpu.step(cycle4)
         }
         0x28..=0x2f => {
-            // Prepare op1
-            let op1 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op1)
+            cycle4(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
+fn cycle4(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute SRA
+    let op1 = cpu.reg.z.load();
     let sign = op1 & 0x80;
     let carry = op1 & 0x01 != 0;
     let res = sign | (op1 >> 1);
@@ -66,21 +46,21 @@ fn execute(code: u8, cpu: &mut Cpu, op1: u8) -> Return {
             // Write [HL]
             cpu.writebyte(res);
             // Proceed
-            Ok(Some(Sra::Delay.into()))
+            cpu.step(cycle5)
         }
         0x28..=0x2f => {
             // Store r8
             help::set_op8(cpu, code & 0x07, res);
             // Finish
-            Ok(None)
+            None
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn delay(_: u8, _: &mut Cpu) -> Return {
+fn cycle5(_: u8, _: &mut Cpu) -> Option<Instruction> {
     // Delay by 1 cycle
 
     // Finish
-    Ok(None)
+    None
 }

@@ -105,7 +105,7 @@ impl Debugger {
         // Update program counter
         self.pc = cpu.load(cpu::Select16::PC);
         self.state = State {
-            cpu: cpu.stage().clone(),
+            cpu: cpu.boundary(),
             ppu: (ppu.dot(), ppu.load(ppu::Select::Ly)),
         };
     }
@@ -276,7 +276,7 @@ impl Debugger {
         // Pre-calculate machine cycle
         let (dx, ly) = self.state.ppu;
         let mtick = self.cycle.is_multiple_of(4);
-        let dinsn = matches!(self.state.cpu, cpu::Stage::Done);
+        let dinsn = self.state.cpu;
         let dxrst = dx == 0;
         let lyrst = ly == 0;
         // Check if this is an edge cycle
@@ -408,7 +408,7 @@ impl Display for Tick {
 /// Emulation state.
 #[derive(Debug, Default)]
 struct State {
-    cpu: cpu::Stage,
+    cpu: bool,
     ppu: (u16, u8),
 }
 
