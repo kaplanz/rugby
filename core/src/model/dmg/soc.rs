@@ -134,7 +134,10 @@ impl SoC {
             let bus = bus::view::Cpu {
                 ibus: bus::Ibus {
                     boot: boot.clone(),
-                    ppu: ppu.mem.clone(),
+                    ppu: dma::Gate {
+                        mem: ppu.mem.clone(),
+                        reg: dma.reg.clone(),
+                    },
                     apu: apu.mem.clone(),
                     io: bus::File {
                         joy: joy.reg.clone(),

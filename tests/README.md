@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-38 passed; 31 failed;
+54 passed; 15 failed;
 ```
 
 <details>
@@ -201,7 +201,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 
   | Pass | Test                                                |
   |:----:| --------------------------------------------------- |
-  |  ❌  | `acceptance/add_sp_e_timing.gb`                     |
+  |  ✅  | `acceptance/add_sp_e_timing.gb`                     |
   |  ✅  | `acceptance/bits/mem_oam.gb`                        |
   |  ✅  | `acceptance/bits/reg_f.gb`                          |
   |  ✅  | `acceptance/bits/unused_hwio-GS.gb`                 |
@@ -211,10 +211,10 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/boot_hwio-dmgABCmgb.gb`                 |
   |  ✅  | `acceptance/boot_regs-dmg0.gb`                      |
   |  ✅  | `acceptance/boot_regs-dmgABC.gb`                    |
-  |  ❌  | `acceptance/call_cc_timing.gb`                      |
-  |  ❌  | `acceptance/call_cc_timing2.gb`                     |
-  |  ❌  | `acceptance/call_timing.gb`                         |
-  |  ❌  | `acceptance/call_timing2.gb`                        |
+  |  ✅  | `acceptance/call_cc_timing.gb`                      |
+  |  ✅  | `acceptance/call_cc_timing2.gb`                     |
+  |  ✅  | `acceptance/call_timing.gb`                         |
+  |  ✅  | `acceptance/call_timing2.gb`                        |
   |  ✅  | `acceptance/di_timing-GS.gb`                        |
   |  ✅  | `acceptance/div_timing.gb`                          |
   |  ✅  | `acceptance/ei_sequence.gb`                         |
@@ -227,15 +227,15 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ✅  | `acceptance/instr/daa.gb`                           |
   |  ✅  | `acceptance/interrupts/ie_push.gb`                  |
   |  ✅  | `acceptance/intr_timing.gb`                         |
-  |  ❌  | `acceptance/jp_cc_timing.gb`                        |
-  |  ❌  | `acceptance/jp_timing.gb`                           |
-  |  ❌  | `acceptance/ld_hl_sp_e_timing.gb`                   |
+  |  ✅  | `acceptance/jp_cc_timing.gb`                        |
+  |  ✅  | `acceptance/jp_timing.gb`                           |
+  |  ✅  | `acceptance/ld_hl_sp_e_timing.gb`                   |
   |  ✅  | `acceptance/oam_dma/basic.gb`                       |
   |  ✅  | `acceptance/oam_dma/reg_read.gb`                    |
-  |  ❌  | `acceptance/oam_dma_restart.gb`                     |
+  |  ✅  | `acceptance/oam_dma_restart.gb`                     |
   |  ❌  | `acceptance/oam_dma/sources-GS.gb`                  |
-  |  ❌  | `acceptance/oam_dma_start.gb`                       |
-  |  ❌  | `acceptance/oam_dma_timing.gb`                      |
+  |  ✅  | `acceptance/oam_dma_start.gb`                       |
+  |  ✅  | `acceptance/oam_dma_timing.gb`                      |
   |  ✅  | `acceptance/pop_timing.gb`                          |
   |  ❌  | `acceptance/ppu/hblank_ly_scx_timing-GS.gb`         |
   |  ✅  | `acceptance/ppu/intr_1_2_timing-GS.gb`              |
@@ -249,13 +249,13 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ✅  | `acceptance/ppu/stat_irq_blocking.gb`               |
   |  ❌  | `acceptance/ppu/stat_lyc_onoff.gb`                  |
   |  ✅  | `acceptance/ppu/vblank_stat_intr-GS.gb`             |
-  |  ❌  | `acceptance/push_timing.gb`                         |
+  |  ✅  | `acceptance/push_timing.gb`                         |
   |  ✅  | `acceptance/rapid_di_ei.gb`                         |
-  |  ❌  | `acceptance/ret_cc_timing.gb`                       |
-  |  ❌  | `acceptance/ret_timing.gb`                          |
+  |  ✅  | `acceptance/ret_cc_timing.gb`                       |
+  |  ✅  | `acceptance/ret_timing.gb`                          |
   |  ✅  | `acceptance/reti_intr_timing.gb`                    |
-  |  ❌  | `acceptance/reti_timing.gb`                         |
-  |  ❌  | `acceptance/rst_timing.gb`                          |
+  |  ✅  | `acceptance/reti_timing.gb`                         |
+  |  ✅  | `acceptance/rst_timing.gb`                          |
   |  ❌  | `acceptance/serial/boot_sclk_align-dmgABCmgb.gb`    |
   |  ✅  | `acceptance/timer/div_write.gb`                     |
   |  ❌  | `acceptance/timer/rapid_toggle.gb`                  |

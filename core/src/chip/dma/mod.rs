@@ -72,6 +72,24 @@ pub struct Control {
     mode: Mode,
     /// DMA source page.
     page: u8,
+    /// Restarted transfer.
+    rst: bool,
+}
+
+impl Control {
+    /// Checks whether a transfer blocks object memory.
+    ///
+    /// Blocking begins one M-cycle after the request, except that a
+    /// restarted transfer blocks through its warmup as the previous
+    /// transfer is still running.
+    #[must_use]
+    pub fn blocking(&self) -> bool {
+        match self.mode {
+            Mode::On { lo: 0xff, .. } => self.rst,
+            Mode::On { .. } => true,
+            _ => false,
+        }
+    }
 }
 
 impl Block for Control {
@@ -103,10 +121,43 @@ impl Register for Control {
         //
         // NOTE: Writes during an active transfer restart it from the newly
         //       written source page.
+        self.rst = matches!(self.mode, Mode::On { lo, .. } if lo != 0xff);
         self.mode = Mode::Req(value);
         debug!("request: 0xfe00 <- {value:#04x}00");
         // Always update stored value
         self.page.store(value);
+    }
+}
+
+/// OAM access gate.
+///
+/// Blocks processor access to object memory during an active transfer,
+/// with reads returning `$FF` and writes dropped.
+#[derive(Debug, Default)]
+pub struct Gate {
+    /// Object memory.
+    pub mem: super::ppu::Bank,
+    /// DMA register.
+    pub reg: Shared<Control>,
+}
+
+impl Memory for Gate {
+    fn read(&self, addr: u16) -> rugby_arch::mem::Result<u8> {
+        if self.reg.borrow().blocking() {
+            // Blocked during transfer
+            Ok(0xff)
+        } else {
+            self.mem.read(addr)
+        }
+    }
+
+    fn write(&mut self, addr: u16, data: u8) -> rugby_arch::mem::Result<()> {
+        if self.reg.borrow().blocking() {
+            // Dropped during transfer
+            Ok(())
+        } else {
+            self.mem.write(addr, data)
+        }
     }
 }
 

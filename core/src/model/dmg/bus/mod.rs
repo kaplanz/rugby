@@ -57,7 +57,7 @@ pub struct Ibus {
     pub boot: boot::Slot,
     /// Graphics memory.
     #[mmap(0xfe00..=0xfe9f)]
-    pub ppu: ppu::Bank,
+    pub ppu: dma::Gate,
     /// Audio memory.
     #[mmap(0xff30..=0xff3f)]
     pub apu: apu::Bank,
