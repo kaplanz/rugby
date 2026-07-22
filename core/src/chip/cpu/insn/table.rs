@@ -34,7 +34,7 @@ pub const DECODE: [Instruction; 0x100] = [
     Instruction { code: 0x1c, exec: exec::inc::default(),    repr: "INC E",          legacy: None },
     Instruction { code: 0x1d, exec: exec::dec::default(),    repr: "DEC E",          legacy: None },
     Instruction { code: 0x1e, exec: exec::ld::default(),     repr: "LD E, n8",       legacy: None },
-    Instruction { code: 0x1f, exec: exec::legacy,            repr: "RRA",            legacy: Some(exec::rra::default) },
+    Instruction { code: 0x1f, exec: exec::rra::default(),    repr: "RRA",            legacy: None },
     Instruction { code: 0x20, exec: exec::jr::default(),     repr: "JR NZ, e8",      legacy: None },
     Instruction { code: 0x21, exec: exec::ldw::default(),    repr: "LD HL, n16",     legacy: None },
     Instruction { code: 0x22, exec: exec::ld::default(),     repr: "LD (HL+), A",    legacy: None },
