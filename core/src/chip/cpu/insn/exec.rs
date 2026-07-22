@@ -30,7 +30,6 @@ pub(super) type Start = fn() -> Operation;
 /// Instruction operation state.
 #[derive(Clone, Debug)]
 pub enum Operation {
-    Jr(jr::Jr),
     Ld(ld::Ld),
     Ldh(ldh::Ldh),
     Ldw(ldw::Ldw),
@@ -67,7 +66,6 @@ impl Execute for Operation {
     #[rustfmt::skip]
     fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>> {
         match self {
-            Operation::Jr(inner)     => inner.exec(code, cpu),
             Operation::Ld(inner)     => inner.exec(code, cpu),
             Operation::Ldh(inner)    => inner.exec(code, cpu),
             Operation::Ldw(inner)    => inner.exec(code, cpu),
