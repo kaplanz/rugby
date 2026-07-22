@@ -68,7 +68,7 @@ behaviours.
 #### Results
 
 ```
-21 passed; 24 failed;
+19 passed; 26 failed;
 ```
 
 <details>
@@ -105,12 +105,12 @@ behaviours.
   |  ✅  | `instr_timing/instr_timing.gb`                      |
   |  ❌  | `interrupt_time/interrupt_time.gb`                  |
   |  ❌  | `mem_timing/individual/01-read_timing.gb`           |
-  |  ✅  | `mem_timing/individual/02-write_timing.gb`          |
+  |  ❌  | `mem_timing/individual/02-write_timing.gb`          |
   |  ❌  | `mem_timing/individual/03-modify_timing.gb`         |
   |  ❌  | `mem_timing/mem_timing.gb`                          |
   |  ❌  | `mem_timing-2/mem_timing.gb`                        |
   |  ❌  | `mem_timing-2/rom_singles/01-read_timing.gb`        |
-  |  ✅  | `mem_timing-2/rom_singles/02-write_timing.gb`       |
+  |  ❌  | `mem_timing-2/rom_singles/02-write_timing.gb`       |
   |  ❌  | `mem_timing-2/rom_singles/03-modify_timing.gb`      |
   |  ❌  | `oam_bug/oam_bug.gb`                                |
   |  ❌  | `oam_bug/rom_singles/1-lcd_sync.gb`                 |
@@ -193,7 +193,7 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
 #### Results
 
 ```
-39 passed; 30 failed;
+38 passed; 31 failed;
 ```
 
 <details>
@@ -236,13 +236,13 @@ Detailed tests on precise characteristics easily verifiable on actual hardware.
   |  ❌  | `acceptance/oam_dma/sources-GS.gb`                  |
   |  ❌  | `acceptance/oam_dma_start.gb`                       |
   |  ❌  | `acceptance/oam_dma_timing.gb`                      |
-  |  ✅  | `acceptance/pop_timing.gb`                          |
+  |  ❌  | `acceptance/pop_timing.gb`                          |
   |  ❌  | `acceptance/ppu/hblank_ly_scx_timing-GS.gb`         |
   |  ✅  | `acceptance/ppu/intr_1_2_timing-GS.gb`              |
   |  ❌  | `acceptance/ppu/intr_2_0_timing.gb`                 |
-  |  ✅  | `acceptance/ppu/intr_2_mode0_timing.gb`             |
+  |  ❌  | `acceptance/ppu/intr_2_mode0_timing.gb`             |
   |  ❌  | `acceptance/ppu/intr_2_mode0_timing_sprites.gb`     |
-  |  ❌  | `acceptance/ppu/intr_2_mode3_timing.gb`             |
+  |  ✅  | `acceptance/ppu/intr_2_mode3_timing.gb`             |
   |  ❌  | `acceptance/ppu/intr_2_oam_ok_timing.gb`            |
   |  ❌  | `acceptance/ppu/lcdon_timing-GS.gb`                 |
   |  ❌  | `acceptance/ppu/lcdon_write_timing-GS.gb`           |
@@ -291,7 +291,7 @@ timing.
 #### Results
 
 ```
-8 passed; 39 failed;
+6 passed; 41 failed;
 ```
 
 <details>
@@ -308,20 +308,20 @@ timing.
   |  ❌  | `acceptance/gpu/intr_2_0_timing.gb`                       |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx1_timing_nops.gb`         |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx2_timing_nops.gb`         |
-  |  ✅  | `acceptance/gpu/intr_2_mode0_scx3_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx3_timing_nops.gb`         |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx4_timing_nops.gb`         |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx5_timing_nops.gb`         |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx6_timing_nops.gb`         |
-  |  ✅  | `acceptance/gpu/intr_2_mode0_scx7_timing_nops.gb`         |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_scx7_timing_nops.gb`         |
   |  ❌  | `acceptance/gpu/intr_2_mode0_scx8_timing_nops.gb`         |
-  |  ✅  | `acceptance/gpu/intr_2_mode0_timing.gb`                   |
+  |  ❌  | `acceptance/gpu/intr_2_mode0_timing.gb`                   |
   |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites.gb`           |
   |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_nops.gb`      |
   |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx1_nops.gb` |
   |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx2_nops.gb` |
   |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx3_nops.gb` |
   |  ❌  | `acceptance/gpu/intr_2_mode0_timing_sprites_scx4_nops.gb` |
-  |  ❌  | `acceptance/gpu/intr_2_mode3_timing.gb`                   |
+  |  ✅  | `acceptance/gpu/intr_2_mode3_timing.gb`                   |
   |  ❌  | `acceptance/gpu/intr_2_oam_ok_timing.gb`                  |
   |  ❌  | `acceptance/gpu/intr_2_timing.gb`                         |
   |  ❌  | `acceptance/gpu/lcdon_mode_timing.gb`                     |
