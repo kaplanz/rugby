@@ -69,7 +69,7 @@ fn read(_: u8, cpu: &mut Cpu, a8: u8) -> Return {
     let addr = u16::from_be_bytes([0xff, a8]);
 
     // Execute LDH B, {a8, C}
-    let op2 = cpu.read(addr);
+    let op2 = cpu.blk.bus.read(addr);
     cpu.reg.a.store(op2);
 
     // Proceed
@@ -82,7 +82,7 @@ fn write(_: u8, cpu: &mut Cpu, a8: u8) -> Return {
 
     // Execute LDH {a8, C}, A
     let op2 = cpu.reg.a.load();
-    cpu.write(addr, op2);
+    cpu.blk.bus.write(addr, op2);
 
     // Proceed
     Ok(Some(Ldh::Delay.into()))

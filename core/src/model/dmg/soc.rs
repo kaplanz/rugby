@@ -131,32 +131,33 @@ impl SoC {
         // Central processing unit
         let cpu = {
             let mem = cpu::Bank::default();
-            cpu::Cpu {
-                bus: bus::view::Cpu {
-                    ibus: bus::Ibus {
+            let bus = bus::view::Cpu {
+                ibus: bus::Ibus {
+                    boot: boot.clone(),
+                    ppu: ppu.mem.clone(),
+                    apu: apu.mem.clone(),
+                    io: bus::File {
+                        joy: joy.reg.clone(),
+                        sio: sio.reg.clone(),
+                        tma: tma.reg.clone(),
+                        irq: irq.reg.clone(),
+                        apu: apu.reg.clone(),
+                        dma: dma.reg.clone(),
+                        ppu: ppu.reg.clone(),
                         boot: boot.clone(),
-                        ppu: ppu.mem.clone(),
-                        apu: apu.mem.clone(),
-                        io: bus::File {
-                            joy: joy.reg.clone(),
-                            sio: sio.reg.clone(),
-                            tma: tma.reg.clone(),
-                            irq: irq.reg.clone(),
-                            apu: apu.reg.clone(),
-                            dma: dma.reg.clone(),
-                            ppu: ppu.reg.clone(),
-                            boot: boot.clone(),
-                        },
-                        cpu: mem.clone(),
                     },
-                    vbus: bus::Vbus { vram: vram.clone() },
-                    ebus: bus::Ebus {
-                        cart: cart.clone(),
-                        wram: wram.clone(),
-                    },
+                    cpu: mem.clone(),
                 },
-                mem,
+                vbus: bus::Vbus { vram: vram.clone() },
+                ebus: bus::Ebus {
+                    cart: cart.clone(),
+                    wram: wram.clone(),
+                },
+            };
+            cpu::Cpu {
+                blk: cpu::blk::Hardware::new(cpu::blk::Bus::new(bus)),
                 reg: cpu::File::default(),
+                mem,
                 etc: cpu::Internal::default(),
                 irq: irq.line.clone(),
             }

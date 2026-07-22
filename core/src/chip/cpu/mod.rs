@@ -6,15 +6,16 @@
 
 use std::fmt::{Debug, Display};
 
-use log::{debug, error, trace, warn};
+use log::{debug, error, trace};
 use rugby_arch::mem::{Memory, Ram};
 use rugby_arch::reg::{Port, Register};
 use rugby_arch::{Block, Shared};
 
+use self::blk::Hardware;
 use self::insn::Instruction;
 use crate::chip::irq;
-use crate::dmg::bus;
 
+pub mod blk;
 pub mod insn;
 pub mod reg;
 
@@ -72,11 +73,11 @@ pub enum Select16 {
 /// Central processing unit.
 #[derive(Debug)]
 pub struct Cpu {
-    /// Processor bus.
-    pub bus: bus::view::Cpu,
+    /// Hardware blocks.
+    pub blk: Hardware,
     /// Processor registers.
     pub reg: File,
-    /// Processor memory.
+    /// Memory bank.
     pub mem: Bank,
     /// Processor internals.
     pub etc: Internal,
@@ -114,31 +115,14 @@ impl Cpu {
         &self.etc.stage
     }
 
-    /// Read the byte at the given address.
-    #[must_use]
-    pub fn read(&self, addr: u16) -> u8 {
-        self.bus
-            .read(addr)
-            .inspect_err(|err| warn!("failed to read [${addr:04x}] (default: `0xff`): {err}"))
-            .unwrap_or(0xff)
-    }
-
-    /// Write to the byte at the given address.
-    pub fn write(&mut self, addr: u16, data: u8) {
-        let _ = self
-            .bus
-            .write(addr, data)
-            .inspect_err(|err| warn!("failed to write [${addr:04x}] <- {data:#04x}: {err}"));
-    }
-
     /// Fetch the next byte after PC.
     fn fetchbyte(&mut self) -> u8 {
         // Load PC
         let mut pc = self.reg.pc.load();
         // Read at PC
-        let byte = self.read(pc);
+        let byte = self.blk.bus.read(pc);
         // Increment PC
-        pc = pc.wrapping_add(1);
+        pc = self.blk.idu.inc(pc);
         self.reg.pc.store(pc);
         // Return fetched byte
         byte
@@ -149,7 +133,7 @@ impl Cpu {
         // Load value of HL
         let hl = self.reg.hl().load();
         // Read at HL
-        self.read(hl)
+        self.blk.bus.read(hl)
     }
 
     /// Write to the byte at HL
@@ -157,7 +141,7 @@ impl Cpu {
         // Load value of HL
         let hl = self.reg.hl().load();
         // Write to HL
-        self.write(hl, byte);
+        self.blk.bus.write(hl, byte);
     }
 
     /// Pop the byte at SP.
@@ -165,9 +149,9 @@ impl Cpu {
         // Load SP
         let mut sp = self.reg.sp.load();
         // Read at SP
-        let byte = self.read(sp);
+        let byte = self.blk.bus.read(sp);
         // Increment SP
-        sp = sp.wrapping_add(1);
+        sp = self.blk.idu.inc(sp);
         self.reg.sp.store(sp);
         // Return popped byte
         byte
@@ -175,12 +159,12 @@ impl Cpu {
 
     /// Push to the byte at SP.
     fn pushbyte(&mut self, byte: u8) {
-        // Increment SP
+        // Decrement SP
         let mut sp = self.reg.sp.load();
-        sp = sp.wrapping_sub(1);
+        sp = self.blk.idu.dec(sp);
         self.reg.sp.store(sp);
         // Push to SP
-        self.write(sp, byte);
+        self.blk.bus.write(sp, byte);
     }
 }
 
@@ -267,7 +251,7 @@ impl Cpu {
         } else {
             // Fetch opcode at PC
             let pc = self.reg.pc.load();
-            let op = self.read(pc);
+            let op = self.blk.bus.read(pc);
             // Construct instruction
             Instruction::decode(op)
         }
@@ -346,6 +330,8 @@ impl Default for Bank {
 /// | Byte | E    | General register E.           |
 /// | Byte | H    | Address (HI) byte.            |
 /// | Byte | L    | Address (LO) byte.            |
+/// | Byte | W    | Private register W.           |
+/// | Byte | Z    | Private register Z.           |
 /// | Word | SP   | Stack pointer.                |
 /// | Word | PC   | Program counter.              |
 #[derive(Debug, Default)]
@@ -366,6 +352,10 @@ pub struct File {
     pub h: reg::H,
     /// Address (LO) byte.
     pub l: reg::L,
+    /// Private register W.
+    pub w: reg::W,
+    /// Private register Z.
+    pub z: reg::Z,
     /// Stack pointer.
     pub sp: reg::Sp,
     /// Program counter.
@@ -418,6 +408,24 @@ impl File {
         AliasMut {
             hi: &mut self.h,
             lo: &mut self.l,
+        }
+    }
+
+    /// Joint WZ register.
+    #[expect(unused)]
+    pub(crate) fn wz(&'_ self) -> Alias<'_> {
+        Alias {
+            hi: &self.w,
+            lo: &self.z,
+        }
+    }
+
+    /// Joint mutable WZ register.
+    #[expect(unused)]
+    pub(crate) fn wz_mut(&'_ mut self) -> AliasMut<'_> {
+        AliasMut {
+            hi: &mut self.w,
+            lo: &mut self.z,
         }
     }
 }
@@ -551,6 +559,9 @@ pub enum Stage {
 
 impl Stage {
     fn exec(mut self, cpu: &mut Cpu) -> Self {
+        // Begin M-cycle
+        cpu.blk.cycle();
+
         // If done, proceed to fetch this cycle
         if let Stage::Done = self {
             // Log previous register stage

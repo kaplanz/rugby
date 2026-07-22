@@ -1,13 +1,14 @@
 use std::iter;
 
 use super::super::*;
+use crate::dmg::bus;
 
 fn setup() -> Cpu {
     let irq = irq::Irq::default();
     Cpu {
-        bus: bus::view::Cpu::default(),
-        mem: Bank::default(),
+        blk: Hardware::new(blk::Bus::new(bus::view::Cpu::default())),
         reg: File::default(),
+        mem: Bank::default(),
         etc: Internal::default(),
         irq: irq.line,
     }

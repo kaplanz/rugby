@@ -58,7 +58,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             // Load A
             let op2 = cpu.reg.a.load();
             // Write A
-            cpu.write(r16, op2);
+            cpu.blk.bus.write(r16, op2);
             // Proceed
             match code {
                 0x02 | 0x12 => Ok(Some(Ld::Done.into())),
@@ -77,7 +77,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             }
             .load();
             // Read r16
-            let op2 = cpu.read(r16);
+            let op2 = cpu.blk.bus.read(r16);
             // Proceed
             Ok(Some(Ld::Byte(op2).into()))
         }
@@ -111,7 +111,7 @@ fn fetch(code: u8, cpu: &mut Cpu) -> Return {
             // Prepare op2
             let op2 = help::get_op8(cpu, code & 0x07);
             // Write op2
-            cpu.write(addr, op2);
+            cpu.blk.bus.write(addr, op2);
             // Proceed
             Ok(Some(Ld::Done.into()))
         }
@@ -207,11 +207,11 @@ fn word(code: u8, cpu: &mut Cpu, word: u16) -> Return {
         0xea => {
             // Execute LD [a16], A
             let op2 = cpu.reg.a.load();
-            cpu.write(word, op2);
+            cpu.blk.bus.write(word, op2);
         }
         0xfa => {
             // Execute LD A, [a16]
-            let op2 = cpu.read(word);
+            let op2 = cpu.blk.bus.read(word);
             cpu.reg.a.store(op2);
         }
         code => return Err(Error::Opcode(code)),

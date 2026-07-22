@@ -31,7 +31,7 @@ fn setup() -> GameBoy {
 #[test]
 fn boot_disable_works() {
     let mut emu = setup();
-    let bus = &mut emu.main.soc.cpu;
+    let bus = &mut emu.main.soc.cpu.blk.bus;
 
     // Ensure boot ROM starts enabled (compare against boot ROM).
     (0x0000..=0x00ff)
@@ -54,7 +54,7 @@ fn boot_disable_works() {
 fn bus_all_works() {
     let mut emu = setup();
     let hram = emu.main.soc.cpu.mem.hram.clone();
-    let bus = &mut emu.main.soc.cpu;
+    let bus = &mut emu.main.soc.cpu.blk.bus;
 
     // Boot ROM
     if let Some(boot) = emu.main.soc.boot.get() {
@@ -180,7 +180,7 @@ fn bus_all_works() {
 #[test]
 fn bus_unmapped_works() {
     let mut emu = setup();
-    let bus = &mut emu.main.soc.cpu.bus;
+    let bus = emu.main.soc.cpu.blk.bus.view();
 
     // Test unmapped addresses
     for range in [0xfea0..=0xfeff, 0xff03..=0xff03, 0xff27..=0xff2f] {

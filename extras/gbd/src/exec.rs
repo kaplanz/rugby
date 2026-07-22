@@ -274,7 +274,7 @@ pub fn quit() -> Result<()> {
 
 pub fn read(emu: &mut GameBoy, addr: u16) -> Result<()> {
     // Perform the read
-    let byte = emu.inner().soc.cpu.read(addr);
+    let byte = emu.inner().soc.cpu.blk.bus.read(addr);
     advise::info!("${addr:04x}: {byte:02x}");
 
     Ok(())
@@ -285,7 +285,9 @@ pub fn read_range(emu: &mut GameBoy, range: Orange<u16>) -> Result<()> {
     let Orange { start, .. } = range.clone();
     let iter = range.into_iter();
     // Load all reads
-    let data: Vec<_> = iter.map(|addr| emu.inner().soc.cpu.read(addr)).collect();
+    let data: Vec<_> = iter
+        .map(|addr| emu.inner().soc.cpu.blk.bus.read(addr))
+        .collect();
     // Display results
     advise::info!("read {size}:", size = bfmt::Size::from(data.len()));
     let data = format!("{}", hexd::Printer::<u8>::new(start.into(), &data));
@@ -432,8 +434,8 @@ pub fn store(emu: &mut GameBoy, loc: Select, value: Value) -> Result<()> {
 pub fn write(emu: &mut GameBoy, addr: u16, byte: u8) -> Result<()> {
     let cpu = &mut emu.inner_mut().soc.cpu;
     // Perform the write
-    cpu.write(addr, byte);
-    let data = cpu.read(addr);
+    cpu.blk.bus.write(addr, byte);
+    let data = cpu.blk.bus.read(addr);
     if data != byte {
         advise::warn!("ignored write ${addr:04x} <- {byte:02x} (retained: {data:02x})");
     }
@@ -452,9 +454,9 @@ pub fn write_range(emu: &mut GameBoy, range: Orange<u16>, byte: u8) -> Result<()
     let data: Vec<_> = iter
         .map(|addr| {
             // Perform the write
-            cpu.write(addr, byte);
+            cpu.blk.bus.write(addr, byte);
             // Check the written value
-            cpu.read(addr)
+            cpu.blk.bus.read(addr)
         })
         .collect();
     // Check if it worked
