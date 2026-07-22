@@ -30,7 +30,6 @@ pub(super) type Start = fn() -> Operation;
 /// Instruction operation state.
 #[derive(Clone, Debug)]
 pub enum Operation {
-    Bit(bit::Bit),
     Call(call::Call),
     Ccf(ccf::Ccf),
     Cp(cp::Cp),
@@ -82,7 +81,6 @@ impl Execute for Operation {
     #[rustfmt::skip]
     fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>> {
         match self {
-            Operation::Bit(inner)    => inner.exec(code, cpu),
             Operation::Call(inner)   => inner.exec(code, cpu),
             Operation::Ccf(inner)    => inner.exec(code, cpu),
             Operation::Cp(inner)     => inner.exec(code, cpu),
