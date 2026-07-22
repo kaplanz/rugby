@@ -1,71 +1,47 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Error, Execute, Operation, Return, help};
+use super::{Cpu, Exec, Instruction, help};
 
-pub const fn default() -> Operation {
-    Operation::Add(Add::Fetch)
+pub const fn default() -> Exec {
+    cycle2
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum Add {
-    #[default]
-    Fetch,
-    Execute(u8),
-}
-
-impl Execute for Add {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch        => fetch(code, cpu),
-            Self::Execute(op2) => execute(code, cpu, op2),
-        }
-    }
-}
-
-impl From<Add> for Operation {
-    fn from(value: Add) -> Self {
-        Self::Add(value)
-    }
-}
-
-fn fetch(code: u8, cpu: &mut Cpu) -> Return {
+fn cycle2(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Check opcode
     match code {
         0x86 => {
-            // Read [HL]
-            let op2 = cpu.readbyte();
+            // Read Z <- [HL]
+            let z = cpu.readbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Add::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0xc6 => {
-            // Fetch n8 <- [PC++]
-            let op2 = cpu.fetchbyte();
+            // Fetch Z <- [PC++]
+            let z = cpu.fetchbyte();
+            cpu.reg.z.store(z);
             // Proceed
-            Ok(Some(Add::Execute(op2).into()))
+            cpu.step(cycle3)
         }
         0x80..=0x87 => {
-            // Prepare op2
-            let op2 = help::get_op8(cpu, code & 0x07);
+            // Prepare Z
+            let z = help::get_op8(cpu, code & 0x07);
+            cpu.reg.z.store(z);
             // Continue
-            execute(code, cpu, op2)
+            cycle3(code, cpu)
         }
-        code => Err(Error::Opcode(code)),
+        code => unreachable!("unexpected opcode: {code:#04X}"),
     }
 }
 
-fn execute(_: u8, cpu: &mut Cpu, op2: u8) -> Return {
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Execute ADD
     let acc = cpu.reg.a.load();
-    let (res, carry) = acc.overflowing_add(op2);
+    let op2 = cpu.reg.z.load();
+    let (res, f) = cpu.blk.alu.add(acc, op2, cpu.reg.f);
     cpu.reg.a.store(res);
-
-    // Set flags
-    cpu.reg.f.set_z(res == 0);
-    cpu.reg.f.set_n(false);
-    cpu.reg.f.set_h(0x0f < (acc & 0x0f) + (op2 & 0x0f));
-    cpu.reg.f.set_c(carry);
+    cpu.reg.f = f;
 
     // Finish
-    Ok(None)
+    None
 }
