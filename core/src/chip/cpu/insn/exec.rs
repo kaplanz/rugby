@@ -30,7 +30,6 @@ pub(super) type Start = fn() -> Operation;
 /// Instruction operation state.
 #[derive(Clone, Debug)]
 pub enum Operation {
-    Int(int::Int),
     Jp(jp::Jp),
     Jr(jr::Jr),
     Ld(ld::Ld),
@@ -69,7 +68,6 @@ impl Execute for Operation {
     #[rustfmt::skip]
     fn exec(self, code: u8, cpu: &mut Cpu) -> Result<Option<Operation>> {
         match self {
-            Operation::Int(inner)    => inner.exec(code, cpu),
             Operation::Jp(inner)     => inner.exec(code, cpu),
             Operation::Jr(inner)     => inner.exec(code, cpu),
             Operation::Ld(inner)     => inner.exec(code, cpu),
@@ -140,11 +138,6 @@ pub(super) fn legacy(code: u8, cpu: &mut Cpu) -> Option<Instruction> {
             None
         }
     }
-}
-
-/// Constructs the interrupt service routine's operation.
-pub(super) fn vector() -> Operation {
-    Operation::Int(int::Int::Fetch)
 }
 
 /// Arithmetic add with carry.

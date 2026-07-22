@@ -1,81 +1,52 @@
 use rugby_arch::reg::Register;
 
-use super::{Cpu, Execute, Ime, Operation, Return};
+use super::{Cpu, Exec, Instruction};
 use crate::chip::irq::Interrupt;
 
-#[derive(Clone, Debug, Default)]
-pub enum Int {
-    #[default]
-    Fetch,
-    Nop,
-    Push0,
-    Push1(u8),
-    Jump(Option<Interrupt>),
+pub const fn default() -> Exec {
+    cycle2
 }
 
-impl Execute for Int {
-    #[rustfmt::skip]
-    fn exec(self, code: u8, cpu: &mut Cpu) -> Return {
-        match self {
-            Self::Fetch      => fetch(code, cpu),
-            Self::Nop        => nop(code, cpu),
-            Self::Push0      => push0(code, cpu),
-            Self::Push1(ena) => push1(code, cpu, ena),
-            Self::Jump(int)  => jump(code, cpu, int),
-        }
-    }
-}
-
-impl From<Int> for Operation {
-    fn from(value: Int) -> Self {
-        Self::Int(value)
-    }
-}
-
-fn fetch(_: u8, cpu: &mut Cpu) -> Return {
-    // Disable interrupts
-    cpu.etc.ime = Ime::Disabled;
+fn cycle2(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Delay by 1 cycle
 
     // Proceed
-    Ok(Some(Int::Nop.into()))
+    cpu.step(cycle3)
 }
 
-fn nop(_: u8, _: &mut Cpu) -> Return {
-    // Execute NOP
-
-    // Proceed
-    Ok(Some(Int::Push0.into()))
-}
-
-fn push0(_: u8, cpu: &mut Cpu) -> Return {
+fn cycle3(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Load MSB
     let msb = cpu.reg.pc.load().to_le_bytes()[1];
 
     // Push MSB -> [--SP]
     cpu.pushbyte(msb);
 
-    // Sample IE after the high push
-    let ena = cpu.irq.ena();
+    // Sample Z <- IE after the high push
+    cpu.reg.z.store(cpu.irq.ena());
 
     // Proceed
-    Ok(Some(Int::Push1(ena).into()))
+    cpu.step(cycle4)
 }
 
-fn push1(_: u8, cpu: &mut Cpu, ena: u8) -> Return {
+fn cycle4(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
     // Load LSB
     let lsb = cpu.reg.pc.load().to_le_bytes()[0];
 
     // Push LSB -> [--SP]
     cpu.pushbyte(lsb);
 
-    // Re-derive the dispatched interrupt after the pushes
-    let int = (ena & cpu.irq.flg()).try_into().ok();
+    // Combine Z <- Z & IF after the low push
+    let z = cpu.reg.z.load() & cpu.irq.flg();
+    cpu.reg.z.store(z);
 
     // Proceed
-    Ok(Some(Int::Jump(int).into()))
+    cpu.step(cycle5)
 }
 
-fn jump(_: u8, cpu: &mut Cpu, int: Option<Interrupt>) -> Return {
+fn cycle5(_: u8, cpu: &mut Cpu) -> Option<Instruction> {
+    // Derive the dispatched interrupt from Z
+    let int: Option<Interrupt> = cpu.reg.z.load().try_into().ok();
+
     // Acknowledge the interrupt
     if let Some(int) = int {
         cpu.irq.clear(int);
@@ -91,6 +62,13 @@ fn jump(_: u8, cpu: &mut Cpu, int: Option<Interrupt>) -> Return {
             .unwrap_or_default(),
     ]));
 
+    // Proceed
+    cpu.step(cycle6)
+}
+
+fn cycle6(_: u8, _: &mut Cpu) -> Option<Instruction> {
+    // Delay by 1 cycle
+
     // Finish
-    Ok(None)
+    None
 }
