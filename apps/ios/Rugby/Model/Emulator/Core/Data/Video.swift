@@ -26,7 +26,11 @@ final class Video: @unchecked Sendable {
     func push(frame: Frame) {
         queue.async {
             // Draw frame to image
-            self.image = Self.draw(frame: frame)
+            let image = Self.draw(frame: frame)
+            // Publish on the main thread
+            DispatchQueue.main.async {
+                self.image = image
+            }
         }
     }
 
