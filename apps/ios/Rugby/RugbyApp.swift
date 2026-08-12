@@ -65,12 +65,17 @@ struct RugbyApp: App {
 }
 
 extension RugbyApp {
+    /// Enables audio playback.
     func enableAudio() {
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(.playback, options: [.mixWithOthers])
-            try session.setActive(true)
-        } catch { err.log(error) }
+        Task.detached(priority: .userInitiated) {
+            do {
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, options: [.mixWithOthers])
+                try session.setActive(true)
+            } catch {
+                log.error("failed to enable audio: \(error)")
+            }
+        }
     }
 }
 
