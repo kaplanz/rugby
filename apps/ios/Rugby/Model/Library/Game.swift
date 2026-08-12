@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -14,8 +15,13 @@ final class Game {
     /// Game folder.
     let path: Folder
 
-    init(path: URL) throws {
-        self.path = .init(game: path)
+    /// Game metadata.
+    let meta: Metadata
+
+    init(path: URL, meta: Metadata? = nil) throws {
+        let folder = Folder(game: path)
+        self.path = folder
+        self.meta = meta ?? .init(path: folder.root)
         self.data = try Data(contentsOf: path)
     }
 
@@ -47,6 +53,17 @@ final class Game {
         /// Title icon.
         var icon: URL {
             root.appending(component: name).appendingPathExtension("png")
+        }
+    }
+
+    /// Persistent game metadata.
+    @Model
+    final class Metadata {
+        /// Folder root.
+        @Attribute(.unique) var path: URL
+
+        init(path: URL) {
+            self.path = path
         }
     }
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import RugbyKit
+import SwiftData
 import UniformTypeIdentifiers
 
 extension UTType {
@@ -23,8 +24,27 @@ final class Library {
     /// Library games.
     var games: [Game] = []
 
+    /// Metadata store.
+    private let store = ModelContext(try! ModelContainer(for: Game.Metadata.self))
+
     init() {
+        store.autosaveEnabled = true
         try? reload()
+    }
+
+    /// Looks up a game's metadata, creating it if absent.
+    private func entry(game: URL) -> Game.Metadata {
+        let path = game.deletingLastPathComponent()
+        // Query existing metadata
+        if let meta = try? store.fetch(
+            FetchDescriptor<Game.Metadata>(predicate: #Predicate { $0.path == path })
+        ).first {
+            return meta
+        }
+        // Register new metadata
+        let meta = Game.Metadata(path: path)
+        store.insert(meta)
+        return meta
     }
 
     /// Synchronizes the library from the filesystem.
@@ -62,7 +82,14 @@ final class Library {
         }
         // Construct game
         .compactMap {
-            try Game(path: $0)
+            try Game(path: $0, meta: entry(game: $0))
+        }
+
+        // Forget removed games
+        let paths = games.map(\.path.root)
+        for meta in try store.fetch(FetchDescriptor<Game.Metadata>())
+        where !paths.contains(meta.path) {
+            store.delete(meta)
         }
     }
 
@@ -164,8 +191,11 @@ final class Library {
                 try fs.moveItem(at: old, to: new)
             }
         // Rename game directory
-        let dst = src.deletingLastPathComponent().appendingPathComponent(name)
+        let dst = src.deletingLastPathComponent().appending(
+            component: name, directoryHint: .isDirectory)
         try fs.moveItem(at: src, to: dst)
+        // Rename game metadata
+        game.meta.path = dst
 
         // Reload game library
         try reload()
