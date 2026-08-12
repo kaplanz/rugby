@@ -38,7 +38,6 @@ final class Video: @unchecked Sendable {
     static func draw(frame: Frame) -> CGImage? {
         // Use frame indices directly (no colour lookup)
         let pal = Options().data.pal.data
-        let buf = Data(frame)
 
         // Convert palette to colour table data
         let data = Array(
@@ -77,7 +76,7 @@ final class Video: @unchecked Sendable {
             bytesPerRow: wd,
             space: space,
             bitmapInfo: CGBitmapInfo(rawValue: 0),
-            provider: CGDataProvider(data: buf as CFData)!,
+            provider: CGDataProvider(data: frame as CFData)!,
             decode: nil,
             shouldInterpolate: true,
             intent: .defaultIntent
