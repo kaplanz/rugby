@@ -58,20 +58,28 @@ struct LibraryItem<V: View>: View {
                     }
                 }
                 Section {
-                    !game.star
+                    !game.meta.star
                         ? Button("Favourite", systemImage: "star") {
-                            withAnimation { game.star.toggle() }
+                            withAnimation { game.meta.star.toggle() }
                         }
                         : Button("Unfavourite", systemImage: "star.slash") {
-                            withAnimation { game.star.toggle() }
+                            withAnimation { game.meta.star.toggle() }
                         }
                 }
-                .disabled(true)
                 Section {
                     Button("Delete", systemImage: "trash", role: .destructive) {
                         delete.toggle()
                     }
                 }
+            }
+            .swipeActions(edge: .leading) {
+                Button(
+                    game.meta.star ? "Unfavourite" : "Favourite",
+                    systemImage: game.meta.star ? "star.slash" : "star"
+                ) {
+                    withAnimation { game.meta.star.toggle() }
+                }
+                .tint(.yellow)
             }
             .onTapGesture {
                 do { try app.play(game) } catch { err.log(error) }

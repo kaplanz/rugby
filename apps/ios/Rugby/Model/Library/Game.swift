@@ -62,13 +62,13 @@ final class Game {
         /// Folder root.
         @Attribute(.unique) var path: URL
 
+        /// Favourite game.
+        var star: Bool = false
+
         init(path: URL) {
             self.path = path
         }
     }
-
-    /// Favourite game.
-    var star: Bool = false
 
     /// Cartridge title.
     var name: String {
