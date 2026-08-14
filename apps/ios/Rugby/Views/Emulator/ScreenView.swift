@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct ScreenView: View {
+    /// Emulator instance.
+    let emu: Emulator
+
     /// Render frame.
-    @State var frame: UIImage?
+    private var frame: UIImage? {
+        emu.frame.map { UIImage(cgImage: $0) }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -31,14 +36,14 @@ struct ScreenView: View {
 }
 
 #Preview {
-    ScreenView()
+    ScreenView(emu: .init())
 }
 
 struct Screen: View {
     @Environment(Options.self) private var opt
 
     /// Render frame.
-    @State var frame: UIImage?
+    let frame: UIImage?
 
     /// Missing frame.
     private var empty: UIImage {
@@ -88,5 +93,5 @@ struct Screen: View {
 }
 
 #Preview {
-    Screen()
+    Screen(frame: nil)
 }

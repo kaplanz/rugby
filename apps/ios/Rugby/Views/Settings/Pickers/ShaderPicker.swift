@@ -22,7 +22,6 @@ struct ShaderPicker: View {
             // Preview
             Section {
                 Screen(frame: frame)
-                    .id(frame)
             }
             .listRowBackground(Color.clear)
             .listRowInsets(.all, 8)

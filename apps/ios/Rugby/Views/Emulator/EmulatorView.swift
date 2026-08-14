@@ -34,17 +34,11 @@ struct EmulatorView: View {
         !isPaused && !showInfo && !showConf && scenePhase == .active
     }
 
-    /// Video output frame.
-    private var frame: UIImage? {
-        emu.frame.map { UIImage(cgImage: $0) }
-    }
-
     var body: some View {
         GeometryReader { geo in
             if geo.size.height > geo.size.width {
                 VStack {
-                    ScreenView(frame: frame)
-                        .id(frame)
+                    ScreenView(emu: emu)
                     Spacer()
                     JoypadView(emu.input(_:state:))
                     Spacer()
@@ -53,8 +47,7 @@ struct EmulatorView: View {
                 HStack {
                     JoypadView(emu.input(_:state:), part: .left)
                     Spacer()
-                    ScreenView(frame: frame)
-                        .id(frame)
+                    ScreenView(emu: emu)
                     Spacer()
                     JoypadView(emu.input(_:state:), part: .right)
                 }
