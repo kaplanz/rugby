@@ -54,6 +54,7 @@ struct PlaybackSettings: View {
             // HUD
             Section {
                 Toggle("Enable HUD", systemImage: "info.windshield", isOn: $cfg.hud)
+                    .disabled(true)
             } footer: {
                 Text(
                     """
