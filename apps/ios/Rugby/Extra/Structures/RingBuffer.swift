@@ -32,7 +32,10 @@ public final class RingBuffer<T> {
     /// Create buffer with a power-of-two capacity.
     public init(capacity: Int = 1 << 12) {
         // Initialize capacity
-        precondition((capacity & (capacity - 1)) == 0, "capacity must be power of two")
+        precondition(
+            capacity > 0 && (capacity & (capacity - 1)) == 0,
+            "capacity must be a positive power of two"
+        )
         size = UInt64(capacity)
 
         // Initialize storage
@@ -47,69 +50,75 @@ public final class RingBuffer<T> {
     }
 
     /// Number of items in the buffer.
-    var count: Int {
-        let tail = self.tail.load(ordering: .acquiring)
+    public var count: Int {
         let head = self.head.load(ordering: .acquiring)
-        return Int(tail &- head)
+        let tail = self.tail.load(ordering: .acquiring)
+        return Int(min(tail &- head, size))
     }
 
     /// Checks if the queue is empty.
-    var isEmpty: Bool {
-        let tail = self.tail.load(ordering: .acquiring)
-        let head = self.head.load(ordering: .acquiring)
-        return head == tail
+    public var isEmpty: Bool {
+        count == 0
     }
 
     /// Clears the buffer.
     ///
-    /// This should be called by the consumer.
+    /// This must be called by the consumer.
     public func clear() {
         let tail = self.tail.load(ordering: .acquiring)
+        let head = self.head.load(ordering: .relaxed)
 
-        // Reinitialize storage
-        data.initialize(repeating: nil, count: Int(size))
-        // Clear read pointer
+        // Discard queued values, which may wrap
+        let slot = Int(head & mask)
+        let used = Int(tail &- head)
+        let wrap = min(used, Int(size) - slot)
+        data.advanced(by: slot).update(repeating: nil, count: wrap)
+        data.update(repeating: nil, count: used - wrap)
+        // Advance read pointer
         self.head.store(tail, ordering: .releasing)
     }
 
     /// Push a value. (Lock-free.)
     ///
-    /// This should be called by the producer.
+    /// This must be called by the producer.
+    ///
+    /// # Returns
+    ///
+    /// Returns an indicator on whether the value was queued.
     ///
     /// # Note
     ///
-    /// If buffer is full, the oldest value is dropped.
-    public func push(_ value: T) {
-        let tail = self.tail.load(ordering: .acquiring)
-        var head = self.head.load(ordering: .acquiring)
+    /// If buffer is full, the pushed value is dropped.
+    @discardableResult
+    public func push(_ value: T) -> Bool {
+        let tail = self.tail.load(ordering: .relaxed)
+        let head = self.head.load(ordering: .acquiring)
 
         // Ensure buffer is not full
-        if tail &- head >= size {
-            // Drop oldest to make room
-            head = self.head.loadThenWrappingIncrement(ordering: .acquiringAndReleasing)
-            data.advanced(by: Int(head & mask)).pointee = .none
-        }
+        guard tail &- head < size else { return false }
 
         // Append value at tail
         data.advanced(by: Int(tail & mask)).pointee = .some(value)
         // Advance tail to publish
-        self.tail.wrappingIncrement(ordering: .acquiringAndReleasing)
+        self.tail.store(tail &+ 1, ordering: .releasing)
+
+        return true
     }
 
     /// Pop a value. (Lock-free.)
     ///
-    /// This should be called by the consumer.
+    /// This must be called by the consumer.
     public func pop() -> T? {
+        let head = self.head.load(ordering: .relaxed)
         let tail = self.tail.load(ordering: .acquiring)
-        let head = self.head.load(ordering: .acquiring)
 
         // Ensure buffer is non-empty
-        guard tail > head else { return nil }
+        guard tail &- head > 0 else { return nil }
 
         // Read value at head
         let value = data.advanced(by: Int(head & mask)).pointee.take()
         // Advance head to remove
-        self.head.wrappingIncrement(ordering: .acquiringAndReleasing)
+        self.head.store(head &+ 1, ordering: .releasing)
 
         // Return obtained value
         return value
