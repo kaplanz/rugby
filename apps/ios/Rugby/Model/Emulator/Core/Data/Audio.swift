@@ -18,7 +18,7 @@ extension Audio {
 @Observable
 final class Audio {
     /// Sample storage.
-    private var data: RingBuffer<Sample>?
+    private let data: RingBuffer<Sample> = .init()
     /// Audio sampler.
     private var play: Playback?
 
@@ -28,7 +28,7 @@ final class Audio {
 
     /// Publish an audio sample.
     func push(sample: Sample) {
-        data?.push(sample)
+        data.push(sample)
     }
 
     /// Resume audio.
@@ -51,18 +51,17 @@ final class Audio {
         // Reset engine
         play?.engine.reset()
         // Clear buffer
-        play?.sample.clear()
+        data.clear()
     }
 
     /// Re-time audio.
     func retime(rate: UInt32) {
         // Stop old engine
         self.stop()
-        // Make new buffer
-        let capacity = 4096 << max(CLOCK.leadingZeroBitCount - rate.leadingZeroBitCount, 0)
-        data = .init(capacity: capacity)
+        // Clear old samples
+        data.clear()
         // Make new engine
-        play = .init(data: data!, rate: rate)
+        play = .init(data: data, rate: rate)
         // Play new engine
         self.start()
     }
