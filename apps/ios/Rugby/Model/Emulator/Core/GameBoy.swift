@@ -261,13 +261,8 @@ private func main(cxn: Connect) {
         // as doing so more often impacts performance and shouldn't be
         // noticeable to users. This improves overall emulation
         // efficiency.
-        if let events = cxn.input.queue.withLockIfAvailable({ queue in
-            defer { queue.removeAll() }
-            return queue
-        }) {
-            events.forEach { (input, state) in
-                (state ? emu.press : emu.release)(input)
-            }
+        while let (input, state) = cxn.input.queue.pop() {
+            (state ? emu.press : emu.release)(input)
         }
 
         // Report performance

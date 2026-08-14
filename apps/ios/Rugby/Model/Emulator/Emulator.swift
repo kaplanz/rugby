@@ -90,9 +90,7 @@ final class Emulator {
 
     /// Forward user input.
     func input(_ input: RugbyKit.Button, state: Bool) {
-        core.input.queue.withLock { queue in
-            queue.append((input, state))
-        }
+        core.input.queue.push((input, state))
     }
 
     /// Report performance.

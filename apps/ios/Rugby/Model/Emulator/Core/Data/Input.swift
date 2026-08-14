@@ -7,10 +7,14 @@
 
 import Foundation
 import RugbyKit
-import Synchronization
+
+extension Input {
+    /// A single input event.
+    typealias Event = (input: Button, state: Bool)
+}
 
 /// Input driver.
 final class Input {
-    /// Input events.
-    let queue: Mutex<[(input: Button, state: Bool)]> = .init([])
+    /// Event storage.
+    let queue: RingBuffer<Event> = .init(capacity: 64)
 }
