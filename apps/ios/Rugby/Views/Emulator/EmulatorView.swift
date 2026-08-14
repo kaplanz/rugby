@@ -54,6 +54,7 @@ struct EmulatorView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea(.container, edges: .bottom)
         .background(back)
         .toolbar {
             ToolbarSpacer(placement: .bottomBar)
