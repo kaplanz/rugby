@@ -57,5 +57,6 @@ struct GameIcon: View {
         .flatMap({ try? Game(path: $0) })
     {
         GameIcon(game: game)
+            .environment(Options())
     }
 }

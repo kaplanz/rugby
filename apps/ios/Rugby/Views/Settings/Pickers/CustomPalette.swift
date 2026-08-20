@@ -60,4 +60,5 @@ struct CustomPalette: View {
 
 #Preview {
     CustomPalette(pal: .constant(.default))
+        .environment(Options())
 }

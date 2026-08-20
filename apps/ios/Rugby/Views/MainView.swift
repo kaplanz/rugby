@@ -136,4 +136,5 @@ struct MainView: View {
         .environment(Failure())
         .environment(Options())
         .environment(Library())
+        .environment(Gamepad())
 }

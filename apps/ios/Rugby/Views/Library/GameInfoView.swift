@@ -226,6 +226,9 @@ struct GameInfoView: View {
         .flatMap({ try? Game(path: $0) })
     {
         GameInfoView(game: game)
+            .environment(Runtime())
+            .environment(Failure())
+            .environment(Options())
     }
 }
 

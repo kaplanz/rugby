@@ -168,4 +168,6 @@ private struct Row: View {
     }
     .environment(Failure())
     .environment(Library())
+    .environment(Runtime())
+    .environment(Options())
 }

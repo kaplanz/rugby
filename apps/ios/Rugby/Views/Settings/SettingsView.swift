@@ -150,6 +150,7 @@ struct SettingsView: View {
     .environment(Failure())
     .environment(Library())
     .environment(Options())
+    .environment(Gamepad())
 }
 
 private struct SettingsLabel: View {

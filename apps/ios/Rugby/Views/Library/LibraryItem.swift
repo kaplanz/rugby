@@ -133,5 +133,6 @@ struct LibraryItem<V: View>: View {
         .environment(Runtime())
         .environment(Failure())
         .environment(Library())
+        .environment(Options())
     }
 }

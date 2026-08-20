@@ -194,4 +194,7 @@ struct EmulatorView: View {
     }
     .environment(Runtime())
     .environment(Failure())
+    .environment(Library())
+    .environment(Options())
+    .environment(Gamepad())
 }

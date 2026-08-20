@@ -100,6 +100,7 @@ struct ControlsSettings: View {
 #Preview {
     ControlsSettings()
         .environment(Options())
+        .environment(Gamepad())
 }
 
 extension RugbyKit.Button {

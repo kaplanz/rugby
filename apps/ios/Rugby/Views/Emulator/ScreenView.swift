@@ -37,6 +37,7 @@ struct ScreenView: View {
 
 #Preview {
     ScreenView(emu: .init())
+        .environment(Options())
 }
 
 struct Screen: View {
@@ -94,4 +95,5 @@ struct Screen: View {
 
 #Preview {
     Screen(frame: nil)
+        .environment(Options())
 }
