@@ -34,7 +34,10 @@ struct ControlsSettings: View {
                                     if let battery = gamepad.battery {
                                         Text("-")
                                         HStack(spacing: 2) {
-                                            Battery(battery: battery)
+                                            BatteryIcon(
+                                                level: battery.batteryLevel,
+                                                state: battery.batteryState
+                                            )
                                                 .font(.body)
                                             Text(
                                                 battery.batteryLevel

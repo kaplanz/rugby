@@ -129,6 +129,7 @@ struct LibraryItem<V: View>: View {
         LibraryItem(game: game) {
             GameIcon(game: game)
                 .frame(width: 160, height: 144)
+                .containerShape(.rect(cornerRadius: 12))
         }
         .environment(Runtime())
         .environment(Failure())

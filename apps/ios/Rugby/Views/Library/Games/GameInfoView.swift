@@ -39,11 +39,12 @@ struct GameInfoView: View {
                 // Icon
                 HStack {
                     GameIcon(game: game)
-                        .background(.clear, in: .rect(cornerRadius: 12))
                         .frame(maxHeight: 286)
-                        .shadow(radius: 6, y: 4)
+                        .containerShape(.rect(cornerRadius: 12))
+                        .shadow(color: .secondary.opacity(0.25), radius: 4, y: 4)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.bottom, 8)
                 // Name
                 Text(game.name)
                     .font(.title2)

@@ -73,22 +73,13 @@ struct MainView: View {
                         }
                     }
                 }
+                .navigationDestination(isPresented: $showSettings) {
+                    SettingsView()
+                }
         }
         .fullScreenCover(isPresented: showEmulator) {
             NavigationStack {
                 EmulatorView(emu: app.emu!)
-            }
-        }
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                SettingsView()
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done", systemImage: "checkmark", role: .confirm) {
-                                showSettings.toggle()
-                            }
-                        }
-                    }
             }
         }
         .sheet(isPresented: $showControls) {
